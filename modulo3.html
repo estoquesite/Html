@@ -2,47 +2,85 @@
 <html lang="pt-PT">
 <head>
 <meta charset="UTF-8">
-<title>Cronograma de Férias e Aniversários - Vale</title>
+<title>Módulo 3 - Cronograma de Férias e Aniversários | Portal Vale v02</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; color: #2c3e50; min-height: 100vh; padding: 12px; }
-.painel-controle { background: #fff; padding: 14px 18px; margin: 0 auto 14px auto; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; max-width: 1120px; display: flex; justify-content: space-between; align-items: center; }
-.btn { cursor: pointer; padding: 6px 12px; font-size: 10.5px; font-weight: 700; border: none; border-radius: 5px; color: #fff; }
+body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #f0f4f8; color: #1e293b; min-height: 100vh; padding: 16px; }
+
+/* PAINEL DE CONTROLO MODERNO */
+.painel-controle { background: #ffffff; padding: 18px 22px; margin: 0 auto 16px auto; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; max-width: 1120px; display: flex; justify-content: space-between; align-items: center; }
+.topo-modulo-info { display: flex; align-items: center; gap: 8px; }
+.badge-modulo { background: linear-gradient(135deg, #b91c1c, #991b1b); color: #fff; font-size: 11.5px; font-weight: 800; padding: 5px 12px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.8px; box-shadow: 0 4px 10px rgba(185,28,28,0.2); }
+.tag-v02 { background-color: #f59e0b; color: #fff; font-weight: 800; font-size: 10px; padding: 2px 7px; border-radius: 4px; margin-left: 6px; }
+
+/* BOTÕES MODERNOS */
+.botoes-painel { display: flex; gap: 8px; align-items: center; }
+.btn { cursor: pointer; padding: 7px 14px; font-size: 11px; font-weight: 700; border: none; border-radius: 6px; color: #fff; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
+.btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
 .btn-vinho { background-color: #991b1b; } 
-.btn-voltar { background-color: #475569; text-decoration: none; display: inline-flex; align-items: center; padding: 6px 12px; font-size: 10.5px; font-weight: 700; border-radius: 5px; color: #fff; } 
+.btn-voltar { background-color: #475569; text-decoration: none; } 
 .btn-imprimir { background-color: #0f172a; }
-.folha-a4 { width: 100%; max-width: 1120px; background: #fff; padding: 8px 10px; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-radius: 4px; }
-table.tabela-ferias { width: 100%; border-collapse: collapse; border: 1.2px solid #334155; table-layout: fixed; }
-table.tabela-ferias th, table.tabela-ferias td { border: 1px solid #334155; text-align: center; vertical-align: middle; font-size: 7px; height: 18px; }
-table.tabela-ferias th { background-color: #ffc000; color: #000; font-weight: 800; }
+
+/* FOLHA A4 TOTALMENTE PREENCHIDA */
+.folha-a4 { width: 100%; max-width: 1120px; background: #fff; padding: 16px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-radius: 10px; border: 1px solid #e2e8f0; min-height: 75vh; display: flex; flex-direction: column; justify-content: space-between; }
+
+/* TABELA DE FÉRIAS MODERNA */
+table.tabela-ferias { width: 100%; border-collapse: collapse; border: 1.5px solid #334155; table-layout: fixed; flex-grow: 1; }
+table.tabela-ferias th, table.tabela-ferias td { border: 1px solid #475569; text-align: center; vertical-align: middle; font-size: 7.5px; height: 26px; padding: 1px; }
+table.tabela-ferias th { background-color: #f59e0b; color: #0f172a; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px; }
+
+/* CÉLULAS EDITÁVEIS COM TOQUE MODERNO (ESTILO LÁPIS/FOCO) */
+table.tabela-ferias td[contenteditable="true"] { transition: background 0.15s; cursor: text; }
+table.tabela-ferias td[contenteditable="true"]:hover { background-color: #f8fafc; }
+table.tabela-ferias td[contenteditable="true"]:focus { background-color: #fef3c7; outline: 1.5px solid #f59e0b; box-shadow: inset 0 0 0 1px #f59e0b; }
+
+/* COLUNAS ESPECÍFICAS */
+.col-mes { width: 45px; background: #991b1b; color: #fff; font-weight: 800; }
+.col-nome-container { display: flex; align-items: center; justify-content: space-between; padding: 0 6px; width: 100%; }
+.col-nome-texto { flex-grow: 1; text-align: left; outline: none; white-space: nowrap; overflow: hidden; font-size: 8px; font-weight: 700; color: #fff; text-transform: uppercase; }
+.col-niver { width: 45px; background: #991b1b; color: #fff; font-weight: 800; }
+.col-saldo { width: 35px; font-weight: 800; background: #f8fafc; }
+
+/* BOTÕES DE AÇÃO E LIXEIRA DISCRETOS */
+.botoes-acoes { display: flex; align-items: center; gap: 2px; opacity: 0.3; transition: opacity 0.2s; }
+tr:hover .botoes-acoes { opacity: 1; }
+.btn-acao { background: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.5); border-radius: 3px; cursor: pointer; padding: 1px 4px; font-size: 8px; line-height: 1; color: #fff; transition: 0.15s; }
+.btn-acao:hover { background: rgba(255,255,255,0.5); transform: scale(1.1); }
+.btn-lixeira { color: #fecaca; }
+
 @media print {
     @page { size: A4 landscape; margin: 4mm 5mm; }
     body { background: #fff !important; padding: 0 !important; }
-    .painel-controle { display: none !important; }
-    .folha-a4 { box-shadow: none !important; width: 100% !important; max-width: 100% !important; }
+    .painel-controle, .botoes-acoes { display: none !important; }
+    .folha-a4 { box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; min-height: 98vh !important; }
 }
 </style>
 </head>
 <body>
+
     <div class="painel-controle">
-        <h3 style="margin: 0; font-size: 14px; font-weight: 800; color: #b91c1c;">Cronograma de Férias e Aniversários</h3>
-        <div style="display: flex; gap: 6px;">
-            <button type="button" class="btn btn-vinho" onclick="addLinhaFerias()">➕ Adicionar Colaborador</button>
-            <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir Férias</button>
-            <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
+        <div class="topo-modulo-info">
+            <span class="badge-modulo">Módulo 3: Férias e Aniversários <span class="tag-v02">v02</span></span>
+        </div>
+        <div class="botoes-painel">
+            <button type="button" class="btn btn-vinho" onclick="addLinhaFerias()">➕ Adicionar</button>
+            <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
+            <a href="index.html" class="btn btn-voltar">⬅ Menu</a>
         </div>
     </div>
+
     <div class="folha-a4">
-        <div style="background: #007e7a; color: #fff; text-align: center; font-weight: 900; font-size: 10px; padding: 4px; margin-bottom: 2px;">CRONOGRAMA DE FÉRIAS E ANIVERSÁRIOS 2026</div>
+        <div style="background: linear-gradient(135deg, #007e7a, #005a57); color: #fff; text-align: center; font-weight: 900; font-size: 11px; padding: 6px; border-radius: 6px; margin-bottom: 6px; letter-spacing: 0.5px;">CRONOGRAMA ANUAL DE FÉRIAS E ANIVERSÁRIOS 2026</div>
+        
         <table class="tabela-ferias">
             <thead>
                 <tr>
-                    <th rowspan="2" style="width:45px;">MÊS</th>
-                    <th rowspan="2" style="width:160px;">PESSOAS</th>
-                    <th rowspan="2" style="width:45px;">NIVER</th>
+                    <th rowspan="2" style="width:50px;">MÊS</th>
+                    <th rowspan="2" style="width:180px;">PESSOAS (COLABORADOR)</th>
+                    <th rowspan="2" style="width:50px;">NIVER</th>
                     <th colspan="2">Jan</th><th colspan="2">Fev</th><th colspan="2">Mar</th><th colspan="2">Abr</th><th colspan="2">Mai</th><th colspan="2">Jun</th>
                     <th colspan="2">Jul</th><th colspan="2">Ago</th><th colspan="2">Set</th><th colspan="2">Out</th><th colspan="2">Nov</th><th colspan="2">Dez</th>
-                    <th rowspan="2" style="width:30px;">Saldo</th>
+                    <th rowspan="2" style="width:35px;">Saldo</th>
                 </tr>
                 <tr style="font-size:6px;">
                     <th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th>
@@ -52,6 +90,7 @@ table.tabela-ferias th { background-color: #ffc000; color: #000; font-weight: 80
             <tbody id="corpoFerias"></tbody>
         </table>
     </div>
+
     <script>
         const DADOS_F = [
             {m:"JAN", n:"MARIANA PEREIRA CRUZ", v:"11/1"}, {m:"JAN", n:"RICARDO GONCALVES DE MELLO LEITE", v:"13/1"},
@@ -66,14 +105,30 @@ table.tabela-ferias th { background-color: #ffc000; color: #000; font-weight: 80
             {m:"DEZ", n:"EMERSON RIBEIRO DOS SANTOS", v:"4/12"}, {m:"DEZ", n:"ALLAN SOUZA DE CARVALHO", v:"15/12"},
             {m:"DEZ", n:"TITO DACAL", v:"27/12"}
         ];
+
         function addLinhaFerias(m='', n='', v='') {
             const corpo = document.getElementById('corpoFerias');
             const tr = document.createElement('tr');
-            let tds = ''; for(let i=0; i<24; i++) tds += `<td contenteditable="true"></td>`;
-            tr.innerHTML = `<td style="background:#a82451; color:#fff; font-weight:800;" contenteditable="true">${m}</td><td style="background:#a82451; color:#fff; font-weight:800; text-align:left; padding-left:3px;" contenteditable="true">${n}</td><td style="background:#a82451; color:#fff; font-weight:800;" contenteditable="true">${v}</td>${tds}<td contenteditable="true" style="font-weight:800;">-</td>`;
+            let tds = ''; for(let i=0; i<24; i++) tds += `<td contenteditable="true" title="Clique para editar"></td>`;
+            tr.innerHTML = `<td class="col-mes" contenteditable="true" title="Mês">${m}</td>` +
+                `<td class="col-nome" style="background:#991b1b;"><div class="col-nome-container"><span class="col-nome-texto" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()" title="Nome do colaborador">${n}</span><div class="botoes-acoes"><button type="button" class="btn-acao btn-lixeira" onclick="removerLinhaFerias(this)" title="Remover linha">🗑️</button></div></div></td>` +
+                `<td class="col-niver" contenteditable="true" title="Aniversário">${v}</td>` +
+                tds + `<td contenteditable="true" style="font-weight:800; background:#f8fafc;" title="Saldo">-</td>`;
             corpo.appendChild(tr);
         }
-        window.onload = function() { DADOS_F.forEach(d => addLinhaFerias(d.m, d.n, d.v)); };
+
+        function removerLinhaFerias(btn) {
+            const tr = btn.closest('tr');
+            if(document.querySelectorAll('#corpoFerias tr').length > 1) {
+                tr.remove();
+            } else {
+                alert('É necessário manter pelo menos uma linha.');
+            }
+        }
+
+        window.onload = function() { 
+            DADOS_F.forEach(d => addLinhaFerias(d.m, d.n, d.v)); 
+        };
     </script>
 </body>
 </html>
