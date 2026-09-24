@@ -1,6 +1,33 @@
 <!DOCTYPE html>
 <html lang="pt-PT">
 <head>
+    <meta charset="UTF-8">
+    <title>Gerador do Portal Vale por Blocos</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; color: #2c3e50; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        .container { background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 900px; width: 100%; }
+        h2 { color: #007e7a; margin-bottom: 5px; font-size: 20px; text-align: center; }
+        p { font-size: 12px; color: #64748b; margin-bottom: 20px; text-align: center; line-height: 1.4; }
+        .bloco-grupo { margin-bottom: 15px; }
+        .bloco-grupo label { display: block; font-weight: 700; font-size: 11px; color: #1e293b; margin-bottom: 4px; text-transform: uppercase; }
+        textarea { width: 100%; height: 160px; font-family: monospace; font-size: 10px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; resize: vertical; background: #f8fafc; }
+        .acoes-geral { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+        .btn { padding: 12px 24px; font-size: 13px; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; color: #fff; transition: 0.2s; }
+        .btn-baixar { background: #1b8a5a; } .btn-baixar:hover { background: #146c46; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Gerador do Portal Vale (4 Blocos de Notas)</h2>
+    <p>Cada parte do seu portal está separada no seu respetivo bloco abaixo. Pode editar, colar dados ou juntar tudo sem limites!</p>
+    
+    <div class="bloco-grupo">
+        <label>📁 Bloco 1: Estrutura Geral, Capa e Estilos (CSS)</label>
+        <textarea id="bloco1"><!DOCTYPE html>
+<html lang="pt-PT">
+<head>
 <meta charset="UTF-8">
 <title>Portal Operacional - Vale - v01</title>
 <style>
@@ -26,7 +53,7 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
 .card-descricao { font-size: 11.5px; color: #64748b; line-height: 1.45; margin-bottom: 16px; }
 .painel-controle { background: #fff; padding: 14px 18px; margin: 0 auto 14px auto; border-radius: 8px; border: 1px solid #e2e8f0; max-width: 1120px; }
 .campos-painel { display: grid; gap: 10px; margin-bottom: 10px; }
-.grid-3 { grid-template-columns: 2fr 1fr 1fr; } .grid-4 { grid-template-columns: 2fr 1fr 1fr 1fr; }
+.grid-3 { grid-template-columns: 2fr 1fr 1fr; }
 .painel-controle label { display: block; font-weight: 700; margin-bottom: 4px; font-size: 10px; color: #475569; text-transform: uppercase; }
 .painel-controle input, .painel-controle textarea { width: 100%; font-size: 11px; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 5px; outline: none; text-transform: uppercase; }
 .botoes-painel { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
@@ -40,16 +67,28 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
 .meta-box { width: 120px; font-size: 7.5px; text-align: left; padding-left: 4px; background: #f8fafc; }
 .col-id { width: 30px; font-weight: 800; background: #f8fafc; }
 .col-nome { text-align: left; padding-left: 4px; font-weight: 800; text-transform: uppercase; white-space: nowrap; overflow: hidden; }
-.carinhas { display: flex; justify-content: space-evenly; cursor: pointer; }
-.c-item { font-size: 7px; font-weight: 800; padding: 0 2px; border-radius: 2px; }
-.c-item.sel-1 { background: #86efac; } .c-item.sel-2 { background: #fde047; } .c-item.sel-3 { background: #fca5a5; }
+.carinha-box { display: flex; justify-content: space-evenly; align-items: center; width: 100%; cursor: pointer; }
+.carinha-svg { width: 11px; height: 11px; display: block; }
+.c-verde circle.rosto { stroke: #15803d; stroke-width: 2.2; fill: #f0fdf4; } .c-verde circle.olho { fill: #15803d; } .c-verde path.boca { stroke: #15803d; stroke-width: 2.2; stroke-linecap: round; fill: none; }
+.c-amarela circle.rosto { stroke: #d97706; stroke-width: 2.2; fill: #fffbeb; } .c-amarela circle.olho { fill: #d97706; } .c-amarela line.boca { stroke: #d97706; stroke-width: 2.2; stroke-linecap: round; fill: none; }
+.c-vermelha circle.rosto { stroke: #dc2626; stroke-width: 2.2; fill: #fef2f2; } .c-vermelha circle.olho { fill: #dc2626; } .c-vermelha path.boca { stroke: #dc2626; stroke-width: 2.2; stroke-linecap: round; fill: none; }
+.carinha-item { display: flex; flex-direction: column; align-items: center; padding: 1px; border-radius: 3px; }
+.carinha-num { font-size: 5.5px; font-weight: 800; color: #334155; }
+.carinha-item.sel-1 { background-color: #bbf7d0; outline: 1px solid #15803d; }
+.carinha-item.sel-2 { background-color: #fef08a; outline: 1px solid #ca8a04; }
+.carinha-item.sel-3 { background-color: #fecaca; outline: 1px solid #dc2626; }
+.rodape-container { display: grid; grid-template-columns: 130px 1.2fr 1.6fr; gap: 5px; width: 100%; font-size: 7px; line-height: 1.25; margin-top: 4px; }
+.box-legenda { border: 1px solid #334155; padding: 3px 5px; background-color: #fff; border-radius: 3px; text-align: left; }
+.box-legenda h4 { margin: 0 0 2px 0; font-size: 7.5px; font-weight: 800; text-transform: uppercase; color: #005a57; border-bottom: 1px solid #e2e8f0; }
+.lista-legenda { list-style: none; padding: 0; margin: 0; }
+.item-emocio { display: flex; align-items: flex-start; gap: 3px; margin-bottom: 2px; }
 .mes-oculto { display: none !important; }
 .btn-tag-mes { border: 1px solid #1b8a5a; background: #e8f5e9; color: #1b5e20; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 3px; cursor: pointer; }
 .btn-tag-mes.inativo { background: #f1f5f9; color: #94a3b8; border-color: #cbd5e1; text-decoration: line-through; }
 @media print {
     @page { size: A4 landscape; margin: 4mm; }
     body { background: #fff; color: #000; }
-    #telaCapa, nav.nav-abas-topo, .painel-controle, .barra-controle-folha, .barra-acoes-folha { display: none !important; }
+    #telaCapa, nav.nav-abas-topo, .painel-controle { display: none !important; }
     .folha-a4 { box-shadow: none; padding: 0; width: 100%; height: 98vh; display: flex; flex-direction: column; justify-content: space-between; page-break-inside: avoid; page-break-after: always; }
 }
 </style>
@@ -74,28 +113,32 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
                 <div class="card-modulo m1" onclick="mudarTela('telaDDS')">
                     <div>
                         <div class="card-titulo">📋 DDS & Emociograma Semanal</div>
-                        <div class="card-descricao">Folhas de 24 linhas por página com ordenação A-Z automática e carinhas de emociograma.</div>
+                        <div class="card-descricao">Folhas completas com 24 linhas, carinhas de emociograma interativas, legendas e ordenação A-Z.</div>
                     </div>
                     <div style="color: #007e7a; font-weight: 700; font-size: 11px;">Aceder ➔</div>
                 </div>
                 <div class="card-modulo m2" onclick="mudarTela('telaMatriz')">
                     <div>
                         <div class="card-titulo">📅 Matriz de DDS (12 Meses)</div>
-                        <div class="card-descricao">Controlo anual completo com opção de ocultar/mostrar meses e grelha limpa para datas.</div>
+                        <div class="card-descricao">Controlo anual completo estendido até baixo, com opção de ocultar/mostrar meses e grelha limpa.</div>
                     </div>
                     <div style="color: #1e40af; font-weight: 700; font-size: 11px;">Aceder ➔</div>
                 </div>
                 <div class="card-modulo m3" onclick="mudarTela('telaFerias')">
                     <div>
                         <div class="card-titulo">🎉 Férias e Aniversários</div>
-                        <div class="card-descricao">Cronograma completo por colaborador com datas de aniversário e planeamento de férias de Jan a Dez.</div>
+                        <div class="card-descricao">Cronograma completo estendido até baixo com datas de aniversário e planeamento de férias por colaborador.</div>
                     </div>
                     <div style="color: #b91c1c; font-weight: 700; font-size: 11px;">Aceder ➔</div>
                 </div>
             </div>
         </main>
+    </div></textarea>
     </div>
-    <div id="telaDDS">
+
+    <div class="bloco-grupo">
+        <label>📋 Bloco 2: Módulo 1 - DDS Semanal & Emociograma</label>
+        <textarea id="bloco2">    <div id="telaDDS">
         <div class="painel-controle">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <h3 style="font-size: 13px; color: #007e7a;">DDS & Emociograma Semanal</h3>
@@ -106,17 +149,20 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
                 <div><label>Semana:</label><input type="text" id="semDDS" placeholder="38"></div>
                 <div><label>Ano:</label><input type="text" id="anoDDS" value="2026"></div>
             </div>
-            <label>Colaboradores (Um por linha - A-Z automático):</label>
+            <label>Colaboradores (Um por linha - Ordenação A-Z automática):</label>
             <textarea id="txtNomesDDS" placeholder="COLE OS NOMES AQUI..."></textarea>
             <div class="botoes-painel">
-                <button type="button" class="btn btn-verde" onclick="gerarDDS(1)">Gerar c/ Carinha 1 (A-Z)</button>
-                <button type="button" class="btn btn-azul" onclick="gerarDDS(null)">Gerar Limpo (A-Z)</button>
+                <button type="button" class="btn btn-verde" onclick="gerarDDS(1)">Gerar Folhas (A-Z)</button>
                 <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
             </div>
         </div>
         <div id="boxFolhasDDS"></div>
+    </div></textarea>
     </div>
-    <div id="telaMatriz">
+
+    <div class="bloco-grupo">
+        <label>📅 Bloco 3: Módulo 2 - Matriz Anual (12 Meses)</label>
+        <textarea id="bloco3">    <div id="telaMatriz">
         <div class="painel-controle">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <h3 style="font-size: 13px; color: #1b8a5a;">Matriz Anual de DDS</h3>
@@ -150,7 +196,7 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
             <table class="cabecalho-container">
                 <tr><td class="logo-box">VALE</td><td class="titulo-box">MATRIZ DE REGISTO DE DIÁLOGO DIÁRIO DE SEGURANÇA</td><td class="meta-box">Ano: 2026</td></tr>
             </table>
-            <table class="tabela-matriz" style="width:100%; border-collapse:collapse; border:1px solid #000;">
+            <table class="tabela-matriz">
                 <thead>
                     <tr>
                         <th style="width:25px;">Nº</th><th style="width:180px; text-align:left; padding-left:4px;">DDS</th>
@@ -162,8 +208,12 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
                 <tbody id="corpoMatriz"></tbody>
             </table>
         </div>
+    </div></textarea>
     </div>
-    <div id="telaFerias">
+
+    <div class="bloco-grupo">
+        <label>🎉 Bloco 4: Módulo 3 - Cronograma de Férias & Scripts de Execução</label>
+        <textarea id="bloco4">    <div id="telaFerias">
         <div class="painel-controle">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <h3 style="font-size: 13px; color: #991b1b;">Cronograma de Férias e Aniversários</h3>
@@ -176,7 +226,7 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
         </div>
         <div class="folha-a4">
             <div style="background: #007e7a; color: #fff; text-align: center; font-weight: 900; font-size: 10px; padding: 4px; margin-bottom: 2px;">CRONOGRAMA DE FÉRIAS E ANIVERSÁRIOS</div>
-            <table class="tabela-ferias" style="width:100%; border-collapse:collapse; border:1px solid #000;">
+            <table class="tabela-ferias">
                 <thead>
                     <tr style="background:#ffc000; font-weight:800;">
                         <th rowspan="2" style="width:45px;">MÊS</th><th rowspan="2" style="width:160px;">PESSOAS</th><th rowspan="2" style="width:45px;">NIVER</th>
@@ -204,12 +254,16 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
         }
         function carinhasHtml(s) {
             var c1 = s === 1 ? 'sel-1' : '', c2 = s === 2 ? 'sel-2' : '', c3 = s === 3 ? 'sel-3' : '';
-            return '<div class="carinhas"><span class="c-item ' + c1 + '" onclick="selCar(this,1)">1</span><span class="c-item ' + c2 + '" onclick="selCar(this,2)">2</span><span class="c-item ' + c3 + '" onclick="selCar(this,3)">3</span></div>';
+            return '<div class="carinha-box">' +
+                '<div class="carinha-item ' + c1 + '" onclick="selCar(this,1)"><span class="carinha-num">1</span><svg class="carinha-svg c-verde" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><path class="boca" d="M 9.5 18 C 12 23 20 23 22.5 18"/></svg></div>' +
+                '<div class="carinha-item ' + c2 + '" onclick="selCar(this,2)"><span class="carinha-num">2</span><svg class="carinha-svg c-amarela" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><line class="boca" x1="10" y1="20" x2="22" y2="20"/></svg></div>' +
+                '<div class="carinha-item ' + c3 + '" onclick="selCar(this,3)"><span class="carinha-num">3</span><svg class="carinha-svg c-vermelha" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><path class="boca" d="M 9.5 22 C 12 17 20 17 22.5 22"/></svg></div>' +
+                '</div>';
         }
         function selCar(el, n) {
             var p = el.parentNode;
-            p.querySelectorAll('.c-item').forEach(function(i) { i.className = 'c-item'; });
-            el.className = 'c-item sel-' + n;
+            p.querySelectorAll('.carinha-item').forEach(function(i) { i.className = 'carinha-item'; });
+            el.className = 'carinha-item sel-' + n;
         }
         function gerarDDS(padrao) {
             var box = document.getElementById('boxFolhasDDS');
@@ -236,9 +290,17 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
                 var c = carinhasHtml(nm && padrao ? padrao : null);
                 linhas += '<tr><td class="col-id">' + num + '</td><td class="col-nome" contenteditable="true">' + nm + '</td><td>' + c + '</td><td contenteditable="true"></td><td>' + c + '</td><td contenteditable="true"></td><td>' + c + '</td><td contenteditable="true"></td><td>' + c + '</td><td contenteditable="true"></td><td>' + c + '</td><td contenteditable="true"></td></tr>';
             }
-            f.innerHTML = '<table class="cabecalho-container"><tr><td class="logo-box">VALE</td><td class="titulo-box">DDS & EMOCIOGRAMA SEMANAL</td><td class="meta-box">Folha: 0' + numFolha + '/0' + (totFolhas || 1) + '</td></tr></table>' +
+            f.innerHTML = '<table class="cabecalho-container"><tr><td class="logo-box">VALE</td><td class="titulo-box">DIÁRIO DIÁRIO DE SEGURANÇA (DDS) E EMOCIOGRAMA</td><td class="meta-box">Folha: 0' + numFolha + '/0' + (totFolhas || 1) + '</td></tr></table>' +
                 '<table class="info-dds"><tr><td>PERÍODO: ' + per + '</td><td>SEMANA: ' + sem + '</td><td>ANO: ' + ano + '</td></tr></table>' +
-                '<table class="tabela-dds"><thead><tr><th rowspan="2" style="width:30px;">Nº</th><th rowspan="2" style="width:170px; text-align:left; padding-left:4px;">Colaborador</th><th colspan="2">Seg</th><th colspan="2">Ter</th><th colspan="2">Qua</th><th colspan="2">Qui</th><th colspan="2">Sex</th></tr><tr><th>Estou</th><th>Rub</th><th>Estou</th><th>Rub</th><th>Estou</th><th>Rub</th><th>Estou</th><th>Rub</th><th>Estou</th><th>Rub</th></tr></thead><tbody>' + linhas + '</tbody></table>';
+                '<table class="tabela-dds"><thead><tr><th rowspan="2" style="width:30px;">Nº</th><th rowspan="2" style="width:170px; text-align:left; padding-left:4px;">Colaborador</th><th colspan="2">Segunda</th><th colspan="2">Terça</th><th colspan="2">Quarta</th><th colspan="2">Quinta</th><th colspan="2">Sexta</th></tr><tr><th>Estou</th><th>Rub</th><th>Estou</th><th>Rub</th><th>Estou</th><th>Rub</th><th>Estou</th><th>Rub</th><th>Estou</th><th>Rub</th></tr></thead><tbody>' + linhas + '</tbody></table>' +
+                '<div class="rodape-container">' +
+                '<div class="box-legenda"><h4>LEGENDA:</h4><ul class="lista-legenda"><li><b>FE</b> = Feriado</li><li><b>AT</b> = Atestado</li><li><b>CO</b> = Compensação</li><li><b>FA</b> = Falta</li><li><b>FR</b> = Férias</li><li><b>FO</b> = Folga</li></ul></div>' +
+                '<div class="box-legenda"><h4>AÇÃO TOMADA (AMARELO/VERMELHO):</h4><ul class="lista-legenda"><li><b>EST/SUP</b> = Estratégia/Suprimentos</li><li><b>ENG</b> = ADM | <b>OP</b> = Operação</li><li><b>HOFF</b> = Home Office</li></ul></div>' +
+                '<div class="box-legenda"><h4>EMOCIOGRAMA:</h4>' +
+                '<div class="item-emocio"><svg class="carinha-svg c-verde" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><path class="boca" d="M 9.5 18 C 12 23 20 23 22.5 18"/></svg><span><b>1:</b> Plenas condições</span></div>' +
+                '<div class="item-emocio"><svg class="carinha-svg c-amarela" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><line class="boca" x1="10" y1="20" x2="22" y2="20"/></svg><span><b>2:</b> Alterado / Acompanhar</span></div>' +
+                '<div class="item-emocio"><svg class="carinha-svg c-vermelha" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><path class="boca" d="M 9.5 22 C 12 17 20 17 22.5 22"/></svg><span><b>3:</b> Sem condições</span></div>' +
+                '</div></div>';
             return f;
         }
         var visM = [true,true,true,true,true,true,true,true,true,true,true,true];
@@ -254,13 +316,13 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
             var nomes = txt.split('\n').map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 0; });
             nomes.sort(function(a, b) { return a.localeCompare(b, 'pt'); });
             document.getElementById('txtNomesMatriz').value = nomes.join('\n');
-            var lista = nomes.length > 0 ? nomes : ['', '', '', '', ''];
+            var lista = nomes.length > 0 ? nomes : ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
             lista.forEach(function(n, i) {
                 var num = (i + 1) < 10 ? '0' + (i + 1) : (i + 1);
                 var tds = '';
                 for (var m = 0; m < 12; m++) {
                     var ocl = visM[m] ? '' : 'mes-oculto';
-                    tds += '<td class="td-data-mes td-m' + m + ' ' + ocl + '" contenteditable="true" style="font-size:7.5px; height:16px;"></td>';
+                    tds += '<td class="td-data-mes td-m' + m + ' ' + ocl + '" contenteditable="true" style="font-size:7.5px; height:18px;"></td>';
                 }
                 var tr = document.createElement('tr');
                 tr.innerHTML = '<td class="col-id">' + num + '</td><td class="col-nome" contenteditable="true">' + n + '</td>' + tds;
@@ -269,22 +331,32 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
         }
         var DADOS_F = [
             {m:"JAN", n:"MARIANA PEREIRA CRUZ", v:"11/1"},
-            {m:"JAN", n:"RICARDO GONCALVES LEITE", v:"13/1"},
+            {m:"JAN", n:"RICARDO GONCALVES DE MELLO LEITE", v:"13/1"},
             {m:"JAN", n:"JOAO SILVA RAMOS", v:"18/1"},
-            {m:"FEV", n:"MARCOS AURELIO MATTOS", v:"1/2"},
+            {m:"JAN", n:"ALFREDO AUGUSTO RAMOS NETO", v:"22/1"},
+            {m:"FEV", n:"MARCOS AURELIO CATALLARES MATTOS", v:"1/2"},
             {m:"FEV", n:"VANDERSON TEIXEIRA", v:"4/2"},
+            {m:"FEV", n:"BRUNO RICARDO", v:"7/2"},
+            {m:"FEV", n:"GABRIEL CARNEIRO", v:"7/2"},
             {m:"MAR", n:"GLEIVSTON SILVA MENDES", v:"22/3"},
-            {m:"JUN", n:"ROBSON SOUZA MENDONCA", v:"4/6"},
+            {m:"JUN", n:"ROBSON DE SOUZA MENDONCA", v:"4/6"},
+            {m:"JUN", n:"PAULO HENRIQUE", v:"8/6"},
             {m:"JUL", n:"BRUNO GOMES FIDELIS", v:"2/7"},
-            {m:"AGO", n:"CAIO HENRIQUE", v:"6/8"},
+            {m:"JUL", n:"ATMISTO SILVA", v:"20/7"},
+            {m:"AGOSTO", n:"CAIO HENRIQUE", v:"6/8"},
+            {m:"AGOSTO", n:"PABLO MESQUITA", v:"25/8"},
+            {m:"AGOSTO", n:"DAVID MARCELO DELGADO DOS SANTOS", v:"26/8"},
             {m:"NOV", n:"DOMINIQUE SILVA", v:"2/11"},
-            {m:"DEZ", n:"EMERSON RIBEIRO SANTOS", v:"4/12"}
+            {m:"NOV", n:"RICHARD SILVA", v:"24/11"},
+            {m:"DEZ", n:"EMERSON RIBEIRO DOS SANTOS", v:"4/12"},
+            {m:"DEZ", n:"ALLAN SOUZA DE CARVALHO", v:"15/12"},
+            {m:"DEZ", n:"TITO DACAL", v:"27/12"}
         ];
         function addLinhaFerias(m, n, v) {
             var corpo = document.getElementById('corpoFerias');
             var tr = document.createElement('tr');
             var tds = '';
-            for (var i = 0; i < 24; i++) tds += '<td contenteditable="true" style="font-size:6px;"></td>';
+            for (var i = 0; i < 24; i++) tds += '<td contenteditable="true" style="font-size:6.5px; height:18px;"></td>';
             tr.innerHTML = '<td style="background:#a82451; color:#fff; font-weight:800; font-size:7.5px;" contenteditable="true">' + (m || '') + '</td>' +
                 '<td style="background:#a82451; color:#fff; font-weight:800; font-size:7.5px; text-align:left; padding-left:3px;" contenteditable="true">' + (n || '') + '</td>' +
                 '<td style="background:#a82451; color:#fff; font-weight:800; font-size:7.5px;" contenteditable="true">' + (v || '') + '</td>' +
@@ -296,6 +368,30 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
             gerarMatriz();
             DADOS_F.forEach(function(d) { addLinhaFerias(d.m, d.n, d.v); });
         };
-    </script>
+    </script></textarea>
+    </div>
+
+    <div class="acoes-geral">
+        <button class="btn btn-baixar" onclick="gerarPortalFinal()">📥 Gerar e Baixar Ficheiro Portal Vale</button>
+    </div>
+</div>
+
+<script>
+function gerarPortalFinal() {
+    var codigoFinal = document.getElementById('bloco1').value + "\n" +
+                      document.getElementById('bloco2').value + "\n" +
+                      document.getElementById('bloco3').value + "\n" +
+                      document.getElementById('bloco4').value;
+    
+    var blob = new Blob([codigoFinal], {type: 'text/html;charset=utf-8'});
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'portal_vale_v01.html';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+</script>
+
 </body>
 </html>
