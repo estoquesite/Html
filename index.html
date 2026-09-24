@@ -1,33 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-PT">
 <head>
-    <meta charset="UTF-8">
-    <title>Gerador do Portal Vale por Blocos</title>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; color: #2c3e50; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
-        .container { background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 900px; width: 100%; }
-        h2 { color: #007e7a; margin-bottom: 5px; font-size: 20px; text-align: center; }
-        p { font-size: 12px; color: #64748b; margin-bottom: 20px; text-align: center; line-height: 1.4; }
-        .bloco-grupo { margin-bottom: 15px; }
-        .bloco-grupo label { display: block; font-weight: 700; font-size: 11px; color: #1e293b; margin-bottom: 4px; text-transform: uppercase; }
-        textarea { width: 100%; height: 160px; font-family: monospace; font-size: 10px; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; resize: vertical; background: #f8fafc; }
-        .acoes-geral { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
-        .btn { padding: 12px 24px; font-size: 13px; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; color: #fff; transition: 0.2s; }
-        .btn-baixar { background: #1b8a5a; } .btn-baixar:hover { background: #146c46; }
-    </style>
-</head>
-<body>
-
-<div class="container">
-    <h2>Gerador do Portal Vale (4 Blocos de Notas)</h2>
-    <p>Cada parte do seu portal está separada no seu respetivo bloco abaixo. Pode editar, colar dados ou juntar tudo sem limites!</p>
-    
-    <div class="bloco-grupo">
-        <label>📁 Bloco 1: Estrutura Geral, Capa e Estilos (CSS)</label>
-        <textarea id="bloco1"><!DOCTYPE html>
-<html lang="pt-PT">
-<head>
 <meta charset="UTF-8">
 <title>Portal Operacional - Vale - v01</title>
 <style>
@@ -103,6 +76,7 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
             <button type="button" class="btn-aba-topo" onclick="mudarTela('telaFerias')">🎉 Férias</button>
         </nav>
     </header>
+
     <div id="telaCapa">
         <main class="capa-main">
             <div class="secao-titulo">
@@ -133,12 +107,10 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
                 </div>
             </div>
         </main>
-    </div></textarea>
     </div>
 
-    <div class="bloco-grupo">
-        <label>📋 Bloco 2: Módulo 1 - DDS Semanal & Emociograma</label>
-        <textarea id="bloco2">    <div id="telaDDS">
+    <!-- MÓDULO 1 -->
+    <div id="telaDDS">
         <div class="painel-controle">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <h3 style="font-size: 13px; color: #007e7a;">DDS & Emociograma Semanal</h3>
@@ -157,12 +129,10 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
             </div>
         </div>
         <div id="boxFolhasDDS"></div>
-    </div></textarea>
     </div>
 
-    <div class="bloco-grupo">
-        <label>📅 Bloco 3: Módulo 2 - Matriz Anual (12 Meses)</label>
-        <textarea id="bloco3">    <div id="telaMatriz">
+    <!-- MÓDULO 2 -->
+    <div id="telaMatriz">
         <div class="painel-controle">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <h3 style="font-size: 13px; color: #1b8a5a;">Matriz Anual de DDS</h3>
@@ -208,12 +178,10 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
                 <tbody id="corpoMatriz"></tbody>
             </table>
         </div>
-    </div></textarea>
     </div>
 
-    <div class="bloco-grupo">
-        <label>🎉 Bloco 4: Módulo 3 - Cronograma de Férias & Scripts de Execução</label>
-        <textarea id="bloco4">    <div id="telaFerias">
+    <!-- MÓDULO 3 -->
+    <div id="telaFerias">
         <div class="painel-controle">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
                 <h3 style="font-size: 13px; color: #991b1b;">Cronograma de Férias e Aniversários</h3>
@@ -243,6 +211,7 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
             </table>
         </div>
     </div>
+
     <script>
         function mudarTela(id) {
             document.getElementById('telaCapa').style.display = 'none';
@@ -252,6 +221,7 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
             document.getElementById(id).style.display = 'block';
             window.scrollTo(0, 0);
         }
+
         function carinhasHtml(s) {
             var c1 = s === 1 ? 'sel-1' : '', c2 = s === 2 ? 'sel-2' : '', c3 = s === 3 ? 'sel-3' : '';
             return '<div class="carinha-box">' +
@@ -260,11 +230,13 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
                 '<div class="carinha-item ' + c3 + '" onclick="selCar(this,3)"><span class="carinha-num">3</span><svg class="carinha-svg c-vermelha" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><path class="boca" d="M 9.5 22 C 12 17 20 17 22.5 22"/></svg></div>' +
                 '</div>';
         }
+
         function selCar(el, n) {
             var p = el.parentNode;
             p.querySelectorAll('.carinha-item').forEach(function(i) { i.className = 'carinha-item'; });
             el.className = 'carinha-item sel-' + n;
         }
+
         function gerarDDS(padrao) {
             var box = document.getElementById('boxFolhasDDS');
             box.innerHTML = '';
@@ -277,6 +249,7 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
             else for (var i = 0; i < nomes.length; i += 24) blocos.push(nomes.slice(i, i + 24));
             blocos.forEach(function(bNomes, idx) { box.appendChild(criarFolhaDDS(bNomes, padrao, (idx + 1), blocos.length)); });
         }
+
         function criarFolhaDDS(nomes, padrao, numFolha, totFolhas) {
             var per = document.getElementById('perDDS').value || '____/____ a ____/____';
             var sem = document.getElementById('semDDS').value || '____';
@@ -303,12 +276,14 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
                 '</div></div>';
             return f;
         }
+
         var visM = [true,true,true,true,true,true,true,true,true,true,true,true];
         function toggleM(idx) {
             visM[idx] = !visM[idx];
             document.querySelectorAll('.btn-tag-mes')[idx].classList.toggle('inativo', !visM[idx]);
             document.querySelectorAll('.th-m' + idx + ', .td-m' + idx).forEach(function(el) { el.classList.toggle('mes-oculto', !visM[idx]); });
         }
+
         function gerarMatriz() {
             var corpo = document.getElementById('corpoMatriz');
             corpo.innerHTML = '';
@@ -329,6 +304,7 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
                 corpo.appendChild(tr);
             });
         }
+
         var DADOS_F = [
             {m:"JAN", n:"MARIANA PEREIRA CRUZ", v:"11/1"},
             {m:"JAN", n:"RICARDO GONCALVES DE MELLO LEITE", v:"13/1"},
@@ -352,6 +328,7 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
             {m:"DEZ", n:"ALLAN SOUZA DE CARVALHO", v:"15/12"},
             {m:"DEZ", n:"TITO DACAL", v:"27/12"}
         ];
+
         function addLinhaFerias(m, n, v) {
             var corpo = document.getElementById('corpoFerias');
             var tr = document.createElement('tr');
@@ -363,35 +340,12 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
                 tds + '<td contenteditable="true" style="font-weight:800; font-size:7.5px;">-</td>';
             corpo.appendChild(tr);
         }
+
         window.onload = function() {
             gerarDDS(null);
             gerarMatriz();
             DADOS_F.forEach(function(d) { addLinhaFerias(d.m, d.n, d.v); });
         };
-    </script></textarea>
-    </div>
-
-    <div class="acoes-geral">
-        <button class="btn btn-baixar" onclick="gerarPortalFinal()">📥 Gerar e Baixar Ficheiro Portal Vale</button>
-    </div>
-</div>
-
-<script>
-function gerarPortalFinal() {
-    var codigoFinal = document.getElementById('bloco1').value + "\n" +
-                      document.getElementById('bloco2').value + "\n" +
-                      document.getElementById('bloco3').value + "\n" +
-                      document.getElementById('bloco4').value;
-    
-    var blob = new Blob([codigoFinal], {type: 'text/html;charset=utf-8'});
-    var link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = 'portal_vale_v01.html';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-}
-</script>
-
+    </script>
 </body>
 </html>
