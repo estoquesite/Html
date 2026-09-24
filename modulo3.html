@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<title>Cronograma de Férias e Aniversários - Vale</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; color: #2c3e50; min-height: 100vh; padding: 12px; }
+.painel-controle { background: #fff; padding: 14px 18px; margin: 0 auto 14px auto; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; max-width: 1120px; display: flex; justify-content: space-between; align-items: center; }
+.btn { cursor: pointer; padding: 6px 12px; font-size: 10.5px; font-weight: 700; border: none; border-radius: 5px; color: #fff; }
+.btn-vinho { background-color: #991b1b; } 
+.btn-voltar { background-color: #475569; text-decoration: none; display: inline-flex; align-items: center; padding: 6px 12px; font-size: 10.5px; font-weight: 700; border-radius: 5px; color: #fff; } 
+.btn-imprimir { background-color: #0f172a; }
+.folha-a4 { width: 100%; max-width: 1120px; background: #fff; padding: 8px 10px; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-radius: 4px; }
+table.tabela-ferias { width: 100%; border-collapse: collapse; border: 1.2px solid #334155; table-layout: fixed; }
+table.tabela-ferias th, table.tabela-ferias td { border: 1px solid #334155; text-align: center; vertical-align: middle; font-size: 7px; height: 18px; }
+table.tabela-ferias th { background-color: #ffc000; color: #000; font-weight: 800; }
+@media print {
+    @page { size: A4 landscape; margin: 4mm 5mm; }
+    body { background: #fff !important; padding: 0 !important; }
+    .painel-controle { display: none !important; }
+    .folha-a4 { box-shadow: none !important; width: 100% !important; max-width: 100% !important; }
+}
+</style>
+</head>
+<body>
+    <div class="painel-controle">
+        <h3 style="margin: 0; font-size: 14px; font-weight: 800; color: #b91c1c;">Cronograma de Férias e Aniversários</h3>
+        <div style="display: flex; gap: 6px;">
+            <button type="button" class="btn btn-vinho" onclick="addLinhaFerias()">➕ Adicionar Colaborador</button>
+            <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir Férias</button>
+            <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
+        </div>
+    </div>
+    <div class="folha-a4">
+        <div style="background: #007e7a; color: #fff; text-align: center; font-weight: 900; font-size: 10px; padding: 4px; margin-bottom: 2px;">CRONOGRAMA DE FÉRIAS E ANIVERSÁRIOS 2026</div>
+        <table class="tabela-ferias">
+            <thead>
+                <tr>
+                    <th rowspan="2" style="width:45px;">MÊS</th>
+                    <th rowspan="2" style="width:160px;">PESSOAS</th>
+                    <th rowspan="2" style="width:45px;">NIVER</th>
+                    <th colspan="2">Jan</th><th colspan="2">Fev</th><th colspan="2">Mar</th><th colspan="2">Abr</th><th colspan="2">Mai</th><th colspan="2">Jun</th>
+                    <th colspan="2">Jul</th><th colspan="2">Ago</th><th colspan="2">Set</th><th colspan="2">Out</th><th colspan="2">Nov</th><th colspan="2">Dez</th>
+                    <th rowspan="2" style="width:30px;">Saldo</th>
+                </tr>
+                <tr style="font-size:6px;">
+                    <th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th>
+                    <th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th>
+                </tr>
+            </thead>
+            <tbody id="corpoFerias"></tbody>
+        </table>
+    </div>
+    <script>
+        const DADOS_F = [
+            {m:"JAN", n:"MARIANA PEREIRA CRUZ", v:"11/1"}, {m:"JAN", n:"RICARDO GONCALVES DE MELLO LEITE", v:"13/1"},
+            {m:"JAN", n:"JOAO SILVA RAMOS", v:"18/1"}, {m:"JAN", n:"ALFREDO AUGUSTO RAMOS NETO", v:"22/1"},
+            {m:"FEV", n:"MARCOS AURELIO CATALLARES MATTOS", v:"1/2"}, {m:"FEV", n:"VANDERSON TEIXEIRA", v:"4/2"},
+            {m:"FEV", n:"BRUNO RICARDO", v:"7/2"}, {m:"FEV", n:"GABRIEL CARNEIRO", v:"7/2"},
+            {m:"MAR", n:"GLEIVSTON SILVA MENDES", v:"22/3"}, {m:"JUN", n:"ROBSON DE SOUZA MENDONCA", v:"4/6"},
+            {m:"JUN", n:"PAULO HENRIQUE", v:"8/6"}, {m:"JUL", n:"BRUNO GOMES FIDELIS", v:"2/7"},
+            {m:"JUL", n:"ATMISTO SILVA", v:"20/7"}, {m:"AGOSTO", n:"CAIO HENRIQUE", v:"6/8"},
+            {m:"AGOSTO", n:"PABLO MESQUITA", v:"25/8"}, {m:"AGOSTO", n:"DAVID MARCELO DELGADO DOS SANTOS", v:"26/8"},
+            {m:"NOV", n:"DOMINIQUE SILVA", v:"2/11"}, {m:"NOV", n:"RICHARD SILVA", v:"24/11"},
+            {m:"DEZ", n:"EMERSON RIBEIRO DOS SANTOS", v:"4/12"}, {m:"DEZ", n:"ALLAN SOUZA DE CARVALHO", v:"15/12"},
+            {m:"DEZ", n:"TITO DACAL", v:"27/12"}
+        ];
+        function addLinhaFerias(m='', n='', v='') {
+            const corpo = document.getElementById('corpoFerias');
+            const tr = document.createElement('tr');
+            let tds = ''; for(let i=0; i<24; i++) tds += `<td contenteditable="true"></td>`;
+            tr.innerHTML = `<td style="background:#a82451; color:#fff; font-weight:800;" contenteditable="true">${m}</td><td style="background:#a82451; color:#fff; font-weight:800; text-align:left; padding-left:3px;" contenteditable="true">${n}</td><td style="background:#a82451; color:#fff; font-weight:800;" contenteditable="true">${v}</td>${tds}<td contenteditable="true" style="font-weight:800;">-</td>`;
+            corpo.appendChild(tr);
+        }
+        window.onload = function() { DADOS_F.forEach(d => addLinhaFerias(d.m, d.n, d.v)); };
+    </script>
+</body>
+</html>
