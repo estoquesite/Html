@@ -2,11 +2,14 @@
 <html lang="pt-PT">
 <head>
 <meta charset="UTF-8">
-<title>Matriz Anual de DDS - Vale</title>
+<title>Módulo 2 - Matriz Anual de DDS | Portal Vale v01</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; color: #2c3e50; min-height: 100vh; padding: 12px; }
 .painel-controle { background: #fff; padding: 14px 18px; margin: 0 auto 14px auto; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; max-width: 1120px; }
+.topo-modulo-info { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 2px solid #1b8a5a; padding-bottom: 8px; }
+.badge-modulo { background: #1b8a5a; color: #fff; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+.tag-v01 { background-color: #ffeb3b; color: #212121; font-weight: 800; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
 .campos-painel { display: grid; gap: 10px; margin-bottom: 10px; grid-template-columns: 2fr 1fr 1fr 1fr; }
 .campo-grupo label { display: block; font-weight: 700; margin-bottom: 4px; font-size: 10px; color: #475569; text-transform: uppercase; }
 .painel-controle input[type="text"] { width: 100%; font-family: inherit; font-size: 11px; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 5px; outline: none; }
@@ -20,43 +23,44 @@ body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; color: #2c3e50;
 .link-rapido { font-size: 9px; font-weight: 700; color: #1e40af; cursor: pointer; text-decoration: underline; background: none; border: none; padding: 0; }
 .botoes-painel { display: flex; gap: 6px; flex-wrap: wrap; }
 .btn { cursor: pointer; padding: 6px 12px; font-size: 10.5px; font-weight: 700; border: none; border-radius: 5px; color: #fff; }
-.btn-verde { background-color: #1b8a5a; } .btn-azul { background-color: #007e7a; } .btn-salvar { background-color: #1e40af; } .btn-carregar { background-color: #0284c7; } .btn-limpar { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; } .btn-voltar { background-color: #475569; text-decoration: none; display: inline-flex; align-items: center; } .btn-imprimir { background-color: #0f172a; margin-left: auto; }
-.folha-a4 { width: 100%; max-width: 1120px; background: #fff; padding: 8px 10px; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-radius: 4px; }
-.cabecalho-container, table.tabela-matriz { width: 100%; border-collapse: collapse; border: 1.2px solid #0f172a; margin-bottom: 3px; table-layout: fixed; }
-.cabecalho-container td { border: 1px solid #334155; padding: 1px 3px; vertical-align: middle; text-align: center; }
-.logo-box { width: 110px; font-weight: 900; font-size: 15px; color: #1b8a5a; background-color: #f8fafc; }
-.titulo-box { font-size: 10px; font-weight: 800; text-transform: uppercase; color: #0f172a; }
-.meta-box { width: 125px; font-size: 8px; text-align: left !important; padding-left: 6px !important; background-color: #f8fafc; }
+.btn-verde { background-color: #1b8a5a; } .btn-azul { background-color: #007e7a; } .btn-salvar { background-color: #1e40af; } .btn-carregar { background-color: #0284c7; } .btn-limpar { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; } .btn-voltar { background-color: #475569; text-decoration: none; } .btn-imprimir { background-color: #0f172a; margin-left: auto; }
+.folha-a4 { width: 100%; max-width: 1120px; background: #fff; padding: 12px; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-radius: 4px; }
+.cabecalho-container, table.tabela-matriz { width: 100%; border-collapse: collapse; border: 1.2px solid #0f172a; margin-bottom: 4px; table-layout: fixed; }
+.cabecalho-container td { border: 1px solid #334155; padding: 3px 6px; vertical-align: middle; text-align: center; }
+.logo-box { width: 120px; font-weight: 900; font-size: 16px; color: #1b8a5a; background-color: #f8fafc; }
+.titulo-box { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #0f172a; }
+.meta-box { width: 140px; font-size: 9px; text-align: left !important; padding-left: 8px !important; background-color: #f8fafc; }
 table.tabela-matriz th, table.tabela-matriz td { border: 1px solid #475569; text-align: center; vertical-align: middle; font-size: 8.5px; }
-.th-matriz-id { width: 32px; background-color: #f1f5f9; font-weight: 800; }
-.th-matriz-colab { width: 220px; background-color: #1b8a5a; color: #fff; font-size: 10px; font-weight: 800; padding: 5px 6px; }
-.th-mes-anual { background-color: #1b8a5a; color: #fff; font-size: 9.5px; font-weight: 800; padding: 5px 2px; }
-table.tabela-matriz tbody tr { height: 16.5px; }
+.th-matriz-id { width: 36px; background-color: #f1f5f9; font-weight: 800; }
+.th-matriz-colab { width: 230px; background-color: #1b8a5a; color: #fff; font-size: 10px; font-weight: 800; padding: 6px; text-align: left; padding-left: 8px; }
+.th-mes-anual { background-color: #1b8a5a; color: #fff; font-size: 9px; font-weight: 800; padding: 6px 2px; }
+table.tabela-matriz tbody tr { height: 26px; }
 table.tabela-matriz tbody tr:nth-child(even) { background-color: #fafbfc; }
 .td-matriz-id { background-color: #f8fafc; font-weight: 800; color: #0f172a; padding: 0 1px; }
-.celula-data { outline: none; font-size: 8px; font-weight: 700; color: #0f172a; background-color: #fff; padding: 0 2px; }
+.celula-data { outline: none; font-size: 8.5px; font-weight: 700; color: #0f172a; background-color: #fff; padding: 0 2px; }
 .celula-data:focus { background-color: #f0fdf4; box-shadow: inset 0 0 0 1.5px #1b8a5a; }
-.botoes-acoes { display: flex; align-items: center; gap: 1px; }
-.btn-acao { background: none; border: none; cursor: pointer; padding: 0 1px; opacity: 0.65; }
-.btn-mais-linha { color: #15803d; font-weight: 900; font-size: 10px; }
-.btn-menos-linha { color: #b91c1c; font-weight: 900; font-size: 10px; }
-.col-nome-container { display: flex; align-items: center; justify-content: space-between; padding: 0 4px; gap: 3px; }
-.col-nome-texto { flex-grow: 1; text-align: left; outline: none; white-space: nowrap; overflow: hidden; font-size: 8.5px; font-weight: 700; color: #000; text-transform: uppercase; }
+.botoes-acoes { display: flex; align-items: center; gap: 2px; }
+.btn-acao { background: none; border: none; cursor: pointer; padding: 0 2px; opacity: 0.7; }
+.btn-mais-linha { color: #15803d; font-weight: 900; font-size: 11px; }
+.btn-menos-linha { color: #b91c1c; font-weight: 900; font-size: 11px; }
+.col-nome-container { display: flex; align-items: center; justify-content: space-between; padding: 0 6px; gap: 4px; width: 100%; }
+.col-nome-texto { flex-grow: 1; text-align: left; outline: none; white-space: nowrap; overflow: hidden; font-size: 9px; font-weight: 700; color: #000; text-transform: uppercase; }
 .mes-oculto { display: none !important; }
 @media print {
     @page { size: A4 landscape; margin: 4mm 5mm; }
     body { background: #fff !important; padding: 0 !important; }
     .painel-controle, .botoes-acoes { display: none !important; }
-    .folha-a4 { box-shadow: none !important; width: 100% !important; max-width: 100% !important; }
+    .folha-a4 { box-shadow: none !important; width: 100% !important; max-width: 100% !important; height: 98vh !important; display: flex !important; flex-direction: column !important; justify-content: space-between !important; }
+    table.tabela-matriz { flex-grow: 1 !important; }
 }
 </style>
 </head>
 <body>
 
     <div class="painel-controle">
-        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-            <h3 style="margin: 0; font-size: 14px; font-weight: 800; color: #1b8a5a;">Matriz Anual de DDS</h3>
-            <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
+        <div class="topo-modulo-info">
+            <span class="badge-modulo">Módulo 2: Matriz Anual de DDS <span class="tag-v01">v01</span></span>
+            <a href="index.html" class="btn btn-voltar" style="padding: 5px 10px; font-size: 10px; font-weight: 700; border-radius: 4px; color: #fff;">⬅ Voltar ao Menu</a>
         </div>
         <div class="campos-painel">
             <div class="campo-grupo"><label>Área:</label><input type="text" id="areaInputMatriz" placeholder="Operação"></div>
@@ -109,7 +113,7 @@ table.tabela-matriz tbody tr:nth-child(even) { background-color: #fafbfc; }
             <thead>
                 <tr>
                     <th class="th-matriz-id">Nº</th>
-                    <th class="th-matriz-colab">DDS</th>
+                    <th class="th-matriz-colab">DDS (Colaboradores)</th>
                     <th class="th-mes-anual col-mes-0">JAN</th><th class="th-mes-anual col-mes-1">FEV</th>
                     <th class="th-mes-anual col-mes-2">MAR</th><th class="th-mes-anual col-mes-3">ABR</th>
                     <th class="th-mes-anual col-mes-4">MAI</th><th class="th-mes-anual col-mes-5">JUN</th>
@@ -146,7 +150,8 @@ table.tabela-matriz tbody tr:nth-child(even) { background-color: #fafbfc; }
             const corpo = document.getElementById('corpoMatriz'); corpo.innerHTML = '';
             const nomes = document.getElementById('nomesInputMatriz').value.toUpperCase().split('\n').map(l=>l.trim()).filter(l=>l.length>0).sort((a,b)=>a.localeCompare(b,'pt'));
             document.getElementById('nomesInputMatriz').value = nomes.join('\n');
-            const lista = nomes.length > 0 ? nomes : ['','','','',''];
+            // Preenche 24 linhas por defeito para ocupar toda a folha A4
+            const lista = nomes.length > 0 ? nomes : Array(24).fill('');
             lista.forEach((n, idx) => { const tr = document.createElement('tr'); tr.innerHTML = criarLinhaMatriz(idx<9?'0'+(idx+1):(idx+1), n); corpo.appendChild(tr); });
             aplicarVisMeses();
         }
