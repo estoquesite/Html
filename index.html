@@ -1,6 +1,38 @@
 <!DOCTYPE html>
 <html lang="pt-PT">
 <head>
+    <meta charset="UTF-8">
+    <title>Gerador e Arquivo - Portal Vale</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; color: #2c3e50; display: flex; align-items: center; justify-content: center; height: 100vh; }
+        .card-painel { background: #fff; padding: 35px; border-radius: 12px; box-shadow: 0 6px 20px rgba(0,0,0,0.1); text-align: center; max-width: 480px; width: 100%; }
+        h2 { color: #007e7a; margin-bottom: 8px; font-size: 20px; }
+        p { font-size: 12.5px; color: #64748b; margin-bottom: 25px; line-height: 1.5; }
+        .botoes-grupo { display: flex; flex-direction: column; gap: 12px; }
+        .btn { padding: 14px 20px; font-size: 13.5px; font-weight: 700; border-radius: 6px; border: none; cursor: pointer; color: #fff; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-portal { background: #007e7a; }
+        .btn-portal:hover { background: #005a57; }
+        .btn-bloco { background: #d97706; }
+        .btn-bloco:hover { background: #b45309; }
+    </style>
+</head>
+<body>
+
+<div class="card-painel">
+    <h2>Arquivo Operacional Vale</h2>
+    <p>Clique nos botões abaixo para descarregar os dois ficheiros diretamente para o seu computador e guardá-los na sua pasta de arquivo:</p>
+    
+    <div class="botoes-grupo">
+        <button class="btn btn-portal" onclick="baixarPortal()">📥 Baixar Portal Completo (Módulos 1, 2 e 3)</button>
+        <button class="btn btn-bloco" onclick="baixarBlocoNotas()">📝 Baixar Bloco de Notas Operacional (Módulo 4)</button>
+    </div>
+</div>
+
+<script>
+var codigoPortal = `<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
 <meta charset="UTF-8">
 <title>Portal Operacional - Vale - v01</title>
 <style>
@@ -13,16 +45,15 @@ nav.nav-abas-topo { display: flex; gap: 8px; align-items: center; flex-wrap: wra
 .btn-aba-topo { background: rgba(255, 255, 255, 0.15); color: #fff; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 6px; padding: 6px 12px; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.15s; }
 .btn-aba-topo:hover { background: #fff; color: #005a57; }
 #telaCapa { display: block; }
-#telaDDS, #telaMatriz, #telaFerias, #telaBlocoNotas { display: none; padding: 12px; }
+#telaDDS, #telaMatriz, #telaFerias { display: none; padding: 12px; }
 main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 20px; }
 .secao-titulo { margin-bottom: 24px; }
 .secao-titulo h2 { font-size: 19px; font-weight: 800; color: #005a57; text-transform: uppercase; }
-.grid-modulos { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
+.grid-modulos { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 18px; }
 .card-modulo { background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: all 0.2s ease; position: relative; min-height: 170px; }
 .card-modulo.m1::before { content: ''; position: absolute; top:0; left:0; right:0; height:4px; background: #007e7a; }
 .card-modulo.m2::before { content: ''; position: absolute; top:0; left:0; right:0; height:4px; background: #1e40af; }
 .card-modulo.m3::before { content: ''; position: absolute; top:0; left:0; right:0; height:4px; background: #b91c1c; }
-.card-modulo.m4::before { content: ''; position: absolute; top:0; left:0; right:0; height:4px; background: #d97706; }
 .card-titulo { font-size: 14px; font-weight: 700; margin-bottom: 6px; color: #1e293b; }
 .card-descricao { font-size: 11px; color: #64748b; line-height: 1.4; margin-bottom: 14px; }
 .painel-controle { background: #fff; padding: 14px 18px; margin: 0 auto 14px auto; border-radius: 8px; border: 1px solid #e2e8f0; max-width: 1120px; }
@@ -32,7 +63,7 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
 .painel-controle input, .painel-controle textarea { width: 100%; font-size: 11px; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 5px; outline: none; text-transform: uppercase; }
 .botoes-painel { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
 .btn { cursor: pointer; padding: 6px 12px; font-size: 10.5px; font-weight: 700; border: none; border-radius: 5px; color: #fff; }
-.btn-verde { background-color: #1b8a5a; } .btn-azul { background-color: #007e7a; } .btn-vinho { background-color: #991b1b; } .btn-amarelo { background-color: #d97706; } .btn-voltar { background-color: #475569; } .btn-imprimir { background-color: #0f172a; margin-left: auto; }
+.btn-verde { background-color: #1b8a5a; } .btn-azul { background-color: #007e7a; } .btn-vinho { background-color: #991b1b; } .btn-voltar { background-color: #475569; } .btn-imprimir { background-color: #0f172a; margin-left: auto; }
 .folha-a4 { width: 100%; max-width: 1120px; background: #fff; padding: 8px 10px; margin: 0 auto 16px auto; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-radius: 4px; }
 .cabecalho-container, .info-dds, table.tabela-dds, table.tabela-matriz, table.tabela-ferias { width: 100%; border-collapse: collapse; border: 1.2px solid #000; table-layout: fixed; margin-bottom: 3px; }
 .cabecalho-container td, .info-dds td, table.tabela-dds th, table.tabela-dds td, table.tabela-matriz th, table.tabela-matriz td, table.tabela-ferias th, table.tabela-ferias td { border: 1px solid #333; padding: 1px 3px; text-align: center; vertical-align: middle; font-size: 7.5px; }
@@ -75,10 +106,8 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
             <button type="button" class="btn-aba-topo" onclick="mudarTela('telaDDS')">📋 DDS</button>
             <button type="button" class="btn-aba-topo" onclick="mudarTela('telaMatriz')">📅 Matriz</button>
             <button type="button" class="btn-aba-topo" onclick="mudarTela('telaFerias')">🎉 Férias</button>
-            <button type="button" class="btn-aba-topo" onclick="mudarTela('telaBlocoNotas')" style="background: #d97706; border-color: #b45309;">📝 Bloco de Notas</button>
         </nav>
     </header>
-
     <div id="telaCapa">
         <main class="capa-main">
             <div class="secao-titulo">
@@ -107,18 +136,9 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
                     </div>
                     <div style="color: #b91c1c; font-weight: 700; font-size: 11px;">Aceder ➔</div>
                 </div>
-                <div class="card-modulo m4" onclick="mudarTela('telaBlocoNotas')">
-                    <div>
-                        <div class="card-titulo">📝 Bloco de Notas Operacional</div>
-                        <div class="card-descricao">Área livre gigante para copiar, colar e guardar todas as anotações sem limites de tamanho.</div>
-                    </div>
-                    <div style="color: #d97706; font-weight: 700; font-size: 11px;">Aceder ➔</div>
-                </div>
             </div>
         </main>
     </div>
-
-    <!-- MÓDULO 1 -->
     <div id="telaDDS">
         <div class="painel-controle">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -139,8 +159,6 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
         </div>
         <div id="boxFolhasDDS"></div>
     </div>
-
-    <!-- MÓDULO 2 -->
     <div id="telaMatriz">
         <div class="painel-controle">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -188,8 +206,6 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
             </table>
         </div>
     </div>
-
-    <!-- MÓDULO 3 -->
     <div id="telaFerias">
         <div class="painel-controle">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
@@ -220,34 +236,15 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
             </table>
         </div>
     </div>
-
-    <!-- MÓDULO 4: BLOCO DE NOTAS LIVRE -->
-    <div id="telaBlocoNotas">
-        <div class="painel-controle">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-                <h3 style="font-size: 13px; color: #d97706;">📝 Módulo 4: Bloco de Notas Operacional</h3>
-                <button type="button" class="btn btn-voltar" onclick="mudarTela('telaCapa')">⬅ Voltar</button>
-            </div>
-            <p style="font-size: 11px; color: #64748b; margin-bottom: 8px;">Espaço livre e contínuo para copiar, colar e guardar qualquer texto, listas ou informações adicionais sem limites.</p>
-            <textarea id="blocoNotasLivre" style="width: 100%; height: 450px; font-family: monospace; font-size: 12px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; resize: vertical;" placeholder="Cole ou escreva aqui o que quiser sem limites..."></textarea>
-            <div class="botoes-painel" style="margin-top: 10px;">
-                <button type="button" class="btn btn-amarelo" onclick="salvarBlocoNotas()">💾 Guardar Nota no Computador</button>
-                <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir Bloco</button>
-            </div>
-        </div>
-    </div>
-
     <script>
         function mudarTela(id) {
             document.getElementById('telaCapa').style.display = 'none';
             document.getElementById('telaDDS').style.display = 'none';
             document.getElementById('telaMatriz').style.display = 'none';
             document.getElementById('telaFerias').style.display = 'none';
-            document.getElementById('telaBlocoNotas').style.display = 'none';
             document.getElementById(id).style.display = 'block';
             window.scrollTo(0, 0);
         }
-
         function carinhasHtml(s) {
             var c1 = s === 1 ? 'sel-1' : '', c2 = s === 2 ? 'sel-2' : '', c3 = s === 3 ? 'sel-3' : '';
             return '<div class="carinha-box">' +
@@ -256,26 +253,23 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
                 '<div class="carinha-item ' + c3 + '" onclick="selCar(this,3)"><span class="carinha-num">3</span><svg class="carinha-svg c-vermelha" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><path class="boca" d="M 9.5 22 C 12 17 20 17 22.5 22"/></svg></div>' +
                 '</div>';
         }
-
         function selCar(el, n) {
             var p = el.parentNode;
             p.querySelectorAll('.carinha-item').forEach(function(i) { i.className = 'carinha-item'; });
             el.className = 'carinha-item sel-' + n;
         }
-
         function gerarDDS(padrao) {
             var box = document.getElementById('boxFolhasDDS');
             box.innerHTML = '';
             var txt = document.getElementById('txtNomesDDS').value.toUpperCase();
-            var nomes = txt.split('\n').map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 0; });
+            var nomes = txt.split('\\n').map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 0; });
             nomes.sort(function(a, b) { return a.localeCompare(b, 'pt'); });
-            document.getElementById('txtNomesDDS').value = nomes.join('\n');
+            document.getElementById('txtNomesDDS').value = nomes.join('\\n');
             var blocos = [];
             if (nomes.length === 0) blocos.push([]);
             else for (var i = 0; i < nomes.length; i += 24) blocos.push(nomes.slice(i, i + 24));
             blocos.forEach(function(bNomes, idx) { box.appendChild(criarFolhaDDS(bNomes, padrao, (idx + 1), blocos.length)); });
         }
-
         function criarFolhaDDS(nomes, padrao, numFolha, totFolhas) {
             var per = document.getElementById('perDDS').value || '____/____ a ____/____';
             var sem = document.getElementById('semDDS').value || '____';
@@ -293,30 +287,28 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
                 '<table class="info-dds"><tr><td>PERÍODO: ' + per + '</td><td>SEMANA: ' + sem + '</td><td>ANO: ' + ano + '</td></tr></table>' +
                 '<table class="tabela-dds"><thead><tr><th rowspan="2" style="width:30px;">Nº</th><th rowspan="2" style="width:170px; text-align:left; padding-left:4px;">Colaborador</th><th colspan="2">Segunda</th><th colspan="2">Terça</th><th colspan="2">Quarta</th><th colspan="2">Quinta</th><th colspan="2">Sexta</th></tr><tr><th>Estou</th><th>Rub</th><th>Estou</th><th>Rub</th><th>Estou</th><th>Rub</th><th>Estou</th><th>Rub</th><th>Estou</th><th>Rub</th></tr></thead><tbody>' + linhas + '</tbody></table>' +
                 '<div class="rodape-container">' +
-                '<div class="box-legenda"><h4>LEGENDA:</h4><ul class="lista-legenda"><li><b>FE</b> = Feriado[span_0](start_span)[span_0](end_span)</li><li><b>AT</b> = Atestado[span_1](start_span)[span_1](end_span)</li><li><b>CO</b> = Compensação[span_2](start_span)[span_2](end_span)</li><li><b>FA</b> = Falta[span_3](start_span)[span_3](end_span)</li><li><b>FR</b> = Férias[span_4](start_span)[span_4](end_span)</li><li><b>FO</b> = Folga[span_5](start_span)[span_5](end_span)</li></ul></div>' +
-                '<div class="box-legenda"><h4>AÇÃO TOMADA (AMARELO/VERMELHO):</h4><ul class="lista-legenda"><li><b>EST/SUP</b> = Estratégia/Suprimentos[span_6](start_span)[span_6](end_span)</li><li><b>ENG</b> = ADM | <b>OP</b> = Operação[span_7](start_span)[span_7](end_span)</li><li><b>HOFF</b> = Home Office[span_8](start_span)[span_8](end_span)</li></ul></div>' +
+                '<div class="box-legenda"><h4>LEGENDA:</h4><ul class="lista-legenda"><li><b>FE</b> = Feriado</li><li><b>AT</b> = Atestado</li><li><b>CO</b> = Compensação</li><li><b>FA</b> = Falta</li><li><b>FR</b> = Férias</li><li><b>FO</b> = Folga</li></ul></div>' +
+                '<div class="box-legenda"><h4>AÇÃO TOMADA (AMARELO/VERMELHO):</h4><ul class="lista-legenda"><li><b>EST/SUP</b> = Estratégia/Suprimentos</li><li><b>ENG</b> = ADM | <b>OP</b> = Operação</li><li><b>HOFF</b> = Home Office</li></ul></div>' +
                 '<div class="box-legenda"><h4>EMOCIOGRAMA:</h4>' +
-                '<div class="item-emocio"><svg class="carinha-svg c-verde" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><path class="boca" d="M 9.5 18 C 12 23 20 23 22.5 18"/></svg><span><b>1:</b> Plenas condições[span_9](start_span)[span_9](end_span)</span></div>' +
-                '<div class="item-emocio"><svg class="carinha-svg c-amarela" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><line class="boca" x1="10" y1="20" x2="22" y2="20"/></svg><span><b>2:</b> Alterado / Acompanhar[span_10](start_span)[span_10](end_span)</span></div>' +
-                '<div class="item-emocio"><svg class="carinha-svg c-vermelha" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><path class="boca" d="M 9.5 22 C 12 17 20 17 22.5 22"/></svg><span><b>3:</b> Sem condições[span_11](start_span)[span_11](end_span)</span></div>' +
+                '<div class="item-emocio"><svg class="carinha-svg c-verde" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><path class="boca" d="M 9.5 18 C 12 23 20 23 22.5 18"/></svg><span><b>1:</b> Plenas condições</span></div>' +
+                '<div class="item-emocio"><svg class="carinha-svg c-amarela" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><line class="boca" x1="10" y1="20" x2="22" y2="20"/></svg><span><b>2:</b> Alterado / Acompanhar</span></div>' +
+                '<div class="item-emocio"><svg class="carinha-svg c-vermelha" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><path class="boca" d="M 9.5 22 C 12 17 20 17 22.5 22"/></svg><span><b>3:</b> Sem condições</span></div>' +
                 '</div></div>';
             return f;
         }
-
         var visM = [true,true,true,true,true,true,true,true,true,true,true,true];
         function toggleM(idx) {
             visM[idx] = !visM[idx];
             document.querySelectorAll('.btn-tag-mes')[idx].classList.toggle('inativo', !visM[idx]);
             document.querySelectorAll('.th-m' + idx + ', .td-m' + idx).forEach(function(el) { el.classList.toggle('mes-oculto', !visM[idx]); });
         }
-
         function gerarMatriz() {
             var corpo = document.getElementById('corpoMatriz');
             corpo.innerHTML = '';
             var txt = document.getElementById('txtNomesMatriz').value.toUpperCase();
-            var nomes = txt.split('\n').map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 0; });
+            var nomes = txt.split('\\n').map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 0; });
             nomes.sort(function(a, b) { return a.localeCompare(b, 'pt'); });
-            document.getElementById('txtNomesMatriz').value = nomes.join('\n');
+            document.getElementById('txtNomesMatriz').value = nomes.join('\\n');
             var lista = nomes.length > 0 ? nomes : ['', '', '', '', '', '', '', '', '', '', '', '', '', '', '', ''];
             lista.forEach(function(n, i) {
                 var num = (i + 1) < 10 ? '0' + (i + 1) : (i + 1);
@@ -330,7 +322,6 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
                 corpo.appendChild(tr);
             });
         }
-
         var DADOS_F = [
             {m:"JAN", n:"MARIANA PEREIRA CRUZ", v:"11/1"},
             {m:"JAN", n:"RICARDO GONCALVES DE MELLO LEITE", v:"13/1"},
@@ -354,7 +345,6 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
             {m:"DEZ", n:"ALLAN SOUZA DE CARVALHO", v:"15/12"},
             {m:"DEZ", n:"TITO DACAL", v:"27/12"}
         ];
-
         function addLinhaFerias(m, n, v) {
             var corpo = document.getElementById('corpoFerias');
             var tr = document.createElement('tr');
@@ -366,23 +356,78 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
                 tds + '<td contenteditable="true" style="font-weight:800; font-size:7.5px;">-</td>';
             corpo.appendChild(tr);
         }
-
-        function salvarBlocoNotas() {
-            var texto = document.getElementById('blocoNotasLivre').value;
-            var blob = new Blob([texto], {type: 'text/plain;charset=utf-8'});
-            var link = document.createElement('a');
-            link.href = URL.createObjectURL(blob);
-            link.download = 'anotacoes_operacionais.txt';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
         window.onload = function() {
             gerarDDS(null);
             gerarMatriz();
             DADOS_F.forEach(function(d) { addLinhaFerias(d.m, d.n, d.v); });
         };
     </script>
+</body>
+</html>`;
+
+var codigoBloco = `<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<title>Bloco de Notas Operacional - Vale</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; color: #2c3e50; padding: 20px; display: flex; justify-content: center; min-height: 100vh; }
+.container { background: #fff; padding: 25px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); max-width: 900px; width: 100%; display: flex; flex-direction: column; }
+h2 { color: #d97706; margin-bottom: 5px; font-size: 20px; }
+p { font-size: 12px; color: #64748b; margin-bottom: 15px; }
+textarea { width: 100%; flex-grow: 1; min-height: 450px; font-family: monospace; font-size: 13px; padding: 12px; border: 1px solid #cbd5e1; border-radius: 6px; resize: vertical; outline: none; }
+.botoes { display: flex; gap: 10px; margin-top: 15px; }
+.btn { padding: 10px 20px; font-size: 12px; font-weight: 700; border-radius: 5px; border: none; cursor: pointer; color: #fff; }
+.btn-amarelo { background: #d97706; } .btn-amarelo:hover { background: #b45309; }
+.btn-dark { background: #0f172a; }
+</style>
+</head>
+<body>
+<div class="container">
+    <h2>📝 Bloco de Notas Operacional</h2>
+    <p>Espaço livre e contínuo para copiar, colar e guardar anotações, turnos ou avisos da operação sem limites.</p>
+    <textarea id="blocoTexto" placeholder="Escreva ou cole aqui as suas anotações..."></textarea>
+    <div class="botoes">
+        <button class="btn btn-amarelo" onclick="guardarFicheiro()">💾 Guardar Nota em Ficheiro .txt</button>
+        <button class="btn btn-dark" onclick="window.print()">🖨️ Imprimir / Guardar PDF</button>
+    </div>
+</div>
+<script>
+function guardarFicheiro() {
+    var texto = document.getElementById('blocoTexto').value;
+    var blob = new Blob([texto], {type: 'text/plain;charset=utf-8'});
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'anotacoes_operacionais.txt';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+</script>
+</body>
+</html>`;
+
+function baixarPortal() {
+    var blob = new Blob([codigoPortal], {type: 'text/html;charset=utf-8'});
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'portal_vale_v01.html';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+
+function baixarBlocoNotas() {
+    var blob = new Blob([codigoBloco], {type: 'text/html;charset=utf-8'});
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'bloco_notas.html';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+</script>
+
 </body>
 </html>
