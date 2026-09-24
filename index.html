@@ -2,66 +2,51 @@
 <html lang="pt-PT">
 <head>
 <meta charset="UTF-8">
-<title>DDS & Emociograma Semanal - Vale</title>
+<title>Matriz Anual de DDS - Vale</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; color: #2c3e50; min-height: 100vh; padding: 12px; }
 .painel-controle { background: #fff; padding: 14px 18px; margin: 0 auto 14px auto; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; max-width: 1120px; }
-.campos-painel { display: grid; gap: 10px; margin-bottom: 10px; grid-template-columns: 2fr 1fr 1fr; }
+.campos-painel { display: grid; gap: 10px; margin-bottom: 10px; grid-template-columns: 2fr 1fr 1fr 1fr; }
 .campo-grupo label { display: block; font-weight: 700; margin-bottom: 4px; font-size: 10px; color: #475569; text-transform: uppercase; }
 .painel-controle input[type="text"] { width: 100%; font-family: inherit; font-size: 11px; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 5px; outline: none; }
 .painel-controle textarea { width: 100%; height: 65px; font-family: inherit; font-size: 11px; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 5px; resize: vertical; text-transform: uppercase; outline: none; }
+.painel-meses-toggle { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 12px; margin-bottom: 10px; }
+.titulo-meses-toggle { font-size: 10px; font-weight: 800; text-transform: uppercase; color: #334155; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
+.container-meses-btns { display: flex; flex-wrap: wrap; gap: 5px; }
+.btn-mes-tag { border: 1px solid #1b8a5a; background-color: #e8f5e9; color: #1b5e20; font-size: 9.5px; font-weight: 800; padding: 3px 8px; border-radius: 4px; cursor: pointer; user-select: none; }
+.btn-mes-tag.inativo { background-color: #f1f5f9; border-color: #cbd5e1; color: #94a3b8; text-decoration: line-through; }
+.links-rapidos-meses { display: flex; gap: 6px; }
+.link-rapido { font-size: 9px; font-weight: 700; color: #1e40af; cursor: pointer; text-decoration: underline; background: none; border: none; padding: 0; }
 .botoes-painel { display: flex; gap: 6px; flex-wrap: wrap; }
-.btn { cursor: pointer; padding: 6px 12px; font-size: 10.5px; font-weight: 700; border: none; border-radius: 5px; color: #fff; display: inline-flex; align-items: center; gap: 4px; }
-.btn-verde { background-color: #1b8a5a; } .btn-azul { background-color: #007e7a; } .btn-add-folha { background-color: #4a148c; } .btn-salvar { background-color: #1e40af; } .btn-carregar { background-color: #0284c7; } .btn-limpar { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; } .btn-voltar { background-color: #475569; text-decoration: none; } .btn-imprimir { background-color: #0f172a; margin-left: auto; }
-.folha-a4 { width: 100%; max-width: 1120px; background: #fff; padding: 12px; margin: 0 auto 16px auto; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-radius: 4px; }
-.barra-controle-folha { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; background: #f8fafc; padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 4px; }
-.grupo-acoes-linhas { display: flex; align-items: center; gap: 6px; }
-.btn-linha-topo { border: 1px solid #007e7a; border-radius: 4px; font-size: 9px; font-weight: 700; padding: 3px 10px; cursor: pointer; background: #fff; color: #007e7a; }
-.btn-remover-folha { background: #fff; color: #dc2626; border: 1px solid #fca5a5; border-radius: 4px; font-size: 9px; font-weight: 700; padding: 3px 8px; cursor: pointer; }
-.cabecalho-container, .info-dds, table.tabela-dds { width: 100%; border-collapse: collapse; border: 1.2px solid #0f172a; margin-bottom: 4px; table-layout: fixed; }
-.cabecalho-container td, .info-dds td { border: 1px solid #334155; padding: 3px 6px; vertical-align: middle; text-align: center; }
-.logo-box { width: 120px; font-weight: 900; font-size: 16px; color: #007e7a; background-color: #f8fafc; }
-.titulo-box { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #0f172a; }
-.meta-box { width: 140px; font-size: 9px; text-align: left !important; padding-left: 8px !important; background-color: #f8fafc; }
-.campo-editavel { outline: none; display: inline-block; min-width: 25px; font-size: 9px; font-weight: 600; }
-table.tabela-dds th, table.tabela-dds td { border: 1px solid #334155; text-align: center; vertical-align: middle; }
-table.tabela-dds th { background-color: #f1f5f9; font-weight: 800; color: #0f172a; }
-table.tabela-dds tbody tr:nth-child(even) { background-color: #fafbfc; }
-table.tabela-dds td { height: 26px; padding: 1px 2px; }
-.tabela-dds .col-id { width: 36px !important; font-weight: 800; background-color: #f8fafc !important; }
-.col-id-container { display: flex; align-items: center; justify-content: center; }
-.col-id-texto { outline: none; font-size: 9px; font-weight: 800; }
-.col-nome-container { display: flex; align-items: center; justify-content: space-between; padding: 0 6px; gap: 4px; }
-.col-nome-texto { flex-grow: 1; text-align: left; outline: none; white-space: nowrap; overflow: hidden; font-size: 9.5px; font-weight: 700; color: #000; text-transform: uppercase; }
-.th-dia-semana { font-size: 9px; font-weight: 800; text-transform: uppercase; padding: 4px 0; background: linear-gradient(180deg, #e6f4f4 0%, #d8ecec 100%) !important; color: #005a57; }
-.th-sub { font-size: 8px !important; font-weight: 800; background-color: #f1f5f9 !important; padding: 3px 0; }
-.col-como-estou { width: 75px; min-width: 75px; padding: 1px !important; }
-.col-rubrica { width: 55px; min-width: 55px; outline: none; font-size: 9px; background-color: #fff; }
-.grupo-carinhas { display: flex; align-items: center; justify-content: space-evenly; width: 100%; gap: 2px; }
-.carinha-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; user-select: none; line-height: 1; padding: 2px; border-radius: 3px; }
-.carinha-num { font-size: 7px; font-weight: 800; color: #334155; margin-bottom: 1px; }
-.carinha-svg { width: 14px; height: 14px; display: block; }
-.c-verde circle.rosto { stroke: #15803d; stroke-width: 2.2; fill: #f0fdf4; } .c-verde circle.olho { fill: #15803d; } .c-verde path.boca { stroke: #15803d; stroke-width: 2.2; stroke-linecap: round; fill: none; }
-.c-amarela circle.rosto { stroke: #d97706; stroke-width: 2.2; fill: #fffbeb; } .c-amarela circle.olho { fill: #d97706; } .c-amarela line.boca { stroke: #d97706; stroke-width: 2.2; stroke-linecap: round; fill: none; }
-.c-vermelha circle.rosto { stroke: #dc2626; stroke-width: 2.2; fill: #fef2f2; } .c-vermelha circle.olho { fill: #dc2626; } .c-vermelha path.boca { stroke: #dc2626; stroke-width: 2.2; stroke-linecap: round; fill: none; }
-.carinha-item.selecionado-1 { background-color: #bbf7d0; outline: 1.2px solid #15803d; }
-.carinha-item.selecionado-2 { background-color: #fef08a; outline: 1.2px solid #ca8a04; }
-.carinha-item.selecionado-3 { background-color: #fecaca; outline: 1.2px solid #dc2626; }
-.botoes-acoes { display: flex; align-items: center; gap: 2px; }
-.btn-acao { background: none; border: none; cursor: pointer; padding: 0 2px; opacity: 0.7; }
-.btn-lixeira { color: #dc2626; font-size: 9px; }
-.btn-mais-linha { color: #15803d; font-weight: 900; font-size: 11px; }
-.btn-menos-linha { color: #b91c1c; font-weight: 900; font-size: 11px; }
-.rodape-container { display: grid; grid-template-columns: 140px 1.2fr 1.6fr; gap: 6px; width: 100%; font-size: 8px; line-height: 1.3; margin-top: 6px; }
-.box-legenda { border: 1px solid #334155; padding: 4px 6px; background-color: #fff; border-radius: 3px; }
-.box-legenda h4 { margin: 0 0 3px 0; font-size: 8px; font-weight: 800; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; color: #005a57; }
-.lista-legenda { list-style: none; padding: 0; margin: 0; }
-.item-emocio { display: flex; align-items: flex-start; gap: 5px; margin-bottom: 3px; }
+.btn { cursor: pointer; padding: 6px 12px; font-size: 10.5px; font-weight: 700; border: none; border-radius: 5px; color: #fff; }
+.btn-verde { background-color: #1b8a5a; } .btn-azul { background-color: #007e7a; } .btn-salvar { background-color: #1e40af; } .btn-carregar { background-color: #0284c7; } .btn-limpar { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; } .btn-voltar { background-color: #475569; text-decoration: none; display: inline-flex; align-items: center; } .btn-imprimir { background-color: #0f172a; margin-left: auto; }
+.folha-a4 { width: 100%; max-width: 1120px; background: #fff; padding: 8px 10px; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-radius: 4px; }
+.cabecalho-container, table.tabela-matriz { width: 100%; border-collapse: collapse; border: 1.2px solid #0f172a; margin-bottom: 3px; table-layout: fixed; }
+.cabecalho-container td { border: 1px solid #334155; padding: 1px 3px; vertical-align: middle; text-align: center; }
+.logo-box { width: 110px; font-weight: 900; font-size: 15px; color: #1b8a5a; background-color: #f8fafc; }
+.titulo-box { font-size: 10px; font-weight: 800; text-transform: uppercase; color: #0f172a; }
+.meta-box { width: 125px; font-size: 8px; text-align: left !important; padding-left: 6px !important; background-color: #f8fafc; }
+table.tabela-matriz th, table.tabela-matriz td { border: 1px solid #475569; text-align: center; vertical-align: middle; font-size: 8.5px; }
+.th-matriz-id { width: 32px; background-color: #f1f5f9; font-weight: 800; }
+.th-matriz-colab { width: 220px; background-color: #1b8a5a; color: #fff; font-size: 10px; font-weight: 800; padding: 5px 6px; }
+.th-mes-anual { background-color: #1b8a5a; color: #fff; font-size: 9.5px; font-weight: 800; padding: 5px 2px; }
+table.tabela-matriz tbody tr { height: 16.5px; }
+table.tabela-matriz tbody tr:nth-child(even) { background-color: #fafbfc; }
+.td-matriz-id { background-color: #f8fafc; font-weight: 800; color: #0f172a; padding: 0 1px; }
+.celula-data { outline: none; font-size: 8px; font-weight: 700; color: #0f172a; background-color: #fff; padding: 0 2px; }
+.celula-data:focus { background-color: #f0fdf4; box-shadow: inset 0 0 0 1.5px #1b8a5a; }
+.botoes-acoes { display: flex; align-items: center; gap: 1px; }
+.btn-acao { background: none; border: none; cursor: pointer; padding: 0 1px; opacity: 0.65; }
+.btn-mais-linha { color: #15803d; font-weight: 900; font-size: 10px; }
+.btn-menos-linha { color: #b91c1c; font-weight: 900; font-size: 10px; }
+.col-nome-container { display: flex; align-items: center; justify-content: space-between; padding: 0 4px; gap: 3px; }
+.col-nome-texto { flex-grow: 1; text-align: left; outline: none; white-space: nowrap; overflow: hidden; font-size: 8.5px; font-weight: 700; color: #000; text-transform: uppercase; }
+.mes-oculto { display: none !important; }
 @media print {
     @page { size: A4 landscape; margin: 4mm 5mm; }
     body { background: #fff !important; padding: 0 !important; }
-    .painel-controle, .botoes-acoes, .barra-controle-folha { display: none !important; }
+    .painel-controle, .botoes-acoes { display: none !important; }
     .folha-a4 { box-shadow: none !important; width: 100% !important; max-width: 100% !important; }
 }
 </style>
@@ -70,85 +55,105 @@ table.tabela-dds td { height: 26px; padding: 1px 2px; }
 
     <div class="painel-controle">
         <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-            <h3 style="margin: 0; font-size: 14px; font-weight: 800; color: #007e7a;">DDS & Emociograma Semanal</h3>
-            <a href="index.html" class="btn btn-voltar" style="padding: 6px 12px; font-size: 10.5px; font-weight: 700; border-radius: 5px; color: #fff;">⬅ Voltar ao Menu</a>
+            <h3 style="margin: 0; font-size: 14px; font-weight: 800; color: #1b8a5a;">Matriz Anual de DDS</h3>
+            <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
         </div>
         <div class="campos-painel">
-            <div class="campo-grupo"><label>Período:</label><input type="text" id="periodoInputDDS" placeholder="21/09 a 25/09"></div>
-            <div class="campo-grupo"><label>Semana:</label><input type="text" id="semanaInputDDS" placeholder="38"></div>
-            <div class="campo-grupo"><label>Ano:</label><input type="text" id="anoInputDDS" value="2026"></div>
+            <div class="campo-grupo"><label>Área:</label><input type="text" id="areaInputMatriz" placeholder="Operação"></div>
+            <div class="campo-grupo"><label>Ano:</label><input type="text" id="anoInputMatriz" value="2026"></div>
+            <div class="campo-grupo"><label>Turno:</label><input type="text" id="turnoInputMatriz" placeholder="Turno A"></div>
+            <div class="campo-grupo"><label>Facilitador:</label><input type="text" id="facilitadorInputMatriz" placeholder="Mariana"></div>
         </div>
-        <div class="campo-grupo"><label>Lista de Colaboradores (Ordenação A-Z automática):</label><textarea id="nomesInputDDS" oninput="this.value=this.value.toUpperCase()" placeholder="COLE OS NOMES AQUI (UM POR LINHA)..."></textarea></div>
+        <div class="painel-meses-toggle">
+            <div class="titulo-meses-toggle"><span>👁️ Visibilidade dos Meses:</span>
+                <div class="links-rapidos-meses">
+                    <button type="button" class="link-rapido" onclick="definirTodosMeses(true)">Exibir Todos</button>
+                    <button type="button" class="link-rapido" onclick="definirTodosMeses(false)">Ocultar Todos</button>
+                </div>
+            </div>
+            <div class="container-meses-btns">
+                <button type="button" class="btn-mes-tag" data-mes="0" onclick="alternarMes(0)">JAN</button>
+                <button type="button" class="btn-mes-tag" data-mes="1" onclick="alternarMes(1)">FEV</button>
+                <button type="button" class="btn-mes-tag" data-mes="2" onclick="alternarMes(2)">MAR</button>
+                <button type="button" class="btn-mes-tag" data-mes="3" onclick="alternarMes(3)">ABR</button>
+                <button type="button" class="btn-mes-tag" data-mes="4" onclick="alternarMes(4)">MAI</button>
+                <button type="button" class="btn-mes-tag" data-mes="5" onclick="alternarMes(5)">JUN</button>
+                <button type="button" class="btn-mes-tag" data-mes="6" onclick="alternarMes(6)">JUL</button>
+                <button type="button" class="btn-mes-tag" data-mes="7" onclick="alternarMes(7)">AGO</button>
+                <button type="button" class="btn-mes-tag" data-mes="8" onclick="alternarMes(8)">SET</button>
+                <button type="button" class="btn-mes-tag" data-mes="9" onclick="alternarMes(9)">OUT</button>
+                <button type="button" class="btn-mes-tag" data-mes="10" onclick="alternarMes(10)">NOV</button>
+                <button type="button" class="btn-mes-tag" data-mes="11" onclick="alternarMes(11)">DEZ</button>
+            </div>
+        </div>
+        <div class="campo-grupo"><label>Colaboradores (Ordenação A-Z automática):</label><textarea id="nomesInputMatriz" oninput="this.value=this.value.toUpperCase()" placeholder="COLE OS NOMES AQUI..."></textarea></div>
         <div class="botoes-painel">
-            <button type="button" class="btn btn-verde" onclick="aplicarDadosDDS('verde')">Gerar c/ Carinha 1 (A-Z)</button>
-            <button type="button" class="btn btn-azul" onclick="aplicarDadosDDS('limpo')">Gerar Limpo (A-Z)</button>
-            <button type="button" class="btn btn-add-folha" onclick="adicionarFolhaManualDDS()">📄➕ Folha Extra</button>
-            <button type="button" class="btn btn-salvar" onclick="salvarTudoDDS()">💾 Guardar</button>
-            <button type="button" class="btn btn-carregar" onclick="carregarTudoDDS()">📂 Carregar</button>
-            <button type="button" class="btn btn-limpar" onclick="limparTudoDDS()">Limpar</button>
+            <button type="button" class="btn btn-verde" onclick="gerarTabelaMatriz()">Atualizar Grelha (A-Z)</button>
+            <button type="button" class="btn btn-azul" onclick="adicionarLinhaFimMatriz()">➕ Linha Vazia</button>
+            <button type="button" class="btn btn-salvar" onclick="salvarTudoMatriz()">💾 Guardar</button>
+            <button type="button" class="btn btn-carregar" onclick="carregarTudoMatriz()">📂 Carregar</button>
+            <button type="button" class="btn btn-limpar" onclick="limparTudoMatriz()">Limpar</button>
             <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
         </div>
     </div>
-    <div id="contentorFolhasDDS"></div>
+
+    <div class="folha-a4">
+        <table class="cabecalho-container">
+            <tr>
+                <td class="logo-box">VALE</td>
+                <td class="titulo-box">MATRIZ DE REGISTO DE DIÁLOGO DIÁRIO DE SEGURANÇA (DDS)</td>
+                <td class="meta-box"><strong>Ano:</strong> <span id="lblAnoMatriz">2026</span></td>
+            </tr>
+        </table>
+        <table class="tabela-matriz">
+            <thead>
+                <tr>
+                    <th class="th-matriz-id">Nº</th>
+                    <th class="th-matriz-colab">DDS</th>
+                    <th class="th-mes-anual col-mes-0">JAN</th><th class="th-mes-anual col-mes-1">FEV</th>
+                    <th class="th-mes-anual col-mes-2">MAR</th><th class="th-mes-anual col-mes-3">ABR</th>
+                    <th class="th-mes-anual col-mes-4">MAI</th><th class="th-mes-anual col-mes-5">JUN</th>
+                    <th class="th-mes-anual col-mes-6">JUL</th><th class="th-mes-anual col-mes-7">AGO</th>
+                    <th class="th-mes-anual col-mes-8">SET</th><th class="th-mes-anual col-mes-9">OUT</th>
+                    <th class="th-mes-anual col-mes-10">NOV</th><th class="th-mes-anual col-mes-11">DEZ</th>
+                </tr>
+            </thead>
+            <tbody id="corpoMatriz"></tbody>
+        </table>
+    </div>
 
     <script>
-        const TOTAL_LINHAS_DDS = 24;
-        function gerarBlocoComoEstou(sel = null) {
-            const c1 = sel === 1 ? 'selecionado-1' : '';
-            const c2 = sel === 2 ? 'selecionado-2' : '';
-            const c3 = sel === 3 ? 'selecionado-3' : '';
-            return `<div class="grupo-carinhas">
-                <div class="carinha-item c-verde ${c1}" onclick="alternarDestaque(this, 1)"><span class="carinha-num">1</span><svg class="carinha-svg" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><path class="boca" d="M 9.5 18 C 12 23 20 23 22.5 18"/></svg></div>
-                <div class="carinha-item c-amarela ${c2}" onclick="alternarDestaque(this, 2)"><span class="carinha-num">2</span><svg class="carinha-svg" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><line class="boca" x1="10" y1="20" x2="22" y2="20"/></svg></div>
-                <div class="carinha-item c-vermelha ${c3}" onclick="alternarDestaque(this, 3)"><span class="carinha-num">3</span><svg class="carinha-svg" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><path class="boca" d="M 9.5 22 C 12 17 20 17 22.5 22"/></svg></div>
-            </div>`;
+        let visMeses = [true,true,true,true,true,true,true,true,true,true,true,true];
+        function aplicarVisMeses() {
+            for(let i=0; i<12; i++) {
+                const vis = visMeses[i];
+                document.querySelector(`.btn-mes-tag[data-mes="${i}"]`).classList.toggle('inativo', !vis);
+                document.querySelectorAll(`.col-mes-${i}`).forEach(el => el.classList.toggle('mes-oculto', !vis));
+            }
         }
-        function alternarDestaque(el, tipo) {
-            const grupo = el.closest('.grupo-carinhas');
-            grupo.querySelectorAll('.carinha-item').forEach(it => it.classList.remove('selecionado-1', 'selecionado-2', 'selecionado-3'));
-            el.classList.add('selecionado-' + tipo);
+        function alternarMes(i) { visMeses[i] = !visMeses[i]; aplicarVisMeses(); }
+        function definirTodosMeses(st) { for(let i=0; i<12; i++) visMeses[i] = st; aplicarVisMeses(); }
+        function criarLinhaMatriz(num, nome='') {
+            let tds = ''; for(let i=0; i<12; i++) tds += `<td class="celula-data col-mes-${i} ${visMeses[i]?'':'mes-oculto'}" contenteditable="true"></td>`;
+            return `<td class="td-matriz-id">${num}</td><td><div class="col-nome-container"><span class="col-nome-texto" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()">${nome}</span><div class="botoes-acoes"><button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixoMatriz(this)">➕</button><button type="button" class="btn-acao btn-menos-linha" onclick="removerLinhaMatriz(this)">➖</button></div></div></td>${tds}`;
         }
-        function criarHTMLLinhaDDS(numStr, nome = '', val = null) {
-            return `<td class="col-id"><div class="col-id-container"><span class="col-id-texto" contenteditable="true">${numStr}</span></div></td>
-            <td><div class="col-nome-container"><span class="col-nome-texto" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()">${nome}</span>
-            <div class="botoes-acoes"><button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixoDDS(this)">➕</button><button type="button" class="btn-acao btn-menos-linha" onclick="removerLinhaAtualDDS(this)">➖</button><button type="button" class="btn-acao btn-lixeira" onclick="apagarLinhaDDS(this)">🗑️</button></div></div></td>
-            <td class="col-como-estou">${gerarBlocoComoEstou(val)}</td><td class="col-rubrica" contenteditable="true"></td>
-            <td class="col-como-estou">${gerarBlocoComoEstou(val)}</td><td class="col-rubrica" contenteditable="true"></td>
-            <td class="col-como-estou">${gerarBlocoComoEstou(val)}</td><td class="col-rubrica" contenteditable="true"></td>
-            <td class="col-como-estou">${gerarBlocoComoEstou(val)}</td><td class="col-rubrica" contenteditable="true"></td>
-            <td class="col-como-estou">${gerarBlocoComoEstou(val)}</td><td class="col-rubrica" contenteditable="true"></td>`;
+        function reordenarMatriz() { document.querySelectorAll('#corpoMatriz tr').forEach((tr, idx) => { tr.querySelector('.td-matriz-id').innerText = idx < 9 ? '0'+(idx+1) : (idx+1); }); }
+        function adicionarLinhaAbaixoMatriz(btn) { const tr = document.createElement('tr'); tr.innerHTML = criarLinhaMatriz('00',''); btn.closest('tr').after(tr); reordenarMatriz(); }
+        function adicionarLinhaFimMatriz() { const tr = document.createElement('tr'); tr.innerHTML = criarLinhaMatriz('00',''); document.getElementById('corpoMatriz').appendChild(tr); reordenarMatriz(); }
+        function removerLinhaMatriz(b) { if(document.querySelectorAll('#corpoMatriz tr').length > 1) { b.closest('tr').remove(); reordenarMatriz(); } }
+        function gerarTabelaMatriz() {
+            document.getElementById('lblAnoMatriz').innerText = document.getElementById('anoInputMatriz').value;
+            const corpo = document.getElementById('corpoMatriz'); corpo.innerHTML = '';
+            const nomes = document.getElementById('nomesInputMatriz').value.toUpperCase().split('\n').map(l=>l.trim()).filter(l=>l.length>0).sort((a,b)=>a.localeCompare(b,'pt'));
+            document.getElementById('nomesInputMatriz').value = nomes.join('\n');
+            const lista = nomes.length > 0 ? nomes : ['','','','',''];
+            lista.forEach((n, idx) => { const tr = document.createElement('tr'); tr.innerHTML = criarLinhaMatriz(idx<9?'0'+(idx+1):(idx+1), n); corpo.appendChild(tr); });
+            aplicarVisMeses();
         }
-        function apagarLinhaDDS(b) { b.closest('tr').querySelector('.col-nome-texto').innerText = ''; }
-        function reordenarNumDDS() { let c = 1; document.querySelectorAll('#contentorFolhasDDS .folha-a4').forEach(f => { f.querySelectorAll('.corpo-tabela-folha tr').forEach(tr => { const el = tr.querySelector('.col-id-texto'); if(el) el.innerText = c < 10 ? '0'+c : c; c++; }); }); }
-        function adicionarLinhaAbaixoDDS(b) { const tr = b.closest('tr'); const nova = document.createElement('tr'); nova.innerHTML = criarHTMLLinhaDDS('00','',null); tr.after(nova); reordenarNumDDS(); }
-        function removerLinhaAtualDDS(b) { const tr = b.closest('tr'); if(tr.parentNode.querySelectorAll('tr').length <= 1) return; tr.remove(); reordenarNumDDS(); }
-        function adicionarLinhaFimDDS(b) { const corpo = b.closest('.folha-a4').querySelector('.corpo-tabela-folha'); const nova = document.createElement('tr'); nova.innerHTML = criarHTMLLinhaDDS('00','',null); corpo.appendChild(nova); reordenarNumDDS(); }
-        function removerLinhaFimDDS(b) { const corpo = b.closest('.folha-a4').querySelector('.corpo-tabela-folha'); const l = corpo.querySelectorAll('tr'); if(l.length <= 1) return; l[l.length-1].remove(); reordenarNumDDS(); }
-        function removerFolhaDDS(b) { b.closest('.folha-a4').remove(); atualizarPaginacaoDDS(); }
-        function criarEstruturaFolhaDDS(nomes, padrao, tot) {
-            let linhas = ''; for(let i=0; i<tot; i++) { let n = nomes[i] ? nomes[i].trim().toUpperCase() : ''; linhas += `<tr>${criarHTMLLinhaDDS('00', n, padrao ? 1 : null)}</tr>`; }
-            const f = document.createElement('div'); f.className = 'folha-a4';
-            f.innerHTML = `<div class="barra-controle-folha"><div class="grupo-acoes-linhas"><button type="button" class="btn-linha-topo" onclick="adicionarLinhaFimDDS(this)">➕ Linha</button><button type="button" class="btn-linha-topo" onclick="removerLinhaFimDDS(this)">➖ Linha</button></div><button type="button" class="btn-remover-folha" onclick="removerFolhaDDS(this)">Remover Folha ✕</button></div>
-            <table class="cabecalho-container"><tr><td class="logo-box">VALE</td><td class="titulo-box">DIÁLOGO DIÁRIO DE SEGURANÇA (DDS) E EMOCIOGRAMA</td><td class="meta-box"><span class="indicador-folha"><strong>Folha:</strong> 01 / 01</span></td></tr></table>
-            <table class="info-dds"><tr><td><strong>Período:</strong> <span class="campo-editavel">${document.getElementById('periodoInputDDS').value}</span></td><td><strong>Semana:</strong> <span class="campo-editavel">${document.getElementById('semanaInputDDS').value}</span></td><td><strong>Ano:</strong> <span class="campo-editavel">${document.getElementById('anoInputDDS').value}</span></td></tr></table>
-            <table class="tabela-dds"><thead><tr><th rowspan="2" class="col-id">Nº</th><th rowspan="2" style="text-align:left; padding-left:4px;">Colaborador</th><th colspan="2" class="th-dia-semana">Segunda</th><th colspan="2" class="th-dia-semana">Terça</th><th colspan="2" class="th-dia-semana">Quarta</th><th colspan="2" class="th-dia-semana">Quinta</th><th colspan="2" class="th-dia-semana">Sexta</th></tr><tr><th class="th-sub">Estou</th><th class="th-sub">Rub</th><th class="th-sub">Estou</th><th class="th-sub">Rub</th><th class="th-sub">Estou</th><th class="th-sub">Rub</th><th class="th-sub">Estou</th><th class="th-sub">Rub</th><th class="th-sub">Estou</th><th class="th-sub">Rub</th></tr></thead><tbody class="corpo-tabela-folha">${linhas}</tbody></table>
-            <div class="rodape-container"><div class="box-legenda"><h4>LEGENDA:</h4><ul class="lista-legenda"><li><strong>FE</strong> = Feriado</li><li><strong>AT</strong> = Atestado</li><li><strong>FA</strong> = Falta</li><li><strong>FR</strong> = Férias</li></ul></div><div class="box-legenda"><h4>AÇÃO TOMADA:</h4><ul class="lista-legenda"><li><strong>EST</strong> = Estratégia</li><li><strong>ENG</strong> = ADM</li><li><strong>OP</strong> = Operação</li></ul></div><div class="box-legenda"><h4>EMOCIOGRAMA:</h4><span style="font-size:7px;">1: Plenas | 2: Acompanhar | 3: Sem condições</span></div></div>`;
-            return f;
-        }
-        function atualizarPaginacaoDDS() { const f = document.querySelectorAll('#contentorFolhasDDS .folha-a4'); f.forEach((folha, idx) => { const ind = folha.querySelector('.indicador-folha'); if(ind) ind.innerHTML = `<strong>Folha:</strong> 0${idx+1} / 0${f.length}`; }); }
-        function adicionarFolhaManualDDS() { document.getElementById('contentorFolhasDDS').appendChild(criarEstruturaFolhaDDS([], null, TOTAL_LINHAS_DDS)); reordenarNumDDS(); atualizarPaginacaoDDS(); }
-        function aplicarDadosDDS(modo) {
-            const box = document.getElementById('contentorFolhasDDS'); box.innerHTML = '';
-            const nomes = document.getElementById('nomesInputDDS').value.toUpperCase().split('\n').map(l => l.trim()).filter(l => l.length > 0).sort((a,b)=>a.localeCompare(b,'pt'));
-            document.getElementById('nomesInputDDS').value = nomes.join('\n');
-            let blocos = []; if(nomes.length === 0) blocos.push([]); else for(let i=0; i<nomes.length; i+=TOTAL_LINHAS_DDS) blocos.push(nomes.slice(i, i+TOTAL_LINHAS_DDS));
-            blocos.forEach(b => box.appendChild(criarEstruturaFolhaDDS(b, modo==='verde', TOTAL_LINHAS_DDS)));
-            reordenarNumDDS(); atualizarPaginacaoDDS();
-        }
-        function salvarTudoDDS() { localStorage.setItem('valedds_v01', JSON.stringify({html: document.getElementById('contentorFolhasDDS').innerHTML})); alert('DDS Guardado!'); }
-        function carregarTudoDDS() { const s = localStorage.getItem('valedds_v01'); if(s) { document.getElementById('contentorFolhasDDS').innerHTML = JSON.parse(s).html; alert('DDS Carregado!'); } }
-        function limparTudoDDS() { document.getElementById('contentorFolhasDDS').innerHTML = ''; adicionarFolhaManualDDS(); }
-        window.onload = function() { adicionarFolhaManualDDS(); };
+        function salvarTudoMatriz() { localStorage.setItem('valematriz_v01', JSON.stringify({html: document.getElementById('corpoMatriz').innerHTML})); alert('Matriz Guardada!'); }
+        function carregarTudoMatriz() { const s = localStorage.getItem('valematriz_v01'); if(s) { document.getElementById('corpoMatriz').innerHTML = JSON.parse(s).html; alert('Matriz Carregada!'); } }
+        function limparTudoMatriz() { document.getElementById('corpoMatriz').innerHTML = ''; gerarTabelaMatriz(); }
+        window.onload = function() { gerarTabelaMatriz(); };
     </script>
 </body>
 </html>
