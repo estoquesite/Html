@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Portal Operacional - Vale - v01</title>
+    <title>Portal Operacional - Vale</title>
     <style>
         * {
             box-sizing: border-box;
@@ -11,115 +11,110 @@
         }
 
         body {
-            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, Helvetica, Arial, sans-serif;
-            background-color: #eef2f5;
-            color: #2c3e50;
+            font-family: Arial, Helvetica, sans-serif;
+            background-color: #f0f4f5;
+            color: #333;
             min-height: 100vh;
         }
 
-        /* GESTÃO DOS ECRÃS */
-        #telaCapa { display: block; }
-        #telaDDS { display: none; padding: 12px; }
-        #telaMatriz { display: none; padding: 12px; }
+        #telaCapa {
+            display: block;
+        }
 
-        /* CABEÇALHO GLOBAL */
+        #telaDDS {
+            display: none;
+            padding: 10px;
+        }
+
+        /* CAPA */
         header {
-            background: linear-gradient(135deg, #007e7a 0%, #005a57 100%);
+            background: linear-gradient(135deg, #007e7a, #005a57);
             color: #fff;
-            padding: 16px 28px;
+            padding: 16px 24px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            box-shadow: 0 4px 12px rgba(0, 126, 122, 0.2);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
         }
 
         .header-logo {
             font-size: 20px;
-            font-weight: 800;
+            font-weight: bold;
             letter-spacing: 1.5px;
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 10px;
         }
 
-        .header-logo span.subtitulo {
+        .header-logo span {
             font-size: 13px;
-            font-weight: 500;
-            background: rgba(255, 255, 255, 0.18);
-            padding: 4px 10px;
-            border-radius: 6px;
-        }
-
-        .tag-v01 {
-            background-color: #ffeb3b;
-            color: #212121;
-            font-weight: 800;
-            font-size: 11px;
+            font-weight: normal;
+            background: rgba(255,255,255,0.2);
             padding: 3px 8px;
             border-radius: 4px;
-            letter-spacing: 0.5px;
         }
 
-        /* CAPA (PAINEL CENTRAL) */
         main.capa-main {
-            max-width: 1120px;
+            max-width: 1100px;
             width: 100%;
             margin: 0 auto;
-            padding: 36px 20px;
+            padding: 30px 20px;
         }
 
-        .secao-titulo { margin-bottom: 24px; }
+        .secao-titulo {
+            margin-bottom: 24px;
+        }
+
         .secao-titulo h2 {
-            font-size: 19px;
-            font-weight: 800;
+            font-size: 18px;
             color: #005a57;
             text-transform: uppercase;
             letter-spacing: 0.8px;
         }
+
         .secao-titulo p {
-            font-size: 13px;
-            color: #64748b;
-            margin-top: 4px;
+            font-size: 12px;
+            color: #666;
+            margin-top: 3px;
         }
 
         .grid-modulos {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 22px;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 20px;
         }
 
         .card-modulo {
             background: #fff;
-            border-radius: 10px;
-            border: 1px solid #e2e8f0;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
-            padding: 22px;
+            border-radius: 8px;
+            border: 1px solid #dcdfe3;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+            padding: 20px;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             cursor: pointer;
-            transition: all 0.25s ease;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
             position: relative;
             overflow: hidden;
-            min-height: 190px;
+            min-height: 180px;
         }
 
         .card-modulo::before {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0;
+            top: 0;
+            left: 0;
+            right: 0;
             height: 4px;
+            background-color: #007e7a;
         }
-
-        .card-modulo.m1::before { background: linear-gradient(90deg, #007e7a, #26a69a); }
-        .card-modulo.m2::before { background: linear-gradient(90deg, #1e40af, #3b82f6); }
 
         .card-modulo:hover {
             transform: translateY(-4px);
-            box-shadow: 0 10px 20px -3px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.12);
+            border-color: #007e7a;
         }
-        .card-modulo.m1:hover { border-color: #007e7a; }
-        .card-modulo.m2:hover { border-color: #1e40af; }
 
         .card-topo {
             display: flex;
@@ -129,191 +124,118 @@
         }
 
         .card-icone {
-            width: 44px;
-            height: 44px;
-            border-radius: 10px;
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            background: #f0f7f7;
             display: flex;
             align-items: center;
             justify-content: center;
             font-size: 22px;
         }
-        .m1 .card-icone { background: #e6f4f4; color: #007e7a; }
-        .m2 .card-icone { background: #eff6ff; color: #1e40af; }
 
         .card-badge {
             font-size: 9px;
-            font-weight: 700;
+            font-weight: bold;
             text-transform: uppercase;
-            padding: 3px 7px;
+            padding: 3px 6px;
             border-radius: 4px;
             background: #e8f5e9;
             color: #1b5e20;
         }
 
         .card-titulo {
-            font-size: 15px;
-            font-weight: 700;
+            font-size: 14px;
+            font-weight: bold;
             margin-bottom: 6px;
-            color: #1e293b;
+            color: #1f2d3d;
         }
 
         .card-descricao {
-            font-size: 11.5px;
-            color: #64748b;
-            line-height: 1.45;
+            font-size: 11px;
+            color: #6c757d;
+            line-height: 1.4;
             margin-bottom: 16px;
         }
 
         .card-rodape {
-            border-top: 1px solid #f1f5f9;
-            padding-top: 12px;
+            border-top: 1px solid #f0f0f0;
+            padding-top: 10px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            font-size: 11.5px;
-            font-weight: 700;
+            font-size: 11px;
+            font-weight: bold;
+            color: #007e7a;
         }
-        .m1 .card-rodape { color: #007e7a; }
-        .m2 .card-rodape { color: #1e40af; }
 
         .card-adicionar {
             border: 2px dashed #007e7a;
-            background: rgba(0, 126, 122, 0.02);
+            background: rgba(0, 126, 122, 0.03);
             align-items: center;
             justify-content: center;
             text-align: center;
         }
-        .card-adicionar:hover { background: rgba(0, 126, 122, 0.06); border-color: #007e7a; }
 
-        /* PAINÉIS DE CONTROLO */
+        .card-adicionar:hover {
+            background: rgba(0, 126, 122, 0.08);
+        }
+
+        /* FOLHA DE DDS COMPACTA PARA 24 LINHAS */
+        @page {
+            size: A4 landscape;
+            margin: 3mm 4mm;
+        }
+
         .painel-controle {
             background: #fff;
-            padding: 14px 18px;
-            margin: 0 auto 14px auto;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06);
-            border: 1px solid #e2e8f0;
+            padding: 10px 14px;
+            margin: 0 auto 12px auto;
+            border-radius: 6px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.15);
             max-width: 1080px;
         }
 
         .campos-painel {
             display: grid;
-            gap: 10px;
-            margin-bottom: 10px;
+            grid-template-columns: 2fr 1.2fr 0.8fr 0.8fr;
+            gap: 8px;
+            margin-bottom: 8px;
         }
-
-        .grid-4 { grid-template-columns: 2fr 1fr 1fr 1fr; }
-        .grid-3 { grid-template-columns: 2fr 1fr 1fr; }
 
         .campo-grupo label {
             display: block;
-            font-weight: 700;
-            margin-bottom: 4px;
-            font-size: 10px;
-            color: #475569;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+            font-weight: bold;
+            margin-bottom: 3px;
+            font-size: 9.5px;
         }
 
         .painel-controle input[type="text"] {
             width: 100%;
             font-family: inherit;
-            font-size: 11px;
-            padding: 6px 8px;
-            border: 1px solid #cbd5e1;
-            border-radius: 5px;
-            outline: none;
-            transition: 0.2s;
-        }
-
-        .painel-controle input[type="text"]:focus {
-            border-color: #007e7a;
-            box-shadow: 0 0 0 2px rgba(0, 126, 122, 0.15);
+            font-size: 10.5px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
         }
 
         .painel-controle textarea {
             width: 100%;
-            height: 65px;
+            height: 60px;
             font-family: inherit;
-            font-size: 11px;
-            padding: 6px 8px;
-            border: 1px solid #cbd5e1;
-            border-radius: 5px;
+            font-size: 10.5px;
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
             resize: vertical;
             text-transform: uppercase;
-            outline: none;
         }
 
-        .painel-controle textarea:focus {
-            border-color: #007e7a;
-            box-shadow: 0 0 0 2px rgba(0, 126, 122, 0.15);
-        }
-
-        /* BARRA SELETORA DE MESES */
-        .painel-meses-toggle {
-            background: #f8fafc;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            padding: 8px 12px;
-            margin-bottom: 10px;
-        }
-
-        .titulo-meses-toggle {
-            font-size: 10px;
-            font-weight: 800;
-            text-transform: uppercase;
-            color: #334155;
+        .dica-painel {
+            font-size: 8.5px;
+            color: #555;
+            margin-top: 2px;
             margin-bottom: 6px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-
-        .container-meses-btns {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 5px;
-        }
-
-        .btn-mes-tag {
-            border: 1px solid #1b8a5a;
-            background-color: #e8f5e9;
-            color: #1b5e20;
-            font-size: 9.5px;
-            font-weight: 800;
-            padding: 3px 8px;
-            border-radius: 4px;
-            cursor: pointer;
-            transition: 0.15s;
-            user-select: none;
-        }
-
-        .btn-mes-tag.inativo {
-            background-color: #f1f5f9;
-            border-color: #cbd5e1;
-            color: #94a3b8;
-            text-decoration: line-through;
-        }
-
-        .btn-mes-tag:hover {
-            opacity: 0.85;
-            transform: scale(1.05);
-        }
-
-        .links-rapidos-meses {
-            display: flex;
-            gap: 6px;
-        }
-
-        .link-rapido {
-            font-size: 9px;
-            font-weight: 700;
-            color: #1e40af;
-            cursor: pointer;
-            text-decoration: underline;
-            background: none;
-            border: none;
-            padding: 0;
         }
 
         .botoes-painel {
@@ -324,296 +246,331 @@
 
         .btn {
             cursor: pointer;
-            padding: 6px 12px;
+            padding: 5px 12px;
             font-size: 10.5px;
-            font-weight: 700;
+            font-weight: bold;
             border: none;
-            border-radius: 5px;
+            border-radius: 4px;
             transition: 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
         }
 
-        .btn-verde { background-color: #1b8a5a; color: #fff; }
-        .btn-verde:hover { background-color: #146c46; }
+        .btn-verde { background-color: #2e7d32; color: #fff; }
         .btn-azul { background-color: #007e7a; color: #fff; }
-        .btn-azul:hover { background-color: #005a57; }
         .btn-add-folha { background-color: #4a148c; color: #fff; }
         .btn-add-folha:hover { background-color: #311b92; }
-        .btn-salvar { background-color: #1e40af; color: #fff; }
-        .btn-salvar:hover { background-color: #1e3a8a; }
-        .btn-carregar { background-color: #d97706; color: #fff; }
-        .btn-carregar:hover { background-color: #b45309; }
-        .btn-limpar { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; }
-        .btn-limpar:hover { background-color: #e2e8f0; }
-        .btn-voltar { background-color: #475569; color: #fff; }
-        .btn-voltar:hover { background-color: #334155; }
-        .btn-imprimir { background-color: #0f172a; color: #fff; margin-left: auto; }
-        .btn-imprimir:hover { background-color: #000; }
+        .btn-salvar { background-color: #1565c0; color: #fff; }
+        .btn-carregar { background-color: #f57f17; color: #fff; }
+        .btn-limpar { background-color: #e0e0e0; color: #333; }
+        .btn-voltar { background-color: #546e7a; color: #fff; }
+        .btn-imprimir { background-color: #212121; color: #fff; margin-left: auto; }
 
-        /* BASE DAS FOLHAS A4 */
         .folha-a4 {
             width: 100%;
             max-width: 1080px;
             background: #fff;
-            padding: 8px 10px;
-            margin: 0 auto 16px auto;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-            border-radius: 4px;
+            padding: 5px 7px;
+            margin: 0 auto 12px auto;
+            box-shadow: 0 0 8px rgba(0,0,0,0.1);
+            page-break-inside: avoid;
+            break-inside: avoid;
             position: relative;
         }
 
-        .barra-controle-folha, .barra-acoes-folha {
+        .quebra-pagina {
+            page-break-after: always;
+            break-after: page;
+        }
+
+        .barra-controle-folha {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 4px;
-            background: #f8fafc;
-            padding: 4px 8px;
-            border: 1px solid #e2e8f0;
-            border-radius: 4px;
+            justify-content: flex-end;
+            margin-bottom: 2px;
         }
-
-        .grupo-acoes-linhas { display: flex; align-items: center; gap: 6px; }
-
-        .btn-linha-topo {
-            border: 1px solid #007e7a;
-            border-radius: 4px;
-            font-size: 8.5px;
-            font-weight: 700;
-            padding: 2px 8px;
-            cursor: pointer;
-            background: #fff;
-            color: #007e7a;
-            transition: 0.15s;
-        }
-        .btn-linha-topo:hover { background: #007e7a; color: #fff; }
 
         .btn-remover-folha {
-            background: #fff;
-            color: #dc2626;
-            border: 1px solid #fca5a5;
-            border-radius: 4px;
-            font-size: 8px;
-            font-weight: 700;
-            padding: 2px 7px;
+            background: #ffebee;
+            color: #c62828;
+            border: 1px solid #ef9a9a;
+            border-radius: 3px;
+            font-size: 7.5px;
+            font-weight: bold;
+            padding: 1px 5px;
             cursor: pointer;
         }
-        .btn-remover-folha:hover { background: #fee2e2; }
 
-        /* TABELAS */
-        .cabecalho-container, .info-dds {
-            width: 100%;
-            border-collapse: collapse;
-            border: 1.2px solid #0f172a;
-            margin-bottom: 3px;
-            table-layout: fixed;
+        .btn-remover-folha:hover {
+            background: #ffcdd2;
         }
 
-        .cabecalho-container td, .info-dds td {
-            border: 1px solid #334155;
-            padding: 1px 3px;
+        .cabecalho-container, .info-dds, table.tabela-dds {
+            width: 100%;
+            border-collapse: collapse;
+            border: 1.1px solid #000;
+            margin-bottom: 2px;
+        }
+
+        .cabecalho-container td, .info-dds td, table.tabela-dds th, table.tabela-dds td {
+            border: 1px solid #000;
+            padding: 0 2px;
             vertical-align: middle;
             text-align: center;
         }
 
         .logo-box {
-            width: 110px;
-            font-weight: 900;
-            font-size: 15px;
-            letter-spacing: 1.5px;
+            width: 105px;
+            font-weight: bold;
+            font-size: 14px;
+            letter-spacing: 1px;
             color: #007e7a;
-            background-color: #f8fafc;
+            background-color: #fafafa;
         }
 
         .titulo-box {
-            font-size: 10px;
-            font-weight: 800;
+            font-size: 9.5px;
+            font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
-            color: #0f172a;
         }
 
         .meta-box {
-            width: 125px;
-            font-size: 8px;
-            line-height: 1.25;
-            text-align: left !important;
-            padding-left: 6px !important;
-            background-color: #f8fafc;
+            width: 115px;
+            font-size: 7.5px;
+            line-height: 1.15;
         }
 
         .info-label {
-            font-weight: 800;
+            font-weight: bold;
             text-transform: uppercase;
             font-size: 7.5px;
-            color: #005a57;
         }
 
         .campo-editavel {
             outline: none;
             display: inline-block;
             min-width: 25px;
-            font-size: 8px;
-            font-weight: 600;
+            font-size: 7.5px;
         }
 
-        .botoes-acoes { display: flex; align-items: center; gap: 1px; }
-        .btn-acao { background: none; border: none; cursor: pointer; padding: 0 1px; opacity: 0.65; line-height: 1; transition: 0.15s; }
-        .btn-acao:hover { opacity: 1; transform: scale(1.2); }
-        .btn-lixeira { color: #dc2626; font-size: 8px; }
-        .btn-mais-linha { color: #15803d; font-weight: 900; font-size: 10px; }
-        .btn-menos-linha { color: #b91c1c; font-weight: 900; font-size: 10px; }
-
-        /* MÓDULO 1: DDS & EMOCIOGRAMA SEMANAL */
-        table.tabela-dds {
-            width: 100%;
-            border-collapse: collapse;
-            border: 1.2px solid #0f172a;
-            margin-bottom: 3px;
-            table-layout: fixed;
-        }
-        table.tabela-dds th, table.tabela-dds td {
-            border: 1px solid #334155;
-            text-align: center;
-            vertical-align: middle;
-        }
-        table.tabela-dds th { background-color: #f1f5f9; font-weight: 800; color: #0f172a; }
-        table.tabela-dds tbody tr:nth-child(even) { background-color: #fafbfc; }
-        table.tabela-dds td { height: 15.5px; padding: 0 1px; }
-
-        .tabela-dds .col-id {
-            width: 32px !important;
-            max-width: 32px !important;
-            font-weight: 800;
-            background-color: #f8fafc !important;
-            color: #0f172a;
-            padding: 0 !important;
-        }
-        .col-id-container { display: flex; align-items: center; justify-content: center; gap: 1px; width: 100%; }
-        .col-id-texto { outline: none; min-width: 14px; text-align: center; font-size: 8px; font-weight: 800; }
-        .col-nome-container { display: flex; align-items: center; justify-content: space-between; padding: 0 4px; gap: 3px; }
-        .col-nome-texto {
-            flex-grow: 1; text-align: left; outline: none; white-space: nowrap; overflow: hidden;
-            text-overflow: ellipsis; font-size: 8.5px; font-weight: 700; color: #000; text-transform: uppercase; letter-spacing: 0.2px;
+        table.tabela-dds th {
+            background-color: #f0f0f0;
+            font-weight: bold;
         }
 
-        .th-dia-semana {
-            font-size: 8px; font-weight: 800; text-transform: uppercase; padding: 2px 0;
-            background: linear-gradient(180deg, #e6f4f4 0%, #d8ecec 100%) !important; color: #005a57; letter-spacing: 0.5px;
-        }
-        .th-tema-dia { font-size: 7px; font-weight: normal; text-align: left !important; padding-left: 4px !important; background-color: #ffffff !important; height: 14px; }
-        .th-data-turno { font-size: 7px; font-weight: normal; text-align: left !important; padding-left: 4px !important; background-color: #f8fafc !important; height: 13px; }
-        .th-sub { font-size: 7px !important; font-weight: 800; background-color: #f1f5f9 !important; }
-
-        .col-como-estou { width: 48px; min-width: 48px; padding: 0 !important; }
-        .col-rubrica { width: 52px; min-width: 52px; outline: none; font-size: 8px; background-color: #fff; }
-
-        .grupo-carinhas { display: flex; align-items: center; justify-content: space-evenly; width: 100%; }
-        .carinha-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; user-select: none; line-height: 1; padding: 0; border-radius: 3px; }
-        .carinha-num { font-size: 6px; font-weight: 800; color: #334155; margin-bottom: 0.5px; }
-        .carinha-svg { width: 10px; height: 10px; display: block; }
-
-        .c-verde circle.rosto { stroke: #15803d; stroke-width: 2.2; fill: #f0fdf4; } .c-verde circle.olho { fill: #15803d; } .c-verde path.boca { stroke: #15803d; stroke-width: 2.2; stroke-linecap: round; fill: none; }
-        .c-amarela circle.rosto { stroke: #d97706; stroke-width: 2.2; fill: #fffbeb; } .c-amarela circle.olho { fill: #d97706; } .c-amarela line.boca { stroke: #d97706; stroke-width: 2.2; stroke-linecap: round; fill: none; }
-        .c-vermelha circle.rosto { stroke: #dc2626; stroke-width: 2.2; fill: #fef2f2; } .c-vermelha circle.olho { fill: #dc2626; } .c-vermelha path.boca { stroke: #dc2626; stroke-width: 2.2; stroke-linecap: round; fill: none; }
-
-        .carinha-item.selecionado-1 { background-color: #bbf7d0; outline: 1.2px solid #15803d; }
-        .carinha-item.selecionado-2 { background-color: #fef08a; outline: 1.2px solid #ca8a04; }
-        .carinha-item.selecionado-3 { background-color: #fecaca; outline: 1.2px solid #dc2626; }
-
-        .rodape-container { display: grid; grid-template-columns: 130px 1.2fr 1.6fr; gap: 5px; width: 100%; font-size: 7px; line-height: 1.25; }
-        .box-legenda { border: 1px solid #334155; padding: 3px 5px; background-color: #fff; border-radius: 3px; }
-        .box-legenda h4 { margin: 0 0 2px 0; font-size: 7.5px; font-weight: 800; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; padding-bottom: 1px; color: #005a57; }
-        .lista-legenda { list-style: none; padding: 0; margin: 0; }
-        .lista-legenda li { margin-bottom: 1px; }
-        .item-emocio { display: flex; align-items: flex-start; gap: 4px; margin-bottom: 2px; }
-
-        /* MÓDULO 2: MATRIZ DINÂMICA */
-        table.tabela-matriz {
-            width: 100%;
-            border-collapse: collapse;
-            border: 1.5px solid #1e293b;
-            table-layout: fixed;
-            background-color: #fff;
+        /* 24 LINHAS CALIBRADAS */
+        table.tabela-dds td {
+            height: 15.5px;
+            padding: 0 1px;
         }
 
-        table.tabela-matriz th,
-        table.tabela-matriz td {
-            border: 1px solid #475569;
-            text-align: center;
-            vertical-align: middle;
-            font-size: 8.5px;
+        .col-id {
+            width: 30px;
+            font-weight: bold;
+            background-color: #fafafa;
         }
 
-        .th-matriz-id { width: 32px; background-color: #f1f5f9; font-weight: 800; }
-        .th-matriz-colab {
-            width: 220px; background-color: #1b8a5a; color: #fff;
-            font-size: 10px; font-weight: 800; letter-spacing: 0.8px; padding: 5px 6px;
-        }
-        .th-mes-anual {
-            background-color: #1b8a5a; color: #fff; font-size: 9.5px;
-            font-weight: 800; letter-spacing: 0.5px; padding: 5px 2px;
+        .col-id-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1px;
         }
 
-        table.tabela-matriz tbody tr { height: 16.5px; }
-        table.tabela-matriz tbody tr:nth-child(even) { background-color: #fafbfc; }
-
-        .td-matriz-id { background-color: #f8fafc; font-weight: 800; color: #0f172a; padding: 0 1px; }
-        
-        .celula-data {
+        .col-id-texto {
             outline: none;
-            font-size: 8px;
-            font-weight: 700;
-            color: #0f172a;
-            background-color: #fff;
-            padding: 0 2px;
+            min-width: 12px;
+            text-align: center;
+            font-size: 7.5px;
+        }
+
+        .col-nome-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-left: 2px;
+            gap: 2px;
+        }
+
+        .col-nome-texto {
+            flex-grow: 1;
+            text-align: left;
+            outline: none;
             white-space: nowrap;
             overflow: hidden;
-            text-overflow: clip;
-            cursor: text;
-        }
-        .celula-data:focus {
-            background-color: #f0fdf4;
-            box-shadow: inset 0 0 0 1.5px #1b8a5a;
+            text-overflow: ellipsis;
+            font-size: 7.5px;
+            text-transform: uppercase;
         }
 
-        .mes-oculto {
-            display: none !important;
+        .botoes-acoes {
+            display: flex;
+            align-items: center;
+            gap: 1px;
         }
 
-        /* IMPRESSÃO DINÂMICA AUTOAJUSTÁVEL */
+        .btn-acao {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 8px;
+            padding: 0 1px;
+            opacity: 0.6;
+        }
+
+        .btn-acao:hover { opacity: 1; }
+        .btn-lapis { color: #007e7a; }
+        .btn-lixeira { color: #d32f2f; }
+
+        .th-dia-semana {
+            font-size: 7.5px;
+            text-transform: uppercase;
+            padding: 1px 0;
+            background-color: #e6ecec !important;
+        }
+
+        .th-tema-dia {
+            font-size: 6.5px;
+            font-weight: normal;
+            text-align: left !important;
+            padding-left: 3px !important;
+            background-color: #ffffff !important;
+            height: 14px;
+        }
+
+        .th-data-turno {
+            font-size: 6.5px;
+            font-weight: normal;
+            text-align: left !important;
+            padding-left: 3px !important;
+            background-color: #fbfbfb !important;
+            height: 13px;
+        }
+
+        .th-sub {
+            font-size: 6.5px !important;
+            font-weight: bold;
+        }
+
+        .col-como-estou { 
+            width: 48px; 
+            min-width: 48px; 
+            padding: 0 !important;
+        }
+
+        .col-rubrica { 
+            width: 52px; 
+            min-width: 52px; 
+            outline: none; 
+            font-size: 7.5px;
+        }
+
+        .grupo-carinhas {
+            display: flex;
+            align-items: center;
+            justify-content: space-evenly;
+            width: 100%;
+        }
+
+        .carinha-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            line-height: 1;
+            padding: 0;
+            border-radius: 2px;
+        }
+
+        .carinha-num {
+            font-size: 5.5px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 0.5px;
+        }
+
+        .carinha-svg {
+            width: 10px;
+            height: 10px;
+            display: block;
+        }
+
+        .c-verde circle.rosto { stroke: #2e7d32; stroke-width: 2; fill: #f1f8e9; }
+        .c-verde circle.olho { fill: #2e7d32; }
+        .c-verde path.boca { stroke: #2e7d32; stroke-width: 2; stroke-linecap: round; fill: none; }
+
+        .c-amarela circle.rosto { stroke: #f57f17; stroke-width: 2; fill: #fffde7; }
+        .c-amarela circle.olho { fill: #f57f17; }
+        .c-amarela line.boca { stroke: #f57f17; stroke-width: 2; stroke-linecap: round; fill: none; }
+
+        .c-vermelha circle.rosto { stroke: #d32f2f; stroke-width: 2; fill: #ffebee; }
+        .c-vermelha circle.olho { fill: #d32f2f; }
+        .c-vermelha path.boca { stroke: #d32f2f; stroke-width: 2; stroke-linecap: round; fill: none; }
+
+        .carinha-item.selecionado-1 { background-color: #c8e6c9; outline: 1px solid #2e7d32; }
+        .carinha-item.selecionado-2 { background-color: #fff59d; outline: 1px solid #f57f17; }
+        .carinha-item.selecionado-3 { background-color: #ffcdd2; outline: 1px solid #d32f2f; }
+
+        .rodape-container {
+            display: grid;
+            grid-template-columns: 130px 1.2fr 1.6fr;
+            gap: 4px;
+            width: 100%;
+            font-size: 6.5px;
+            line-height: 1.15;
+        }
+
+        .box-legenda {
+            border: 1px solid #000;
+            padding: 2px 3px;
+            background-color: #fff;
+        }
+
+        .box-legenda h4 {
+            margin: 0 0 1.5px 0;
+            font-size: 7px;
+            font-weight: bold;
+            text-transform: uppercase;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 1px;
+        }
+
+        .lista-legenda {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .lista-legenda li {
+            margin-bottom: 1px;
+        }
+
+        .item-emocio {
+            display: flex;
+            align-items: flex-start;
+            gap: 3px;
+            margin-bottom: 1.5px;
+        }
+
         @media print {
-            @page { size: A4 landscape; margin: 4mm 5mm; }
-            body { background: #fff !important; padding: 0 !important; margin: 0 !important; color: #000 !important; }
-            
             #telaCapa { display: none !important; }
-            .painel-controle, .botoes-acoes, .btn-lapis-num, .barra-controle-folha, .barra-acoes-folha, .acoes-linha { display: none !important; }
-
+            #telaDDS { display: block !important; padding: 0 !important; }
+            .painel-controle, .botoes-acoes, .btn-lapis-num, .barra-controle-folha { display: none !important; }
             .folha-a4 {
-                box-shadow: none !important; border-radius: 0 !important; padding: 0 !important; margin: 0 !important;
-                width: 100% !important; max-width: 100% !important; height: 98vh !important;
-                display: flex !important; flex-direction: column !important; justify-content: space-between !important;
-                page-break-inside: avoid !important; break-inside: avoid !important;
-                page-break-after: always !important; break-after: page !important;
+                box-shadow: none;
+                padding: 0;
+                margin: 0;
+                max-width: 100%;
+                page-break-inside: avoid !important;
             }
-            .folha-a4:last-child { page-break-after: auto !important; break-after: auto !important; }
-
-            table.tabela-dds, table.tabela-matriz { flex-grow: 1 !important; margin-bottom: 2px !important; }
-            table.tabela-dds tbody tr, table.tabela-matriz tbody tr { height: auto !important; }
-            table.tabela-dds td, table.tabela-matriz td { height: auto !important; padding: 1px !important; }
-            .col-nome-texto, .td-nome-texto { font-weight: 800 !important; color: #000 !important; }
         }
     </style>
 </head>
 <body>
 
-    <!-- ==================== CAPA INICIAL ==================== -->
+    <!-- CAPA -->
     <div id="telaCapa">
         <header>
             <div class="header-logo">
-                VALE <span class="subtitulo">Portal de Aplicações Operacionais</span> <span class="tag-v01">v01</span>
+                VALE <span>Portal de Aplicações Operacionais</span>
             </div>
             <div style="font-size: 11px; opacity: 0.9;">Painel Central</div>
         </header>
@@ -621,20 +578,19 @@
         <main class="capa-main">
             <div class="secao-titulo">
                 <h2>MÓDULOS & APLICAÇÕES</h2>
-                <p>Selecione o ficheiro pretendido para iniciar a edição:</p>
+                <p>Selecione uma aplicação para aceder diretamente:</p>
             </div>
 
             <div class="grid-modulos">
-                <!-- CARTÃO 1: DDS EMOCIOGRAMA -->
-                <div class="card-modulo m1" onclick="abrirDDS()">
+                <div class="card-modulo" onclick="abrirDDS()">
                     <div>
                         <div class="card-topo">
                             <div class="card-icone">📋</div>
                             <span class="card-badge">PRONTO A USAR</span>
                         </div>
-                        <div class="card-titulo">DDS & Emociograma Semanal</div>
+                        <div class="card-titulo">DDS & Emociograma Semanal (24 Linhas)</div>
                         <div class="card-descricao">
-                            Registo diário com 24 linhas por folha, ordenação alfabética automática (A-Z), carinhas de emociograma e autoajuste para impressão sem cortes.
+                            Controlo de presença diário de Segunda a Sexta com carinhas de emociograma, assinatura por rubrica e registo de temas diários.
                         </div>
                     </div>
                     <div class="card-rodape">
@@ -643,261 +599,116 @@
                     </div>
                 </div>
 
-                <!-- CARTÃO 2: MATRIZ DINÂMICA -->
-                <div class="card-modulo m2" onclick="abrirMatriz()">
-                    <div>
-                        <div class="card-topo">
-                            <div class="card-icone">📅</div>
-                            <span class="card-badge" style="background: #dbeafe; color: #1e40af;">MESES DINÂMICOS</span>
-                        </div>
-                        <div class="card-titulo">Matriz Anual de DDS</div>
-                        <div class="card-descricao">
-                            Todos os meses disponíveis com botão para ocultar e reexibir os meses que desejar, campos limpos para escrever a data e ordenação A-Z.
-                        </div>
-                    </div>
-                    <div class="card-rodape">
-                        <span>Aceder Matriz</span>
-                        <span>➔</span>
-                    </div>
-                </div>
-
-                <!-- CARTÃO ADICIONAR -->
-                <div class="card-modulo card-adicionar" onclick="alert('Funcionalidade de expansão em desenvolvimento.')">
+                <div class="card-modulo card-adicionar" onclick="alert('Poderá adicionar novos módulos aqui conforme forem desenvolvidos.')">
                     <div style="font-size: 28px; color: #007e7a; margin-bottom: 6px;">➕</div>
-                    <span style="font-size: 11px; font-weight: 700; color: #007e7a;">Adicionar Novo Módulo</span>
+                    <span style="font-size: 11px; font-weight: bold; color: #007e7a;">Adicionar Novo Módulo</span>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- ==================== MÓDULO 1: DDS EMOCIOGRAMA ==================== -->
+    <!-- FORMULÁRIO DDS -->
     <div id="telaDDS">
+
         <div class="painel-controle">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                <h3 style="margin: 0; font-size: 14px; font-weight: 800; color: #007e7a; display: flex; align-items: center; gap: 8px;">
-                    DDS & Emociograma Semanal <span class="tag-v01">v01</span>
-                </h3>
-                <button type="button" class="btn btn-voltar" onclick="abrirCapa()">⬅ Voltar à Capa</button>
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
+                <h3 style="margin: 0; font-size: 13px; color: #007e7a;">Painel de Preenchimento Inteligente (24 Linhas/Folha) - Vale</h3>
+                <button type="button" class="btn btn-voltar" onclick="voltarParaCapa()">⬅ Voltar à Capa</button>
             </div>
 
-            <div class="campos-painel grid-3">
+            <div class="campos-painel">
                 <div class="campo-grupo">
-                    <label for="periodoInputDDS">Período (Dias/Mês):</label>
-                    <input type="text" id="periodoInputDDS" placeholder="Ex: 21/09 a 25/09">
+                    <label for="temaInput">Tema Geral / Semanal:</label>
+                    <input type="text" id="temaInput" placeholder="Ex: Percepção de Risco">
                 </div>
                 <div class="campo-grupo">
-                    <label for="semanaInputDDS">Semana (Nº):</label>
-                    <input type="text" id="semanaInputDDS" placeholder="Ex: 38">
+                    <label for="periodoInput">Período (Dias/Mês):</label>
+                    <input type="text" id="periodoInput" placeholder="Ex: 21/09 a 25/09">
                 </div>
                 <div class="campo-grupo">
-                    <label for="anoInputDDS">Ano:</label>
-                    <input type="text" id="anoInputDDS" placeholder="Ex: 2026">
+                    <label for="semanaInput">Semana (Nº):</label>
+                    <input type="text" id="semanaInput" placeholder="Ex: 38">
+                </div>
+                <div class="campo-grupo">
+                    <label for="anoInput">Ano:</label>
+                    <input type="text" id="anoInput" placeholder="Ex: 2026">
                 </div>
             </div>
 
             <div class="campo-grupo">
-                <label for="nomesInputDDS">Lista de Colaboradores (ordenação A-Z automática ao gerar):</label>
-                <textarea id="nomesInputDDS" oninput="converterMaiusculo(this)" placeholder="COLE OS NOMES AQUI (UM POR LINHA)... O SISTEMA IRÁ ORDENAR AUTOMATICAMENTE DE A A Z."></textarea>
+                <label for="nomesInput">Lista de Colaboradores:</label>
+                <textarea id="nomesInput" oninput="this.value = this.value.toUpperCase()" placeholder="COLE OS NOMES DOS COLABORADORES (UM POR LINHA)... DICA: USE '---' SE QUISER FORÇAR A SEPARAÇÃO MANUAL POR FOLHA."></textarea>
+                <div class="dica-painel">
+                    💡 <strong>Distribuição Inteligente:</strong> O sistema gera as folhas automaticamente a cada 24 nomes e inclui sempre uma folha em branco no final. Texto sempre em maiúsculas.
+                </div>
             </div>
 
             <div class="botoes-painel">
-                <button type="button" class="btn btn-verde" onclick="aplicarDadosDDS('verde')">Gerar Folhas c/ Carinha 1 (A-Z)</button>
-                <button type="button" class="btn btn-azul" onclick="aplicarDadosDDS('limpo')">Gerar Folhas Limpas (A-Z)</button>
-                <button type="button" class="btn btn-add-folha" onclick="adicionarFolhaManualDDS()">📄➕ Folha Extra</button>
-                <button type="button" class="btn btn-salvar" onclick="salvarTudoDDS()">💾 Guardar Dados</button>
-                <button type="button" class="btn btn-carregar" onclick="carregarTudoDDS()">📂 Carregar Salvo</button>
-                <button type="button" class="btn btn-limpar" onclick="limparTudoDDS()">Limpar Tudo</button>
-                <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir DDS</button>
+                <button type="button" class="btn btn-verde" onclick="aplicarDados('verde')">Gerar Folhas c/ Carinha 1 (Verde)</button>
+                <button type="button" class="btn btn-azul" onclick="aplicarDados('limpo')">Gerar Folhas c/ Carinhas Neutras</button>
+                <button type="button" class="btn btn-add-folha" onclick="adicionarFolhaManual()">📄➕ Adicionar Folha Extra</button>
+                <button type="button" class="btn btn-salvar" onclick="salvarTudo()">💾 Guardar Dados</button>
+                <button type="button" class="btn btn-carregar" onclick="carregarTudo()">📂 Carregar Salvo</button>
+                <button type="button" class="btn btn-limpar" onclick="limparTudo()">Limpar Tudo</button>
+                <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir / Guardar em PDF</button>
             </div>
         </div>
 
-        <div id="contentorFolhasDDS"></div>
+        <!-- CONTENTOR DINÂMICO DE FOLHAS -->
+        <div id="contentorFolhas"></div>
+
     </div>
 
-    <!-- ==================== MÓDULO 2: MATRIZ DINÂMICA ==================== -->
-    <div id="telaMatriz">
-        <div class="painel-controle" style="border-color: #94a3b8;">
-            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;">
-                <h3 style="margin: 0; font-size: 14px; font-weight: 800; color: #1b8a5a; display: flex; align-items: center; gap: 8px;">
-                    Matriz de DDS (Controlo de Meses Ocultáveis) <span class="tag-v01" style="background:#dbeafe; color:#1e40af;">v01</span>
-                </h3>
-                <button type="button" class="btn btn-voltar" onclick="abrirCapa()">⬅ Voltar à Capa</button>
-            </div>
-
-            <div class="campos-painel grid-4">
-                <div class="campo-grupo">
-                    <label for="areaInputMatriz">Gerência / Área Operacional:</label>
-                    <input type="text" id="areaInputMatriz" placeholder="Ex: Operação / Suprimentos">
-                </div>
-                <div class="campo-grupo">
-                    <label for="anoInputMatriz">Ano de Referência:</label>
-                    <input type="text" id="anoInputMatriz" value="2026">
-                </div>
-                <div class="campo-grupo">
-                    <label for="turnoInputMatriz">Turno / Equipa:</label>
-                    <input type="text" id="turnoInputMatriz" placeholder="Ex: Turno A">
-                </div>
-                <div class="campo-grupo">
-                    <label for="facilitadorInputMatriz">Responsável / Facilitador:</label>
-                    <input type="text" id="facilitadorInputMatriz" placeholder="Ex: Mariana Cruz">
-                </div>
-            </div>
-
-            <!-- BARRA DE SELEÇÃO E OCULTAÇÃO DE MESES -->
-            <div class="painel-meses-toggle">
-                <div class="titulo-meses-toggle">
-                    <span>👁️ Visibilidade dos Meses na Grelha (Clique para Ocultar / Exibir):</span>
-                    <div class="links-rapidos-meses">
-                        <button type="button" class="link-rapido" onclick="definirTodosMeses(true)">Exibir Todos</button>
-                        <button type="button" class="link-rapido" onclick="definirQuadrimestre('Q3')">SET a DEZ</button>
-                        <button type="button" class="link-rapido" onclick="definirTodosMeses(false)">Ocultar Todos</button>
-                    </div>
-                </div>
-                <div class="container-meses-btns">
-                    <button type="button" class="btn-mes-tag" data-mes="0" onclick="alternarMes(0)">JAN</button>
-                    <button type="button" class="btn-mes-tag" data-mes="1" onclick="alternarMes(1)">FEV</button>
-                    <button type="button" class="btn-mes-tag" data-mes="2" onclick="alternarMes(2)">MAR</button>
-                    <button type="button" class="btn-mes-tag" data-mes="3" onclick="alternarMes(3)">ABR</button>
-                    <button type="button" class="btn-mes-tag" data-mes="4" onclick="alternarMes(4)">MAI</button>
-                    <button type="button" class="btn-mes-tag" data-mes="5" onclick="alternarMes(5)">JUN</button>
-                    <button type="button" class="btn-mes-tag" data-mes="6" onclick="alternarMes(6)">JUL</button>
-                    <button type="button" class="btn-mes-tag" data-mes="7" onclick="alternarMes(7)">AGO</button>
-                    <button type="button" class="btn-mes-tag" data-mes="8" onclick="alternarMes(8)">SET</button>
-                    <button type="button" class="btn-mes-tag" data-mes="9" onclick="alternarMes(9)">OUT</button>
-                    <button type="button" class="btn-mes-tag" data-mes="10" onclick="alternarMes(10)">NOV</button>
-                    <button type="button" class="btn-mes-tag" data-mes="11" onclick="alternarMes(11)">DEZ</button>
-                </div>
-            </div>
-
-            <div class="campo-grupo">
-                <label for="nomesInputMatriz">Lista de Colaboradores (ordenação A-Z automática ao gerar):</label>
-                <textarea id="nomesInputMatriz" oninput="converterMaiusculo(this)" placeholder="COLE OS NOMES AQUI (UM POR LINHA)... DEIXE EM BRANCO PARA INICIAR COM LINHAS VAZIAS."></textarea>
-            </div>
-
-            <div class="botoes-painel">
-                <button type="button" class="btn btn-verde" onclick="gerarTabelaMatriz()">Atualizar Grelha (A-Z)</button>
-                <button type="button" class="btn btn-azul" onclick="adicionarLinhaFimMatriz()">➕ Adicionar Linha Vazia</button>
-                <button type="button" class="btn btn-salvar" onclick="salvarTudoMatriz()">💾 Guardar Matriz</button>
-                <button type="button" class="btn btn-carregar" onclick="carregarTudoMatriz()">📂 Carregar Salvo</button>
-                <button type="button" class="btn btn-limpar" onclick="limparTudoMatriz()">Limpar Tudo</button>
-                <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir Matriz</button>
-            </div>
-        </div>
-
-        <div class="folha-a4" id="folhaMatriz">
-            <div class="barra-acoes-folha">
-                <span style="font-size: 9px; font-weight: 700; color: #475569;">Escreva a data diretamente em cada quadrado do mês. Os meses ocultos não saem na impressão.</span>
-                <div>
-                    <button type="button" class="btn-linha-topo" onclick="adicionarLinhaFimMatriz()">➕ Linha</button>
-                    <button type="button" class="btn-remover-folha" onclick="removerUltimaLinhaMatriz()">➖ Linha</button>
-                </div>
-            </div>
-
-            <table class="cabecalho-container">
-                <tr>
-                    <td class="logo-box" style="color: #1b8a5a;">VALE</td>
-                    <td class="titulo-box">MATRIZ DE REGISTO DE DIÁLOGO DIÁRIO DE SEGURANÇA (DDS)</td>
-                    <td class="meta-box">
-                        <strong>Código:</strong> REG-DDS-MATRIZ<br>
-                        <strong>Revisão:</strong> v01<br>
-                        <strong>Ano:</strong> <span id="lblAnoMatriz">2026</span>
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="2" style="font-size: 8px; text-align: left; padding-left: 6px;">
-                        <strong>ÁREA:</strong> <span id="lblAreaMatriz">GERÊNCIA OPERACIONAL</span> &nbsp;|&nbsp; 
-                        <strong>TURNO/EQUIPA:</strong> <span id="lblTurnoMatriz">GERAL</span>
-                    </td>
-                    <td style="font-size: 8px; text-align: left; padding-left: 6px;">
-                        <strong>FACILITADOR:</strong> <span id="lblFacilitadorMatriz">---</span>
-                    </td>
-                </tr>
-            </table>
-
-            <table class="tabela-matriz">
-                <thead>
-                    <tr id="linhaCabecalhoMeses">
-                        <th class="th-matriz-id">Nº</th>
-                        <th class="th-matriz-colab">DDS</th>
-                        <th class="th-mes-anual col-mes-0">JAN</th>
-                        <th class="th-mes-anual col-mes-1">FEV</th>
-                        <th class="th-mes-anual col-mes-2">MAR</th>
-                        <th class="th-mes-anual col-mes-3">ABR</th>
-                        <th class="th-mes-anual col-mes-4">MAI</th>
-                        <th class="th-mes-anual col-mes-5">JUN</th>
-                        <th class="th-mes-anual col-mes-6">JUL</th>
-                        <th class="th-mes-anual col-mes-7">AGO</th>
-                        <th class="th-mes-anual col-mes-8">SET</th>
-                        <th class="th-mes-anual col-mes-9">OUT</th>
-                        <th class="th-mes-anual col-mes-10">NOV</th>
-                        <th class="th-mes-anual col-mes-11">DEZ</th>
-                    </tr>
-                </thead>
-                <tbody id="corpoMatriz">
-                    <!-- Linhas inseridas pelo script -->
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    <!-- SCRIPTS GERAIS -->
+    <!-- SCRIPTS -->
     <script>
-        function converterMaiusculo(el) {
-            if (el.tagName === 'TEXTAREA' || el.tagName === 'INPUT') {
-                el.value = el.value.toUpperCase();
-            } else {
-                const sel = window.getSelection();
-                if (!sel.rangeCount) return;
-                const start = sel.anchorOffset;
-                el.innerText = el.innerText.toUpperCase();
-                if (el.childNodes.length > 0) {
-                    const range = document.createRange();
-                    range.setStart(el.childNodes[0], Math.min(start, el.innerText.length));
-                    range.collapse(true);
-                    sel.removeAllRanges();
-                    sel.addRange(range);
-                }
-            }
-        }
-
-        function abrirCapa() {
-            document.getElementById('telaCapa').style.display = 'block';
-            document.getElementById('telaDDS').style.display = 'none';
-            document.getElementById('telaMatriz').style.display = 'none';
-            window.scrollTo(0, 0);
-        }
+        const TOTAL_LINHAS = 24;
 
         function abrirDDS() {
             document.getElementById('telaCapa').style.display = 'none';
             document.getElementById('telaDDS').style.display = 'block';
-            document.getElementById('telaMatriz').style.display = 'none';
             window.scrollTo(0, 0);
         }
 
-        function abrirMatriz() {
-            document.getElementById('telaCapa').style.display = 'none';
+        function voltarParaCapa() {
             document.getElementById('telaDDS').style.display = 'none';
-            document.getElementById('telaMatriz').style.display = 'block';
+            document.getElementById('telaCapa').style.display = 'block';
             window.scrollTo(0, 0);
         }
-
-        // =======================================================
-        // LÓGICA DO MÓDULO 1: DDS & EMOCIOGRAMA SEMANAL
-        // =======================================================
-        const TOTAL_LINHAS_DDS = 24;
 
         function gerarBlocoComoEstou(selecionado = null) {
             const cls1 = selecionado === 1 ? 'selecionado-1' : '';
             const cls2 = selecionado === 2 ? 'selecionado-2' : '';
             const cls3 = selecionado === 3 ? 'selecionado-3' : '';
+
             return `
                 <div class="grupo-carinhas">
-                    <div class="carinha-item c-verde ${cls1}" onclick="alternarDestaque(this, 1)" title="1 - Apto"><span class="carinha-num">1</span><svg class="carinha-svg" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><path class="boca" d="M 9.5 18 C 12 23 20 23 22.5 18"/></svg></div>
-                    <div class="carinha-item c-amarela ${cls2}" onclick="alternarDestaque(this, 2)" title="2 - Atenção"><span class="carinha-num">2</span><svg class="carinha-svg" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><line class="boca" x1="10" y1="20" x2="22" y2="20"/></svg></div>
-                    <div class="carinha-item c-vermelha ${cls3}" onclick="alternarDestaque(this, 3)" title="3 - Inapto"><span class="carinha-num">3</span><svg class="carinha-svg" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><path class="boca" d="M 9.5 22 C 12 17 20 17 22.5 22"/>
+                    <div class="carinha-item c-verde ${cls1}" onclick="alternarDestaque(this, 1)" title="1 - Apto">
+                        <span class="carinha-num">1</span>
+                        <svg class="carinha-svg" viewBox="0 0 32 32">
+                            <circle class="rosto" cx="16" cy="16" r="14"/>
+                            <circle class="olho" cx="11.5" cy="12.5" r="1.7"/>
+                            <circle class="olho" cx="20.5" cy="12.5" r="1.7"/>
+                            <path class="boca" d="M 9.5 18 C 12 23 20 23 22.5 18"/>
                         </svg>
                     </div>
-                    <div class="carinha-item c-vermelha ${cls3}" onclick="alternarDestaque(this, 3)" title="3 - Inapto"><span class="carinha-num">3</span><svg class="carinha-svg" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><path class="boca" d="M 9.5 22 C 12 17 20 17 22.5 22"/></svg></div>
+                    <div class="carinha-item c-amarela ${cls2}" onclick="alternarDestaque(this, 2)" title="2 - Atenção">
+                        <span class="carinha-num">2</span>
+                        <svg class="carinha-svg" viewBox="0 0 32 32">
+                            <circle class="rosto" cx="16" cy="16" r="14"/>
+                            <circle class="olho" cx="11.5" cy="12.5" r="1.7"/>
+                            <circle class="olho" cx="20.5" cy="12.5" r="1.7"/>
+                            <line class="boca" x1="10" y1="20" x2="22" y2="20"/>
+                        </svg>
+                    </div>
+                    <div class="carinha-item c-vermelha ${cls3}" onclick="alternarDestaque(this, 3)" title="3 - Inapto">
+                        <span class="carinha-num">3</span>
+                        <svg class="carinha-svg" viewBox="0 0 32 32">
+                            <circle class="rosto" cx="16" cy="16" r="14"/>
+                            <circle class="olho" cx="11.5" cy="12.5" r="1.7"/>
+                            <circle class="olho" cx="20.5" cy="12.5" r="1.7"/>
+                            <path class="boca" d="M 9.5 22 C 12 17 20 17 22.5 22"/>
+                        </svg>
+                    </div>
                 </div>
             `;
         }
@@ -906,6 +717,7 @@
             const grupo = elemento.closest('.grupo-carinhas');
             const itens = grupo.querySelectorAll('.carinha-item');
             const classeAlvo = 'selecionado-' + tipo;
+
             if (elemento.classList.contains(classeAlvo)) {
                 elemento.classList.remove(classeAlvo);
             } else {
@@ -914,132 +726,136 @@
             }
         }
 
-        function criarHTMLLinhaDDS(numeroStr, nome = '', valorSel = null) {
-            return `
-                <td class="col-id">
-                    <div class="col-id-container">
-                        <span class="col-id-texto" contenteditable="true">${numeroStr}</span>
-                    </div>
-                </td>
-                <td>
-                    <div class="col-nome-container">
-                        <span class="col-nome-texto" contenteditable="true" oninput="converterMaiusculo(this)">${nome}</span>
-                        <div class="botoes-acoes">
-                            <button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixoDDS(this)">➕</button>
-                            <button type="button" class="btn-acao btn-menos-linha" onclick="removerLinhaAtualDDS(this)">➖</button>
-                            <button type="button" class="btn-acao btn-lixeira" onclick="apagarLinhaDDS(this)">🗑️</button>
-                        </div>
-                    </div>
-                </td>
-                <td class="col-como-estou">${gerarBlocoComoEstou(valorSel)}</td><td class="col-rubrica" contenteditable="true"></td>
-                <td class="col-como-estou">${gerarBlocoComoEstou(valorSel)}</td><td class="col-rubrica" contenteditable="true"></td>
-                <td class="col-como-estou">${gerarBlocoComoEstou(valorSel)}</td><td class="col-rubrica" contenteditable="true"></td>
-                <td class="col-como-estou">${gerarBlocoComoEstou(valorSel)}</td><td class="col-rubrica" contenteditable="true"></td>
-                <td class="col-como-estou">${gerarBlocoComoEstou(valorSel)}</td><td class="col-rubrica" contenteditable="true"></td>
-            `;
+        function editarElemento(el) {
+            if (el) {
+                el.focus();
+                const range = document.createRange();
+                const sel = window.getSelection();
+                range.selectNodeContents(el);
+                range.collapse(false);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
         }
 
-        function apagarLinhaDDS(botao) {
+        function editarNumero(botao) {
             const tr = botao.closest('tr');
-            tr.querySelector('.col-nome-texto').innerText = '';
+            editarElemento(tr.querySelector('.col-id-texto'));
+        }
+
+        function editarNome(botao) {
+            const tr = botao.closest('tr');
+            editarElemento(tr.querySelector('.col-nome-texto'));
+        }
+
+        function converterMaiusculo(el) {
+            const sel = window.getSelection();
+            const start = sel.anchorOffset;
+            el.innerText = el.innerText.toUpperCase();
+            if (el.childNodes.length > 0) {
+                const range = document.createRange();
+                range.setStart(el.childNodes[0], Math.min(start, el.innerText.length));
+                range.collapse(true);
+                sel.removeAllRanges();
+                sel.addRange(range);
+            }
+        }
+
+        function apagarLinha(botao) {
+            const tr = botao.closest('tr');
+            const textoNome = tr.querySelector('.col-nome-texto');
+            if (textoNome) textoNome.innerText = '';
             tr.querySelectorAll('.col-como-estou').forEach(c => c.innerHTML = gerarBlocoComoEstou(null));
             tr.querySelectorAll('.col-rubrica').forEach(r => r.innerText = '');
         }
 
-        function reordenarNumDDS() {
-            let cont = 1;
-            document.querySelectorAll('#contentorFolhasDDS .folha-a4').forEach(folha => {
-                folha.querySelectorAll('.corpo-tabela-folha tr').forEach(tr => {
-                    const elNum = tr.querySelector('.col-id-texto');
-                    if (elNum) elNum.innerText = cont < 10 ? '0'+cont : cont;
-                    cont++;
-                });
-            });
-        }
+        function gerarLinhasTabela(listaNomes = [], selecionarPadrao = null, inicioNumero = 1) {
+            let html = '';
+            for (let i = 1; i <= TOTAL_LINHAS; i++) {
+                const numeroLinha = inicioNumero + (i - 1);
+                const numStr = numeroLinha < 10 ? '0' + numeroLinha : numeroLinha;
+                const nome = listaNomes[i - 1] ? listaNomes[i - 1].trim().toUpperCase() : '';
+                const valorSel = (nome.length > 0 && selecionarPadrao) ? selecionarPadrao : null;
 
-        function adicionarLinhaAbaixoDDS(botao) {
-            const tr = botao.closest('tr');
-            const nova = document.createElement('tr');
-            nova.innerHTML = criarHTMLLinhaDDS('00', '', null);
-            tr.after(nova);
-            reordenarNumDDS();
-        }
-
-        function removerLinhaAtualDDS(botao) {
-            const tr = botao.closest('tr');
-            if (tr.parentNode.querySelectorAll('tr').length <= 1) return alert('É necessário no mínimo 1 linha.');
-            tr.remove();
-            reordenarNumDDS();
-        }
-
-        function adicionarLinhaFimDDS(botao) {
-            const corpo = botao.closest('.folha-a4').querySelector('.corpo-tabela-folha');
-            const nova = document.createElement('tr');
-            nova.innerHTML = criarHTMLLinhaDDS('00', '', null);
-            corpo.appendChild(nova);
-            reordenarNumDDS();
-        }
-
-        function removerLinhaFimDDS(botao) {
-            const corpo = botao.closest('.folha-a4').querySelector('.corpo-tabela-folha');
-            const linhas = corpo.querySelectorAll('tr');
-            if (linhas.length <= 1) return alert('É necessário no mínimo 1 linha.');
-            linhas[linhas.length - 1].remove();
-            reordenarNumDDS();
-        }
-
-        function removerFolhaDDS(botao) {
-            const contentor = document.getElementById('contentorFolhasDDS');
-            if (contentor.querySelectorAll('.folha-a4').length <= 1) return alert('É necessário pelo menos uma folha.');
-            botao.closest('.folha-a4').remove();
-            reordenarNumDDS();
-            atualizarPaginacaoDDS();
-        }
-
-        function criarEstruturaFolhaDDS(listaNomes, padrao, totalLinhas) {
-            const periodo = document.getElementById('periodoInputDDS').value || '____/____ a ____/____';
-            const semana = document.getElementById('semanaInputDDS').value || '____';
-            const ano = document.getElementById('anoInputDDS').value || '____';
-
-            let linhasHtml = '';
-            for (let i = 0; i < totalLinhas; i++) {
-                const nome = listaNomes[i] ? listaNomes[i].trim().toUpperCase() : '';
-                const vSel = (nome && padrao) ? padrao : null;
-                linhasHtml += `<tr>${criarHTMLLinhaDDS('00', nome, vSel)}</tr>`;
+                html += `
+                    <tr>
+                        <td class="col-id">
+                            <div class="col-id-container">
+                                <span class="col-id-texto" contenteditable="true">${numStr}</span>
+                                <button type="button" class="btn-acao btn-lapis btn-lapis-num" title="Editar número" onclick="editarNumero(this)">✏️</button>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="col-nome-container">
+                                <span class="col-nome-texto" contenteditable="true" oninput="converterMaiusculo(this)">${nome}</span>
+                                <div class="botoes-acoes">
+                                    <button type="button" class="btn-acao btn-lapis" title="Editar nome" onclick="editarNome(this)">✏️</button>
+                                    <button type="button" class="btn-acao btn-lixeira" title="Apagar colaborador" onclick="apagarLinha(this)">🗑️</button>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="col-como-estou">${gerarBlocoComoEstou(valorSel)}</td>
+                        <td class="col-rubrica" contenteditable="true"></td>
+                        <td class="col-como-estou">${gerarBlocoComoEstou(valorSel)}</td>
+                        <td class="col-rubrica" contenteditable="true"></td>
+                        <td class="col-como-estou">${gerarBlocoComoEstou(valorSel)}</td>
+                        <td class="col-rubrica" contenteditable="true"></td>
+                        <td class="col-como-estou">${gerarBlocoComoEstou(valorSel)}</td>
+                        <td class="col-rubrica" contenteditable="true"></td>
+                        <td class="col-como-estou">${gerarBlocoComoEstou(valorSel)}</td>
+                        <td class="col-rubrica" contenteditable="true"></td>
+                    </tr>
+                `;
             }
+            return html;
+        }
+
+        function criarEstruturaFolha(inicioNumero, listaNomes, selecionarPadrao) {
+            const tema = document.getElementById('temaInput').value;
+            const periodo = document.getElementById('periodoInput').value || '____/____ a ____/____';
+            const semana = document.getElementById('semanaInput').value || '____';
+            const ano = document.getElementById('anoInput').value || '____';
 
             const folha = document.createElement('div');
             folha.className = 'folha-a4';
+
             folha.innerHTML = `
                 <div class="barra-controle-folha">
-                    <div class="grupo-acoes-linhas">
-                        <button type="button" class="btn-linha-topo" onclick="adicionarLinhaFimDDS(this)">➕ Linha</button>
-                        <button type="button" class="btn-linha-topo" onclick="removerLinhaFimDDS(this)">➖ Linha</button>
-                    </div>
-                    <button type="button" class="btn-remover-folha" onclick="removerFolhaDDS(this)">Remover Folha ✕</button>
+                    <button type="button" class="btn-remover-folha" onclick="removerFolha(this)">Remover Folha ✕</button>
                 </div>
                 <table class="cabecalho-container">
                     <tr>
                         <td class="logo-box">VALE</td>
-                        <td class="titulo-box">DIÁLOGO DIÁRIO DE SEGURANÇA (DDS) E CONTROLE DE EMOCIOGRAMA</td>
-                        <td class="meta-box"><strong>Código:</strong> REG-SST-021<br><strong>Revisão:</strong> v01<br><span class="indicador-folha"><strong>Folha:</strong> 00 / 00</span></td>
+                        <td class="titulo-box">
+                            DIÁLOGO DIÁRIO DE SEGURANÇA (DDS) & CONTROLE DE EMOCIOGRAMA
+                        </td>
+                        <td class="meta-box">
+                            <strong>Código:</strong> REG-SST-021<br>
+                            <strong>Revisão:</strong> 03<br>
+                            <span class="indicador-folha"><strong>Folha:</strong> 00 / 00</span>
+                        </td>
                     </tr>
                 </table>
+
                 <table class="info-dds">
                     <tr>
-                        <td style="width: 25%;"><span class="info-label">Gerência / Área:</span> <span class="campo-editavel" contenteditable="true"></span></td>
-                        <td style="width: 25%;"><span class="info-label">Contrato / Obra:</span> <span class="campo-editavel" contenteditable="true"></span></td>
-                        <td style="width: 22%;"><span class="info-label">Período:</span> <span class="campo-editavel">${periodo}</span></td>
-                        <td style="width: 9%;"><span class="info-label">Semana:</span> <span class="campo-editavel">${semana}</span></td>
-                        <td style="width: 9%;"><span class="info-label">Ano:</span> <span class="campo-editavel">${ano}</span></td>
-                        <td style="width: 10%;"><span class="info-label">Facilitador:</span> <span class="campo-editavel" contenteditable="true"></span></td>
+                        <td style="width: 28%;"><span class="info-label">Gerência / Área:</span> <span class="campo-editavel campo-gerencia" contenteditable="true"></span></td>
+                        <td style="width: 27%;"><span class="info-label">Contrato / Obra:</span> <span class="campo-editavel campo-contrato" contenteditable="true"></span></td>
+                        <td style="width: 25%;"><span class="info-label">Período:</span> <span class="campo-editavel campo-periodo" contenteditable="true">${periodo}</span></td>
+                        <td style="width: 10%;"><span class="info-label">Semana:</span> <span class="campo-editavel campo-semana" contenteditable="true">${semana}</span></td>
+                        <td style="width: 10%;"><span class="info-label">Ano:</span> <span class="campo-editavel campo-ano" contenteditable="true">${ano}</span></td>
+                    </tr>
+                    <tr>
+                        <td colspan="3"><span class="info-label">Tema(s) Abordado(s):</span> <span class="campo-editavel campo-tema" contenteditable="true">${tema}</span></td>
+                        <td colspan="2"><span class="info-label">Facilitador:</span> <span class="campo-editavel campo-facilitador" contenteditable="true"></span></td>
                     </tr>
                 </table>
+
                 <table class="tabela-dds">
                     <thead>
                         <tr>
                             <th rowspan="4" class="col-id">Nº</th>
-                            <th rowspan="4" style="width: 175px; text-align: left; padding-left: 4px;">Nome do Colaborador</th>
+                            <th rowspan="4" style="width: 170px; text-align: left; padding-left: 4px;">Nome do Colaborador</th>
                             <th colspan="2" class="th-dia-semana">Segunda-feira</th>
                             <th colspan="2" class="th-dia-semana">Terça-feira</th>
                             <th colspan="2" class="th-dia-semana">Quarta-feira</th>
@@ -1061,287 +877,226 @@
                             <th colspan="2" class="th-data-turno">Data / Turno: <span class="campo-editavel" contenteditable="true"></span></th>
                         </tr>
                         <tr>
-                            <th class="th-sub col-como-estou">Como estou</th><th class="th-sub col-rubrica">Rubrica</th>
-                            <th class="th-sub col-como-estou">Como estou</th><th class="th-sub col-rubrica">Rubrica</th>
-                            <th class="th-sub col-como-estou">Como estou</th><th class="th-sub col-rubrica">Rubrica</th>
-                            <th class="th-sub col-como-estou">Como estou</th><th class="th-sub col-rubrica">Rubrica</th>
-                            <th class="th-sub col-como-estou">Como estou</th><th class="th-sub col-rubrica">Rubrica</th>
+                            <th class="th-sub col-como-estou">Como estou</th>
+                            <th class="th-sub col-rubrica">Rubrica</th>
+                            <th class="th-sub col-como-estou">Como estou</th>
+                            <th class="th-sub col-rubrica">Rubrica</th>
+                            <th class="th-sub col-como-estou">Como estou</th>
+                            <th class="th-sub col-rubrica">Rubrica</th>
+                            <th class="th-sub col-como-estou">Como estou</th>
+                            <th class="th-sub col-rubrica">Rubrica</th>
+                            <th class="th-sub col-como-estou">Como estou</th>
+                            <th class="th-sub col-rubrica">Rubrica</th>
                         </tr>
                     </thead>
-                    <tbody class="corpo-tabela-folha">${linhasHtml}</tbody>
+                    <tbody class="corpo-tabela-folha">
+                        ${gerarLinhasTabela(listaNomes, selecionarPadrao, inicioNumero)}
+                    </tbody>
                 </table>
+
                 <div class="rodape-container">
-                    <div class="box-legenda"><h4>LEGENDA:</h4><ul class="lista-legenda"><li><strong>FE</strong> = Feriado[span_0](start_span)[span_0](end_span)</li><li><strong>AT</strong> = Atestado Médico[span_1](start_span)[span_1](end_span)</li><li><strong>CO</strong> = Compensação[span_2](start_span)[span_2](end_span)</li><li><strong>FA</strong> = Falta[span_3](start_span)[span_3](end_span)</li><li><strong>FR</strong> = Férias[span_4](start_span)[span_4](end_span)</li><li><strong>FO</strong> = Folga[span_5](start_span)[span_5](end_span)</li></ul></div>
-                    <div class="box-legenda"><h4>AÇÃO TOMADA COM EMOCIOGRAMA AMARELO OU VERMELHO:</h4><div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;"><ul class="lista-legenda"><li><strong>EST/SUP</strong> = Estratégia / Suprimentos[span_6](start_span)[span_6](end_span)</li><li><strong>EST</strong> = Estratégia[span_7](start_span)[span_7](end_span)</li><li><strong>ENG ADM</strong> = ADM[span_8](start_span)[span_8](end_span)</li></ul><ul class="lista-legenda"><li><strong>ENG</strong> = ADM[span_9](start_span)[span_9](end_span)</li><li><strong>OP</strong> = Operação[span_10](start_span)[span_10](end_span)</li><li><strong>HOFF</strong> = Home Office[span_11](start_span)[span_11](end_span)</li><li><strong>AE</strong> = Área Externa[span_12](start_span)[span_12](end_span)</li></ul></div></div>
-                    <div class="box-legenda"><h4>EMOCIOGRAMA:</h4>
-                        <div class="item-emocio"><svg class="carinha-svg c-verde" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><path class="boca" d="M 9.5 18 C 12 23 20 23 22.5 18"/></svg><span><strong>1:</strong> Funcionário em plenas condições físicas e psicológicas.[span_13](start_span)[span_13](end_span)</span></div>
-                        <div class="item-emocio"><svg class="carinha-svg c-amarela" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><line class="boca" x1="10" y1="20" x2="22" y2="20"/></svg><span><strong>2:</strong> Estado físico ou psicológico alterado. Acompanhar.[span_14](start_span)[span_14](end_span)</span></div>
-                        <div class="item-emocio"><svg class="carinha-svg c-vermelha" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><path class="boca" d="M 9.5 22 C 12 17 20 17 22.5 22"/></svg><span><strong>3:</strong> Sem condições para exercer as atividades.[span_15](start_span)[span_15](end_span)</span></div>
+                    <div class="box-legenda">
+                        <h4>LEGENDA:</h4>
+                        <ul class="lista-legenda">
+                            <li><strong>FE</strong> = Feriado[span_0](start_span)[span_0](end_span)</li>
+                            <li><strong>AT</strong> = Atestado Médico[span_1](start_span)[span_1](end_span)</li>
+                            <li><strong>CO</strong> = Compensação[span_2](start_span)[span_2](end_span)</li>
+                            <li><strong>FA</strong> = Falta[span_3](start_span)[span_3](end_span)</li>
+                            <li><strong>FR</strong> = Férias[span_4](start_span)[span_4](end_span)</li>
+                            <li><strong>FO</strong> = Folga[span_5](start_span)[span_5](end_span)</li>
+                        </ul>
+                    </div>
+                    <div class="box-legenda">
+                        <h4>AÇÃO TOMADA COM O FUNCIONÁRIO COM EMOCIOGRAMA AMARELO OU VERMELHO:</h4>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+                            <ul class="lista-legenda">
+                                <li><strong>EST/SUP</strong> = Estratégia / Suprimentos[span_6](start_span)[span_6](end_span)</li>
+                                <li><strong>EST</strong> = Estratégia[span_7](start_span)[span_7](end_span)</li>
+                                <li><strong>ENG ADM</strong> = ADM[span_8](start_span)[span_8](end_span)</li>
+                            </ul>
+                            <ul class="lista-legenda">
+                                <li><strong>ENG</strong> = ADM[span_9](start_span)[span_9](end_span)</li>
+                                <li><strong>OP</strong> = Operação[span_10](start_span)[span_10](end_span)</li>
+                                <li><strong>HOFF</strong> = Home Office[span_11](start_span)[span_11](end_span)</li>
+                                <li><strong>AE</strong> = Área Externa[span_12](start_span)[span_12](end_span)</li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="box-legenda">
+                        <h4>EMOCIOGRAMA:</h4>
+                        <div class="item-emocio">
+                            <svg class="carinha-svg c-verde" viewBox="0 0 32 32" style="min-width: 12px;">
+                                <circle class="rosto" cx="16" cy="16" r="14"/>
+                                <circle class="olho" cx="11.5" cy="12.5" r="1.7"/>
+                                <circle class="olho" cx="20.5" cy="12.5" r="1.7"/>
+                                <path class="boca" d="M 9.5 18 C 12 23 20 23 22.5 18"/>
+                            </svg>
+                            <span><strong>1:</strong> Funcionário em plenas condições físicas e psicológicas de exercer suas funções.[span_13](start_span)[span_13](end_span)[span_14](start_span)[span_14](end_span)</span>
+                        </div>
+                        <div class="item-emocio">
+                            <svg class="carinha-svg c-amarela" viewBox="0 0 32 32" style="min-width: 12px;">
+                                <circle class="rosto" cx="16" cy="16" r="14"/>
+                                <circle class="olho" cx="11.5" cy="12.5" r="1.7"/>
+                                <circle class="olho" cx="20.5" cy="12.5" r="1.7"/>
+                                <line class="boca" x1="10" y1="20" x2="22" y2="20"/>
+                            </svg>
+                            <span><strong>2:</strong> Funcionário com estado físico ou psicológico alterado, porém em condições de exercer suas atividades normais. Acompanhar.[span_15](start_span)[span_15](end_span)[span_16](start_span)[span_16](end_span)</span>
+                        </div>
+                        <div class="item-emocio">
+                            <svg class="carinha-svg c-vermelha" viewBox="0 0 32 32" style="min-width: 14px;">
+                                <circle class="rosto" cx="16" cy="16" r="14"/>
+                                <circle class="olho" cx="11.5" cy="12.5" r="1.7"/>
+                                <circle class="olho" cx="20.5" cy="12.5" r="1.7"/>
+                                <path class="boca" d="M 9.5 22 C 12 17 20 17 22.5 22"/>
+                            </svg>
+                            <span><strong>3:</strong> Funcionário sem condições físicas ou psicológicas para exercer suas atividades.[span_17](start_span)[span_17](end_span)[span_18](start_span)[span_18](end_span)</span>
+                        </div>
                     </div>
                 </div>
             `;
             return folha;
         }
 
-        function atualizarPaginacaoDDS() {
-            const folhas = document.querySelectorAll('#contentorFolhasDDS .folha-a4');
-            const t = folhas.length;
-            const tStr = t < 10 ? '0'+t : t;
-            folhas.forEach((folha, idx) => {
-                const a = idx + 1;
-                const ind = folha.querySelector('.indicador-folha');
-                if (ind) ind.innerHTML = `<strong>Folha:</strong> ${a < 10 ? '0'+a : a} / ${tStr}`;
+        function atualizarPaginacaoFolhas() {
+            const folhas = document.querySelectorAll('#contentorFolhas .folha-a4');
+            const total = folhas.length;
+            const totalStr = total < 10 ? '0' + total : total;
+
+            folhas.forEach((folha, index) => {
+                const atual = index + 1;
+                const atualStr = atual < 10 ? '0' + atual : atual;
+                const indicador = folha.querySelector('.indicador-folha');
+                if (indicador) {
+                    indicador.innerHTML = `<strong>Folha:</strong> ${atualStr} / ${totalStr}`;
+                }
+                if (index < total - 1) {
+                    folha.classList.add('quebra-pagina');
+                } else {
+                    folha.classList.remove('quebra-pagina');
+                }
             });
         }
 
-        function adicionarFolhaManualDDS() {
-            document.getElementById('contentorFolhasDDS').appendChild(criarEstruturaFolhaDDS([], null, TOTAL_LINHAS_DDS));
-            reordenarNumDDS(); atualizarPaginacaoDDS();
+        function adicionarFolhaManual() {
+            const contentor = document.getElementById('contentorFolhas');
+            const total = contentor.querySelectorAll('.folha-a4').length;
+            const inicioNum = (total * TOTAL_LINHAS) + 1;
+            const folha = criarEstruturaFolha(inicioNum, [], null);
+            contentor.appendChild(folha);
+            atualizarPaginacaoFolhas();
+            folha.scrollIntoView({ behavior: 'smooth' });
         }
 
-        function aplicarDadosDDS(modoCarinha) {
-            const contentor = document.getElementById('contentorFolhasDDS');
+        function removerFolha(botao) {
+            const contentor = document.getElementById('contentorFolhas');
+            if (contentor.querySelectorAll('.folha-a4').length <= 1) {
+                alert('É necessário manter pelo menos uma folha.');
+                return;
+            }
+            const folha = botao.closest('.folha-a4');
+            if (folha) {
+                folha.remove();
+                atualizarPaginacaoFolhas();
+            }
+        }
+
+        function aplicarDados(modoCarinha) {
+            const contentor = document.getElementById('contentorFolhas');
             contentor.innerHTML = '';
+
             const padrao = modoCarinha === 'verde' ? 1 : null;
-            
-            const linhas = document.getElementById('nomesInputDDS').value
-                .toUpperCase()
-                .split('\n')
-                .map(l => l.trim())
-                .filter(l => l.length > 0)
-                .sort((a, b) => a.localeCompare(b, 'pt'));
+            const textoBruto = document.getElementById('nomesInput').value.toUpperCase();
 
-            document.getElementById('nomesInputDDS').value = linhas.join('\n');
+            let blocosDeFolhas = [];
 
-            let blocos = [];
-            if (linhas.length === 0) {
-                blocos.push([]);
-            } else {
-                for (let i = 0; i < linhas.length; i += TOTAL_LINHAS_DDS) {
-                    blocos.push(linhas.slice(i, i + TOTAL_LINHAS_DDS));
-                }
-            }
-
-            blocos.forEach(nomesFolha => contentor.appendChild(criarEstruturaFolhaDDS(nomesFolha, padrao, TOTAL_LINHAS_DDS)));
-            contentor.appendChild(criarEstruturaFolhaDDS([], null, TOTAL_LINHAS_DDS));
-            reordenarNumDDS();
-            atualizarPaginacaoDDS();
-        }
-
-        function salvarTudoDDS() {
-            const dados = {
-                periodo: document.getElementById('periodoInputDDS').value,
-                semana: document.getElementById('semanaInputDDS').value,
-                ano: document.getElementById('anoInputDDS').value,
-                nomes: document.getElementById('nomesInputDDS').value,
-                html: document.getElementById('contentorFolhasDDS').innerHTML
-            };
-            localStorage.setItem('valedds_v01', JSON.stringify(dados));
-            alert('DDS Guardado com sucesso! (v01)');
-        }
-
-        function carregarTudoDDS() {
-            const s = localStorage.getItem('valedds_v01');
-            if(!s) return alert('Sem registos salvos.');
-            const d = JSON.parse(s);
-            document.getElementById('periodoInputDDS').value = d.periodo || '';
-            document.getElementById('semanaInputDDS').value = d.semana || '';
-            document.getElementById('anoInputDDS').value = d.ano || '';
-            document.getElementById('nomesInputDDS').value = d.nomes || '';
-            if(d.html) { document.getElementById('contentorFolhasDDS').innerHTML = d.html; atualizarPaginacaoDDS(); }
-            alert('DDS Carregado!');
-        }
-
-        function limparTudoDDS() {
-            if(confirm('Limpar tudo do DDS?')) {
-                document.getElementById('periodoInputDDS').value = '';
-                document.getElementById('semanaInputDDS').value = '';
-                document.getElementById('anoInputDDS').value = '';
-                document.getElementById('nomesInputDDS').value = '';
-                document.getElementById('contentorFolhasDDS').innerHTML = '';
-                adicionarFolhaManualDDS();
-            }
-        }
-
-        // =======================================================
-        // LÓGICA DO MÓDULO 2: MATRIZ DINÂMICA
-        // =======================================================
-        let statusMesesVisiveis = [true, true, true, true, true, true, true, true, true, true, true, true];
-
-        function aplicarVisibilidadeMeses() {
-            for (let i = 0; i < 12; i++) {
-                const visivel = statusMesesVisiveis[i];
-                const btnTag = document.querySelector(`.btn-mes-tag[data-mes="${i}"]`);
-                if (btnTag) {
-                    if (visivel) btnTag.classList.remove('inativo');
-                    else btnTag.classList.add('inativo');
-                }
-                const elementos = document.querySelectorAll(`.col-mes-${i}`);
-                elementos.forEach(el => {
-                    if (visivel) el.classList.remove('mes-oculto');
-                    else el.classList.add('mes-oculto');
+            if (textoBruto.includes('---')) {
+                const partes = textoBruto.split('---');
+                partes.forEach(p => {
+                    const linhas = p.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                    if (linhas.length > 0) {
+                        for (let i = 0; i < linhas.length; i += TOTAL_LINHAS) {
+                            blocosDeFolhas.push(linhas.slice(i, i + TOTAL_LINHAS));
+                        }
+                    }
                 });
+            } else {
+                const linhas = textoBruto.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+                if (linhas.length === 0) {
+                    blocosDeFolhas.push([]);
+                } else {
+                    for (let i = 0; i < linhas.length; i += TOTAL_LINHAS) {
+                        blocosDeFolhas.push(linhas.slice(i, i + TOTAL_LINHAS));
+                    }
+                }
             }
-        }
 
-        function alternarMes(indiceMes) {
-            statusMesesVisiveis[indiceMes] = !statusMesesVisiveis[indiceMes];
-            aplicarVisibilidadeMeses();
-        }
-
-        function definirTodosMeses(estado) {
-            for (let i = 0; i < 12; i++) statusMesesVisiveis[i] = estado;
-            aplicarVisibilidadeMeses();
-        }
-
-        function definirQuadrimestre(tipo) {
-            for (let i = 0; i < 12; i++) {
-                statusMesesVisiveis[i] = (i >= 8 && i <= 11);
-            }
-            aplicarVisibilidadeMeses();
-        }
-
-        function criarHTMLLinhaMatriz(numeroStr, nome = '') {
-            let cols = '';
-            for (let i = 0; i < 12; i++) {
-                const classeOculto = statusMesesVisiveis[i] ? '' : 'mes-oculto';
-                cols += `<td class="celula-data col-mes-${i} ${classeOculto}" contenteditable="true"></td>`;
-            }
-            return `
-                <td class="td-matriz-id">${numeroStr}</td>
-                <td>
-                    <div class="col-nome-container">
-                        <span class="col-nome-texto" contenteditable="true" oninput="converterMaiusculo(this)">${nome}</span>
-                        <div class="botoes-acoes">
-                            <button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixoMatriz(this)">➕</button>
-                            <button type="button" class="btn-acao btn-menos-linha" onclick="removerLinhaAtualMatriz(this)">➖</button>
-                            <button type="button" class="btn-acao btn-lixeira" onclick="limparNomeMatriz(this)">🗑️</button>
-                        </div>
-                    </div>
-                </td>
-                ${cols}
-            `;
-        }
-
-        function limparNomeMatriz(botao) {
-            botao.closest('tr').querySelector('.col-nome-texto').innerText = '';
-        }
-
-        function reordenarNumMatriz() {
-            document.querySelectorAll('#corpoMatriz tr').forEach((tr, index) => {
-                const td = tr.querySelector('.td-matriz-id');
-                if(td) td.innerText = (index + 1) < 10 ? '0' + (index + 1) : (index + 1);
+            let numeroCorrente = 1;
+            blocosDeFolhas.forEach((nomesFolha) => {
+                const folha = criarEstruturaFolha(numeroCorrente, nomesFolha, padrao);
+                contentor.appendChild(folha);
+                numeroCorrente += TOTAL_LINHAS;
             });
+
+            const folhaEmBranco = criarEstruturaFolha(numeroCorrente, [], null);
+            contentor.appendChild(folhaEmBranco);
+
+            atualizarPaginacaoFolhas();
         }
 
-        function adicionarLinhaAbaixoMatriz(btn) {
-            const nova = document.createElement('tr');
-            nova.innerHTML = criarHTMLLinhaMatriz('00', '');
-            btn.closest('tr').after(nova);
-            reordenarNumMatriz();
-        }
-
-        function removerLinhaAtualMatriz(btn) {
-            if(document.querySelectorAll('#corpoMatriz tr').length <= 1) return alert('Mínimo de 1 linha.');
-            btn.closest('tr').remove();
-            reordenarNumMatriz();
-        }
-
-        function adicionarLinhaFimMatriz() {
-            const nova = document.createElement('tr');
-            nova.innerHTML = criarHTMLLinhaMatriz('00', '');
-            document.getElementById('corpoMatriz').appendChild(nova);
-            reordenarNumMatriz();
-        }
-
-        function removerUltimaLinhaMatriz() {
-            const linhas = document.querySelectorAll('#corpoMatriz tr');
-            if(linhas.length <= 1) return alert('Mínimo de 1 linha.');
-            linhas[linhas.length - 1].remove();
-            reordenarNumMatriz();
-        }
-
-        function sincronizarCabecalhoMatriz() {
-            document.getElementById('lblAreaMatriz').innerText = (document.getElementById('areaInputMatriz').value || 'GERÊNCIA OPERACIONAL').toUpperCase();
-            document.getElementById('lblAnoMatriz').innerText = document.getElementById('anoInputMatriz').value || '2026';
-            document.getElementById('lblTurnoMatriz').innerText = (document.getElementById('turnoInputMatriz').value || 'GERAL').toUpperCase();
-            document.getElementById('lblFacilitadorMatriz').innerText = (document.getElementById('facilitadorInputMatriz').value || '---').toUpperCase();
-        }
-
-        function gerarTabelaMatriz() {
-            sincronizarCabecalhoMatriz();
-            
-            const linhas = document.getElementById('nomesInputMatriz').value
-                .toUpperCase()
-                .split('\n')
-                .map(l => l.trim())
-                .filter(l => l.length > 0)
-                .sort((a, b) => a.localeCompare(b, 'pt'));
-
-            document.getElementById('nomesInputMatriz').value = linhas.join('\n');
-
-            const corpo = document.getElementById('corpoMatriz');
-            corpo.innerHTML = '';
-            
-            // Se estiver vazio, inicia com linhas em branco estruturadas
-            const lista = linhas.length > 0 ? linhas : ['', '', '', '', ''];
-            lista.forEach((nome, idx) => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = criarHTMLLinhaMatriz(idx < 9 ? '0'+(idx+1) : (idx+1), nome);
-                corpo.appendChild(tr);
-            });
-            aplicarVisibilidadeMeses();
-        }
-
-        function salvarTudoMatriz() {
-            sincronizarCabecalhoMatriz();
+        function salvarTudo() {
             const dados = {
-                area: document.getElementById('areaInputMatriz').value,
-                ano: document.getElementById('anoInputMatriz').value,
-                turno: document.getElementById('turnoInputMatriz').value,
-                facil: document.getElementById('facilitadorInputMatriz').value,
-                nomes: document.getElementById('nomesInputMatriz').value,
-                meses: statusMesesVisiveis,
-                html: document.getElementById('corpoMatriz').innerHTML
+                tema: document.getElementById('temaInput').value,
+                periodo: document.getElementById('periodoInput').value,
+                semana: document.getElementById('semanaInput').value,
+                ano: document.getElementById('anoInput').value,
+                nomes: document.getElementById('nomesInput').value.toUpperCase(),
+                folhasHTML: document.getElementById('contentorFolhas').innerHTML
             };
-            localStorage.setItem('valematriz_dinamica_v01', JSON.stringify(dados));
-            alert('Matriz Guardada com Sucesso! (v01)');
+            localStorage.setItem('dados_dds_vale', JSON.stringify(dados));
+            alert('Dados guardados com sucesso no navegador!');
         }
 
-        function carregarTudoMatriz() {
-            const s = localStorage.getItem('valematriz_dinamica_v01');
-            if(!s) return alert('Sem registos salvos.');
-            const d = JSON.parse(s);
-            document.getElementById('areaInputMatriz').value = d.area || '';
-            document.getElementById('anoInputMatriz').value = d.ano || '';
-            document.getElementById('turnoInputMatriz').value = d.turno || '';
-            document.getElementById('facilitadorInputMatriz').value = d.facil || '';
-            document.getElementById('nomesInputMatriz').value = d.nomes || '';
-            if (d.meses) statusMesesVisiveis = d.meses;
-            if(d.html) document.getElementById('corpoMatriz').innerHTML = d.html;
-            sincronizarCabecalhoMatriz();
-            aplicarVisibilidadeMeses();
-            alert('Matriz Carregada!');
+        function carregarTudo() {
+            const salvo = localStorage.getItem('dados_dds_vale');
+            if (!salvo) {
+                alert('Nenhum dado guardado anteriormente.');
+                return;
+            }
+            const dados = JSON.parse(salvo);
+            document.getElementById('temaInput').value = dados.tema || '';
+            document.getElementById('periodoInput').value = dados.periodo || '';
+            document.getElementById('semanaInput').value = dados.semana || '';
+            document.getElementById('anoInput').value = dados.ano || '';
+            document.getElementById('nomesInput').value = (dados.nomes || '').toUpperCase();
+
+            if (dados.folhasHTML) {
+                document.getElementById('contentorFolhas').innerHTML = dados.folhasHTML;
+                atualizarPaginacaoFolhas();
+            }
+            alert('Dados carregados com sucesso!');
         }
 
-        function limparTudoMatriz() {
-            if(confirm('Limpar Matriz?')) {
-                document.getElementById('nomesInputMatriz').value = '';
-                document.getElementById('corpoMatriz').innerHTML = '';
-                adicionarLinhaFimMatriz();
+        function limparTudo() {
+            if (confirm('Deseja limpar todos os dados da tela?')) {
+                document.getElementById('temaInput').value = '';
+                document.getElementById('periodoInput').value = '';
+                document.getElementById('semanaInput').value = '';
+                document.getElementById('anoInput').value = '';
+                document.getElementById('nomesInput').value = '';
+                const contentor = document.getElementById('contentorFolhas');
+                contentor.innerHTML = '';
+                contentor.appendChild(criarEstruturaFolha(1, [], null));
+                contentor.appendChild(criarEstruturaFolha(TOTAL_LINHAS + 1, [], null));
+                atualizarPaginacaoFolhas();
             }
         }
 
-        // INICIALIZAÇÃO
         window.onload = function() {
-            // Módulo 1 (DDS)
-            document.getElementById('contentorFolhasDDS').appendChild(criarEstruturaFolhaDDS([], null, TOTAL_LINHAS_DDS));
-            reordenarNumDDS();
-            atualizarPaginacaoDDS();
-
-            // Módulo 2 inicia com caixa de nomes limpa
-            document.getElementById('nomesInputMatriz').value = '';
-            gerarTabelaMatriz();
+            const contentor = document.getElementById('contentorFolhas');
+            contentor.innerHTML = '';
+            contentor.appendChild(criarEstruturaFolha(1, [], null));
+            contentor.appendChild(criarEstruturaFolha(TOTAL_LINHAS + 1, [], null));
+            atualizarPaginacaoFolhas();
         };
     </script>
 </body>
