@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <title>Gerador de Portal - Vale</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        .box { background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; max-width: 450px; width: 100%; }
+        h2 { color: #007e7a; margin-bottom: 10px; font-size: 18px; }
+        p { font-size: 12px; color: #64748b; margin-bottom: 20px; line-height: 1.5; }
+        .btn { background: #1b8a5a; color: #fff; border: none; padding: 12px 24px; font-size: 14px; font-weight: 700; border-radius: 6px; cursor: pointer; transition: 0.2s; width: 100%; }
+        .btn:hover { background: #146c46; }
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h2>Gerador Instantâneo do Portal Vale</h2>
+    <p>Clique no botão abaixo para gerar e descarregar o ficheiro HTML completo (com os 3 módulos redondos, ordenação A-Z e sem cortes) diretamente para a sua pasta de transferências.</p>
+    <button class="btn" onclick="baixarPortal()">📥 Baixar o Portal Completo</button>
+</div>
+
+<script>
+function baixarPortal() {
+    var codigoPortal = `<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <title>Portal Operacional - Vale - v01</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; color: #2c3e50; min-height: 100vh; }
+        header { background: linear-gradient(135deg, #007e7a, #005a57); color: #fff; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0, 126, 122, 0.2); }
+        .header-logo { font-size: 19px; font-weight: 800; letter-spacing: 1.5px; display: flex; align-items: center; gap: 10px; }
+        .tag-v01 { background-color: #ffeb3b; color: #212121; font-weight: 800; font-size: 10px; padding: 2px 7px; border-radius: 4px; }
+        nav.nav-abas-topo { display: flex; gap: 8px; align-items: center; }
+        .btn-aba-topo { background: rgba(255, 255, 255, 0.15); color: #fff; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 6px; padding: 6px 12px; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.15s; }
+        .btn-aba-topo:hover { background: #fff; color: #005a57; }
+        #telaCapa { display: block; }
+        #telaDDS, #telaMatriz, #telaFerias { display: none; padding: 12px; }
+        main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 20px; }
+        .secao-titulo { margin-bottom: 24px; }
+        .secao-titulo h2 { font-size: 19px; font-weight: 800; color: #005a57; text-transform: uppercase; }
+        .grid-modulos { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 22px; }
+        .card-modulo { background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: all 0.2s ease; position: relative; min-height: 190px; }
+        .card-modulo.m1::before { content: ''; position: absolute; top:0; left:0; right:0; height:4px; background: #007e7a; }
+        .card-modulo.m2::before { content: ''; position: absolute; top:0; left:0; right:0; height:4px; background: #1e40af; }
+        .card-modulo.m3::before { content: ''; position: absolute; top:0; left:0; right:0; height:4px; background: #b91c1c; }
+        .card-titulo { font-size: 15px; font-weight: 700; margin-bottom: 6px; color: #1e293b; }
+        .card-descricao { font-size: 11.5px; color: #64748b; line-height: 1.45; margin-bottom: 16px; }
+        .painel-controle { background: #fff; padding: 14px 18px; margin: 0 auto 14px auto; border-radius: 8px; border: 1px solid #e2e8f0; max-width: 1120px; }
+        .campos-painel { display: grid; gap: 10px; margin-bottom: 10px; }
+        .grid-3 { grid-template-columns: 2fr 1fr 1fr; } .grid-4 { grid-template-columns: 2fr 1fr 1fr 1fr; }
+        .painel-controle label { display: block; font-weight: 700; margin-bottom: 4px; font-size: 10px; color: #475569; text-transform: uppercase; }
+        .painel-controle input, .painel-controle textarea { width: 100%; font-size: 11px; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 5px; outline: none; text-transform: uppercase; }
+        .botoes-painel { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
+        .btn { cursor: pointer; padding: 6px 12px; font-size: 10.5px; font-weight: 700; border: none; border-radius: 5px; color: #fff; }
+        .btn-verde { background-color: #1b8a5a; } .btn-azul { background-color: #007e7a; } .btn-vinho { background-color: #991b1b; } .btn-voltar { background-color: #475569; } .btn-imprimir { background-color: #0f172a; margin-left: auto; }
+        .folha-a4 { width: 100%; max-width: 1120px; background: #fff; padding: 8px 10px; margin: 0 auto 16px auto; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-radius: 4px; }
+        .cabecalho-container, .info-dds, table.tabela-dds, table.tabela-matriz, table.tabela-ferias { width: 100%; border-collapse: collapse; border: 1.2px solid #000; table-layout: fixed; margin-bottom: 3px; }
+        .cabecalho-container td, .info-dds td, table.tabela-dds th, table.tabela-dds td, table.tabela-matriz th, table.tabela-matriz td, table.tabela-ferias th, table.tabela-ferias td { border: 1px solid #333; padding: 1px 3px; text-align: center; vertical-align: middle; font-size: 7.5px; }
+        .logo-box { width: 110px; font-weight: 900; font-size: 14px; color: #007e7a; background: #f8fafc; }
+        .titulo-box { font-size: 9px; font-weight: 800; text-transform: uppercase; }
+        .meta-box { width: 120px; font-size: 7.5px; text-align: left; padding-left: 4px; background: #f8fafc; }
+        .col-id { width: 30px; font-weight: 800; background: #f8fafc; }
+        .col-nome { text-align: left; padding-left: 4px; font-weight: 800; text-transform: uppercase; white-space: nowrap; overflow: hidden; }
+        .carinhas { display: flex; justify-content: space-evenly; cursor: pointer; }
+        .c-item { font-size: 7px; font-weight: 800; padding: 0 2px; border-radius: 2px; }
+        .c-item.sel-1 { background: #86efac; } .c-item.sel-2 { background: #fde047; } .c-item.sel-3 { background: #fca5a5; }
+        .mes-oculto { display: none !important; }
+        .btn-tag-mes { border: 1px solid #1b8a5a; background: #e8f5e9; color: #1b5e20; font-size: 9px; font-weight: 800; padding: 2px 6px; border-radius: 3px; cursor: pointer; }
+        .btn-tag-mes.inativo { background: #f1f5f9; color: #94a3b8; border-color: #cbd5e1; text-decoration: line-through; }
+        @media print {
+            @page { size: A4 landscape; margin: 4mm; }
+            body { background: #fff; color: #000; }
+            #telaCapa, nav.nav-abas-topo, .painel-controle, .barra-controle-folha, .barra-acoes-folha { display: none !important; }
+            .folha-a4 { box-shadow: none; padding: 0; width: 100%; height: 98vh; display: flex; flex-direction: column; justify-content: space-between; page-break-inside: avoid; page-break-after: always; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-logo">VALE <span>Portal Operacional</span> <span class="tag-v01">v01</span></div>
+        <nav class="nav-abas-topo">
+            <button type="button" class="btn-aba-topo" onclick="mudarTela('telaCapa')">🏠 Início</button>
+            <button type="button" class="btn-aba-topo" onclick="mudarTela('telaDDS')">📋 DDS</button>
+            <button type="button" class="btn-aba-topo" onclick="mudarTela('telaMatriz')">📅 Matriz</button>
+            <button type="button" class="btn-aba-topo" onclick="mudarTela('telaFerias')">🎉 Férias</button>
+        </nav>
+    </header>
+
+    <div id="telaCapa">
+        <main class="capa-main">
+            <div class="secao-titulo">
+                <h2>MÓDULOS & APLICAÇÕES</h2>
+                <p>Selecione um dos módulos abaixo para começar:</p>
+            </div>
+            <div class="grid-modulos">
+                <div class="card-modulo m1" onclick="mudarTela('telaDDS')">
+                    <div>
+                        <div class="card-titulo">📋 DDS & Emociograma Semanal</div>
+                        <div class="card-descricao">Folhes de 24 linhas por página com ordenação A-Z automática e carinhas de emociograma.</div>
+                    </div>
+                    <div style="color: #007e7a; font-weight: 700; font-size: 11px;">Aceder ➔</div>
+                </div>
+                <div class="card-modulo m2" onclick="mudarTela('telaMatriz')">
+                    <div>
+                        <div class="card-titulo">📅 Matriz de DDS (12 Meses)</div>
+                        <div class="card-descricao">Controlo anual completo com opção de ocultar/mostrar meses e grelha limpa para datas.</div>
+                    </div>
+                    <div style="color: #1e40af; font-weight: 700; font-size: 11px;">Aceder ➔</div>
+                </div>
+                <div class="card-modulo m3" onclick="mudarTela('telaFerias')">
+                    <div>
+                        <div class="card-titulo">🎉 Férias e Aniversários</div>
+                        <div class="card-descricao">Cronograma completo por colaborador com datas de aniversário e planeamento de férias de Jan a Dez.</div>
+                    </div>
+                    <div style="color: #b91c1c; font-weight: 700; font-size: 11px;">Aceder ➔</div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <div id="telaDDS">
+        <div class="painel-controle">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h3 style="font-size: 13px; color: #007e7a;">DDS & Emociograma Semanal</h3>
+                <button type="button" class="btn btn-voltar" onclick="mudarTela('telaCapa')">⬅ Voltar</button>
+            </div>
+            <div class="campos-painel grid-3">
+                <div><label>Período:</label><input type="text" id="perDDS" placeholder="21/09 a 25/09"></div>
+                <div><label>Semana:</label><input type="text" id="semDDS" placeholder="38"></div>
+                <div><label>Ano:</label><input type="text" id="anoDDS" value="2026"></div>
+            </div>
+            <label>Colaboradores (Um por linha - A-Z automático):</label>
+            <textarea id="txtNomesDDS" placeholder="COLE OS NOMES AQUI..."></textarea>
+            <div class="botoes-painel">
+                <button type="button" class="btn btn-verde" onclick="gerarDDS(1)">Gerar c/ Carinha 1 (A-Z)</button>
+                <button type="button" class="btn btn-azul" onclick="gerarDDS(null)">Gerar Limpo (A-Z)</button>
+                <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
+            </div>
+        </div>
+        <div id="boxFolhasDDS"></div>
+    </div>
+
+    <div id="telaMatriz">
+        <div class="painel-controle">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h3 style="font-size: 13px; color: #1b8a5a;">Matriz Anual de DDS</h3>
+                <button type="button" class="btn btn-voltar" onclick="mudarTela('telaCapa')">⬅ Voltar</button>
+            </div>
+            <div style="margin-bottom: 6px;">
+                <label>Mostrar / Ocultar Meses:</label>
+                <div style="display: flex; gap: 3px; flex-wrap: wrap; margin-top: 3px;">
+                    <button type="button" class="btn-tag-mes" onclick="toggleM(0)">JAN</button>
+                    <button type="button" class="btn-tag-mes" onclick="toggleM(1)">FEV</button>
+                    <button type="button" class="btn-tag-mes" onclick="toggleM(2)">MAR</button>
+                    <button type="button" class="btn-tag-mes" onclick="toggleM(3)">ABR</button>
+                    <button type="button" class="btn-tag-mes" onclick="toggleM(4)">MAI</button>
+                    <button type="button" class="btn-tag-mes" onclick="toggleM(5)">JUN</button>
+                    <button type="button" class="btn-tag-mes" onclick="toggleM(6)">JUL</button>
+                    <button type="button" class="btn-tag-mes" onclick="toggleM(7)">AGO</button>
+                    <button type="button" class="btn-tag-mes" onclick="toggleM(8)">SET</button>
+                    <button type="button" class="btn-tag-mes" onclick="toggleM(9)">OUT</button>
+                    <button type="button" class="btn-tag-mes" onclick="toggleM(10)">NOV</button>
+                    <button type="button" class="btn-tag-mes" onclick="toggleM(11)">DEZ</button>
+                </div>
+            </div>
+            <label>Colaboradores da Matriz (A-Z):</label>
+            <textarea id="txtNomesMatriz" placeholder="COLE OS NOMES AQUI..."></textarea>
+            <div class="botoes-painel">
+                <button type="button" class="btn btn-verde" onclick="gerarMatriz()">Atualizar Grelha (A-Z)</button>
+                <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
+            </div>
+        </div>
+        <div class="folha-a4">
+            <table class="cabecalho-container">
+                <tr><td class="logo-box">VALE</td><td class="titulo-box">MATRIZ DE REGISTO DE DIÁLOGO DIÁRIO DE SEGURANÇA</td><td class="meta-box">Ano: 2026</td></tr>
+            </table>
+            <table class="tabela-matriz" style="width:100%; border-collapse:collapse; border:1px solid #000;">
+                <thead>
+                    <tr>
+                        <th style="width:25px;">Nº</th><th style="width:180px; text-align:left; padding-left:4px;">DDS</th>
+                        <th class="th-m0" style="background:#1b8a5a; color:#fff;">JAN</th><th class="th-m1" style="background:#1b8a5a; color:#fff;">FEV</th><th class="th-m2" style="background:#1b8a5a; color:#fff;">MAR</th><th class="th-m3" style="background:#1b8a5a; color:#fff;">ABR</th>
+                        <th class="th-m4" style="background:#1b8a5a; color:#fff;">MAI</th><th class="th-m5" style="background:#1b8a5a; color:#fff;">JUN</th><th class="th-m6" style="background:#1b8a5a; color:#fff;">JUL</th><th class="th-m7" style="background:#1b8a5a; color:#fff;">AGO</th>
+                        <th class="th-m8" style="background:#1b8a5a; color:#fff;">SET</th><th class="th-m9" style="background:#1b8a5a; color:#fff;">OUT</th><th class="th-m10" style="background:#1b8a5a; color:#fff;">NOV</th><th class="th-m11" style="background:#1b8a5a; color:#fff;">DEZ</th>
+                    </tr>
+                </thead>
+                <tbody id="corpoMatriz"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="telaFerias">
+        <div class="painel-controle">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h3 style="font-size: 13px; color: #991b1b;">Cronograma de Férias e Aniversários</h3>
+                <button type="button" class="btn btn-voltar" onclick="mudarTela('telaCapa')">⬅ Voltar</button>
+            </div>
+            <div class="botoes-painel">
+                <button type="button" class="btn btn-vinho" onclick="addLinhaFerias()">➕ Adicionar Colaborador</button>
+                <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
+            </div>
+        </div>
+        <div class="folha-a4">
+            <div style="background: #007e7a; color: #fff; text-align: center; font-weight: 900; font-size: 10px; padding: 4px; margin-bottom: 2px;">CRONOGRAMA DE FÉRIAS E ANIVERSÁRIOS</div>
+            <table class="tabela-ferias" style="width:100%; border-collapse:collapse; border:1px solid #000;">
+                <thead>
+                    <tr style="background:#ffc000; font-weight:800;">
+                        <th rowspan="2" style="width:45px;">MÊS</th><th rowspan="2" style="width:160px;">PESSOAS</th><th rowspan="2" style="width:45px;">NIVER</th>
+                        <th colspan="2">Jan</th><th colspan="2">Fev</th><th colspan="2">Mar</th><th colspan="2">Abr</th><th colspan="2">Mai</th><th colspan="2">Jun</th>
+                        <th colspan="2">Jul</th><th colspan="2">Ago</th><th colspan="2">Set</th><th colspan="2">Out</th><th colspan="2">Nov</th><th colspan="2">Dez</th>
+                        <th rowspan="2" style="width:30px;">Saldo</th>
+                    </tr>
+                    <tr style="background:#ffc000; font-size:6.5px;">
+                        <th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th>
+                        <th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th>
+                    </tr>
+                </thead>
+                <tbody id="corpoFerias"></tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function mudarTela(id) {
+            document.getElementById('telaCapa').style.display = 'none';
+            document.getElementById('telaDDS').style.display = 'none';
+            document.getElementById('telaMatriz').style.display = 'none';
+            document.getElementById('telaFerias').style.display = 'none';
+            document.getElementById(id).style.display = 'block';
+            window.scrollTo(0, 0);
+        }
+        function carinhasHtml(s) {
+            var c1 = s === 1 ? 'sel-1' : '', c2 = s === 2 ? 'sel-2' : '', c3 = s === 3 ? 'sel-3' : '';
+            return '<div class="carinhas"><span class="c-item ' + c1 + '" onclick="selCar(this,1)">1</span><span class="c-item ' + c2 + '" onclick="selCar(this,2)">2</span><span class="c-item ' + c3 + '" onclick="selCar(this,3)">3</span></div>';
+        }
+        function selCar(el, n) {
+            var p = el.parentNode;
+            p.querySelectorAll('.c-item').forEach(function(i) { i.className = 'c-item'; });
+            el.className = 'c-item sel-' + n;
+        }
+        function gerarDDS(padrao) {
+            var box = document.getElementById('boxFolhasDDS');
+            box.innerHTML = '';
+            var txt = document.getElementById('txtNomesDDS').value.toUpperCase();
+            var nomes = txt.split('\\n').map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 0; });
+            nomes.sort(function(a, b) { return a.localeCompare(b, 'pt'); });
+            document.getElementById('txtNomesDDS').value = nomes.join('\\n');
+            var blocos = [];
+            if (nomes.length === 0) blocos.push([]);
+            else for (var i = 0; i < nomes.length; i += 24) blocos.push(nomes.slice(i, i + 24));
+            blocos.forEach(function(bNomes, idx) { box.appendChild(criarFolhaDDS(bNomes, padrao, (idx + 1), blocos.length)); });
+        }
+        function criarFolhaDDS(nomes, padrao, numFolha, totFolhas) {
+            var per = document.getElementById('perDDS').value || '____/____ a ____/____';
+            var sem = document.getElementById('semDDS').value || '____';
+            var ano = document.getElementById('anoDDS').value || '2026';
+            var f = document.createElement('div');
+            f.className = 'folha-a4';
+            var linhas = '';
+            for (var i = 0; i < 24; i++) {
+                var num = (i + 1) < 10 ? '0' + (i + 1) : (i + 1);
+                var nm = nomes[i] || '';
+                var c = carinhasHtml(nm && padrao ? padrao : null);
+                linhas += '<tr><td class="col-id">' + num + '</td><td class="col-nome" contenteditable="true">' + nm + '</td><td>' + c + '</td><td contenteditable="true"></td><td>' + c + '</td><td contenteditable="true"></td><td>' + c + '</td><td contenteditable="true"></td><td>' + c + '</td><td contenteditable="true"></td><td>' + c + '</td><td contenteditable="true"></td></tr>';
+            }
+            f.innerHTML = '<table class="cabecalho-container"><tr><td class="logo-box">VALE</td><td class="titulo-box">DDS & EMOCIOGRAMA SEMANAL</td><td class="meta-box">Folha: 0' + numFolha + '/0' + (totFolhas || 1) + '</td></tr></table>' +
+                '<table class="info-dds"><tr><td>PERÍODO: ' + per + '</td><td>SEMANA: ' + sem + '</td><td>ANO: ' + ano + '</td></tr></table>' +
+                '<table class="tabela-dds"><thead><tr><th rowspan="2" style="width:30px;">Nº</th><th rowspan="2" style="width:170px; text-align:left; padding-left:4px;">Colaborador</th><th colspan="2">Seg</th><th colspan="2">Ter</th><th colspan="2">Qua</th><th colspan="2">Qui</th><th colspan="2">Sex</th></tr><tr><th>Estou</th><th>Rub</th><th>Estou</th><th>Rub</th><th>Estou</th><th>Rub</th><th>Estou</th><th>Rub</th><th>Estou</th><th>Rub</th></tr></thead><tbody>' + linhas + '</tbody></table>';
+            return f;
+        }
+        var visM = [true,true,true,true,true,true,true,true,true,true,true,true];
+        function toggleM(idx) {
+            visM[idx] = !visM[idx];
+            document.querySelectorAll('.btn-tag-mes')[idx].classList.toggle('inativo', !visM[idx]);
+            document.querySelectorAll('.th-m' + idx + ', .td-m' + idx).forEach(function(el) { el.classList.toggle('mes-oculto', !visM[idx]); });
+        }
+        function gerarMatriz() {
+            var corpo = document.getElementById('corpoMatriz');
+            corpo.innerHTML = '';
+            var txt = document.getElementById('txtNomesMatriz').value.toUpperCase();
+            var nomes = txt.split('\\n').map(function(l) { return l.trim(); }).filter(function(l) { return l.length > 0; });
+            nomes.sort(function(a, b) { return a.localeCompare(b, 'pt'); });
+            document.getElementById('txtNomesMatriz').value = nomes.join('\\n');
+            var lista = nomes.length > 0 ? nomes : ['', '', '', '', ''];
+            lista.forEach(function(n, i) {
+                var num = (i + 1) < 10 ? '0' + (i + 1) : (i + 1);
+                var tds = '';
+                for (var m = 0; m < 12; m++) {
+                    var ocl = visM[m] ? '' : 'mes-oculto';
+                    tds += '<td class="td-data-mes td-m' + m + ' ' + ocl + '" contenteditable="true" style="font-size:7.5px; height:16px;"></td>';
+                }
+                var tr = document.createElement('tr');
+                tr.innerHTML = '<td class="col-id">' + num + '</td><td class="col-nome" contenteditable="true">' + n + '</td>' + tds;
+                corpo.appendChild(tr);
+            });
+        }
+        var DADOS_F = [
+            {m:"JAN", n:"MARIANA PEREIRA CRUZ", v:"11/1"},
+            {m:"JAN", n:"RICARDO GONCALVES LEITE", v:"13/1"},
+            {m:"JAN", n:"JOAO SILVA RAMOS", v:"18/1"},
+            {m:"FEV", n:"MARCOS AURELIO MATTOS", v:"1/2"},
+            {m:"FEV", n:"VANDERSON TEIXEIRA", v:"4/2"},
+            {m:"MAR", n:"GLEIVSTON SILVA MENDES", v:"22/3"},
+            {m:"JUN", n:"ROBSON SOUZA MENDONCA", v:"4/6"},
+            {m:"JUL", n:"BRUNO GOMES FIDELIS", v:"2/7"},
+            {m:"AGO", n:"CAIO HENRIQUE", v:"6/8"},
+            {m:"NOV", n:"DOMINIQUE SILVA", v:"2/11"},
+            {m:"DEZ", n:"EMERSON RIBEIRO SANTOS", v:"4/12"}
+        ];
+        function addLinhaFerias(m, n, v) {
+            var corpo = document.getElementById('corpoFerias');
+            var tr = document.createElement('tr');
+            var tds = '';
+            for (var i = 0; i < 24; i++) tds += '<td contenteditable="true" style="font-size:6px;"></td>';
+            tr.innerHTML = '<td style="background:#a82451; color:#fff; font-weight:800; font-size:7.5px;" contenteditable="true">' + (m || '') + '</td>' +
+                '<td style="background:#a82451; color:#fff; font-weight:800; font-size:7.5px; text-align:left; padding-left:3px;" contenteditable="true">' + (n || '') + '</td>' +
+                '<td style="background:#a82451; color:#fff; font-weight:800; font-size:7.5px;" contenteditable="true">' + (v || '') + '</td>' +
+                tds + '<td contenteditable="true" style="font-weight:800; font-size:7.5px;">-</td>';
+            corpo.appendChild(tr);
+        }
+        window.onload = function() {
+            gerarDDS(null);
+            gerarMatriz();
+            DADOS_F.forEach(function(d) { addLinhaFerias(d.m, d.n, d.v); });
+        };
+    </script>
+</body>
+</html>`;
+
+    var blob = new Blob([codigoPortal], {type: 'text/html;charset=utf-8'});
+    var link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = 'portal_vale_v01.html';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
+</script>
+
+</body>
+</html>
