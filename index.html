@@ -9,21 +9,22 @@ body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; color: #2c3e50;
 header { background: linear-gradient(135deg, #007e7a, #005a57); color: #fff; padding: 14px 24px; display: flex; align-items: center; justify-content: space-between; box-shadow: 0 4px 12px rgba(0, 126, 122, 0.2); }
 .header-logo { font-size: 19px; font-weight: 800; letter-spacing: 1.5px; display: flex; align-items: center; gap: 10px; }
 .tag-v01 { background-color: #ffeb3b; color: #212121; font-weight: 800; font-size: 10px; padding: 2px 7px; border-radius: 4px; }
-nav.nav-abas-topo { display: flex; gap: 8px; align-items: center; }
+nav.nav-abas-topo { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
 .btn-aba-topo { background: rgba(255, 255, 255, 0.15); color: #fff; border: 1px solid rgba(255, 255, 255, 0.3); border-radius: 6px; padding: 6px 12px; font-size: 11px; font-weight: 700; cursor: pointer; transition: 0.15s; }
 .btn-aba-topo:hover { background: #fff; color: #005a57; }
 #telaCapa { display: block; }
-#telaDDS, #telaMatriz, #telaFerias { display: none; padding: 12px; }
+#telaDDS, #telaMatriz, #telaFerias, #telaBlocoNotas { display: none; padding: 12px; }
 main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 20px; }
 .secao-titulo { margin-bottom: 24px; }
 .secao-titulo h2 { font-size: 19px; font-weight: 800; color: #005a57; text-transform: uppercase; }
-.grid-modulos { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 22px; }
-.card-modulo { background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 22px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: all 0.2s ease; position: relative; min-height: 190px; }
+.grid-modulos { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; }
+.card-modulo { background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); padding: 20px; display: flex; flex-direction: column; justify-content: space-between; cursor: pointer; transition: all 0.2s ease; position: relative; min-height: 170px; }
 .card-modulo.m1::before { content: ''; position: absolute; top:0; left:0; right:0; height:4px; background: #007e7a; }
 .card-modulo.m2::before { content: ''; position: absolute; top:0; left:0; right:0; height:4px; background: #1e40af; }
 .card-modulo.m3::before { content: ''; position: absolute; top:0; left:0; right:0; height:4px; background: #b91c1c; }
-.card-titulo { font-size: 15px; font-weight: 700; margin-bottom: 6px; color: #1e293b; }
-.card-descricao { font-size: 11.5px; color: #64748b; line-height: 1.45; margin-bottom: 16px; }
+.card-modulo.m4::before { content: ''; position: absolute; top:0; left:0; right:0; height:4px; background: #d97706; }
+.card-titulo { font-size: 14px; font-weight: 700; margin-bottom: 6px; color: #1e293b; }
+.card-descricao { font-size: 11px; color: #64748b; line-height: 1.4; margin-bottom: 14px; }
 .painel-controle { background: #fff; padding: 14px 18px; margin: 0 auto 14px auto; border-radius: 8px; border: 1px solid #e2e8f0; max-width: 1120px; }
 .campos-painel { display: grid; gap: 10px; margin-bottom: 10px; }
 .grid-3 { grid-template-columns: 2fr 1fr 1fr; }
@@ -31,7 +32,7 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
 .painel-controle input, .painel-controle textarea { width: 100%; font-size: 11px; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 5px; outline: none; text-transform: uppercase; }
 .botoes-painel { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; }
 .btn { cursor: pointer; padding: 6px 12px; font-size: 10.5px; font-weight: 700; border: none; border-radius: 5px; color: #fff; }
-.btn-verde { background-color: #1b8a5a; } .btn-azul { background-color: #007e7a; } .btn-vinho { background-color: #991b1b; } .btn-voltar { background-color: #475569; } .btn-imprimir { background-color: #0f172a; margin-left: auto; }
+.btn-verde { background-color: #1b8a5a; } .btn-azul { background-color: #007e7a; } .btn-vinho { background-color: #991b1b; } .btn-amarelo { background-color: #d97706; } .btn-voltar { background-color: #475569; } .btn-imprimir { background-color: #0f172a; margin-left: auto; }
 .folha-a4 { width: 100%; max-width: 1120px; background: #fff; padding: 8px 10px; margin: 0 auto 16px auto; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-radius: 4px; }
 .cabecalho-container, .info-dds, table.tabela-dds, table.tabela-matriz, table.tabela-ferias { width: 100%; border-collapse: collapse; border: 1.2px solid #000; table-layout: fixed; margin-bottom: 3px; }
 .cabecalho-container td, .info-dds td, table.tabela-dds th, table.tabela-dds td, table.tabela-matriz th, table.tabela-matriz td, table.tabela-ferias th, table.tabela-ferias td { border: 1px solid #333; padding: 1px 3px; text-align: center; vertical-align: middle; font-size: 7.5px; }
@@ -74,6 +75,7 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
             <button type="button" class="btn-aba-topo" onclick="mudarTela('telaDDS')">📋 DDS</button>
             <button type="button" class="btn-aba-topo" onclick="mudarTela('telaMatriz')">📅 Matriz</button>
             <button type="button" class="btn-aba-topo" onclick="mudarTela('telaFerias')">🎉 Férias</button>
+            <button type="button" class="btn-aba-topo" onclick="mudarTela('telaBlocoNotas')" style="background: #d97706; border-color: #b45309;">📝 Bloco de Notas</button>
         </nav>
     </header>
 
@@ -104,6 +106,13 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
                         <div class="card-descricao">Cronograma completo estendido até baixo com datas de aniversário e planeamento de férias por colaborador.</div>
                     </div>
                     <div style="color: #b91c1c; font-weight: 700; font-size: 11px;">Aceder ➔</div>
+                </div>
+                <div class="card-modulo m4" onclick="mudarTela('telaBlocoNotas')">
+                    <div>
+                        <div class="card-titulo">📝 Bloco de Notas Operacional</div>
+                        <div class="card-descricao">Área livre gigante para copiar, colar e guardar todas as anotações sem limites de tamanho.</div>
+                    </div>
+                    <div style="color: #d97706; font-weight: 700; font-size: 11px;">Aceder ➔</div>
                 </div>
             </div>
         </main>
@@ -212,12 +221,29 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
         </div>
     </div>
 
+    <!-- MÓDULO 4: BLOCO DE NOTAS LIVRE -->
+    <div id="telaBlocoNotas">
+        <div class="painel-controle">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                <h3 style="font-size: 13px; color: #d97706;">📝 Módulo 4: Bloco de Notas Operacional</h3>
+                <button type="button" class="btn btn-voltar" onclick="mudarTela('telaCapa')">⬅ Voltar</button>
+            </div>
+            <p style="font-size: 11px; color: #64748b; margin-bottom: 8px;">Espaço livre e contínuo para copiar, colar e guardar qualquer texto, listas ou informações adicionais sem limites.</p>
+            <textarea id="blocoNotasLivre" style="width: 100%; height: 450px; font-family: monospace; font-size: 12px; padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; resize: vertical;" placeholder="Cole ou escreva aqui o que quiser sem limites..."></textarea>
+            <div class="botoes-painel" style="margin-top: 10px;">
+                <button type="button" class="btn btn-amarelo" onclick="salvarBlocoNotas()">💾 Guardar Nota no Computador</button>
+                <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir Bloco</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         function mudarTela(id) {
             document.getElementById('telaCapa').style.display = 'none';
             document.getElementById('telaDDS').style.display = 'none';
             document.getElementById('telaMatriz').style.display = 'none';
             document.getElementById('telaFerias').style.display = 'none';
+            document.getElementById('telaBlocoNotas').style.display = 'none';
             document.getElementById(id).style.display = 'block';
             window.scrollTo(0, 0);
         }
@@ -339,6 +365,17 @@ main.capa-main { max-width: 1120px; width: 100%; margin: 0 auto; padding: 36px 2
                 '<td style="background:#a82451; color:#fff; font-weight:800; font-size:7.5px;" contenteditable="true">' + (v || '') + '</td>' +
                 tds + '<td contenteditable="true" style="font-weight:800; font-size:7.5px;">-</td>';
             corpo.appendChild(tr);
+        }
+
+        function salvarBlocoNotas() {
+            var texto = document.getElementById('blocoNotasLivre').value;
+            var blob = new Blob([texto], {type: 'text/plain;charset=utf-8'});
+            var link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'anotacoes_operacionais.txt';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
         }
 
         window.onload = function() {
