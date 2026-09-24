@@ -181,10 +181,10 @@
             background: rgba(0, 126, 122, 0.08);
         }
 
-        /* FOLHA DE DDS COMPACTA PARA 24 LINHAS */
+        /* FOLHA DE DDS */
         @page {
             size: A4 landscape;
-            margin: 3mm 4mm;
+            margin: 4mm 5mm;
         }
 
         .painel-controle {
@@ -228,7 +228,6 @@
             border: 1px solid #ccc;
             border-radius: 4px;
             resize: vertical;
-            text-transform: uppercase;
         }
 
         .dica-painel {
@@ -268,8 +267,8 @@
             width: 100%;
             max-width: 1080px;
             background: #fff;
-            padding: 5px 7px;
-            margin: 0 auto 12px auto;
+            padding: 6px 8px;
+            margin: 0 auto 15px auto;
             box-shadow: 0 0 8px rgba(0,0,0,0.1);
             page-break-inside: avoid;
             break-inside: avoid;
@@ -284,7 +283,7 @@
         .barra-controle-folha {
             display: flex;
             justify-content: flex-end;
-            margin-bottom: 2px;
+            margin-bottom: 3px;
         }
 
         .btn-remover-folha {
@@ -292,9 +291,9 @@
             color: #c62828;
             border: 1px solid #ef9a9a;
             border-radius: 3px;
-            font-size: 7.5px;
+            font-size: 8px;
             font-weight: bold;
-            padding: 1px 5px;
+            padding: 2px 6px;
             cursor: pointer;
         }
 
@@ -305,49 +304,49 @@
         .cabecalho-container, .info-dds, table.tabela-dds {
             width: 100%;
             border-collapse: collapse;
-            border: 1.1px solid #000;
-            margin-bottom: 2px;
+            border: 1.2px solid #000;
+            margin-bottom: 3px;
         }
 
         .cabecalho-container td, .info-dds td, table.tabela-dds th, table.tabela-dds td {
             border: 1px solid #000;
-            padding: 0 2px;
+            padding: 1px 3px;
             vertical-align: middle;
             text-align: center;
         }
 
         .logo-box {
-            width: 105px;
+            width: 110px;
             font-weight: bold;
-            font-size: 14px;
+            font-size: 15px;
             letter-spacing: 1px;
             color: #007e7a;
             background-color: #fafafa;
         }
 
         .titulo-box {
-            font-size: 9.5px;
+            font-size: 10px;
             font-weight: bold;
             text-transform: uppercase;
         }
 
         .meta-box {
-            width: 115px;
-            font-size: 7.5px;
-            line-height: 1.15;
+            width: 120px;
+            font-size: 8px;
+            line-height: 1.2;
         }
 
         .info-label {
             font-weight: bold;
             text-transform: uppercase;
-            font-size: 7.5px;
+            font-size: 8px;
         }
 
         .campo-editavel {
             outline: none;
             display: inline-block;
             min-width: 25px;
-            font-size: 7.5px;
+            font-size: 8px;
         }
 
         table.tabela-dds th {
@@ -355,14 +354,13 @@
             font-weight: bold;
         }
 
-        /* 24 LINHAS CALIBRADAS */
         table.tabela-dds td {
-            height: 15.5px;
+            height: 17px;
             padding: 0 1px;
         }
 
         .col-id {
-            width: 30px;
+            width: 32px;
             font-weight: bold;
             background-color: #fafafa;
         }
@@ -378,7 +376,6 @@
             outline: none;
             min-width: 12px;
             text-align: center;
-            font-size: 7.5px;
         }
 
         .col-nome-container {
@@ -396,8 +393,7 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            font-size: 7.5px;
-            text-transform: uppercase;
+            font-size: 8px;
         }
 
         .botoes-acoes {
@@ -410,7 +406,7 @@
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 8px;
+            font-size: 8.5px;
             padding: 0 1px;
             opacity: 0.6;
         }
@@ -420,52 +416,42 @@
         .btn-lixeira { color: #d32f2f; }
 
         .th-dia-semana {
-            font-size: 7.5px;
+            font-size: 8px;
             text-transform: uppercase;
             padding: 1px 0;
             background-color: #e6ecec !important;
         }
 
         .th-tema-dia {
-            font-size: 6.5px;
+            font-size: 7px;
             font-weight: normal;
             text-align: left !important;
             padding-left: 3px !important;
             background-color: #ffffff !important;
-            height: 14px;
+            height: 15px;
         }
 
         .th-data-turno {
-            font-size: 6.5px;
+            font-size: 7px;
             font-weight: normal;
             text-align: left !important;
             padding-left: 3px !important;
             background-color: #fbfbfb !important;
-            height: 13px;
+            height: 14px;
         }
 
         .th-sub {
-            font-size: 6.5px !important;
+            font-size: 7px !important;
             font-weight: bold;
         }
 
-        .col-como-estou { 
-            width: 48px; 
-            min-width: 48px; 
-            padding: 0 !important;
-        }
-
-        .col-rubrica { 
-            width: 52px; 
-            min-width: 52px; 
-            outline: none; 
-            font-size: 7.5px;
-        }
+        .col-como-estou { width: 64px; }
+        .col-rubrica { width: 36px; outline: none; }
 
         .grupo-carinhas {
             display: flex;
             align-items: center;
-            justify-content: space-evenly;
+            justify-content: space-around;
             width: 100%;
         }
 
@@ -476,20 +462,20 @@
             cursor: pointer;
             user-select: none;
             line-height: 1;
-            padding: 0;
-            border-radius: 2px;
+            padding: 0 1px;
+            border-radius: 3px;
         }
 
         .carinha-num {
-            font-size: 5.5px;
+            font-size: 6.5px;
             font-weight: bold;
             color: #333;
             margin-bottom: 0.5px;
         }
 
         .carinha-svg {
-            width: 10px;
-            height: 10px;
+            width: 11.5px;
+            height: 11.5px;
             display: block;
         }
 
@@ -505,28 +491,28 @@
         .c-vermelha circle.olho { fill: #d32f2f; }
         .c-vermelha path.boca { stroke: #d32f2f; stroke-width: 2; stroke-linecap: round; fill: none; }
 
-        .carinha-item.selecionado-1 { background-color: #c8e6c9; outline: 1px solid #2e7d32; }
-        .carinha-item.selecionado-2 { background-color: #fff59d; outline: 1px solid #f57f17; }
-        .carinha-item.selecionado-3 { background-color: #ffcdd2; outline: 1px solid #d32f2f; }
+        .carinha-item.selecionado-1 { background-color: #c8e6c9; outline: 1.2px solid #2e7d32; }
+        .carinha-item.selecionado-2 { background-color: #fff59d; outline: 1.2px solid #f57f17; }
+        .carinha-item.selecionado-3 { background-color: #ffcdd2; outline: 1.2px solid #d32f2f; }
 
         .rodape-container {
             display: grid;
-            grid-template-columns: 130px 1.2fr 1.6fr;
-            gap: 4px;
+            grid-template-columns: 135px 1.2fr 1.6fr;
+            gap: 5px;
             width: 100%;
-            font-size: 6.5px;
-            line-height: 1.15;
+            font-size: 7px;
+            line-height: 1.2;
         }
 
         .box-legenda {
             border: 1px solid #000;
-            padding: 2px 3px;
+            padding: 2px 4px;
             background-color: #fff;
         }
 
         .box-legenda h4 {
-            margin: 0 0 1.5px 0;
-            font-size: 7px;
+            margin: 0 0 2px 0;
+            font-size: 7.5px;
             font-weight: bold;
             text-transform: uppercase;
             border-bottom: 1px solid #ccc;
@@ -546,8 +532,8 @@
         .item-emocio {
             display: flex;
             align-items: flex-start;
-            gap: 3px;
-            margin-bottom: 1.5px;
+            gap: 4px;
+            margin-bottom: 2px;
         }
 
         @media print {
@@ -588,7 +574,7 @@
                             <div class="card-icone">📋</div>
                             <span class="card-badge">PRONTO A USAR</span>
                         </div>
-                        <div class="card-titulo">DDS & Emociograma Semanal (24 Linhas)</div>
+                        <div class="card-titulo">DDS & Emociograma Semanal</div>
                         <div class="card-descricao">
                             Controlo de presença diário de Segunda a Sexta com carinhas de emociograma, assinatura por rubrica e registo de temas diários.
                         </div>
@@ -612,7 +598,7 @@
 
         <div class="painel-controle">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;">
-                <h3 style="margin: 0; font-size: 13px; color: #007e7a;">Painel de Preenchimento Inteligente (24 Linhas/Folha) - Vale</h3>
+                <h3 style="margin: 0; font-size: 13px; color: #007e7a;">Painel de Preenchimento Inteligente - DDS Vale</h3>
                 <button type="button" class="btn btn-voltar" onclick="voltarParaCapa()">⬅ Voltar à Capa</button>
             </div>
 
@@ -637,9 +623,9 @@
 
             <div class="campo-grupo">
                 <label for="nomesInput">Lista de Colaboradores:</label>
-                <textarea id="nomesInput" oninput="this.value = this.value.toUpperCase()" placeholder="COLE OS NOMES DOS COLABORADORES (UM POR LINHA)... DICA: USE '---' SE QUISER FORÇAR A SEPARAÇÃO MANUAL POR FOLHA."></textarea>
+                <textarea id="nomesInput" placeholder="Cole os nomes dos colaboradores (um por linha)... Dica: use '---' se quiser forçar a separação manual por folha."></textarea>
                 <div class="dica-painel">
-                    💡 <strong>Distribuição Inteligente:</strong> O sistema gera as folhas automaticamente a cada 24 nomes e inclui sempre uma folha em branco no final. Texto sempre em maiúsculas.
+                    💡 <strong>Distribuição Inteligente:</strong> O sistema gera as folhas automaticamente a cada 21 nomes e inclui sempre uma folha em branco no final.
                 </div>
             </div>
 
@@ -661,7 +647,7 @@
 
     <!-- SCRIPTS -->
     <script>
-        const TOTAL_LINHAS = 24;
+        const TOTAL_LINHAS = 21;
 
         function abrirDDS() {
             document.getElementById('telaCapa').style.display = 'none';
@@ -748,19 +734,6 @@
             editarElemento(tr.querySelector('.col-nome-texto'));
         }
 
-        function converterMaiusculo(el) {
-            const sel = window.getSelection();
-            const start = sel.anchorOffset;
-            el.innerText = el.innerText.toUpperCase();
-            if (el.childNodes.length > 0) {
-                const range = document.createRange();
-                range.setStart(el.childNodes[0], Math.min(start, el.innerText.length));
-                range.collapse(true);
-                sel.removeAllRanges();
-                sel.addRange(range);
-            }
-        }
-
         function apagarLinha(botao) {
             const tr = botao.closest('tr');
             const textoNome = tr.querySelector('.col-nome-texto');
@@ -774,7 +747,7 @@
             for (let i = 1; i <= TOTAL_LINHAS; i++) {
                 const numeroLinha = inicioNumero + (i - 1);
                 const numStr = numeroLinha < 10 ? '0' + numeroLinha : numeroLinha;
-                const nome = listaNomes[i - 1] ? listaNomes[i - 1].trim().toUpperCase() : '';
+                const nome = listaNomes[i - 1] ? listaNomes[i - 1].trim() : '';
                 const valorSel = (nome.length > 0 && selecionarPadrao) ? selecionarPadrao : null;
 
                 html += `
@@ -787,7 +760,7 @@
                         </td>
                         <td>
                             <div class="col-nome-container">
-                                <span class="col-nome-texto" contenteditable="true" oninput="converterMaiusculo(this)">${nome}</span>
+                                <span class="col-nome-texto" contenteditable="true">${nome}</span>
                                 <div class="botoes-acoes">
                                     <button type="button" class="btn-acao btn-lapis" title="Editar nome" onclick="editarNome(this)">✏️</button>
                                     <button type="button" class="btn-acao btn-lixeira" title="Apagar colaborador" onclick="apagarLinha(this)">🗑️</button>
@@ -898,27 +871,27 @@
                     <div class="box-legenda">
                         <h4>LEGENDA:</h4>
                         <ul class="lista-legenda">
-                            <li><strong>FE</strong> = Feriado[span_0](start_span)[span_0](end_span)</li>
-                            <li><strong>AT</strong> = Atestado Médico[span_1](start_span)[span_1](end_span)</li>
-                            <li><strong>CO</strong> = Compensação[span_2](start_span)[span_2](end_span)</li>
-                            <li><strong>FA</strong> = Falta[span_3](start_span)[span_3](end_span)</li>
-                            <li><strong>FR</strong> = Férias[span_4](start_span)[span_4](end_span)</li>
-                            <li><strong>FO</strong> = Folga[span_5](start_span)[span_5](end_span)</li>
+                            <li><strong>FE</strong> = Feriado</li>
+                            <li><strong>AT</strong> = Atestado Médico</li>
+                            <li><strong>CO</strong> = Compensação</li>
+                            <li><strong>FA</strong> = Falta</li>
+                            <li><strong>FR</strong> = Férias</li>
+                            <li><strong>FO</strong> = Folga</li>
                         </ul>
                     </div>
                     <div class="box-legenda">
                         <h4>AÇÃO TOMADA COM O FUNCIONÁRIO COM EMOCIOGRAMA AMARELO OU VERMELHO:</h4>
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
                             <ul class="lista-legenda">
-                                <li><strong>EST/SUP</strong> = Estratégia / Suprimentos[span_6](start_span)[span_6](end_span)</li>
-                                <li><strong>EST</strong> = Estratégia[span_7](start_span)[span_7](end_span)</li>
-                                <li><strong>ENG ADM</strong> = ADM[span_8](start_span)[span_8](end_span)</li>
+                                <li><strong>EST/SUP</strong> = Estratégia / Suprimentos</li>
+                                <li><strong>EST</strong> = Estratégia</li>
+                                <li><strong>ENG ADM</strong> = ADM</li>
                             </ul>
                             <ul class="lista-legenda">
-                                <li><strong>ENG</strong> = ADM[span_9](start_span)[span_9](end_span)</li>
-                                <li><strong>OP</strong> = Operação[span_10](start_span)[span_10](end_span)</li>
-                                <li><strong>HOFF</strong> = Home Office[span_11](start_span)[span_11](end_span)</li>
-                                <li><strong>AE</strong> = Área Externa[span_12](start_span)[span_12](end_span)</li>
+                                <li><strong>ENG</strong> = ADM</li>
+                                <li><strong>OP</strong> = Operação</li>
+                                <li><strong>HOFF</strong> = Home Office</li>
+                                <li><strong>AE</strong> = Área Externa</li>
                             </ul>
                         </div>
                     </div>
@@ -931,7 +904,7 @@
                                 <circle class="olho" cx="20.5" cy="12.5" r="1.7"/>
                                 <path class="boca" d="M 9.5 18 C 12 23 20 23 22.5 18"/>
                             </svg>
-                            <span><strong>1:</strong> Funcionário em plenas condições físicas e psicológicas de exercer suas funções.[span_13](start_span)[span_13](end_span)[span_14](start_span)[span_14](end_span)</span>
+                            <span><strong>1:</strong> Funcionário em plenas condições físicas e psicológicas de exercer suas funções.</span>
                         </div>
                         <div class="item-emocio">
                             <svg class="carinha-svg c-amarela" viewBox="0 0 32 32" style="min-width: 12px;">
@@ -940,7 +913,7 @@
                                 <circle class="olho" cx="20.5" cy="12.5" r="1.7"/>
                                 <line class="boca" x1="10" y1="20" x2="22" y2="20"/>
                             </svg>
-                            <span><strong>2:</strong> Funcionário com estado físico ou psicológico alterado, porém em condições de exercer suas atividades normais. Acompanhar.[span_15](start_span)[span_15](end_span)[span_16](start_span)[span_16](end_span)</span>
+                            <span><strong>2:</strong> Funcionário com estado físico ou psicológico alterado, porém em condições de exercer suas atividades normais. Acompanhar.</span>
                         </div>
                         <div class="item-emocio">
                             <svg class="carinha-svg c-vermelha" viewBox="0 0 32 32" style="min-width: 14px;">
@@ -949,7 +922,7 @@
                                 <circle class="olho" cx="20.5" cy="12.5" r="1.7"/>
                                 <path class="boca" d="M 9.5 22 C 12 17 20 17 22.5 22"/>
                             </svg>
-                            <span><strong>3:</strong> Funcionário sem condições físicas ou psicológicas para exercer suas atividades.[span_17](start_span)[span_17](end_span)[span_18](start_span)[span_18](end_span)</span>
+                            <span><strong>3:</strong> Funcionário sem condições físicas ou psicológicas para exercer suas atividades.</span>
                         </div>
                     </div>
                 </div>
@@ -1005,7 +978,7 @@
             contentor.innerHTML = '';
 
             const padrao = modoCarinha === 'verde' ? 1 : null;
-            const textoBruto = document.getElementById('nomesInput').value.toUpperCase();
+            const textoBruto = document.getElementById('nomesInput').value;
 
             let blocosDeFolhas = [];
 
@@ -1049,7 +1022,7 @@
                 periodo: document.getElementById('periodoInput').value,
                 semana: document.getElementById('semanaInput').value,
                 ano: document.getElementById('anoInput').value,
-                nomes: document.getElementById('nomesInput').value.toUpperCase(),
+                nomes: document.getElementById('nomesInput').value,
                 folhasHTML: document.getElementById('contentorFolhas').innerHTML
             };
             localStorage.setItem('dados_dds_vale', JSON.stringify(dados));
@@ -1067,7 +1040,7 @@
             document.getElementById('periodoInput').value = dados.periodo || '';
             document.getElementById('semanaInput').value = dados.semana || '';
             document.getElementById('anoInput').value = dados.ano || '';
-            document.getElementById('nomesInput').value = (dados.nomes || '').toUpperCase();
+            document.getElementById('nomesInput').value = dados.nomes || '';
 
             if (dados.folhasHTML) {
                 document.getElementById('contentorFolhas').innerHTML = dados.folhasHTML;
