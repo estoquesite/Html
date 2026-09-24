@@ -32,30 +32,31 @@ table.tabela-dds th, table.tabela-dds td { border: 1px solid #334155; text-align
 table.tabela-dds th { background-color: #f1f5f9; font-weight: 800; color: #0f172a; }
 table.tabela-dds tbody tr:nth-child(even) { background-color: #fafbfc; }
 table.tabela-dds td { height: 26px; padding: 1px 2px; }
-.tabela-dds .col-id { width: 36px !important; font-weight: 800; background-color: #f8fafc !important; }
+.tabela-dds .col-id { width: 32px !important; font-weight: 800; background-color: #f8fafc !important; }
+.tabela-dds .col-colaborador { width: 230px !important; text-align: left; }
 .col-id-container { display: flex; align-items: center; justify-content: center; }
 .col-id-texto { outline: none; font-size: 9px; font-weight: 800; }
-.col-nome-container { display: flex; align-items: center; justify-content: space-between; padding: 0 6px; gap: 4px; }
-.col-nome-texto { flex-grow: 1; text-align: left; outline: none; white-space: nowrap; overflow: hidden; font-size: 9.5px; font-weight: 700; color: #000; text-transform: uppercase; }
+.col-nome-container { display: flex; align-items: center; justify-content: space-between; padding: 0 4px; gap: 4px; width: 100%; }
+.col-nome-texto { flex-grow: 1; text-align: left; outline: none; white-space: nowrap; overflow: hidden; font-size: 9px; font-weight: 700; color: #000; text-transform: uppercase; }
 .th-dia-semana { font-size: 9px; font-weight: 800; text-transform: uppercase; padding: 4px 0; background: linear-gradient(180deg, #e6f4f4 0%, #d8ecec 100%) !important; color: #005a57; }
 .th-sub { font-size: 8px !important; font-weight: 800; background-color: #f1f5f9 !important; padding: 3px 0; }
-.col-como-estou { width: 75px; min-width: 75px; padding: 1px !important; }
-.col-rubrica { width: 55px; min-width: 55px; outline: none; font-size: 9px; background-color: #fff; }
-.grupo-carinhas { display: flex; align-items: center; justify-content: space-evenly; width: 100%; gap: 2px; }
-.carinha-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; user-select: none; line-height: 1; padding: 2px; border-radius: 3px; }
-.carinha-num { font-size: 7px; font-weight: 800; color: #334155; margin-bottom: 1px; }
-.carinha-svg { width: 14px; height: 14px; display: block; }
+.col-como-estou { width: 55px; min-width: 55px; padding: 1px !important; }
+.col-rubrica { width: 45px; min-width: 45px; outline: none; font-size: 8.5px; background-color: #fff; }
+.grupo-carinhas { display: flex; align-items: center; justify-content: space-evenly; width: 100%; gap: 1px; }
+.carinha-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; user-select: none; line-height: 1; padding: 1px; border-radius: 3px; }
+.carinha-num { font-size: 6px; font-weight: 800; color: #334155; margin-bottom: 0.5px; }
+.carinha-svg { width: 12px; height: 12px; display: block; }
 .c-verde circle.rosto { stroke: #15803d; stroke-width: 2.2; fill: #f0fdf4; } .c-verde circle.olho { fill: #15803d; } .c-verde path.boca { stroke: #15803d; stroke-width: 2.2; stroke-linecap: round; fill: none; }
 .c-amarela circle.rosto { stroke: #d97706; stroke-width: 2.2; fill: #fffbeb; } .c-amarela circle.olho { fill: #d97706; } .c-amarela line.boca { stroke: #d97706; stroke-width: 2.2; stroke-linecap: round; fill: none; }
 .c-vermelha circle.rosto { stroke: #dc2626; stroke-width: 2.2; fill: #fef2f2; } .c-vermelha circle.olho { fill: #dc2626; } .c-vermelha path.boca { stroke: #dc2626; stroke-width: 2.2; stroke-linecap: round; fill: none; }
 .carinha-item.selecionado-1 { background-color: #bbf7d0; outline: 1.2px solid #15803d; }
 .carinha-item.selecionado-2 { background-color: #fef08a; outline: 1.2px solid #ca8a04; }
 .carinha-item.selecionado-3 { background-color: #fecaca; outline: 1.2px solid #dc2626; }
-.botoes-acoes { display: flex; align-items: center; gap: 2px; }
-.btn-acao { background: none; border: none; cursor: pointer; padding: 0 2px; opacity: 0.7; }
-.btn-lixeira { color: #dc2626; font-size: 9px; }
-.btn-mais-linha { color: #15803d; font-weight: 900; font-size: 11px; }
-.btn-menos-linha { color: #b91c1c; font-weight: 900; font-size: 11px; }
+.botoes-acoes { display: flex; align-items: center; gap: 1px; }
+.btn-acao { background: none; border: none; cursor: pointer; padding: 0 1px; opacity: 0.7; }
+.btn-lixeira { color: #dc2626; font-size: 8px; }
+.btn-mais-linha { color: #15803d; font-weight: 900; font-size: 10px; }
+.btn-menos-linha { color: #b91c1c; font-weight: 900; font-size: 10px; }
 .rodape-container { display: grid; grid-template-columns: 140px 1.2fr 1.6fr; gap: 6px; width: 100%; font-size: 8px; line-height: 1.3; margin-top: 6px; }
 .box-legenda { border: 1px solid #334155; padding: 4px 6px; background-color: #fff; border-radius: 3px; }
 .box-legenda h4 { margin: 0 0 3px 0; font-size: 8px; font-weight: 800; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; color: #005a57; }
@@ -113,7 +114,7 @@ table.tabela-dds td { height: 26px; padding: 1px 2px; }
         }
         function criarHTMLLinhaDDS(numStr, nome = '', val = null) {
             return `<td class="col-id"><div class="col-id-container"><span class="col-id-texto" contenteditable="true">${numStr}</span></div></td>
-            <td><div class="col-nome-container"><span class="col-nome-texto" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()">${nome}</span>
+            <td class="col-colaborador"><div class="col-nome-container"><span class="col-nome-texto" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()">${nome}</span>
             <div class="botoes-acoes"><button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixoDDS(this)">➕</button><button type="button" class="btn-acao btn-menos-linha" onclick="removerLinhaAtualDDS(this)">➖</button><button type="button" class="btn-acao btn-lixeira" onclick="apagarLinhaDDS(this)">🗑️</button></div></div></td>
             <td class="col-como-estou">${gerarBlocoComoEstou(val)}</td><td class="col-rubrica" contenteditable="true"></td>
             <td class="col-como-estou">${gerarBlocoComoEstou(val)}</td><td class="col-rubrica" contenteditable="true"></td>
@@ -134,7 +135,7 @@ table.tabela-dds td { height: 26px; padding: 1px 2px; }
             f.innerHTML = `<div class="barra-controle-folha"><div class="grupo-acoes-linhas"><button type="button" class="btn-linha-topo" onclick="adicionarLinhaFimDDS(this)">➕ Linha</button><button type="button" class="btn-linha-topo" onclick="removerLinhaFimDDS(this)">➖ Linha</button></div><button type="button" class="btn-remover-folha" onclick="removerFolhaDDS(this)">Remover Folha ✕</button></div>
             <table class="cabecalho-container"><tr><td class="logo-box">VALE</td><td class="titulo-box">DIÁLOGO DIÁRIO DE SEGURANÇA (DDS) E EMOCIOGRAMA</td><td class="meta-box"><span class="indicador-folha"><strong>Folha:</strong> 01 / 01</span></td></tr></table>
             <table class="info-dds"><tr><td><strong>Período:</strong> <span class="campo-editavel">${document.getElementById('periodoInputDDS').value}</span></td><td><strong>Semana:</strong> <span class="campo-editavel">${document.getElementById('semanaInputDDS').value}</span></td><td><strong>Ano:</strong> <span class="campo-editavel">${document.getElementById('anoInputDDS').value}</span></td></tr></table>
-            <table class="tabela-dds"><thead><tr><th rowspan="2" class="col-id">Nº</th><th rowspan="2" style="text-align:left; padding-left:4px;">Colaborador</th><th colspan="2" class="th-dia-semana">Segunda</th><th colspan="2" class="th-dia-semana">Terça</th><th colspan="2" class="th-dia-semana">Quarta</th><th colspan="2" class="th-dia-semana">Quinta</th><th colspan="2" class="th-dia-semana">Sexta</th></tr><tr><th class="th-sub">Estou</th><th class="th-sub">Rub</th><th class="th-sub">Estou</th><th class="th-sub">Rub</th><th class="th-sub">Estou</th><th class="th-sub">Rub</th><th class="th-sub">Estou</th><th class="th-sub">Rub</th><th class="th-sub">Estou</th><th class="th-sub">Rub</th></tr></thead><tbody class="corpo-tabela-folha">${linhas}</tbody></table>
+            <table class="tabela-dds"><thead><tr><th rowspan="2" class="col-id">Nº</th><th rowspan="2" class="col-colaborador" style="padding-left:6px;">Colaborador</th><th colspan="2" class="th-dia-semana">Segunda</th><th colspan="2" class="th-dia-semana">Terça</th><th colspan="2" class="th-dia-semana">Quarta</th><th colspan="2" class="th-dia-semana">Quinta</th><th colspan="2" class="th-dia-semana">Sexta</th></tr><tr><th class="th-sub">Estou</th><th class="th-sub">Rub</th><th class="th-sub">Estou</th><th class="th-sub">Rub</th><th class="th-sub">Estou</th><th class="th-sub">Rub</th><th class="th-sub">Estou</th><th class="th-sub">Rub</th><th class="th-sub">Estou</th><th class="th-sub">Rub</th></tr></thead><tbody class="corpo-tabela-folha">${linhas}</tbody></table>
             <div class="rodape-container"><div class="box-legenda"><h4>LEGENDA:</h4><ul class="lista-legenda"><li><strong>FE</strong> = Feriado</li><li><strong>AT</strong> = Atestado</li><li><strong>FA</strong> = Falta</li><li><strong>FR</strong> = Férias</li></ul></div><div class="box-legenda"><h4>AÇÃO TOMADA:</h4><ul class="lista-legenda"><li><strong>EST</strong> = Estratégia</li><li><strong>ENG</strong> = ADM</li><li><strong>OP</strong> = Operação</li></ul></div><div class="box-legenda"><h4>EMOCIOGRAMA:</h4><span style="font-size:7px;">1: Plenas | 2: Acompanhar | 3: Sem condições</span></div></div>`;
             return f;
         }
