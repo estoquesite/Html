@@ -2,57 +2,47 @@
 <html lang="pt-PT">
 <head>
 <meta charset="UTF-8">
-<title>Módulo 3 - Cronograma de Férias e Aniversários | Portal Vale v02</title>
+<title>Módulo 3 - Cronograma de Férias | Portal Vale v02</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #f0f4f8; color: #1e293b; min-height: 100vh; padding: 16px; }
 
-/* PAINEL DE CONTROLO MODERNO */
-.painel-controle { background: #ffffff; padding: 18px 22px; margin: 0 auto 16px auto; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; max-width: 1120px; display: flex; justify-content: space-between; align-items: center; }
+.painel-controle { background: #ffffff; padding: 18px 22px; margin: 0 auto 16px auto; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; max-width: 1200px; display: flex; justify-content: space-between; align-items: center; }
 .topo-modulo-info { display: flex; align-items: center; gap: 8px; }
-.badge-modulo { background: linear-gradient(135deg, #b91c1c, #991b1b); color: #fff; font-size: 11.5px; font-weight: 800; padding: 5px 12px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.8px; box-shadow: 0 4px 10px rgba(185,28,28,0.2); }
+.badge-modulo { background: linear-gradient(135deg, #b91c1c, #991b1b); color: #fff; font-size: 11.5px; font-weight: 800; padding: 5px 12px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.8px; }
 .tag-v02 { background-color: #f59e0b; color: #fff; font-weight: 800; font-size: 10px; padding: 2px 7px; border-radius: 4px; margin-left: 6px; }
 
-/* BOTÕES MODERNOS */
 .botoes-painel { display: flex; gap: 8px; align-items: center; }
-.btn { cursor: pointer; padding: 7px 14px; font-size: 11px; font-weight: 700; border: none; border-radius: 6px; color: #fff; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-.btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
+.btn { cursor: pointer; padding: 7px 14px; font-size: 11px; font-weight: 700; border: none; border-radius: 6px; color: #fff; display: inline-flex; align-items: center; gap: 5px; }
 .btn-vinho { background-color: #991b1b; } 
 .btn-voltar { background-color: #475569; text-decoration: none; } 
 .btn-imprimir { background-color: #0f172a; }
 
-/* FOLHA A4 TOTALMENTE PREENCHIDA */
-.folha-a4 { width: 100%; max-width: 1120px; background: #fff; padding: 16px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-radius: 10px; border: 1px solid #e2e8f0; min-height: 75vh; display: flex; flex-direction: column; justify-content: space-between; }
+.barra-zoom { background: #e2e8f0; padding: 6px 14px; max-width: 1200px; margin: 0 auto 8px auto; border-radius: 6px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; font-size: 11px; font-weight: 700; color: #475569; }
+.btn-zoom { background: #fff; border: 1px solid #cbd5e1; padding: 3px 10px; border-radius: 4px; cursor: pointer; font-weight: 800; color: #1e293b; }
+.btn-zoom:hover { background: #f1f5f9; }
 
-/* TABELA DE FÉRIAS MODERNA */
-table.tabela-ferias { width: 100%; border-collapse: collapse; border: 1.5px solid #334155; table-layout: fixed; flex-grow: 1; }
-table.tabela-ferias th, table.tabela-ferias td { border: 1px solid #475569; text-align: center; vertical-align: middle; font-size: 7.5px; height: 26px; padding: 1px; }
-table.tabela-ferias th { background-color: #f59e0b; color: #0f172a; font-weight: 800; text-transform: uppercase; letter-spacing: 0.3px; }
+.folha-a4 { width: 100%; max-width: 1200px; background: #fff; padding: 16px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-radius: 10px; border: 1px solid #e2e8f0; transform-origin: top center; transition: transform 0.1s ease; }
 
-/* CÉLULAS EDITÁVEIS COM TOQUE MODERNO (ESTILO LÁPIS/FOCO) */
-table.tabela-ferias td[contenteditable="true"] { transition: background 0.15s; cursor: text; }
-table.tabela-ferias td[contenteditable="true"]:hover { background-color: #f8fafc; }
-table.tabela-ferias td[contenteditable="true"]:focus { background-color: #fef3c7; outline: 1.5px solid #f59e0b; box-shadow: inset 0 0 0 1px #f59e0b; }
+table.tabela-ferias { width: 100%; border-collapse: collapse; border: 1.5px solid #334155; table-layout: fixed; }
+table.tabela-ferias th, table.tabela-ferias td { border: 1px solid #475569; text-align: center; vertical-align: middle; font-size: 8px; height: 26px; padding: 1px; }
+table.tabela-ferias th { background-color: #f59e0b; color: #0f172a; font-weight: 800; text-transform: uppercase; }
 
-/* COLUNAS ESPECÍFICAS */
-.col-mes { width: 45px; background: #991b1b; color: #fff; font-weight: 800; }
+.col-mes { width: 50px; background: #991b1b; color: #fff; font-weight: 800; }
 .col-nome-container { display: flex; align-items: center; justify-content: space-between; padding: 0 6px; width: 100%; }
-.col-nome-texto { flex-grow: 1; text-align: left; outline: none; white-space: nowrap; overflow: hidden; font-size: 8px; font-weight: 700; color: #fff; text-transform: uppercase; }
-.col-niver { width: 45px; background: #991b1b; color: #fff; font-weight: 800; }
-.col-saldo { width: 35px; font-weight: 800; background: #f8fafc; }
+.col-nome-texto { flex-grow: 1; text-align: left; outline: none; white-space: nowrap; overflow: hidden; font-size: 8.5px; font-weight: 700; color: #fff; text-transform: uppercase; }
+.col-saldo { width: 45px; font-weight: 800; background: #f8fafc; }
 
-/* BOTÕES DE AÇÃO E LIXEIRA DISCRETOS */
 .botoes-acoes { display: flex; align-items: center; gap: 2px; opacity: 0.3; transition: opacity 0.2s; }
 tr:hover .botoes-acoes { opacity: 1; }
-.btn-acao { background: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.5); border-radius: 3px; cursor: pointer; padding: 1px 4px; font-size: 8px; line-height: 1; color: #fff; transition: 0.15s; }
-.btn-acao:hover { background: rgba(255,255,255,0.5); transform: scale(1.1); }
+.btn-acao { background: rgba(255,255,255,0.25); border: 1px solid rgba(255,255,255,0.5); border-radius: 3px; cursor: pointer; padding: 1px 4px; font-size: 8px; color: #fff; }
 .btn-lixeira { color: #fecaca; }
 
 @media print {
-    @page { size: A4 landscape; margin: 4mm 5mm; }
+    @page { size: A4 landscape; margin: 3mm 4mm; }
     body { background: #fff !important; padding: 0 !important; }
-    .painel-controle, .botoes-acoes { display: none !important; }
-    .folha-a4 { box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; min-height: 98vh !important; }
+    .painel-controle, .barra-zoom, .botoes-acoes { display: none !important; }
+    .folha-a4 { box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; transform: none !important; }
 }
 </style>
 </head>
@@ -60,7 +50,7 @@ tr:hover .botoes-acoes { opacity: 1; }
 
     <div class="painel-controle">
         <div class="topo-modulo-info">
-            <span class="badge-modulo">Módulo 3: Férias e Aniversários <span class="tag-v02">v02</span></span>
+            <span class="badge-modulo">Módulo 3: Cronograma de Férias <span class="tag-v02">v02</span></span>
         </div>
         <div class="botoes-painel">
             <button type="button" class="btn btn-vinho" onclick="addLinhaFerias()">➕ Adicionar</button>
@@ -69,20 +59,26 @@ tr:hover .botoes-acoes { opacity: 1; }
         </div>
     </div>
 
+    <div class="barra-zoom">
+        <span>Ajustar Tamanho (Zoom):</span>
+        <button class="btn-zoom" onclick="mudarZoom(-0.1)">➖ Reduzir</button>
+        <button class="btn-zoom" onclick="resetZoom()">100%</button>
+        <button class="btn-zoom" onclick="mudarZoom(0.1)">➕ Ampliar</button>
+    </div>
+
     <div class="folha-a4">
-        <div style="background: linear-gradient(135deg, #007e7a, #005a57); color: #fff; text-align: center; font-weight: 900; font-size: 11px; padding: 6px; border-radius: 6px; margin-bottom: 6px; letter-spacing: 0.5px;">CRONOGRAMA ANUAL DE FÉRIAS E ANIVERSÁRIOS 2026</div>
+        <div style="background: linear-gradient(135deg, #007e7a, #005a57); color: #fff; text-align: center; font-weight: 900; font-size: 11px; padding: 6px; border-radius: 6px; margin-bottom: 6px; letter-spacing: 0.5px;">CRONOGRAMA ANUAL DE FÉRIAS 2026</div>
         
         <table class="tabela-ferias">
             <thead>
                 <tr>
-                    <th rowspan="2" style="width:50px;">MÊS</th>
-                    <th rowspan="2" style="width:180px;">PESSOAS (COLABORADOR)</th>
-                    <th rowspan="2" style="width:50px;">NIVER</th>
+                    <th rowspan="2" style="width:55px;">MÊS</th>
+                    <th rowspan="2" style="width:220px;">PESSOAS (COLABORADOR)</th>
                     <th colspan="2">Jan</th><th colspan="2">Fev</th><th colspan="2">Mar</th><th colspan="2">Abr</th><th colspan="2">Mai</th><th colspan="2">Jun</th>
                     <th colspan="2">Jul</th><th colspan="2">Ago</th><th colspan="2">Set</th><th colspan="2">Out</th><th colspan="2">Nov</th><th colspan="2">Dez</th>
-                    <th rowspan="2" style="width:35px;">Saldo</th>
+                    <th rowspan="2" style="width:45px;">Saldo</th>
                 </tr>
-                <tr style="font-size:6px;">
+                <tr style="font-size:6.5px;">
                     <th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th>
                     <th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th>
                 </tr>
@@ -92,43 +88,46 @@ tr:hover .botoes-acoes { opacity: 1; }
     </div>
 
     <script>
+        let nivelZoom = 1.0;
+        function mudarZoom(valor) {
+            nivelZoom = Math.min(Math.max(nivelZoom + valor, 0.6), 1.4);
+            document.querySelector('.folha-a4').style.transform = `scale(${nivelZoom})`;
+        }
+        function resetZoom() {
+            nivelZoom = 1.0;
+            document.querySelector('.folha-a4').style.transform = `scale(1)`;
+        }
+
         const DADOS_F = [
-            {m:"JAN", n:"MARIANA PEREIRA CRUZ", v:"11/1"}, {m:"JAN", n:"RICARDO GONCALVES DE MELLO LEITE", v:"13/1"},
-            {m:"JAN", n:"JOAO SILVA RAMOS", v:"18/1"}, {m:"JAN", n:"ALFREDO AUGUSTO RAMOS NETO", v:"22/1"},
-            {m:"FEV", n:"MARCOS AURELIO CATALLARES MATTOS", v:"1/2"}, {m:"FEV", n:"VANDERSON TEIXEIRA", v:"4/2"},
-            {m:"FEV", n:"BRUNO RICARDO", v:"7/2"}, {m:"FEV", n:"GABRIEL CARNEIRO", v:"7/2"},
-            {m:"MAR", n:"GLEIVSTON SILVA MENDES", v:"22/3"}, {m:"JUN", n:"ROBSON DE SOUZA MENDONCA", v:"4/6"},
-            {m:"JUN", n:"PAULO HENRIQUE", v:"8/6"}, {m:"JUL", n:"BRUNO GOMES FIDELIS", v:"2/7"},
-            {m:"JUL", n:"ATMISTO SILVA", v:"20/7"}, {m:"AGOSTO", n:"CAIO HENRIQUE", v:"6/8"},
-            {m:"AGOSTO", n:"PABLO MESQUITA", v:"25/8"}, {m:"AGOSTO", n:"DAVID MARCELO DELGADO DOS SANTOS", v:"26/8"},
-            {m:"NOV", n:"DOMINIQUE SILVA", v:"2/11"}, {m:"NOV", n:"RICHARD SILVA", v:"24/11"},
-            {m:"DEZ", n:"EMERSON RIBEIRO DOS SANTOS", v:"4/12"}, {m:"DEZ", n:"ALLAN SOUZA DE CARVALHO", v:"15/12"},
-            {m:"DEZ", n:"TITO DACAL", v:"27/12"}
+            {m:"JAN", n:"MARIANA PEREIRA CRUZ"}, {m:"JAN", n:"RICARDO GONCALVES DE MELLO LEITE"},
+            {m:"JAN", n:"JOAO SILVA RAMOS"}, {m:"JAN", n:"ALFREDO AUGUSTO RAMOS NETO"},
+            {m:"FEV", n:"MARCOS AURELIO CATALLARES MATTOS"}, {m:"FEV", n:"VANDERSON TEIXEIRA"},
+            {m:"FEV", n:"BRUNO RICARDO"}, {m:"FEV", n:"GABRIEL CARNEIRO"},
+            {m:"MAR", n:"GLEIVSTON SILVA MENDES"}, {m:"JUN", n:"ROBSON DE SOUZA MENDONCA"},
+            {m:"JUN", n:"PAULO HENRIQUE"}, {m:"JUL", n:"BRUNO GOMES FIDELIS"},
+            {m:"JUL", n:"ATMISTO SILVA"}, {m:"AGOSTO", n:"CAIO HENRIQUE"},
+            {m:"AGOSTO", n:"PABLO MESQUITA"}, {m:"AGOSTO", n:"DAVID MARCELO DELGADO DOS SANTOS"},
+            {m:"NOV", n:"DOMINIQUE SILVA"}, {m:"NOV", n:"RICHARD SILVA"},
+            {m:"DEZ", n:"EMERSON RIBEIRO DOS SANTOS"}, {m:"DEZ", n:"ALLAN SOUZA DE CARVALHO"},
+            {m:"DEZ", n:"TITO DACAL"}
         ];
 
-        function addLinhaFerias(m='', n='', v='') {
+        function addLinhaFerias(m='', n='') {
             const corpo = document.getElementById('corpoFerias');
             const tr = document.createElement('tr');
             let tds = ''; for(let i=0; i<24; i++) tds += `<td contenteditable="true" title="Clique para editar"></td>`;
-            tr.innerHTML = `<td class="col-mes" contenteditable="true" title="Mês">${m}</td>` +
-                `<td class="col-nome" style="background:#991b1b;"><div class="col-nome-container"><span class="col-nome-texto" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()" title="Nome do colaborador">${n}</span><div class="botoes-acoes"><button type="button" class="btn-acao btn-lixeira" onclick="removerLinhaFerias(this)" title="Remover linha">🗑️</button></div></div></td>` +
-                `<td class="col-niver" contenteditable="true" title="Aniversário">${v}</td>` +
-                tds + `<td contenteditable="true" style="font-weight:800; background:#f8fafc;" title="Saldo">-</td>`;
+            tr.innerHTML = `<td class="col-mes" contenteditable="true">${m}</td>` +
+                `<td class="col-nome" style="background:#991b1b;"><div class="col-nome-container"><span class="col-nome-texto" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()">${n}</span><div class="botoes-acoes"><button type="button" class="btn-acao btn-lixeira" onclick="removerLinhaFerias(this)" title="Remover linha">🗑️</button></div></div></td>` +
+                tds + `<td class="col-saldo" contenteditable="true">-</td>`;
             corpo.appendChild(tr);
         }
 
         function removerLinhaFerias(btn) {
             const tr = btn.closest('tr');
-            if(document.querySelectorAll('#corpoFerias tr').length > 1) {
-                tr.remove();
-            } else {
-                alert('É necessário manter pelo menos uma linha.');
-            }
+            if(document.querySelectorAll('#corpoFerias tr').length > 1) tr.remove();
         }
 
-        window.onload = function() { 
-            DADOS_F.forEach(d => addLinhaFerias(d.m, d.n, d.v)); 
-        };
+        window.onload = function() { DADOS_F.forEach(d => addLinhaFerias(d.m, d.n)); };
     </script>
 </body>
 </html>
