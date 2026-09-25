@@ -43,11 +43,15 @@ tr:hover .botoes-acoes { opacity: 1; }
 .btn-acao { background: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.6); border-radius: 3px; cursor: pointer; padding: 1px 4px; font-size: 8px; color: #fff; }
 .btn-lixeira { color: #fee2e2; }
 
+/* IMPRESSÃO COM FORÇAGEM DE CORES DE FUNDO */
 @media print {
     @page { size: A4 landscape; margin: 3mm 4mm; }
-    body { background: #fff !important; padding: 0 !important; }
+    body { background: #fff !important; padding: 0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .painel-controle, .barra-zoom, .botoes-acoes, .barra-controle-folha { display: none !important; }
     .folha-a4 { box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; transform: none !important; margin: 0 !important; }
+    table.tabela-ferias th { background-color: #db2777 !important; color: #fff !important; }
+    .col-nome { background-color: #db2777 !important; }
+    .col-id, .col-saldo { background-color: #fff1f2 !important; }
 }
 </style>
 </head>
