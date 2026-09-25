@@ -2,56 +2,87 @@
 <html lang="pt-PT">
 <head>
 <meta charset="UTF-8">
-<title>Módulo 2 - Matriz Anual de DDS | Portal Vale v01</title>
+<title>Módulo 2 - Matriz Anual de DDS | Portal Vale v02</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', sans-serif; background: #eef2f5; color: #2c3e50; min-height: 100vh; padding: 12px; }
-.painel-controle { background: #fff; padding: 14px 18px; margin: 0 auto 14px auto; border-radius: 8px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.06); border: 1px solid #e2e8f0; max-width: 1120px; }
-.topo-modulo-info { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 2px solid #1b8a5a; padding-bottom: 8px; }
-.badge-modulo { background: #1b8a5a; color: #fff; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
-.tag-v01 { background-color: #ffeb3b; color: #212121; font-weight: 800; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
-.campos-painel { display: grid; gap: 10px; margin-bottom: 10px; grid-template-columns: 2fr 1fr 1fr 1fr; }
-.campo-grupo label { display: block; font-weight: 700; margin-bottom: 4px; font-size: 10px; color: #475569; text-transform: uppercase; }
-.painel-controle input[type="text"] { width: 100%; font-family: inherit; font-size: 11px; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 5px; outline: none; }
-.painel-controle textarea { width: 100%; height: 65px; font-family: inherit; font-size: 11px; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 5px; resize: vertical; text-transform: uppercase; outline: none; }
-.painel-meses-toggle { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 6px; padding: 8px 12px; margin-bottom: 10px; }
-.titulo-meses-toggle { font-size: 10px; font-weight: 800; text-transform: uppercase; color: #334155; margin-bottom: 6px; display: flex; align-items: center; justify-content: space-between; }
-.container-meses-btns { display: flex; flex-wrap: wrap; gap: 5px; }
-.btn-mes-tag { border: 1px solid #1b8a5a; background-color: #e8f5e9; color: #1b5e20; font-size: 9.5px; font-weight: 800; padding: 3px 8px; border-radius: 4px; cursor: pointer; user-select: none; }
+body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #f0f4f8; color: #1e293b; min-height: 100vh; padding: 16px; }
+
+/* PAINEL DE CONTROLO */
+.painel-controle { background: #ffffff; padding: 18px 22px; margin: 0 auto 16px auto; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; max-width: 1200px; }
+.topo-modulo-info { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; border-bottom: 2px solid #1b8a5a; padding-bottom: 10px; }
+.badge-modulo { background: linear-gradient(135deg, #1b8a5a, #14532d); color: #fff; font-size: 11.5px; font-weight: 800; padding: 5px 12px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.8px; }
+.tag-v02 { background-color: #f59e0b; color: #fff; font-weight: 800; font-size: 10px; padding: 2px 7px; border-radius: 4px; margin-left: 6px; }
+
+.campos-painel { display: grid; gap: 12px; margin-bottom: 12px; grid-template-columns: 2fr 1fr 1fr 1fr; }
+.campo-grupo label { display: block; font-weight: 700; margin-bottom: 5px; font-size: 10.5px; color: #475569; text-transform: uppercase; }
+.painel-controle input[type="text"] { width: 100%; font-family: inherit; font-size: 12px; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; background: #f8fafc; outline: none; }
+.painel-controle textarea { width: 100%; height: 70px; font-family: inherit; font-size: 12px; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; resize: vertical; text-transform: uppercase; background: #f8fafc; outline: none; }
+
+.painel-meses-toggle { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; }
+.titulo-meses-toggle { font-size: 10.5px; font-weight: 800; text-transform: uppercase; color: #334155; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+.container-meses-btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.btn-mes-tag { border: 1px solid #1b8a5a; background-color: #e8f5e9; color: #1b5e20; font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 5px; cursor: pointer; user-select: none; transition: 0.15s; }
+.btn-mes-tag:hover { filter: brightness(0.95); }
 .btn-mes-tag.inativo { background-color: #f1f5f9; border-color: #cbd5e1; color: #94a3b8; text-decoration: line-through; }
-.links-rapidos-meses { display: flex; gap: 6px; }
-.link-rapido { font-size: 9px; font-weight: 700; color: #1e40af; cursor: pointer; text-decoration: underline; background: none; border: none; padding: 0; }
-.botoes-painel { display: flex; gap: 6px; flex-wrap: wrap; }
-.btn { cursor: pointer; padding: 6px 12px; font-size: 10.5px; font-weight: 700; border: none; border-radius: 5px; color: #fff; }
-.btn-verde { background-color: #1b8a5a; } .btn-azul { background-color: #007e7a; } .btn-salvar { background-color: #1e40af; } .btn-carregar { background-color: #0284c7; } .btn-limpar { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; } .btn-voltar { background-color: #475569; text-decoration: none; } .btn-imprimir { background-color: #0f172a; margin-left: auto; }
-.folha-a4 { width: 100%; max-width: 1120px; background: #fff; padding: 12px; margin: 0 auto; box-shadow: 0 4px 12px rgba(0,0,0,0.08); border-radius: 4px; }
+.links-rapidos-meses { display: flex; gap: 8px; }
+.link-rapido { font-size: 9.5px; font-weight: 700; color: #1e40af; cursor: pointer; text-decoration: underline; background: none; border: none; }
+
+.botoes-painel { display: flex; gap: 8px; flex-wrap: wrap; }
+.btn { cursor: pointer; padding: 7px 14px; font-size: 11px; font-weight: 700; border: none; border-radius: 6px; color: #fff; display: inline-flex; align-items: center; gap: 5px; }
+.btn-verde { background-color: #10b981; } .btn-azul { background-color: #007e7a; } .btn-add-folha { background-color: #7c3aed; } .btn-salvar { background-color: #2563eb; } .btn-carregar { background-color: #0284c7; } .btn-limpar { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; } .btn-voltar { background-color: #475569; text-decoration: none; } .btn-imprimir { background-color: #0f172a; margin-left: auto; }
+
+/* CONTAINER DE ZOOM (ESTILO EXCEL) */
+.barra-zoom { background: #e2e8f0; padding: 6px 14px; max-width: 1200px; margin: 0 auto 8px auto; border-radius: 6px; display: flex; align-items: center; justify-content: flex-end; gap: 8px; font-size: 11px; font-weight: 700; color: #475569; }
+.btn-zoom { background: #fff; border: 1px solid #cbd5e1; padding: 3px 10px; border-radius: 4px; cursor: pointer; font-weight: 800; color: #1e293b; }
+.btn-zoom:hover { background: #f1f5f9; }
+
+/* FOLHA A4 COM SUPORTE A ZOOM */
+.wrapper-zoom { width: 100%; overflow-x: auto; margin-bottom: 20px; }
+.folha-a4 { width: 100%; max-width: 1200px; background: #fff; padding: 14px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-radius: 10px; border: 1px solid #e2e8f0; transform-origin: top center; transition: transform 0.1s ease; }
+
+.barra-controle-folha { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; background: #f8fafc; padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 6px; }
+.grupo-acoes-linhas { display: flex; align-items: center; gap: 6px; }
+.btn-linha-topo { border: 1px solid #1b8a5a; border-radius: 4px; font-size: 9px; font-weight: 700; padding: 3px 8px; cursor: pointer; background: #fff; color: #1b8a5a; }
+.btn-remover-folha { background: #fff; color: #ef4444; border: 1px solid #fca5a5; border-radius: 4px; font-size: 9px; font-weight: 700; padding: 3px 8px; cursor: pointer; }
+
 .cabecalho-container, table.tabela-matriz { width: 100%; border-collapse: collapse; border: 1.2px solid #0f172a; margin-bottom: 4px; table-layout: fixed; }
 .cabecalho-container td { border: 1px solid #334155; padding: 3px 6px; vertical-align: middle; text-align: center; }
-.logo-box { width: 120px; font-weight: 900; font-size: 16px; color: #1b8a5a; background-color: #f8fafc; }
-.titulo-box { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #0f172a; }
-.meta-box { width: 140px; font-size: 9px; text-align: left !important; padding-left: 8px !important; background-color: #f8fafc; }
+.logo-box { width: 110px; font-weight: 900; font-size: 15px; color: #1b8a5a; background-color: #f8fafc; }
+.titulo-box { font-size: 10.5px; font-weight: 800; text-transform: uppercase; color: #0f172a; }
+.meta-box { width: 130px; font-size: 8.5px; text-align: left !important; padding-left: 6px !important; background-color: #f8fafc; }
+
 table.tabela-matriz th, table.tabela-matriz td { border: 1px solid #475569; text-align: center; vertical-align: middle; font-size: 8.5px; }
-.th-matriz-id { width: 36px; background-color: #f1f5f9; font-weight: 800; }
-.th-matriz-colab { width: 230px; background-color: #1b8a5a; color: #fff; font-size: 10px; font-weight: 800; padding: 6px; text-align: left; padding-left: 8px; }
-.th-mes-anual { background-color: #1b8a5a; color: #fff; font-size: 9px; font-weight: 800; padding: 6px 2px; }
-table.tabela-matriz tbody tr { height: 26px; }
+.th-matriz-id { width: 38px; background-color: #f1f5f9; font-weight: 800; }
+.th-matriz-colab { width: 230px; background-color: #1b8a5a; color: #fff; font-size: 10px; font-weight: 800; padding: 5px; text-align: left; padding-left: 8px; }
+.th-mes-anual { background-color: #1b8a5a; color: #fff; font-size: 9px; font-weight: 800; padding: 5px 2px; }
+
+table.tabela-matriz tbody tr { height: 24px; }
 table.tabela-matriz tbody tr:nth-child(even) { background-color: #fafbfc; }
-.td-matriz-id { background-color: #f8fafc; font-weight: 800; color: #0f172a; padding: 0 1px; }
+
+/* NÚMEROS EDITÁVEIS */
+.td-matriz-id { background-color: #f8fafc; font-weight: 800; padding: 0 1px; }
+.col-id-texto { outline: none; font-size: 9px; font-weight: 800; color: #0f172a; background: #e2e8f0; padding: 1px 4px; border-radius: 3px; display: inline-block; width: 100%; text-align: center; }
+.col-id-texto:focus { background: #fef3c7; }
+
 .celula-data { outline: none; font-size: 8.5px; font-weight: 700; color: #0f172a; background-color: #fff; padding: 0 2px; }
 .celula-data:focus { background-color: #f0fdf4; box-shadow: inset 0 0 0 1.5px #1b8a5a; }
-.botoes-acoes { display: flex; align-items: center; gap: 2px; }
-.btn-acao { background: none; border: none; cursor: pointer; padding: 0 2px; opacity: 0.7; }
-.btn-mais-linha { color: #15803d; font-weight: 900; font-size: 11px; }
-.btn-menos-linha { color: #b91c1c; font-weight: 900; font-size: 11px; }
+
+.botoes-acoes { display: flex; align-items: center; gap: 2px; opacity: 0.3; transition: opacity 0.2s; }
+tr:hover .botoes-acoes { opacity: 1; }
+.btn-acao { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 3px; cursor: pointer; padding: 1px 3px; font-size: 8px; line-height: 1; }
+.btn-mais-linha { color: #10b981; border-color: #6ee7b7; font-weight: 900; }
+.btn-menos-linha { color: #f59e0b; border-color: #fcd34d; font-weight: 900; }
+.btn-lixeira { color: #ef4444; border-color: #fca5a5; }
+
 .col-nome-container { display: flex; align-items: center; justify-content: space-between; padding: 0 6px; gap: 4px; width: 100%; }
 .col-nome-texto { flex-grow: 1; text-align: left; outline: none; white-space: nowrap; overflow: hidden; font-size: 9px; font-weight: 700; color: #000; text-transform: uppercase; }
 .mes-oculto { display: none !important; }
+
 @media print {
-    @page { size: A4 landscape; margin: 4mm 5mm; }
+    @page { size: A4 landscape; margin: 3mm 4mm; }
     body { background: #fff !important; padding: 0 !important; }
-    .painel-controle, .botoes-acoes { display: none !important; }
-    .folha-a4 { box-shadow: none !important; width: 100% !important; max-width: 100% !important; height: 98vh !important; display: flex !important; flex-direction: column !important; justify-content: space-between !important; }
-    table.tabela-matriz { flex-grow: 1 !important; }
+    .painel-controle, .barra-zoom, .botoes-acoes, .barra-controle-folha { display: none !important; }
+    .folha-a4 { box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; transform: none !important; }
 }
 </style>
 </head>
@@ -59,8 +90,8 @@ table.tabela-matriz tbody tr:nth-child(even) { background-color: #fafbfc; }
 
     <div class="painel-controle">
         <div class="topo-modulo-info">
-            <span class="badge-modulo">Módulo 2: Matriz Anual de DDS <span class="tag-v01">v01</span></span>
-            <a href="index.html" class="btn btn-voltar" style="padding: 5px 10px; font-size: 10px; font-weight: 700; border-radius: 4px; color: #fff;">⬅ Voltar ao Menu</a>
+            <span class="badge-modulo">Módulo 2: Matriz Anual de DDS <span class="tag-v02">v02</span></span>
+            <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
         </div>
         <div class="campos-painel">
             <div class="campo-grupo"><label>Área:</label><input type="text" id="areaInputMatriz" placeholder="Operação"></div>
@@ -93,7 +124,7 @@ table.tabela-matriz tbody tr:nth-child(even) { background-color: #fafbfc; }
         <div class="campo-grupo"><label>Colaboradores (Ordenação A-Z automática):</label><textarea id="nomesInputMatriz" oninput="this.value=this.value.toUpperCase()" placeholder="COLE OS NOMES AQUI..."></textarea></div>
         <div class="botoes-painel">
             <button type="button" class="btn btn-verde" onclick="gerarTabelaMatriz()">Atualizar Grelha (A-Z)</button>
-            <button type="button" class="btn btn-azul" onclick="adicionarLinhaFimMatriz()">➕ Linha Vazia</button>
+            <button type="button" class="btn btn-azul" onclick="adicionarFolhaMatriz()">📄➕ Folha Extra</button>
             <button type="button" class="btn btn-salvar" onclick="salvarTudoMatriz()">💾 Guardar</button>
             <button type="button" class="btn btn-carregar" onclick="carregarTudoMatriz()">📂 Carregar</button>
             <button type="button" class="btn btn-limpar" onclick="limparTudoMatriz()">Limpar</button>
@@ -101,33 +132,29 @@ table.tabela-matriz tbody tr:nth-child(even) { background-color: #fafbfc; }
         </div>
     </div>
 
-    <div class="folha-a4">
-        <table class="cabecalho-container">
-            <tr>
-                <td class="logo-box">VALE</td>
-                <td class="titulo-box">MATRIZ DE REGISTO DE DIÁLOGO DIÁRIO DE SEGURANÇA (DDS)</td>
-                <td class="meta-box"><strong>Ano:</strong> <span id="lblAnoMatriz">2026</span></td>
-            </tr>
-        </table>
-        <table class="tabela-matriz">
-            <thead>
-                <tr>
-                    <th class="th-matriz-id">Nº</th>
-                    <th class="th-matriz-colab">DDS (Colaboradores)</th>
-                    <th class="th-mes-anual col-mes-0">JAN</th><th class="th-mes-anual col-mes-1">FEV</th>
-                    <th class="th-mes-anual col-mes-2">MAR</th><th class="th-mes-anual col-mes-3">ABR</th>
-                    <th class="th-mes-anual col-mes-4">MAI</th><th class="th-mes-anual col-mes-5">JUN</th>
-                    <th class="th-mes-anual col-mes-6">JUL</th><th class="th-mes-anual col-mes-7">AGO</th>
-                    <th class="th-mes-anual col-mes-8">SET</th><th class="th-mes-anual col-mes-9">OUT</th>
-                    <th class="th-mes-anual col-mes-10">NOV</th><th class="th-mes-anual col-mes-11">DEZ</th>
-                </tr>
-            </thead>
-            <tbody id="corpoMatriz"></tbody>
-        </table>
+    <!-- BARRA DE ZOOM / AJUSTE DE TAMANHO -->
+    <div class="barra-zoom">
+        <span>Ajustar Tamanho (Zoom):</span>
+        <button class="btn-zoom" onclick="mudarZoom(-0.1)">➖ Reduzir</button>
+        <button class="btn-zoom" onclick="resetZoom()">100%</button>
+        <button class="btn-zoom" onclick="mudarZoom(0.1)">➕ Ampliar</button>
     </div>
+
+    <div id="contentorFolhasMatriz"></div>
 
     <script>
         let visMeses = [true,true,true,true,true,true,true,true,true,true,true,true];
+        let nivelZoom = 1.0;
+
+        function mudarZoom(valor) {
+            nivelZoom = Math.min(Math.max(nivelZoom + valor, 0.6), 1.4);
+            document.querySelectorAll('.folha-a4').forEach(f => f.style.transform = `scale(${nivelZoom})`);
+        }
+        function resetZoom() {
+            nivelZoom = 1.0;
+            document.querySelectorAll('.folha-a4').forEach(f => f.style.transform = `scale(1)`);
+        }
+
         function aplicarVisMeses() {
             for(let i=0; i<12; i++) {
                 const vis = visMeses[i];
@@ -137,28 +164,71 @@ table.tabela-matriz tbody tr:nth-child(even) { background-color: #fafbfc; }
         }
         function alternarMes(i) { visMeses[i] = !visMeses[i]; aplicarVisMeses(); }
         function definirTodosMeses(st) { for(let i=0; i<12; i++) visMeses[i] = st; aplicarVisMeses(); }
-        function criarLinhaMatriz(num, nome='') {
-            let tds = ''; for(let i=0; i<12; i++) tds += `<td class="celula-data col-mes-${i} ${visMeses[i]?'':'mes-oculto'}" contenteditable="true"></td>`;
-            return `<td class="td-matriz-id">${num}</td><td><div class="col-nome-container"><span class="col-nome-texto" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()">${nome}</span><div class="botoes-acoes"><button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixoMatriz(this)">➕</button><button type="button" class="btn-acao btn-menos-linha" onclick="removerLinhaMatriz(this)">➖</button></div></div></td>${tds}`;
+
+        function criarLinhaMatriz(numStr, nome='') {
+            let tds = ''; for(let i=0; i<12; i++) tds += `<td class="celula-data col-mes-${i} ${visMeses[i]?'':'mes-oculto'}" contenteditable="true" title="Preencher DDS"></td>`;
+            return `<td class="td-matriz-id"><div class="col-id-container"><span class="col-id-texto" contenteditable="true" title="Editar número">${numStr}</span></div></td>` +
+                   `<td><div class="col-nome-container"><span class="col-nome-texto" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()" title="Nome do colaborador">${nome}</span>` +
+                   `<div class="botoes-acoes"><button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixoMatriz(this)" title="Adicionar linha abaixo">➕</button><button type="button" class="btn-acao btn-menos-linha" onclick="removerLinhaMatriz(this)" title="Remover linha">➖</button><button type="button" class="btn-acao btn-lixeira" onclick="apagarLinhaMatriz(this)" title="Apagar nome">🗑️</button></div></div></td>${tds}`;
         }
-        function reordenarMatriz() { document.querySelectorAll('#corpoMatriz tr').forEach((tr, idx) => { tr.querySelector('.td-matriz-id').innerText = idx < 9 ? '0'+(idx+1) : (idx+1); }); }
-        function adicionarLinhaAbaixoMatriz(btn) { const tr = document.createElement('tr'); tr.innerHTML = criarLinhaMatriz('00',''); btn.closest('tr').after(tr); reordenarMatriz(); }
-        function adicionarLinhaFimMatriz() { const tr = document.createElement('tr'); tr.innerHTML = criarLinhaMatriz('00',''); document.getElementById('corpoMatriz').appendChild(tr); reordenarMatriz(); }
-        function removerLinhaMatriz(b) { if(document.querySelectorAll('#corpoMatriz tr').length > 1) { b.closest('tr').remove(); reordenarMatriz(); } }
+
+        function apagarLinhaMatriz(b) { b.closest('tr').querySelector('.col-nome-texto').innerText = ''; }
+        function adicionarLinhaAbaixoMatriz(btn) { const tr = document.createElement('tr'); tr.innerHTML = criarLinhaMatriz('00',''); btn.closest('tr').after(tr); }
+        function adicionarLinhaFimMatriz(btn) { const corpo = btn.closest('.folha-a4').querySelector('.corpo-tabela-matriz'); const tr = document.createElement('tr'); tr.innerHTML = criarLinhaMatriz('00',''); corpo.appendChild(tr); }
+        function removerLinhaMatriz(b) { const tr = b.closest('tr'); if(tr.parentNode.querySelectorAll('tr').length > 1) tr.remove(); }
+        function removerFolhaMatriz(b) { b.closest('.folha-a4').remove(); atualizarPaginacaoMatriz(); }
+
+        function criarEstruturaFolhaMatriz(nomesArr, tot) {
+            let linhas = ''; 
+            for(let i=0; i<tot; i++) { 
+                let n = nomesArr[i] ? nomesArr[i].trim().toUpperCase() : ''; 
+                let numStr = (i+1 < 10 ? '0'+(i+1) : (i+1)); 
+                linhas += `<tr>${criarLinhaMatriz(numStr, n)}</tr>`; 
+            }
+            const f = document.createElement('div'); f.className = 'folha-a4'; f.style.transform = `scale(${nivelZoom})`;
+            f.innerHTML = `<div class="barra-controle-folha"><div class="grupo-acoes-linhas"><button type="button" class="btn-linha-topo" onclick="adicionarLinhaFimMatriz(this)">➕ Linha no Fim</button></div><button type="button" class="btn-remover-folha" onclick="removerFolhaMatriz(this)">Remover Folha ✕</button></div>
+            <table class="cabecalho-container">
+                <tr>
+                    <td class="logo-box">VALE</td>
+                    <td class="titulo-box">MATRIZ DE REGISTO DE DIÁLOGO DIÁRIO DE SEGURANÇA (DDS)</td>
+                    <td class="meta-box"><strong>Ano:</strong> <span class="campo-editavel" contenteditable="true">${document.getElementById('anoInputMatriz').value}</span><br><span class="indicador-folha"><strong>Folha:</strong> 01 / 01</span></td>
+                </tr>
+            </table>
+            <table class="tabela-matriz">
+                <thead>
+                    <tr>
+                        <th class="th-matriz-id">Nº</th>
+                        <th class="th-matriz-colab">DDS (Colaboradores)</th>
+                        <th class="th-mes-anual col-mes-0">JAN</th><th class="th-mes-anual col-mes-1">FEV</th>
+                        <th class="th-mes-anual col-mes-2">MAR</th><th class="th-mes-anual col-mes-3">ABR</th>
+                        <th class="th-mes-anual col-mes-4">MAI</th><th class="th-mes-anual col-mes-5">JUN</th>
+                        <th class="th-mes-anual col-mes-6">JUL</th><th class="th-mes-anual col-mes-7">AGO</th>
+                        <th class="th-mes-anual col-mes-8">SET</th><th class="th-mes-anual col-mes-9">OUT</th>
+                        <th class="th-mes-anual col-mes-10">NOV</th><th class="th-mes-anual col-mes-11">DEZ</th>
+                    </tr>
+                </thead>
+                <tbody class="corpo-tabela-matriz">${linhas}</tbody>
+            </table>`;
+            return f;
+        }
+
+        function atualizarPaginacaoMatriz() { const f = document.querySelectorAll('#contentorFolhasMatriz .folha-a4'); f.forEach((folha, idx) => { const ind = folha.querySelector('.indicador-folha'); if(ind) ind.innerHTML = `<strong>Folha:</strong> 0${idx+1} / 0${f.length}`; }); }
+        function adicionarFolhaMatriz() { document.getElementById('contentorFolhasMatriz').appendChild(criarEstruturaFolhaMatriz([], 24)); atualizarPaginacaoMatriz(); }
+
         function gerarTabelaMatriz() {
-            document.getElementById('lblAnoMatriz').innerText = document.getElementById('anoInputMatriz').value;
-            const corpo = document.getElementById('corpoMatriz'); corpo.innerHTML = '';
+            const box = document.getElementById('contentorFolhasMatriz'); box.innerHTML = '';
             const nomes = document.getElementById('nomesInputMatriz').value.toUpperCase().split('\n').map(l=>l.trim()).filter(l=>l.length>0).sort((a,b)=>a.localeCompare(b,'pt'));
             document.getElementById('nomesInputMatriz').value = nomes.join('\n');
-            // Preenche 24 linhas por defeito para ocupar toda a folha A4
-            const lista = nomes.length > 0 ? nomes : Array(24).fill('');
-            lista.forEach((n, idx) => { const tr = document.createElement('tr'); tr.innerHTML = criarLinhaMatriz(idx<9?'0'+(idx+1):(idx+1), n); corpo.appendChild(tr); });
-            aplicarVisMeses();
+            let blocos = []; if(nomes.length === 0) blocos.push([]); else for(let i=0; i<nomes.length; i+=24) blocos.push(nomes.slice(i, i+24));
+            blocos.forEach(b => box.appendChild(criarEstruturaFolhaMatriz(b, 24)));
+            aplicarVisMeses(); atualizarPaginacaoMatriz();
         }
-        function salvarTudoMatriz() { localStorage.setItem('valematriz_v01', JSON.stringify({html: document.getElementById('corpoMatriz').innerHTML})); alert('Matriz Guardada!'); }
-        function carregarTudoMatriz() { const s = localStorage.getItem('valematriz_v01'); if(s) { document.getElementById('corpoMatriz').innerHTML = JSON.parse(s).html; alert('Matriz Carregada!'); } }
-        function limparTudoMatriz() { document.getElementById('corpoMatriz').innerHTML = ''; gerarTabelaMatriz(); }
-        window.onload = function() { gerarTabelaMatriz(); };
+
+        function salvarTudoMatriz() { localStorage.setItem('valematriz_v02', JSON.stringify({html: document.getElementById('contentorFolhasMatriz').innerHTML})); alert('Matriz Guardada com sucesso! (v02)'); }
+        function carregarTudoMatriz() { const s = localStorage.getItem('valematriz_v02'); if(s) { document.getElementById('contentorFolhasMatriz').innerHTML = JSON.parse(s).html; alert('Matriz Carregada!'); } }
+        function limparTudoMatriz() { document.getElementById('contentorFolhasMatriz').innerHTML = ''; adicionarFolhaMatriz(); }
+
+        window.onload = function() { adicionarFolhaMatriz(); };
     </script>
 </body>
 </html>
