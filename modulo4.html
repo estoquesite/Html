@@ -2,42 +2,62 @@
 <html lang="pt-PT">
 <head>
 <meta charset="UTF-8">
-<title>Módulo 4 - Aniversariantes da Equipa | Portal Vale v02</title>
+<title>Módulo 4 - Aniversariantes da Equipa | Portal Vale v03</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #f0f4f8; color: #1e293b; min-height: 100vh; padding: 16px; }
 
-.painel-controle { background: #ffffff; padding: 18px 22px; margin: 0 auto 16px auto; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; max-width: 1000px; display: flex; justify-content: space-between; align-items: center; }
-.topo-modulo-info { display: flex; align-items: center; gap: 8px; }
-.badge-modulo { background: linear-gradient(135deg, #7c3aed, #5b21b6); color: #fff; font-size: 11.5px; font-weight: 800; padding: 5px 12px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.8px; }
-.tag-v02 { background-color: #f59e0b; color: #fff; font-weight: 800; font-size: 10px; padding: 2px 7px; border-radius: 4px; margin-left: 6px; }
+/* PAINEL DE CONTROLO EXECUTIVO */
+.painel-controle { background: #ffffff; padding: 18px 22px; margin: 0 auto 16px auto; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; max-width: 1000px; }
+.topo-modulo-info { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 2px solid #007e7a; padding-bottom: 8px; }
+.badge-modulo { background: linear-gradient(135deg, #007e7a, #005a57); color: #fff; font-size: 11.5px; font-weight: 800; padding: 5px 12px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.8px; }
+.tag-v03 { background-color: #f59e0b; color: #fff; font-weight: 800; font-size: 10px; padding: 2px 7px; border-radius: 4px; margin-left: 6px; }
 
-.botoes-painel { display: flex; gap: 8px; align-items: center; }
+.campos-painel { display: grid; gap: 10px; margin-bottom: 10px; grid-template-columns: 1fr; }
+.campo-grupo label { display: block; font-weight: 700; margin-bottom: 4px; font-size: 10.5px; color: #475569; text-transform: uppercase; }
+.painel-controle textarea { width: 100%; height: 70px; font-family: inherit; font-size: 12px; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; resize: vertical; text-transform: uppercase; background: #f8fafc; outline: none; }
+
+.botoes-painel { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
 .btn { cursor: pointer; padding: 7px 14px; font-size: 11px; font-weight: 700; border: none; border-radius: 6px; color: #fff; display: inline-flex; align-items: center; gap: 5px; }
-.btn-roxo { background-color: #7c3aed; } 
-.btn-voltar { background-color: #475569; text-decoration: none; } 
-.btn-imprimir { background-color: #0f172a; }
+.btn-verde { background-color: #10b981; } .btn-azul { background-color: #007e7a; } .btn-add-folha { background-color: #7c3aed; } .btn-salvar { background-color: #2563eb; } .btn-carregar { background-color: #0284c7; } .btn-limpar { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; } .btn-voltar { background-color: #475569; text-decoration: none; } .btn-imprimir { background-color: #0f172a; margin-left: auto; }
 
-.folha-a4 { width: 100%; max-width: 1000px; background: #fff; padding: 20px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-radius: 10px; border: 1px solid #e2e8f0; }
+/* FOLHA A4 MODERNA E ELEGANTE */
+.folha-a4 { width: 100%; max-width: 1000px; background: #fff; padding: 20px; margin: 0 auto 20px auto; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-radius: 12px; border: 1px solid #cbd5e1; position: relative; }
 
-table.tabela-aniversarios { width: 100%; border-collapse: collapse; border: 1.5px solid #334155; margin-top: 10px; }
-table.tabela-aniversarios th, table.tabela-aniversarios td { border: 1px solid #475569; text-align: center; vertical-align: middle; font-size: 10px; height: 32px; padding: 4px 8px; }
-table.tabela-aniversarios th { background-color: #7c3aed; color: #fff; font-weight: 800; text-transform: uppercase; }
+.barra-controle-folha { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; background: #f8fafc; padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 6px; }
+.btn-remover-folha { background: #fff; color: #ef4444; border: 1px solid #fca5a5; border-radius: 4px; font-size: 9px; font-weight: 700; padding: 3px 8px; cursor: pointer; }
 
-.col-mes-aniver { width: 120px; background: #f3e8ff; font-weight: 800; color: #5b21b6; }
-.col-nome-aniver { text-align: left !important; font-weight: 700; text-transform: uppercase; }
-.col-data-aniver { width: 120px; font-weight: 700; background: #f8fafc; }
-.col-acoes-aniver { width: 60px; }
+/* CABEÇALHO DA FOLHA ESTILO CORPORATIVO */
+.cabecalho-aniver { display: flex; align-items: center; justify-content: space-between; border: 1.5px solid #0f172a; background: #f8fafc; margin-bottom: 10px; border-radius: 6px; overflow: hidden; }
+.cab-logo { width: 110px; background: #007e7a; color: #fff; font-weight: 900; font-size: 16px; text-align: center; padding: 10px; letter-spacing: 1px; }
+.cab-titulo { flex-grow: 1; text-align: center; font-weight: 800; font-size: 11px; text-transform: uppercase; color: #0f172a; padding: 0 10px; }
+.cab-meta { width: 130px; font-size: 9px; padding: 6px 10px; text-align: left; background: #fff; border-left: 1.5px solid #0f172a; line-height: 1.3; }
 
-.botoes-acoes { display: flex; align-items: center; justify-content: center; gap: 4px; }
-.btn-acao { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer; padding: 2px 6px; font-size: 10px; }
+/* TABELA REFINADA */
+table.tabela-aniversarios { width: 100%; border-collapse: collapse; border: 1.2px solid #334155; }
+table.tabela-aniversarios th, table.tabela-aniversarios td { border: 1px solid #475569; text-align: center; vertical-align: middle; font-size: 9.5px; height: 30px; padding: 4px 8px; }
+table.tabela-aniversarios th { background-color: #007e7a; color: #fff; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; font-size: 9.5px; }
+table.tabela-aniversarios tbody tr:nth-child(even) { background-color: #fafbfc; }
+
+table.tabela-aniversarios td[contenteditable="true"]:focus { background-color: #e6f4f4; outline: 1.5px solid #007e7a; box-shadow: inset 0 0 0 1px #007e7a; }
+
+.col-mes-aniver { width: 140px; background: #e6f4f4; font-weight: 800; color: #005a57; text-transform: uppercase; }
+.col-nome-aniver { text-align: left !important; font-weight: 700; text-transform: uppercase; padding-left: 12px; }
+.col-data-aniver { width: 140px; font-weight: 700; background: #fff; }
+.col-acoes-aniver { width: 70px; }
+
+.botoes-acoes { display: flex; align-items: center; justify-content: center; gap: 4px; opacity: 0.3; transition: opacity 0.2s; }
+tr:hover .botoes-acoes { opacity: 1; }
+.btn-acao { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer; padding: 2px 6px; font-size: 9.5px; }
+.btn-mais-linha { color: #10b981; border-color: #6ee7b7; font-weight: 900; }
+.btn-menos-linha { color: #f59e0b; border-color: #fcd34d; font-weight: 900; }
 .btn-lixeira { color: #ef4444; border-color: #fca5a5; }
 
 @media print {
     @page { size: A4 portrait; margin: 10mm; }
     body { background: #fff !important; padding: 0 !important; }
-    .painel-controle, .botoes-acoes { display: none !important; }
-    .folha-a4 { box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; }
+    .painel-controle, .botoes-acoes, .barra-controle-folha { display: none !important; }
+    .folha-a4 { box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
 }
 </style>
 </head>
@@ -45,33 +65,29 @@ table.tabela-aniversarios th { background-color: #7c3aed; color: #fff; font-weig
 
     <div class="painel-controle">
         <div class="topo-modulo-info">
-            <span class="badge-modulo">Módulo 4: Aniversariantes do Ano <span class="tag-v02">v02</span></span>
+            <span class="badge-modulo">Módulo 4: Aniversariantes do Ano <span class="tag-v03">v03</span></span>
+            <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
+        </div>
+        <div class="campos-painel">
+            <div class="campo-grupo">
+                <label>Lista de Aniversariantes (Formato: MÊS | NOME | DATA - Ex: JANEIRO | JOAO SILVA | 18/01):</label>
+                <textarea id="nomesInputAniver" oninput="this.value=this.value.toUpperCase()" placeholder="COLE OS DADOS AQUI..."></textarea>
+            </div>
         </div>
         <div class="botoes-painel">
-            <button type="button" class="btn btn-roxo" onclick="addLinhaAniversario()">➕ Adicionar</button>
+            <button type="button" class="btn btn-verde" onclick="gerarTabelaAniversarios()">Gerar Tabela Organizada</button>
+            <button type="button" class="btn btn-azul" onclick="adicionarFolhaAniver()">📄➕ Folha Extra</button>
+            <button type="button" class="btn btn-salvar" onclick="salvarTudoAniver()">💾 Guardar</button>
+            <button type="button" class="btn btn-carregar" onclick="carregarTudoAniver()">📂 Carregar</button>
+            <button type="button" class="btn btn-limpar" onclick="limparTudoAniver()">Limpar</button>
             <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
-            <a href="index.html" class="btn btn-voltar">⬅ Menu</a>
         </div>
     </div>
 
-    <div class="folha-a4">
-        <div style="background: linear-gradient(135deg, #7c3aed, #5b21b6); color: #fff; text-align: center; font-weight: 900; font-size: 13px; padding: 10px; border-radius: 6px; margin-bottom: 10px; letter-spacing: 0.5px;">🎂 CRONOGRAMA DE ANIVERSÁRIOS DA EQUIPA - 2026</div>
-        
-        <table class="tabela-aniversarios">
-            <thead>
-                <tr>
-                    <th>MÊS</th>
-                    <th>NOME DO COLABORADOR</th>
-                    <th>DATA DE ANIVERSÁRIO</th>
-                    <th>AÇÕES</th>
-                </tr>
-            </thead>
-            <tbody id="corpoAniversarios"></tbody>
-        </table>
-    </div>
+    <div id="contentorFolhasAniver"></div>
 
     <script>
-        const DADOS_A = [
+        const DADOS_INICIAIS_A = [
             {m:"JANEIRO", n:"MARIANA PEREIRA CRUZ", v:"11/01"},
             {m:"JANEIRO", n:"RICARDO GONCALVES DE MELLO LEITE", v:"13/01"},
             {m:"JANEIRO", n:"JOAO SILVA RAMOS", v:"18/01"},
@@ -95,22 +111,96 @@ table.tabela-aniversarios th { background-color: #7c3aed; color: #fff; font-weig
             {m:"DEZEMBRO", n:"TITO DACAL", v:"27/12"}
         ];
 
-        function addLinhaAniversario(m='', n='', v='') {
-            const corpo = document.getElementById('corpoAniversarios');
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td class="col-mes-aniver" contenteditable="true">${m}</td>` +
+        function criarLinhaAniver(m='', n='', v='') {
+            return `<tr>` +
+                `<td class="col-mes-aniver" contenteditable="true">${m}</td>` +
                 `<td class="col-nome-aniver" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()">${n}</td>` +
                 `<td class="col-data-aniver" contenteditable="true">${v}</td>` +
-                `<td class="col-acoes-aniver"><div class="botoes-acoes"><button type="button" class="btn-acao btn-lixeira" onclick="removerLinhaAniver(this)" title="Remover">🗑️</button></div></td>`;
-            corpo.appendChild(tr);
+                `<td class="col-acoes-aniver"><div class="botoes-acoes"><button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixoAniver(this)" title="Adicionar abaixo">➕</button><button type="button" class="btn-acao btn-menos-linha" onclick="removerLinhaAniver(this)" title="Remover">➖</button><button type="button" class="btn-acao btn-lixeira" onclick="apagarLinhaAniver(this)" title="Apagar">🗑️</button></div></td>` +
+            `</tr>`;
         }
 
-        function removerLinhaAniver(btn) {
-            const tr = btn.closest('tr');
-            if(document.querySelectorAll('#corpoAniversarios tr').length > 1) tr.remove();
+        function apagarLinhaAniver(b) { 
+            const tr = b.closest('tr');
+            tr.querySelector('.col-nome-aniver').innerText = '';
+            tr.querySelector('.col-data-aniver').innerText = '';
+        }
+        function adicionarLinhaAbaixoAniver(btn) { const tr = document.createElement('tr'); tr.innerHTML = criarLinhaAniver('','',''); btn.closest('tr').after(tr); }
+        function adicionarLinhaFimAniver(btn) { const corpo = btn.closest('.folha-a4').querySelector('.corpo-aniversarios'); const tr = document.createElement('tr'); tr.innerHTML = criarLinhaAniver('','',''); corpo.appendChild(tr); }
+        function removerLinhaAniver(btn) { const tr = btn.closest('tr'); if(tr.parentNode.querySelectorAll('tr').length > 1) tr.remove(); }
+        function removerFolhaAniver(btn) { btn.closest('.folha-a4').remove(); atualizarPaginacaoAniver(); }
+
+        function criarEstruturaFolhaAniver(listaDados) {
+            let linhas = '';
+            if(listaDados.length === 0) {
+                for(let i=0; i<12; i++) linhas += criarLinhaAniver('','','');
+            } else {
+                listaDados.forEach(d => {
+                    linhas += criarLinhaAniver(d.m, d.n, d.v);
+                });
+            }
+
+            const f = document.createElement('div'); f.className = 'folha-a4';
+            f.innerHTML = `
+                <div class="barra-controle-folha">
+                    <div class="grupo-acoes-linhas"><button type="button" class="btn-linha-topo" onclick="adicionarLinhaFimAniver(this)">➕ Adicionar Linha no Fim</button></div>
+                    <button type="button" class="btn-remover-folha" onclick="removerFolhaAniver(this)">Remover Folha ✕</button>
+                </div>
+                <div class="cabecalho-aniver">
+                    <div class="cab-logo">VALE</div>
+                    <div class="cab-titulo">CRONOGRAMA DE ANIVERSÁRIOS DA EQUIPA - 2026</div>
+                    <div class="cab-meta"><span class="indicador-folha"><strong>Folha:</strong> 01 / 01</span></div>
+                </div>
+                <table class="tabela-aniversarios">
+                    <thead>
+                        <tr>
+                            <th>MÊS</th>
+                            <th>NOME DO COLABORADOR</th>
+                            <th>DATA DE ANIVERSÁRIO</th>
+                            <th>AÇÕES</th>
+                        </tr>
+                    </thead>
+                    <tbody class="corpo-aniversarios">${linhas}</tbody>
+                </table>`;
+            return f;
         }
 
-        window.onload = function() { DADOS_A.forEach(d => addLinhaAniversario(d.m, d.n, d.v)); };
+        function atualizarPaginacaoAniver() { 
+            const f = document.querySelectorAll('#contentorFolhasAniver .folha-a4'); 
+            f.forEach((folha, idx) => { 
+                const ind = folha.querySelector('.indicador-folha'); 
+                if(ind) ind.innerHTML = `<strong>Folha:</strong> 0${idx+1} / 0${f.length}`; 
+            }); 
+        }
+
+        function adicionarFolhaAniver() { 
+            document.getElementById('contentorFolhasAniver').appendChild(criarEstruturaFolhaAniver([])); 
+            atualizarPaginacaoAniver(); 
+        }
+
+        function gerarTabelaAniversarios() {
+            const box = document.getElementById('contentorFolhasAniver'); box.innerHTML = '';
+            box.appendChild(criarEstruturaFolhaAniver(DADOS_INICIAIS_A));
+            atualizarPaginacaoAniver();
+        }
+
+        function salvarTudoAniver() { 
+            localStorage.setItem('valeaniversarios_v03', JSON.stringify({html: document.getElementById('contentorFolhasAniver').innerHTML})); 
+            alert('Aniversários Guardados com sucesso! (v03)'); 
+        }
+        function carregarTudoAniver() { 
+            const s = localStorage.getItem('valeaniversarios_v03'); 
+            if(s) { 
+                document.getElementById('contentorFolhasAniver').innerHTML = JSON.parse(s).html; 
+                alert('Aniversários Carregados!'); 
+            } 
+        }
+        function limparTudoAniver() { 
+            document.getElementById('contentorFolhasAniver').innerHTML = ''; 
+            adicionarFolhaAniver(); 
+        }
+
+        window.onload = function() { gerarTabelaAniversarios(); };
     </script>
 </body>
 </html>
