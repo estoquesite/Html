@@ -35,7 +35,7 @@ table.tabela-ferias th { background-color: #db2777; color: #fff; font-weight: 80
 .col-id { width: 40px; background: #fff1f2; font-weight: 800; color: #831843; }
 .col-nome { background: #db2777 !important; }
 .col-nome-container { display: flex; align-items: center; justify-content: space-between; padding: 0 6px; width: 100%; }
-.col-nome-texto { flex-grow: 1; text-align: left; outline: none; white-space: nowrap; overflow: hidden; font-size: 8.5px; font-weight: 700; color: #fff; text-transform: uppercase; }
+.col-nome-texto { flex-grow: 1; text-align: left; outline: none; white-space: nowrap; overflow: hidden; font-size: 9px; font-weight: 800; color: #ffffff; text-transform: uppercase; letter-spacing: 0.3px; }
 .col-saldo { width: 45px; font-weight: 800; background: #fff1f2; }
 
 .botoes-acoes { display: flex; align-items: center; gap: 2px; opacity: 0.3; transition: opacity 0.2s; }
@@ -43,9 +43,9 @@ tr:hover .botoes-acoes { opacity: 1; }
 .btn-acao { background: rgba(255,255,255,0.3); border: 1px solid rgba(255,255,255,0.6); border-radius: 3px; cursor: pointer; padding: 1px 4px; font-size: 8px; color: #fff; }
 .btn-lixeira { color: #fee2e2; }
 
-/* IMPRESSÃO COM FORÇAGEM DE CORES DE FUNDO */
+/* REMOVE URL E CABEÇALHOS AUTOMÁTICOS DO NAVEGADOR NA IMPRESSÃO */
 @media print {
-    @page { size: A4 landscape; margin: 3mm 4mm; }
+    @page { size: A4 landscape; margin: 5mm; }
     body { background: #fff !important; padding: 0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .painel-controle, .barra-zoom, .botoes-acoes, .barra-controle-folha { display: none !important; }
     .folha-a4 { box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; transform: none !important; margin: 0 !important; }
@@ -119,10 +119,10 @@ tr:hover .botoes-acoes { opacity: 1; }
             const f = document.createElement('div'); f.className = 'folha-a4'; f.style.transform = `scale(${nivelZoom})`;
             f.innerHTML = `
                 <div class="barra-controle-folha">
-                    <div class="grupo-acoes-linhas"><span><strong>Cronograma de Férias 2026</strong></span></div>
+                    <div class="grupo-acoes-linhas"><span><strong>Módulo 3: Cronograma de Férias (v03)</strong></span></div>
                     <button type="button" class="btn-remover-folha" onclick="removerFolhaFerias(this)">Remover Folha ✕</button>
                 </div>
-                <div style="background: linear-gradient(135deg, #db2777, #be185d); color: #fff; text-align: center; font-weight: 900; font-size: 11px; padding: 6px; border-radius: 6px; margin-bottom: 6px; letter-spacing: 0.5px;">CONTROLO ANUAL DE FÉRIAS DA EQUIPA</div>
+                <div style="background: linear-gradient(135deg, #db2777, #be185d); color: #fff; text-align: center; font-weight: 900; font-size: 11px; padding: 6px; border-radius: 6px; margin-bottom: 6px; letter-spacing: 0.5px;">CONTROLO ANUAL DE FÉRIAS DA EQUIPA - 2026</div>
                 <table class="tabela-ferias">
                     <thead>
                         <tr>
