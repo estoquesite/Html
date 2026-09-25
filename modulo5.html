@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+<meta charset="UTF-8">
+<title>Módulo 5 - Absenteísmo e Justificativas | Portal Vale v01</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #fff0f5; color: #1e293b; min-height: 100vh; padding: 16px; }
+
+/* PAINEL DE CONTROLO */
+.painel-controle { background: #ffffff; padding: 18px 22px; margin: 0 auto 16px auto; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(219, 39, 119, 0.1); border: 1px solid #fbcfe8; max-width: 900px; }
+.topo-modulo-info { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 2px solid #db2777; padding-bottom: 8px; }
+.badge-modulo { background: linear-gradient(135deg, #db2777, #be185d); color: #fff; font-size: 11.5px; font-weight: 800; padding: 5px 12px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.8px; }
+.tag-v01 { background-color: #f59e0b; color: #fff; font-weight: 800; font-size: 10px; padding: 2px 7px; border-radius: 4px; margin-left: 6px; }
+
+.botoes-painel { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
+.btn { cursor: pointer; padding: 7px 14px; font-size: 11px; font-weight: 700; border: none; border-radius: 6px; color: #fff; display: inline-flex; align-items: center; gap: 5px; }
+.btn-pink { background-color: #db2777; } 
+.btn-add-folha { background-color: #7c3aed; }
+.btn-salvar { background-color: #2563eb; } 
+.btn-carregar { background-color: #0284c7; } 
+.btn-limpar { background-color: #fdf2f8; color: #9d174d; border: 1px solid #f472b6; } 
+.btn-voltar { background-color: #475569; text-decoration: none; } 
+.btn-imprimir { background-color: #0f172a; margin-left: auto; }
+
+/* FOLHA A4 VERTICAL */
+.folha-a4 { width: 100%; max-width: 900px; background: #fff; padding: 18px 24px; margin: 0 auto 20px auto; box-shadow: 0 10px 30px rgba(219, 39, 119, 0.08); border-radius: 12px; border: 1px solid #f472b6; position: relative; }
+
+.barra-controle-folha { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; background: #fff1f2; padding: 6px 10px; border: 1px solid #fbcfe8; border-radius: 6px; }
+.btn-remover-folha { background: #fff; color: #ef4444; border: 1px solid #fca5a5; border-radius: 4px; font-size: 9px; font-weight: 700; padding: 3px 8px; cursor: pointer; }
+
+/* CABEÇALHO */
+.cabecalho-abs { display: flex; align-items: center; justify-content: space-between; border: 1.5px solid #db2777; background: #fff1f2; margin-bottom: 12px; border-radius: 6px; overflow: hidden; }
+.cab-logo { width: 110px; background: #db2777; color: #fff; font-weight: 900; font-size: 15px; text-align: center; padding: 8px; letter-spacing: 1px; }
+.cab-titulo { flex-grow: 1; text-align: center; font-weight: 800; font-size: 11px; text-transform: uppercase; color: #831843; padding: 0 10px; }
+.cab-meta { width: 130px; font-size: 8.5px; padding: 4px 8px; text-align: left; background: #fff; border-left: 1.5px solid #db2777; line-height: 1.3; }
+
+/* TABELA DE ABSENTEÍSMO */
+table.tabela-abs { width: 100%; border-collapse: collapse; border: 1.2px solid #db2777; }
+table.tabela-abs th, table.tabela-abs td { border: 1px solid #f472b6; text-align: center; vertical-align: middle; font-size: 9.5px; height: 28px; padding: 3px 8px; }
+table.tabela-abs th { background-color: #db2777; color: #fff; font-weight: 800; text-transform: uppercase; font-size: 9.5px; letter-spacing: 0.5px; }
+table.tabela-abs tbody tr:nth-child(even) { background-color: #fff1f2; }
+
+.col-id { width: 45px; background: #fff1f2; font-weight: 800; color: #831843; }
+.col-nome { text-align: left !important; font-weight: 700; text-transform: uppercase; padding-left: 12px; background: #fce7f3; color: #831843; width: 240px; }
+.col-data { width: 110px; font-weight: 700; background: #fff; }
+.col-motivo { text-align: left !important; font-weight: 600; padding-left: 10px; }
+.col-acoes { width: 70px; }
+
+.botoes-acoes { display: flex; align-items: center; justify-content: center; gap: 4px; opacity: 0.3; transition: opacity 0.2s; }
+tr:hover .botoes-acoes { opacity: 1; }
+.btn-acao { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer; padding: 2px 5px; font-size: 9px; }
+.btn-mais-linha { color: #10b981; border-color: #6ee7b7; font-weight: 900; }
+.btn-lixeira { color: #ef4444; border-color: #fca5a5; }
+
+/* IMPRESSÃO LIMPA SEM AÇÕES E SEM URL */
+@media print {
+    @page { size: A4 portrait; margin: 0mm; }
+    html, body { background: #fff !important; width: 210mm; height: 297mm; margin: 0 !important; padding: 10mm !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .painel-controle, .botoes-acoes, .barra-controle-folha, .col-acoes, th:last-child { display: none !important; }
+    .folha-a4 { box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+    table.tabela-abs th { background-color: #db2777 !important; color: #fff !important; }
+    .col-nome { background-color: #fce7f3 !important; color: #831843 !important; }
+}
+</style>
+</head>
+<body>
+
+    <div class="painel-controle">
+        <div class="topo-modulo-info">
+            <span class="badge-modulo">Módulo 5: Absenteísmo e Justificativas <span class="tag-v01">v01</span></span>
+            <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
+        </div>
+        <div class="botoes-painel">
+            <button type="button" class="btn btn-pink" onclick="adicionarLinhaAbs('', '', '', '')">➕ Adicionar Registo</button>
+            <button type="button" class="btn btn-add-folha" onclick="adicionarFolhaAbs()">📄➕ Folha Extra</button>
+            <button type="button" class="btn btn-salvar" onclick="salvarTudoAbs()">💾 Guardar</button>
+            <button type="button" class="btn btn-carregar" onclick="carregarTudoAbs()">📂 Carregar</button>
+            <button type="button" class="btn btn-limpar" onclick="limparTudoAbs()">Limpar</button>
+            <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
+        </div>
+    </div>
+
+    <div id="contentorFolhasAbs"></div>
+
+    <script>
+        function criarTabelaAbsHTML(dadosArr) {
+            let linhas = '';
+            const lista = dadosArr.length > 0 ? dadosArr : Array(15).fill({n:'', d:'', m:''});
+            
+            lista.forEach((item, idx) => {
+                let numStr = (idx+1 < 10 ? '0'+(idx+1) : (idx+1));
+                linhas += `<tr>` +
+                    `<td class="col-id">${numStr}</td>` +
+                    `<td class="col-nome" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()">${item.n || ''}</td>` +
+                    `<td class="col-data" contenteditable="true">${item.d || ''}</td>` +
+                    `<td class="col-motivo" contenteditable="true">${item.m || ''}</td>` +
+                    `<td class="col-acoes"><div class="botoes-acoes"><button type="button" class="btn-acao btn-mais-linha" onclick="adicionarAbaixo(this)" title="Adicionar">➕</button><button type="button" class="btn-acao btn-lixeira" onclick="removerLinhaAbs(this)" title="Apagar">🗑️</button></div></td>` +
+                `</tr>`;
+            });
+
+            const f = document.createElement('div'); f.className = 'folha-a4';
+            f.innerHTML = `
+                <div class="barra-controle-folha">
+                    <div class="grupo-acoes-linhas"><span><strong>Controlo de Absenteísmo</strong></span></div>
+                    <button type="button" class="btn-remover-folha" onclick="removerFolhaAbs(this)">Remover Folha ✕</button>
+                </div>
+                <div class="cabecalho-abs">
+                    <div class="cab-logo">VALE</div>
+                    <div class="cab-titulo">📋 REGISTO DE ABSENTEÍSMO E JUSTIFICATIVAS - 2026</div>
+                    <div class="cab-meta"><span class="indicador-folha"><strong>Página:</strong> 01 / 01</span></div>
+                </div>
+                <table class="tabela-abs">
+                    <thead>
+                        <tr>
+                            <th style="width:45px;">Nº</th>
+                            <th>COLABORADOR</th>
+                            <th style="width:110px;">DATA</th>
+                            <th>MOTIVO / JUSTIFICATIVA</th>
+                            <th class="col-acoes">AÇÕES</th>
+                        </tr>
+                    </thead>
+                    <tbody class="corpo-abs">${linhas}</tbody>
+                </table>`;
+            return f;
+        }
+
+        function atualizarPaginacaoAbs() {
+            const folhas = document.querySelectorAll('#contentorFolhasAbs .folha-a4');
+            folhas.forEach((folha, idx) => {
+                const ind = folha.querySelector('.indicador-folha');
+                if(ind) ind.innerHTML = `<strong>Página:</strong> 0${idx+1} / 0${folhas.length}`;
+            });
+        }
+
+        function adicionarLinhaAbs(n='', d='', m='') {
+            const ultimaFolha = document.querySelector('#contentorFolhasAbs .folha-a4:last-child tbody');
+            if(ultimaFolha) {
+                const qtd = ultimaFolha.querySelectorAll('tr').length + 1;
+                const tr = document.createElement('tr');
+                tr.innerHTML = `<td class="col-id">${qtd < 10 ? '0'+qtd : qtd}</td>` +
+                    `<td class="col-nome" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()">${n}</td>` +
+                    `<td class="col-data" contenteditable="true">${d}</td>` +
+                    `<td class="col-motivo" contenteditable="true">${m}</td>` +
+                    `<td class="col-acoes"><div class="botoes-acoes"><button type="button" class="btn-acao btn-mais-linha" onclick="adicionarAbaixo(this)" title="Adicionar">➕</button><button type="button" class="btn-acao btn-lixeira" onclick="removerLinhaAbs(this)" title="Apagar">🗑️</button></div></td>`;
+                ultimaFolha.appendChild(tr);
+            }
+        }
+
+        function adicionarAbaixo(btn) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td class="col-id">00</td>` +
+                `<td class="col-nome" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()"></td>` +
+                `<td class="col-data" contenteditable="true"></td>` +
+                `<td class="col-motivo" contenteditable="true"></td>` +
+                `<td class="col-acoes"><div class="botoes-acoes"><button type="button" class="btn-acao btn-mais-linha" onclick="adicionarAbaixo(this)" title="Adicionar">➕</button><button type="button" class="btn-acao btn-lixeira" onclick="removerLinhaAbs(this)" title="Apagar">🗑️</button></div></td>`;
+            btn.closest('tr').after(tr);
+            reordenarIdsAbs(btn.closest('tbody'));
+        }
+
+        function removerLinhaAbs(btn) {
+            const tr = btn.closest('tr');
+            const tbody = tr.parentNode;
+            if(tbody.querySelectorAll('tr').length > 1) {
+                tr.remove();
+                reordenarIdsAbs(tbody);
+            } else {
+                tr.querySelector('.col-nome').innerText = '';
+                tr.querySelector('.col-data').innerText = '';
+                tr.querySelector('.col-motivo').innerText = '';
+            }
+        }
+
+        function reordenarIdsAbs(tbody) {
+            tbody.querySelectorAll('tr').forEach((row, idx) => {
+                const n = idx + 1;
+                row.querySelector('.col-id').innerText = n < 10 ? '0'+n : n;
+            });
+        }
+
+        function adicionarFolhaAbs() {
+            document.getElementById('contentorFolhasAbs').appendChild(criarTabelaAbsHTML([]));
+            atualizarPaginacaoAbs();
+        }
+
+        function removerFolhaAbs(btn) {
+            const folhas = document.querySelectorAll('#contentorFolhasAbs .folha-a4');
+            if(folhas.length > 1) {
+                btn.closest('.folha-a4').remove();
+                atualizarPaginacaoAbs();
+            }
+        }
+
+        function salvarTudoAbs() {
+            let dados = [];
+            document.querySelectorAll('#contentorFolhasAbs .folha-a4').forEach(folha => {
+                folha.querySelectorAll('tbody tr').forEach(tr => {
+                    let n = tr.querySelector('.col-nome').innerText.trim();
+                    let d = tr.querySelector('.col-data').innerText.trim();
+                    let m = tr.querySelector('.col-motivo').innerText.trim();
+                    if(n !== "") dados.push({n, d, m});
+                });
+            });
+            localStorage.setItem('valeabsenteismo_v01', JSON.stringify(dados));
+            alert('Absenteísmo Guardado com sucesso! (v01)');
+        }
+
+        function carregarTudoAbs() {
+            const s = localStorage.getItem('valeabsenteismo_v01');
+            if(s) {
+                let dados = JSON.parse(s);
+                const box = document.getElementById('contentorFolhasAbs'); box.innerHTML = '';
+                box.appendChild(criarTabelaAbsHTML(dados));
+                atualizarPaginacaoAbs();
+                alert('Absenteísmo Carregado!');
+            } else {
+                alert('Nenhum dado guardado encontrado.');
+            }
+        }
+
+        function limparTudoAbs() {
+            const box = document.getElementById('contentorFolhasAbs'); box.innerHTML = '';
+            box.appendChild(criarTabelaAbsHTML([]));
+            atualizarPaginacaoAbs();
+        }
+
+        window.onload = function() {
+            document.getElementById('contentorFolhasAbs').appendChild(criarTabelaAbsHTML([]));
+            atualizarPaginacaoAbs();
+        };
+    </script>
+</body>
+</html>
