@@ -2,16 +2,16 @@
 <html lang="pt-PT">
 <head>
 <meta charset="UTF-8">
-<title>Módulo 2 - Matriz Anual de DDS | Portal Vale v03</title>
+<title>Módulo 2 - Matriz Anual de DDS | Portal Vale v04</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #f0f4f8; color: #1e293b; min-height: 100vh; padding: 16px; }
 
 /* PAINEL DE CONTROLO */
-.painel-controle { background: #ffffff; padding: 18px 22px; margin: 0 auto 16px auto; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; max-width: 1200px; }
+.painel-controle { background: #ffffff; padding: 18px 22px; margin: 0 auto 16px auto; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; max-width: 100%; }
 .topo-modulo-info { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; border-bottom: 2px solid #007e7a; padding-bottom: 10px; }
 .badge-modulo { background: linear-gradient(135deg, #007e7a, #005a57); color: #fff; font-size: 11.5px; font-weight: 800; padding: 5px 12px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.8px; }
-.tag-v03 { background-color: #f59e0b; color: #fff; font-weight: 800; font-size: 10px; padding: 2px 7px; border-radius: 4px; margin-left: 6px; }
+.tag-v04 { background-color: #f59e0b; color: #fff; font-weight: 800; font-size: 10px; padding: 2px 7px; border-radius: 4px; margin-left: 6px; }
 
 .campos-painel { display: grid; gap: 12px; margin-bottom: 12px; grid-template-columns: 2fr 1fr 1fr 1fr; }
 .campo-grupo label { display: block; font-weight: 700; margin-bottom: 5px; font-size: 10.5px; color: #475569; text-transform: uppercase; }
@@ -31,16 +31,16 @@ body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background
 .btn { cursor: pointer; padding: 7px 14px; font-size: 11px; font-weight: 700; border: none; border-radius: 6px; color: #fff; display: inline-flex; align-items: center; gap: 5px; }
 .btn-verde { background-color: #007e7a; } .btn-azul { background-color: #0284c7; } .btn-salvar { background-color: #2563eb; } .btn-carregar { background-color: #0284c7; } .btn-limpar { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; } .btn-voltar { background-color: #475569; text-decoration: none; } .btn-imprimir { background-color: #0f172a; margin-left: auto; }
 
-/* FOLHA A4 ESTABILIZADA */
-.wrapper-tabela { width: 100%; overflow-x: auto; margin-bottom: 20px; }
-.folha-a4 { width: 100%; max-width: 1200px; background: #fff; padding: 16px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-radius: 10px; border: 1px solid #e2e8f0; }
+/* COMPORTAMENTO REAL DE EXCEL (LARGURA NATURAL E EXPANSÍVEL) */
+.wrapper-tabela { width: 100%; overflow-x: auto; margin-bottom: 20px; padding-bottom: 10px; }
+.folha-a4 { display: inline-block; width: auto; min-width: min-content; background: #fff; padding: 16px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-radius: 10px; border: 1px solid #e2e8f0; }
 
 .barra-controle-folha { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; background: #f8fafc; padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 6px; }
 .grupo-acoes-linhas { display: flex; align-items: center; gap: 6px; }
 .btn-linha-topo { border: 1px solid #007e7a; border-radius: 4px; font-size: 9px; font-weight: 700; padding: 3px 8px; cursor: pointer; background: #fff; color: #007e7a; }
 .btn-remover-folha { background: #fff; color: #ef4444; border: 1px solid #fca5a5; border-radius: 4px; font-size: 9px; font-weight: 700; padding: 3px 8px; cursor: pointer; }
 
-.cabecalho-container, table.tabela-matriz { width: 100%; border-collapse: collapse; border: 1.2px solid #0f172a; margin-bottom: 4px; table-layout: fixed; }
+.cabecalho-container, table.tabela-matriz { width: auto; border-collapse: collapse; border: 1.2px solid #0f172a; margin-bottom: 4px; table-layout: fixed; }
 .cabecalho-container td { border: 1px solid #334155; padding: 3px 6px; vertical-align: middle; text-align: center; }
 .logo-box { width: 90px; font-weight: 900; font-size: 14px; color: #007e7a; background-color: #f8fafc; }
 .titulo-box { font-size: 10.5px; font-weight: 800; text-transform: uppercase; color: #0f172a; padding: 0 10px; }
@@ -49,7 +49,7 @@ body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background
 table.tabela-matriz th, table.tabela-matriz td { border: 1px solid #475569; text-align: center; vertical-align: middle; font-size: 9px; }
 .th-matriz-id { width: 38px; background-color: #f1f5f9; font-weight: 800; }
 .th-matriz-colab { width: 230px; background-color: #007e7a; color: #fff; font-size: 10px; font-weight: 800; padding: 5px; text-align: left; padding-left: 8px; }
-.th-mes-anual { background-color: #007e7a; color: #fff; font-size: 9.5px; font-weight: 800; padding: 5px 2px; }
+.th-mes-anual { width: 45px; background-color: #007e7a; color: #fff; font-size: 9.5px; font-weight: 800; padding: 5px 2px; }
 
 table.tabela-matriz tbody tr { height: 26px; }
 table.tabela-matriz tbody tr:nth-child(even) { background-color: #fafbfc; }
@@ -59,7 +59,7 @@ table.tabela-matriz tbody tr:nth-child(even) { background-color: #fafbfc; }
 .col-id-texto { outline: none; font-size: 9px; font-weight: 800; color: #0f172a; background: #e2e8f0; padding: 1px 4px; border-radius: 3px; display: inline-block; width: 100%; text-align: center; }
 .col-id-texto:focus { background: #fef3c7; }
 
-.celula-data { outline: none; font-size: 9px; font-weight: 700; color: #0f172a; background-color: #fff; padding: 0 2px; }
+.celula-data { width: 45px; outline: none; font-size: 9px; font-weight: 700; color: #0f172a; background-color: #fff; padding: 0 2px; }
 .celula-data:focus { background-color: #e6f4f4; box-shadow: inset 0 0 0 1.5px #007e7a; }
 
 .botoes-acoes { display: flex; align-items: center; gap: 2px; opacity: 0.3; transition: opacity 0.2s; }
@@ -73,10 +73,10 @@ tr:hover .botoes-acoes { opacity: 1; }
 .col-nome-texto { flex-grow: 1; text-align: left; outline: none; white-space: nowrap; overflow: hidden; font-size: 9.5px; font-weight: 700; color: #000; text-transform: uppercase; }
 .mes-oculto { display: none !important; }
 
-/* IMPRESSÃO LIMPA SEM FUNDO CINZENTO NOS NÚMEROS E SEM URL */
+/* IMPRESSÃO LIMPA SEM URL E SEM FUNDO CINZENTO NOS NÚMEROS */
 @media print {
-    @page { size: A4 landscape; margin: 5mm; }
-    body { background: #fff !important; padding: 0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    @page { size: A4 landscape; margin: 0mm; }
+    body { background: #fff !important; padding: 10mm !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
     .painel-controle, .botoes-acoes, .barra-controle-folha { display: none !important; }
     .wrapper-tabela { overflow: visible !important; width: 100% !important; }
     .folha-a4 { box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
@@ -90,7 +90,7 @@ tr:hover .botoes-acoes { opacity: 1; }
 
     <div class="painel-controle">
         <div class="topo-modulo-info">
-            <span class="badge-modulo">Módulo 2: Matriz Anual de DDS <span class="tag-v03">v03</span></span>
+            <span class="badge-modulo">Módulo 2: Matriz Anual de DDS <span class="tag-v04">v04</span></span>
             <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
         </div>
         <div class="campos-painel">
@@ -100,7 +100,7 @@ tr:hover .botoes-acoes { opacity: 1; }
             <div class="campo-grupo"><label>Facilitador:</label><input type="text" id="facilitadorInputMatriz" placeholder="Mariana"></div>
         </div>
         <div class="painel-meses-toggle">
-            <div class="titulo-meses-toggle"><span>👁️ Visibilidade dos Meses:</span>
+            <div class="titulo-meses-toggle"><span>👁️ Visibilidade dos Meses (Largura Natural Tipo Excel):</span>
                 <div class="links-rapidos-meses">
                     <button type="button" class="link-rapido" onclick="definirTodosMeses(true)">Exibir Todos</button>
                     <button type="button" class="link-rapido" onclick="definirTodosMeses(false)">Ocultar Todos</button>
@@ -211,8 +211,8 @@ tr:hover .botoes-acoes { opacity: 1; }
             aplicarVisMeses(); atualizarPaginacaoMatriz();
         }
 
-        function salvarTudoMatriz() { localStorage.setItem('valematriz_v03', JSON.stringify({html: document.getElementById('contentorFolhasMatriz').innerHTML})); alert('Matriz Guardada com sucesso! (v03)'); }
-        function carregarTudoMatriz() { const s = localStorage.getItem('valematriz_v03'); if(s) { document.getElementById('contentorFolhasMatriz').innerHTML = JSON.parse(s).html; aplicarVisMeses(); alert('Matriz Carregada!'); } }
+        function salvarTudoMatriz() { localStorage.setItem('valematriz_v04', JSON.stringify({html: document.getElementById('contentorFolhasMatriz').innerHTML})); alert('Matriz Guardada com sucesso! (v04)'); }
+        function carregarTudoMatriz() { const s = localStorage.getItem('valematriz_v04'); if(s) { document.getElementById('contentorFolhasMatriz').innerHTML = JSON.parse(s).html; aplicarVisMeses(); alert('Matriz Carregada!'); } }
         function limparTudoMatriz() { document.getElementById('contentorFolhasMatriz').innerHTML = ''; adicionarFolhaMatriz(); }
 
         window.onload = function() { adicionarFolhaMatriz(); };
