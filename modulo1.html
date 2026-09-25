@@ -5,105 +5,90 @@
 <title>Módulo 1 - DDS & Emociograma | Portal Vale v02</title>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #f0f4f8; color: #1e293b; min-height: 100vh; padding: 16px; }
+body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #f0f4f8; color: #1e293b; min-height: 100vh; padding: 12px; }
 
-/* PAINEL DE CONTROLO MODERNO */
-.painel-controle { background: #ffffff; padding: 18px 22px; margin: 0 auto 16px auto; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; max-width: 1120px; }
-.topo-modulo-info { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; border-bottom: 2px solid #007e7a; padding-bottom: 10px; }
-.badge-modulo { background: linear-gradient(135deg, #007e7a, #005a57); color: #fff; font-size: 11.5px; font-weight: 800; padding: 5px 12px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.8px; box-shadow: 0 4px 10px rgba(0,126,122,0.2); }
-.tag-v02 { background-color: #f59e0b; color: #fff; font-weight: 800; font-size: 10px; padding: 2px 7px; border-radius: 4px; margin-left: 6px; }
+/* PAINEL DE CONTROLO */
+.painel-controle { background: #ffffff; padding: 14px 18px; margin: 0 auto 14px auto; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; max-width: 1120px; }
+.topo-modulo-info { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; border-bottom: 2px solid #007e7a; padding-bottom: 6px; }
+.badge-modulo { background: linear-gradient(135deg, #007e7a, #005a57); color: #fff; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 5px; text-transform: uppercase; }
+.tag-v02 { background-color: #f59e0b; color: #fff; font-weight: 800; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
 
-.campos-painel { display: grid; gap: 12px; margin-bottom: 12px; grid-template-columns: 2fr 1fr 1fr; }
-.campo-grupo label { display: block; font-weight: 700; margin-bottom: 5px; font-size: 10.5px; color: #475569; text-transform: uppercase; letter-spacing: 0.5px; }
-.painel-controle input[type="text"] { width: 100%; font-family: inherit; font-size: 12px; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; outline: none; transition: 0.2s; background: #f8fafc; }
-.painel-controle input[type="text"]:focus { border-color: #007e7a; background: #fff; box-shadow: 0 0 0 3px rgba(0,126,122,0.1); }
-.painel-controle textarea { width: 100%; height: 70px; font-family: inherit; font-size: 12px; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; resize: vertical; text-transform: uppercase; outline: none; background: #f8fafc; transition: 0.2s; }
-.painel-controle textarea:focus { border-color: #007e7a; background: #fff; box-shadow: 0 0 0 3px rgba(0,126,122,0.1); }
+.campos-painel { display: grid; gap: 10px; margin-bottom: 8px; grid-template-columns: 2fr 1fr 1fr; }
+.campo-grupo label { display: block; font-weight: 700; margin-bottom: 3px; font-size: 10px; color: #475569; text-transform: uppercase; }
+.painel-controle input[type="text"] { width: 100%; font-family: inherit; font-size: 11px; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 5px; background: #f8fafc; outline: none; }
+.painel-controle textarea { width: 100%; height: 55px; font-family: inherit; font-size: 11px; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 5px; resize: vertical; text-transform: uppercase; background: #f8fafc; outline: none; }
 
-/* BOTÕES MODERNOS */
-.botoes-painel { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
-.btn { cursor: pointer; padding: 7px 14px; font-size: 11px; font-weight: 700; border: none; border-radius: 6px; color: #fff; display: inline-flex; align-items: center; gap: 5px; transition: all 0.2s; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-.btn:hover { transform: translateY(-1px); filter: brightness(1.05); }
-.btn-verde { background-color: #10b981; } 
-.btn-azul { background-color: #007e7a; } 
-.btn-add-folha { background-color: #7c3aed; } 
-.btn-salvar { background-color: #2563eb; } 
-.btn-carregar { background-color: #0284c7; } 
-.btn-limpar { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; } 
-.btn-voltar { background-color: #475569; text-decoration: none; } 
-.btn-imprimir { background-color: #0f172a; margin-left: auto; }
+.botoes-painel { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.btn { cursor: pointer; padding: 6px 12px; font-size: 10.5px; font-weight: 700; border: none; border-radius: 5px; color: #fff; display: inline-flex; align-items: center; gap: 4px; }
+.btn-verde { background-color: #10b981; } .btn-azul { background-color: #007e7a; } .btn-add-folha { background-color: #7c3aed; } .btn-salvar { background-color: #2563eb; } .btn-carregar { background-color: #0284c7; } .btn-limpar { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; } .btn-voltar { background-color: #475569; text-decoration: none; } .btn-imprimir { background-color: #0f172a; margin-left: auto; }
 
-/* FOLHA A4 MODERNA */
-.folha-a4 { width: 100%; max-width: 1120px; background: #fff; padding: 16px; margin: 0 auto 20px auto; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-radius: 10px; position: relative; border: 1px solid #e2e8f0; }
+/* FOLHA A4 OTIMIZADA PARA IMPRESSÃO ÚNICA */
+.folha-a4 { width: 100%; max-width: 1120px; background: #fff; padding: 10px 14px; margin: 0 auto 14px auto; box-shadow: 0 4px 15px rgba(0,0,0,0.06); border-radius: 8px; border: 1px solid #e2e8f0; }
 
-.barra-controle-folha { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; background: #f8fafc; padding: 8px 12px; border: 1px solid #e2e8f0; border-radius: 6px; }
-.grupo-acoes-linhas { display: flex; align-items: center; gap: 8px; }
-.btn-linha-topo { border: 1px solid #007e7a; border-radius: 5px; font-size: 9.5px; font-weight: 700; padding: 4px 10px; cursor: pointer; background: #fff; color: #007e7a; transition: 0.15s; }
-.btn-linha-topo:hover { background: #007e7a; color: #fff; }
-.btn-remover-folha { background: #fff; color: #ef4444; border: 1px solid #fca5a5; border-radius: 5px; font-size: 9.5px; font-weight: 700; padding: 4px 10px; cursor: pointer; transition: 0.15s; }
-.btn-remover-folha:hover { background: #fee2e2; }
+.barra-controle-folha { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; background: #f8fafc; padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 4px; }
+.grupo-acoes-linhas { display: flex; align-items: center; gap: 6px; }
+.btn-linha-topo { border: 1px solid #007e7a; border-radius: 4px; font-size: 8.5px; font-weight: 700; padding: 2px 8px; cursor: pointer; background: #fff; color: #007e7a; }
+.btn-remover-folha { background: #fff; color: #ef4444; border: 1px solid #fca5a5; border-radius: 4px; font-size: 8.5px; font-weight: 700; padding: 2px 8px; cursor: pointer; }
 
-/* TABELAS COM ESTILO LIMPO */
-.cabecalho-container, .info-dds, table.tabela-dds { width: 100%; border-collapse: collapse; border: 1.5px solid #0f172a; margin-bottom: 6px; table-layout: fixed; }
-.cabecalho-container td, .info-dds td { border: 1px solid #334155; padding: 4px 8px; vertical-align: middle; text-align: center; }
-.logo-box { width: 120px; font-weight: 900; font-size: 16px; color: #007e7a; background-color: #f8fafc; letter-spacing: 1px; }
-.titulo-box { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #0f172a; letter-spacing: 0.5px; }
-.meta-box { width: 150px; font-size: 9px; text-align: left !important; padding-left: 8px !important; background-color: #f8fafc; line-height: 1.3; }
-.campo-editavel { outline: none; display: inline-block; min-width: 25px; font-size: 9px; font-weight: 600; }
+.cabecalho-container, .info-dds, table.tabela-dds { width: 100%; border-collapse: collapse; border: 1.2px solid #0f172a; margin-bottom: 3px; table-layout: fixed; }
+.cabecalho-container td, .info-dds td { border: 1px solid #334155; padding: 2px 5px; vertical-align: middle; text-align: center; }
+.logo-box { width: 110px; font-weight: 900; font-size: 15px; color: #007e7a; background-color: #f8fafc; }
+.titulo-box { font-size: 10px; font-weight: 800; text-transform: uppercase; color: #0f172a; }
+.meta-box { width: 130px; font-size: 8.5px; text-align: left !important; padding-left: 6px !important; background-color: #f8fafc; }
+.campo-editavel { outline: none; display: inline-block; min-width: 25px; font-size: 8.5px; font-weight: 600; }
 
 table.tabela-dds th, table.tabela-dds td { border: 1px solid #334155; text-align: center; vertical-align: middle; }
 table.tabela-dds th { background-color: #f8fafc; font-weight: 800; color: #0f172a; }
 table.tabela-dds tbody tr:nth-child(even) { background-color: #fafbfc; }
-table.tabela-dds td { height: 28px; padding: 2px 3px; }
+table.tabela-dds td { height: 21.5px; padding: 1px 2px; }
 
-/* COLUNAS REAJUSTADAS E NUMERAÇÃO MODERNA */
-.tabela-dds .col-id { width: 42px !important; background-color: #f1f5f9 !important; font-weight: 800; }
+/* COLUNAS E NÚMEROS EDITÁVEIS */
+.tabela-dds .col-id { width: 36px !important; background-color: #f1f5f9 !important; font-weight: 800; }
 .col-id-container { display: flex; align-items: center; justify-content: center; width: 100%; }
-.col-id-texto { outline: none; font-size: 10px; font-weight: 800; color: #0f172a; background: #e2e8f0; padding: 2px 6px; border-radius: 4px; display: inline-block; }
+.col-id-texto { outline: none; font-size: 9px; font-weight: 800; color: #0f172a; background: #e2e8f0; padding: 1px 4px; border-radius: 3px; display: inline-block; width: 100%; text-align: center; }
+.col-id-texto:focus { background: #fef3c7; }
 
-.tabela-dds .col-colaborador { width: 260px !important; text-align: left; }
-.col-nome-container { display: flex; align-items: center; justify-content: space-between; padding: 0 6px; gap: 6px; width: 100%; }
-.col-nome-texto { flex-grow: 1; text-align: left; outline: none; white-space: nowrap; overflow: hidden; font-size: 9.5px; font-weight: 700; color: #0f172a; text-transform: uppercase; }
+.tabela-dds .col-colaborador { width: 240px !important; text-align: left; }
+.col-nome-container { display: flex; align-items: center; justify-content: space-between; padding: 0 4px; gap: 4px; width: 100%; }
+.col-nome-texto { flex-grow: 1; text-align: left; outline: none; white-space: nowrap; overflow: hidden; font-size: 8.5px; font-weight: 700; color: #0f172a; text-transform: uppercase; }
 
-/* BOTÕES DE LINHA DISCRETOS E ELEGANTES */
-.botoes-acoes { display: flex; align-items: center; gap: 3px; opacity: 0.4; transition: opacity 0.2s; }
-tr:hover .botoes-acoes { opacity: 1; } /* Aparecem ao passar o rato ou tocar */
-.btn-acao { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 3px; cursor: pointer; padding: 2px 4px; font-size: 9px; line-height: 1; transition: 0.15s; }
-.btn-acao:hover { background: #e2e8f0; transform: scale(1.1); }
+.botoes-acoes { display: flex; align-items: center; gap: 2px; opacity: 0.3; transition: opacity 0.2s; }
+tr:hover .botoes-acoes { opacity: 1; }
+.btn-acao { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 3px; cursor: pointer; padding: 1px 3px; font-size: 8px; line-height: 1; }
 .btn-lixeira { color: #ef4444; border-color: #fca5a5; }
 .btn-mais-linha { color: #10b981; border-color: #6ee7b7; font-weight: 900; }
 .btn-menos-linha { color: #f59e0b; border-color: #fcd34d; font-weight: 900; }
 
-.th-dia-semana { font-size: 9.5px; font-weight: 800; text-transform: uppercase; padding: 5px 0; background: linear-gradient(180deg, #e6f4f4 0%, #d8ecec 100%) !important; color: #005a57; }
-.th-sub { font-size: 8px !important; font-weight: 800; background-color: #f1f5f9 !important; padding: 3px 0; }
-.col-como-estou { width: 60px; min-width: 60px; padding: 1px !important; }
-.col-rubrica { width: 50px; min-width: 50px; outline: none; font-size: 9px; background-color: #fff; }
+.th-dia-semana { font-size: 8.5px; font-weight: 800; text-transform: uppercase; padding: 3px 0; background: linear-gradient(180deg, #e6f4f4 0%, #d8ecec 100%) !important; color: #005a57; }
+.th-sub { font-size: 7.5px !important; font-weight: 800; background-color: #f1f5f9 !important; padding: 2px 0; }
+.col-como-estou { width: 55px; min-width: 55px; padding: 1px !important; }
+.col-rubrica { width: 45px; min-width: 45px; outline: none; font-size: 8.5px; background-color: #fff; }
 
 /* CARINHAS DE EMOCIOGRAMA */
 .grupo-carinhas { display: flex; align-items: center; justify-content: space-evenly; width: 100%; gap: 1px; }
-.carinha-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; user-select: none; line-height: 1; padding: 2px; border-radius: 4px; transition: 0.15s; }
-.carinha-item:hover { background: #e2e8f0; }
-.carinha-num { font-size: 6.5px; font-weight: 800; color: #475569; margin-bottom: 1px; }
-.carinha-svg { width: 13px; height: 13px; display: block; }
+.carinha-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; user-select: none; line-height: 1; padding: 1px; border-radius: 3px; }
+.carinha-num { font-size: 6px; font-weight: 800; color: #475569; margin-bottom: 0.5px; }
+.carinha-svg { width: 11px; height: 11px; display: block; }
 .c-verde circle.rosto { stroke: #10b981; stroke-width: 2.2; fill: #ecfdf5; } .c-verde circle.olho { fill: #10b981; } .c-verde path.boca { stroke: #10b981; stroke-width: 2.2; stroke-linecap: round; fill: none; }
 .c-amarela circle.rosto { stroke: #f59e0b; stroke-width: 2.2; fill: #fffbeb; } .c-amarela circle.olho { fill: #f59e0b; } .c-amarela line.boca { stroke: #f59e0b; stroke-width: 2.2; stroke-linecap: round; fill: none; }
 .c-vermelha circle.rosto { stroke: #ef4444; stroke-width: 2.2; fill: #fef2f2; } .c-vermelha circle.olho { fill: #ef4444; } .c-vermelha path.boca { stroke: #ef4444; stroke-width: 2.2; stroke-linecap: round; fill: none; }
 
-.carinha-item.selecionado-1 { background-color: #d1fae5; outline: 1.5px solid #10b981; }
-.carinha-item.selecionado-2 { background-color: #fef3c7; outline: 1.5px solid #f59e0b; }
-.carinha-item.selecionado-3 { background-color: #fee2e2; outline: 1.5px solid #ef4444; }
+.carinha-item.selecionado-1 { background-color: #d1fae5; outline: 1.2px solid #10b981; }
+.carinha-item.selecionado-2 { background-color: #fef3c7; outline: 1.2px solid #f59e0b; }
+.carinha-item.selecionado-3 { background-color: #fee2e2; outline: 1.2px solid #ef4444; }
 
-.rodape-container { display: grid; grid-template-columns: 140px 1.2fr 1.6fr; gap: 8px; width: 100%; font-size: 8.5px; line-height: 1.35; margin-top: 8px; }
-.box-legenda { border: 1px solid #cbd5e1; padding: 6px 8px; background-color: #f8fafc; border-radius: 6px; }
-.box-legenda h4 { margin: 0 0 4px 0; font-size: 8.5px; font-weight: 800; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px; color: #005a57; }
+/* RODAPÉ COMPLETO EXATAMENTE COMO NA SUA VERSÃO ORIGINAL */
+.rodape-container { display: grid; grid-template-columns: 140px 1.4fr 1.8fr; gap: 6px; width: 100%; font-size: 7.5px; line-height: 1.25; margin-top: 4px; }
+.box-legenda { border: 1px solid #cbd5e1; padding: 4px 6px; background-color: #f8fafc; border-radius: 5px; }
+.box-legenda h4 { margin: 0 0 2px 0; font-size: 8px; font-weight: 800; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px; color: #005a57; }
 .lista-legenda { list-style: none; padding: 0; margin: 0; }
-.item-emocio { display: flex; align-items: flex-start; gap: 6px; margin-bottom: 3px; }
+.lista-legenda li { margin-bottom: 1.5px; }
 
 @media print {
-    @page { size: A4 landscape; margin: 4mm 5mm; }
+    @page { size: A4 landscape; margin: 3mm 4mm; }
     body { background: #fff !important; padding: 0 !important; }
     .painel-controle, .botoes-acoes, .barra-controle-folha { display: none !important; }
-    .folha-a4 { box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; }
+    .folha-a4 { box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
 }
 </style>
 </head>
@@ -150,41 +135,73 @@ tr:hover .botoes-acoes { opacity: 1; } /* Aparecem ao passar o rato ou tocar */
             el.classList.add('selecionado-' + tipo);
         }
         function criarHTMLLinhaDDS(numStr, nome = '', val = null) {
-            return `<td class="col-id"><div class="col-id-container"><span class="col-id-texto" contenteditable="true">${numStr}</span></div></td>
-            <td class="col-colaborador"><div class="col-nome-container"><span class="col-nome-texto" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()">${nome}</span>
+            return `<td class="col-id"><div class="col-id-container"><span class="col-id-texto" contenteditable="true" title="Editar número">${numStr}</span></div></td>
+            <td class="col-colaborador"><div class="col-nome-container"><span class="col-nome-texto" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()" title="Nome do colaborador">${nome}</span>
             <div class="botoes-acoes"><button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixoDDS(this)" title="Adicionar linha abaixo">➕</button><button type="button" class="btn-acao btn-menos-linha" onclick="removerLinhaAtualDDS(this)" title="Remover linha">➖</button><button type="button" class="btn-acao btn-lixeira" onclick="apagarLinhaDDS(this)" title="Apagar nome">🗑️</button></div></div></td>
-            <td class="col-como-estou">${gerarBlocoComoEstou(val)}</td><td class="col-rubrica" contenteditable="true"></td>
-            <td class="col-como-estou">${gerarBlocoComoEstou(val)}</td><td class="col-rubrica" contenteditable="true"></td>
-            <td class="col-como-estou">${gerarBlocoComoEstou(val)}</td><td class="col-rubrica" contenteditable="true"></td>
-            <td class="col-como-estou">${gerarBlocoComoEstou(val)}</td><td class="col-rubrica" contenteditable="true"></td>
-            <td class="col-como-estou">${gerarBlocoComoEstou(val)}</td><td class="col-rubrica" contenteditable="true"></td>`;
+            <td class="col-como-estou">${gerarBlocoComoEstou(val)}</td><td class="col-rubrica" contenteditable="true" title="Rubrica"></td>
+            <td class="col-como-estou">${gerarBlocoComoEstou(val)}</td><td class="col-rubrica" contenteditable="true" title="Rubrica"></td>
+            <td class="col-como-estou">${gerarBlocoComoEstou(val)}</td><td class="col-rubrica" contenteditable="true" title="Rubrica"></td>
+            <td class="col-como-estou">${gerarBlocoComoEstou(val)}</td><td class="col-rubrica" contenteditable="true" title="Rubrica"></td>
+            <td class="col-como-estou">${gerarBlocoComoEstou(val)}</td><td class="col-rubrica" contenteditable="true" title="Rubrica"></td>`;
         }
         function apagarLinhaDDS(b) { b.closest('tr').querySelector('.col-nome-texto').innerText = ''; }
-        function reordenarNumDDS() { let c = 1; document.querySelectorAll('#contentorFolhasDDS .folha-a4').forEach(f => { f.querySelectorAll('.corpo-tabela-folha tr').forEach(tr => { const el = tr.querySelector('.col-id-texto'); if(el) el.innerText = c < 10 ? '0'+c : c; c++; }); }); }
-        function adicionarLinhaAbaixoDDS(b) { const tr = b.closest('tr'); const nova = document.createElement('tr'); nova.innerHTML = criarHTMLLinhaDDS('00','',null); tr.after(nova); reordenarNumDDS(); }
-        function removerLinhaAtualDDS(b) { const tr = b.closest('tr'); if(tr.parentNode.querySelectorAll('tr').length <= 1) return; tr.remove(); reordenarNumDDS(); }
-        function adicionarLinhaFimDDS(b) { const corpo = b.closest('.folha-a4').querySelector('.corpo-tabela-folha'); const nova = document.createElement('tr'); nova.innerHTML = criarHTMLLinhaDDS('00','',null); corpo.appendChild(nova); reordenarNumDDS(); }
-        function removerLinhaFimDDS(b) { const corpo = b.closest('.folha-a4').querySelector('.corpo-tabela-folha'); const l = corpo.querySelectorAll('tr'); if(l.length <= 1) return; l[l.length-1].remove(); reordenarNumDDS(); }
+        function reordenarNumDDS() { /* Mantém numeração livre para edição manual */ }
+        function adicionarLinhaAbaixoDDS(b) { const tr = b.closest('tr'); const nova = document.createElement('tr'); nova.innerHTML = criarHTMLLinhaDDS('00','',null); tr.after(nova); }
+        function removerLinhaAtualDDS(b) { const tr = b.closest('tr'); if(tr.parentNode.querySelectorAll('tr').length <= 1) return; tr.remove(); }
+        function adicionarLinhaFimDDS(b) { const corpo = b.closest('.folha-a4').querySelector('.corpo-tabela-folha'); const nova = document.createElement('tr'); nova.innerHTML = criarHTMLLinhaDDS('00','',null); corpo.appendChild(nova); }
+        function removerLinhaFimDDS(b) { const corpo = b.closest('.folha-a4').querySelector('.corpo-tabela-folha'); const l = corpo.querySelectorAll('tr'); if(l.length <= 1) return; l[l.length-1].remove(); }
         function removerFolhaDDS(b) { b.closest('.folha-a4').remove(); atualizarPaginacaoDDS(); }
         function criarEstruturaFolhaDDS(nomes, padrao, tot) {
-            let linhas = ''; for(let i=0; i<tot; i++) { let n = nomes[i] ? nomes[i].trim().toUpperCase() : ''; linhas += `<tr>${criarHTMLLinhaDDS('00', n, padrao ? 1 : null)}</tr>`; }
+            let linhas = ''; for(let i=0; i<tot; i++) { let n = nomes[i] ? nomes[i].trim().toUpperCase() : ''; let numStr = (i+1 < 10 ? '0'+(i+1) : (i+1)); linhas += `<tr>${criarHTMLLinhaDDS(numStr, n, padrao ? 1 : null)}</tr>`; }
             const f = document.createElement('div'); f.className = 'folha-a4';
             f.innerHTML = `<div class="barra-controle-folha"><div class="grupo-acoes-linhas"><button type="button" class="btn-linha-topo" onclick="adicionarLinhaFimDDS(this)">➕ Linha no Fim</button><button type="button" class="btn-linha-topo" onclick="removerLinhaFimDDS(this)">➖ Remover Última</button></div><button type="button" class="btn-remover-folha" onclick="removerFolhaDDS(this)">Remover Folha ✕</button></div>
             <table class="cabecalho-container"><tr><td class="logo-box">VALE</td><td class="titulo-box">DIÁLOGO DIÁRIO DE SEGURANÇA (DDS) E EMOCIOGRAMA</td><td class="meta-box"><span class="indicador-folha"><strong>Folha:</strong> 01 / 01</span></td></tr></table>
-            <table class="info-dds"><tr><td><strong>Período:</strong> <span class="campo-editavel">${document.getElementById('periodoInputDDS').value}</span></td><td><strong>Semana:</strong> <span class="campo-editavel">${document.getElementById('semanaInputDDS').value}</span></td><td><strong>Ano:</strong> <span class="campo-editavel">${document.getElementById('anoInputDDS').value}</span></td></tr></table>
-            <table class="tabela-dds"><thead><tr><th rowspan="2" class="col-id">Nº</th><th rowspan="2" class="col-colaborador" style="padding-left:8px; text-align:left;">Colaborador</th><th colspan="2" class="th-dia-semana">Segunda</th><th colspan="2" class="th-dia-semana">Terça</th><th colspan="2" class="th-dia-semana">Quarta</th><th colspan="2" class="th-dia-semana">Quinta</th><th colspan="2" class="th-dia-semana">Sexta</th></tr><tr><th class="th-sub">Estou</th><th class="th-sub">Rub</th><th class="th-sub">Estou</th><th class="th-sub">Rub</th><th class="th-sub">Estou</th><th class="th-sub">Rub</th><th class="th-sub">Estou</th><th class="th-sub">Rub</th><th class="th-sub">Estou</th><th class="th-sub">Rub</th></tr></thead><tbody class="corpo-tabela-folha">${linhas}</tbody></table>
-            <div class="rodape-container"><div class="box-legenda"><h4>LEGENDA:</h4><ul class="lista-legenda"><li><strong>FE</strong> = Feriado</li><li><strong>AT</strong> = Atestado</li><li><strong>FA</strong> = Falta</li><li><strong>FR</strong> = Férias</li></ul></div><div class="box-legenda"><h4>AÇÃO TOMADA:</h4><ul class="lista-legenda"><li><strong>EST</strong> = Estratégia</li><li><strong>ENG</strong> = ADM</li><li><strong>OP</strong> = Operação</li></ul></div><div class="box-legenda"><h4>EMOCIOGRAMA:</h4><span style="font-size:7.5px;">1: Plenas | 2: Acompanhar | 3: Sem condições</span></div></div>`;
+            <table class="info-dds"><tr><td><strong>Período:</strong> <span class="campo-editavel" contenteditable="true">${document.getElementById('periodoInputDDS').value}</span></td><td><strong>Semana:</strong> <span class="campo-editavel" contenteditable="true">${document.getElementById('semanaInputDDS').value}</span></td><td><strong>Ano:</strong> <span class="campo-editavel" contenteditable="true">${document.getElementById('anoInputDDS').value}</span></td></tr></table>
+            <table class="tabela-dds"><thead><tr><th rowspan="2" class="col-id">Nº</th><th rowspan="2" class="col-colaborador" style="padding-left:6px; text-align:left;">Colaborador</th><th colspan="2" class="th-dia-semana">Segunda</th><th colspan="2" class="th-dia-semana">Terça</th><th colspan="2" class="th-dia-semana">Quarta</th><th colspan="2" class="th-dia-semana">Quinta</th><th colspan="2" class="th-dia-semana">Sexta</th></tr><tr><th class="th-sub">Estou</th><th class="th-sub">Rub</th><th class="th-sub">Estou</th><th class="th-sub">Rub</th><th class="th-sub">Estou</th><th class="th-sub">Rub</th><th class="th-sub">Estou</th><th class="th-sub">Rub</th><th class="th-sub">Estou</th><th class="th-sub">Rub</th></tr></thead><tbody class="corpo-tabela-folha">${linhas}</tbody></table>
+            <div class="rodape-container">
+                <div class="box-legenda">
+                    <h4>Legenda:</h4>
+                    <ul class="lista-legenda">
+                        <li><strong>FE</strong> = Feriado</li>
+                        <li><strong>AT</strong> = Atestado Médico[cite: 9]</li>
+                        <li><strong>CO</strong> = Compensação[cite: 9]</li>
+                        <li><strong>FA</strong> = Falta[cite: 9]</li>
+                        <li><strong>FR</strong> = Férias[cite: 9]</li>
+                        <li><strong>FO</strong> = Folga[cite: 9]</li>
+                    </ul>
+                </div>
+                <div class="box-legenda">
+                    <h4>Ação tomada:</h4>
+                    <ul class="lista-legenda">
+                        <li><strong>EST/SUP</strong> = Estratégia/Suprimentos[cite: 9]</li>
+                        <li><strong>ENG</strong> = ADM[cite: 9]</li>
+                        <li><strong>EST</strong> = Estratégia[cite: 9]</li>
+                        <li><strong>ENG</strong> = ADM[cite: 9]</li>
+                        <li><strong>OP</strong> = Operação[cite: 9]</li>
+                        <li><strong>HOFF</strong> = Home Office[cite: 9]</li>
+                        <li><strong>AE</strong> = Área Externa[cite: 9]</li>
+                    </ul>
+                </div>
+                <div class="box-legenda">
+                    <h4>Emociograma:</h4>
+                    <ul class="lista-legenda">
+                        <li><strong>1:</strong> Funcionário em plenas condições físicas e psicológicas de exercer suas funções[cite: 9].</li>
+                        <li><strong>2:</strong> Funcionário com estado físico ou psicológico alterado, porém em condições de exercer suas atividades compatíveis com seu estado físico ou psicológico. Este deverá ter o acompanhamento[cite: 9].</li>
+                        <li><strong>3:</strong> Funcionário sem condições físicas ou psicológicas de exercer suas atividades compatíveis com sua área[cite: 9].</li>
+                    </ul>
+                </div>
+            </div>`;
             return f;
         }
         function atualizarPaginacaoDDS() { const f = document.querySelectorAll('#contentorFolhasDDS .folha-a4'); f.forEach((folha, idx) => { const ind = folha.querySelector('.indicador-folha'); if(ind) ind.innerHTML = `<strong>Folha:</strong> 0${idx+1} / 0${f.length}`; }); }
-        function adicionarFolhaManualDDS() { document.getElementById('contentorFolhasDDS').appendChild(criarEstruturaFolhaDDS([], null, TOTAL_LINHAS_DDS)); reordenarNumDDS(); atualizarPaginacaoDDS(); }
+        function adicionarFolhaManualDDS() { document.getElementById('contentorFolhasDDS').appendChild(criarEstruturaFolhaDDS([], null, TOTAL_LINHAS_DDS)); atualizarPaginacaoDDS(); }
         function aplicarDadosDDS(modo) {
             const box = document.getElementById('contentorFolhasDDS'); box.innerHTML = '';
             const nomes = document.getElementById('nomesInputDDS').value.toUpperCase().split('\n').map(l => l.trim()).filter(l => l.length > 0).sort((a,b)=>a.localeCompare(b,'pt'));
             document.getElementById('nomesInputDDS').value = nomes.join('\n');
             let blocos = []; if(nomes.length === 0) blocos.push([]); else for(let i=0; i<nomes.length; i+=TOTAL_LINHAS_DDS) blocos.push(nomes.slice(i, i+TOTAL_LINHAS_DDS));
             blocos.forEach(b => box.appendChild(criarEstruturaFolhaDDS(b, modo==='verde', TOTAL_LINHAS_DDS)));
-            reordenarNumDDS(); atualizarPaginacaoDDS();
+            atualizarPaginacaoDDS();
         }
         function salvarTudoDDS() { localStorage.setItem('valedds_v02', JSON.stringify({html: document.getElementById('contentorFolhasDDS').innerHTML})); alert('DDS Guardado com sucesso! (v02)'); }
         function carregarTudoDDS() { const s = localStorage.getItem('valedds_v02'); if(s) { document.getElementById('contentorFolhasDDS').innerHTML = JSON.parse(s).html; alert('DDS Carregado!'); } }
