@@ -1,76 +1,343 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<title>Módulo 4 - Aniversariantes da Equipa | Portal Vale v07</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Módulo 4 - Aniversariantes da Equipe | Portal Vale v07</title>
 <style>
+:root {
+    --primary: #db2777;
+    --primary-dark: #be185d;
+    --primary-light: #fce7f3;
+    --primary-border: #f472b6;
+    --primary-bg: #fff1f2;
+    --accent: #f59e0b;
+    --danger: #ef4444;
+    --success: #10b981;
+    --slate-900: #0f172a;
+    --slate-700: #334155;
+    --slate-600: #475569;
+    --slate-300: #cbd5e1;
+    --slate-200: #e2e8f0;
+    --slate-100: #f1f5f9;
+    --slate-50: #f8fafc;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #fff0f5; color: #1e293b; min-height: 100vh; padding: 16px; }
+body { 
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+    background: #fff5f7; 
+    color: var(--slate-900); 
+    min-height: 100vh; 
+    padding: 16px; 
+}
 
-/* PAINEL DE CONTROLO */
-.painel-controle { background: #ffffff; padding: 18px 22px; margin: 0 auto 16px auto; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(219, 39, 119, 0.1); border: 1px solid #fbcfe8; max-width: 900px; }
-.topo-modulo-info { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 2px solid #db2777; padding-bottom: 8px; }
-.badge-modulo { background: linear-gradient(135deg, #db2777, #be185d); color: #fff; font-size: 11.5px; font-weight: 800; padding: 5px 12px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.8px; }
-.tag-v07 { background-color: #f59e0b; color: #fff; font-weight: 800; font-size: 10px; padding: 2px 7px; border-radius: 4px; margin-left: 6px; }
+/* NOTIFICAÇÃO TOAST */
+#toastNotificacao {
+    position: fixed; 
+    bottom: 24px; 
+    right: 24px; 
+    background: var(--slate-900); 
+    color: #fff;
+    padding: 10px 18px; 
+    border-radius: 6px; 
+    font-size: 11.5px; 
+    font-weight: 600;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.25); 
+    opacity: 0; 
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease; 
+    transform: translateY(12px); 
+    z-index: 9999;
+}
+#toastNotificacao.ativo { opacity: 1; transform: translateY(0); }
 
-.campos-painel { display: grid; gap: 12px; margin-bottom: 12px; grid-template-columns: 200px 1fr; }
-.campo-grupo label { display: block; font-weight: 700; margin-bottom: 4px; font-size: 10px; color: #9d174d; text-transform: uppercase; }
-.painel-controle input[type="text"] { width: 100%; font-family: inherit; font-size: 12px; padding: 8px 10px; border: 1px solid #f472b6; border-radius: 6px; background: #fff1f2; outline: none; }
+/* PAINEL DE CONTROLE */
+.painel-controle { 
+    background: #ffffff; 
+    padding: 18px 22px; 
+    margin: 0 auto 16px auto; 
+    border-radius: 12px; 
+    box-shadow: 0 10px 25px -5px rgba(219, 39, 119, 0.08); 
+    border: 1px solid #fbcfe8; 
+    max-width: 960px; 
+}
+.topo-modulo-info { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    margin-bottom: 12px; 
+    border-bottom: 2px solid var(--primary); 
+    padding-bottom: 8px; 
+}
+.badge-modulo { 
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
+    color: #fff; 
+    font-size: 11.5px; 
+    font-weight: 800; 
+    padding: 5px 12px; 
+    border-radius: 6px; 
+    text-transform: uppercase; 
+    letter-spacing: 0.8px; 
+}
+.tag-v07 { 
+    background-color: var(--accent); 
+    color: #fff; 
+    font-weight: 800; 
+    font-size: 10px; 
+    padding: 2px 7px; 
+    border-radius: 4px; 
+    margin-left: 6px; 
+}
 
-.botoes-painel { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
-.btn { cursor: pointer; padding: 7px 14px; font-size: 11px; font-weight: 700; border: none; border-radius: 6px; color: #fff; display: inline-flex; align-items: center; gap: 5px; }
-.btn-pink { background-color: #db2777; } 
-.btn-add-folha { background-color: #7c3aed; }
+.campos-painel { 
+    display: grid; 
+    gap: 12px; 
+    margin-bottom: 10px; 
+    grid-template-columns: 140px 1.5fr; 
+}
+.campo-grupo label { 
+    display: block; 
+    font-weight: 700; 
+    margin-bottom: 4px; 
+    font-size: 10.5px; 
+    color: #9d174d; 
+    text-transform: uppercase; 
+}
+.painel-controle input[type="text"] { 
+    width: 100%; 
+    font-family: inherit; 
+    font-size: 12px; 
+    padding: 8px 10px; 
+    border: 1px solid var(--primary-border); 
+    border-radius: 6px; 
+    background: var(--primary-bg); 
+    outline: none; 
+    transition: border-color 0.2s, background-color 0.2s;
+}
+.painel-controle input[type="text"]:focus, .painel-controle textarea:focus { 
+    border-color: var(--primary); 
+    background: #fff; 
+}
+.painel-controle textarea { 
+    width: 100%; 
+    height: 55px; 
+    font-family: inherit; 
+    font-size: 11.5px; 
+    padding: 8px 10px; 
+    border: 1px solid var(--primary-border); 
+    border-radius: 6px; 
+    resize: vertical; 
+    text-transform: uppercase; 
+    background: var(--primary-bg); 
+    outline: none; 
+}
+
+.botoes-painel { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.btn { 
+    cursor: pointer; 
+    padding: 7px 14px; 
+    font-size: 11px; 
+    font-weight: 700; 
+    border: none; 
+    border-radius: 6px; 
+    color: #fff; 
+    display: inline-flex; 
+    align-items: center; 
+    gap: 5px; 
+    transition: filter 0.15s ease, transform 0.05s ease;
+}
+.btn:hover { filter: brightness(1.08); }
+.btn:active { transform: translateY(1px); }
+
+.btn-pink { background-color: var(--primary); } 
+.btn-ordenar { background-color: #ea580c; }
 .btn-salvar { background-color: #2563eb; } 
-.btn-carregar { background-color: #0284c7; } 
-.btn-limpar { background-color: #fdf2f8; color: #9d174d; border: 1px solid #f472b6; } 
-.btn-voltar { background-color: #475569; text-decoration: none; } 
-.btn-imprimir { background-color: #0f172a; margin-left: auto; }
+.btn-carregar { background-color: #0891b2; } 
+.btn-exportar { background-color: #4f46e5; }
+.btn-limpar { background-color: var(--slate-100); color: var(--slate-600); border: 1px solid var(--slate-300); } 
+.btn-voltar { background-color: var(--slate-600); text-decoration: none; } 
+.btn-imprimir { background-color: var(--slate-900); margin-left: auto; }
 
-/* FOLHA A4 VERTICAL COMPACTA */
-.folha-a4 { width: 100%; max-width: 900px; background: #fff; padding: 14px 20px; margin: 0 auto 20px auto; box-shadow: 0 10px 30px rgba(219, 39, 119, 0.08); border-radius: 12px; border: 1px solid #f472b6; position: relative; }
+/* FOLHA A4 RETRATO */
+.folha-a4 { 
+    width: 100%; 
+    max-width: 960px; 
+    background: #fff; 
+    padding: 14px 18px; 
+    margin: 0 auto 20px auto; 
+    box-shadow: 0 10px 30px rgba(219, 39, 119, 0.08); 
+    border-radius: 12px; 
+    border: 1px solid var(--primary-border); 
+    position: relative; 
+}
 
-.barra-controle-folha { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; background: #fff1f2; padding: 6px 10px; border: 1px solid #fbcfe8; border-radius: 6px; }
-.btn-remover-folha { background: #fff; color: #ef4444; border: 1px solid #fca5a5; border-radius: 4px; font-size: 9px; font-weight: 700; padding: 3px 8px; cursor: pointer; }
+.barra-controle-folha { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 8px; 
+    background: var(--primary-bg); 
+    padding: 5px 10px; 
+    border: 1px solid #fbcfe8; 
+    border-radius: 6px; 
+}
 
-/* CABEÇALHO COMPACTO */
-.cabecalho-aniver { display: flex; align-items: center; justify-content: space-between; border: 1.5px solid #db2777; background: #fff1f2; margin-bottom: 10px; border-radius: 6px; overflow: hidden; }
-.cab-logo { width: 100px; background: #db2777; color: #fff; font-weight: 900; font-size: 14px; text-align: center; padding: 6px; letter-spacing: 1px; }
-.cab-titulo { flex-grow: 1; text-align: center; font-weight: 800; font-size: 10.5px; text-transform: uppercase; color: #831843; padding: 0 10px; }
-.cab-meta { width: 120px; font-size: 8px; padding: 4px 8px; text-align: left; background: #fff; border-left: 1.5px solid #db2777; line-height: 1.2; }
+/* CABEÇALHO PADRÃO VALE */
+.cabecalho-container, .info-aniver-bar { 
+    width: 100%; 
+    border-collapse: collapse; 
+    border: 1.2px solid var(--slate-900); 
+    margin-bottom: 4px; 
+    table-layout: fixed; 
+}
+.cabecalho-container td, .info-aniver-bar td { 
+    border: 1px solid var(--slate-700); 
+    padding: 3px 8px; 
+    vertical-align: middle; 
+    text-align: center; 
+}
+.logo-box { 
+    width: 90px; 
+    font-weight: 900; 
+    font-size: 16px; 
+    color: #007e7a; 
+    letter-spacing: 1.5px;
+    background-color: var(--slate-50); 
+}
+.titulo-box { 
+    font-size: 11px; 
+    font-weight: 800; 
+    text-transform: uppercase; 
+    color: var(--slate-900); 
+    padding: 0 10px; 
+}
+.meta-box { 
+    width: 130px; 
+    font-size: 8.5px; 
+    text-align: left !important; 
+    padding-left: 8px !important; 
+    background-color: var(--slate-50); 
+    line-height: 1.35; 
+}
 
-/* BLOCOS VERTICAIS COM PREVENÇÃO DE CORTE */
-.bloco-mes { margin-bottom: 8px; border: 1.2px solid #db2777; border-radius: 5px; overflow: hidden; page-break-inside: avoid; break-inside: avoid; }
-.bloco-mes-titulo { background-color: #db2777; color: #fff; font-weight: 800; font-size: 9px; text-transform: uppercase; padding: 3px 8px; display: flex; justify-content: space-between; align-items: center; letter-spacing: 0.5px; }
+.info-aniver-bar { 
+    font-size: 8.5px; 
+    font-weight: 700; 
+    background-color: var(--slate-50); 
+}
+.info-aniver-bar td { text-align: left; padding: 2px 8px; }
+.campo-editavel { outline: none; display: inline-block; min-width: 25px; font-weight: 600; color: var(--slate-900); }
+
+/* GRADE DE MESES (2 COLUNAS) */
+.contentor-blocos-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.bloco-mes { 
+    border: 1.2px solid var(--primary); 
+    border-radius: 6px; 
+    overflow: hidden; 
+    page-break-inside: avoid; 
+    break-inside: avoid; 
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+}
+.bloco-mes-titulo { 
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
+    color: #fff; 
+    font-weight: 800; 
+    font-size: 9px; 
+    text-transform: uppercase; 
+    padding: 3px 8px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    letter-spacing: 0.5px; 
+}
 
 table.tabela-mes { width: 100%; border-collapse: collapse; }
-table.tabela-mes th, table.tabela-mes td { border: 1px solid #f472b6; text-align: center; vertical-align: middle; font-size: 9px; height: 23px; padding: 2px 6px; }
-table.tabela-mes th { background-color: #fdf2f8; color: #831843; font-weight: 700; font-size: 8.5px; text-transform: uppercase; }
-table.tabela-mes tbody tr:nth-child(even) { background-color: #fff1f2; }
+table.tabela-mes th, table.tabela-mes td { 
+    border: 1px solid var(--primary-border); 
+    text-align: center; 
+    vertical-align: middle; 
+    font-size: 8.5px; 
+    height: 22px; 
+    padding: 1px 4px; 
+}
+table.tabela-mes th { 
+    background-color: #fdf2f8; 
+    color: #831843; 
+    font-weight: 800; 
+    font-size: 8px; 
+    text-transform: uppercase; 
+}
+table.tabela-mes tbody tr:nth-child(even) { background-color: var(--primary-bg); }
 
-.col-nome-aniver { text-align: left !important; font-weight: 700; text-transform: uppercase; padding-left: 10px; }
-.col-data-aniver { width: 120px; font-weight: 700; background: #fff; }
-.col-acoes-aniver { width: 60px; }
+.col-nome-aniver { text-align: left !important; font-weight: 700; text-transform: uppercase; padding-left: 6px !important; outline: none; }
+.col-data-aniver { width: 65px; font-weight: 700; background: #fff; outline: none; }
+.col-acoes-aniver { width: 44px; }
 
-.botoes-acoes { display: flex; align-items: center; justify-content: center; gap: 4px; opacity: 0.3; transition: opacity 0.2s; }
+.botoes-acoes { display: flex; align-items: center; justify-content: center; gap: 3px; opacity: 0.3; transition: opacity 0.2s; }
 tr:hover .botoes-acoes { opacity: 1; }
-.btn-acao { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 4px; cursor: pointer; padding: 2px 4px; font-size: 8.5px; }
-.btn-mais-linha { color: #10b981; border-color: #6ee7b7; font-weight: 900; }
-.btn-lixeira { color: #ef4444; border-color: #fca5a5; }
+.btn-acao { 
+    background: var(--slate-100); 
+    border: 1px solid var(--slate-300); 
+    border-radius: 3px; 
+    cursor: pointer; 
+    padding: 1px 3px; 
+    font-size: 8px; 
+}
+.btn-mais-linha { color: var(--success); font-weight: 900; }
+.btn-lixeira { color: var(--danger); }
 
-/* IMPRESSÃO LIMPA E PROIBIÇÃO DE CORTE EM MEIO DE BLOCOS */
+/* IMPRESSÃO A4 RETRATO */
 @media print {
-    @page { size: A4 portrait; margin: 0mm; }
-    html, body { background: #fff !important; width: 210mm; height: 297mm; margin: 0 !important; padding: 8mm !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .painel-controle, .botoes-acoes, .barra-controle-folha, .btn-acoes-bloco, .col-acoes-aniver, th:last-child { display: none !important; }
-    .folha-a4 { box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
-    .bloco-mes { page-break-inside: avoid; break-inside: avoid; }
-    .bloco-mes-titulo { background-color: #db2777 !important; color: #fff !important; }
+    @page { 
+        size: A4 portrait; 
+        margin: 5mm 6mm; 
+    }
+    body { 
+        background: #fff !important; 
+        margin: 0 !important; 
+        padding: 0 !important; 
+        -webkit-print-color-adjust: exact; 
+        print-color-adjust: exact; 
+    }
+    .painel-controle, .botoes-acoes, .barra-controle-folha, .btn-acoes-bloco, .col-acoes-aniver, th.th-acoes, #toastNotificacao { 
+        display: none !important; 
+    }
+    .folha-a4 { 
+        box-shadow: none !important; 
+        border: none !important; 
+        width: 100% !important; 
+        max-width: 100% !important; 
+        padding: 0 !important; 
+        margin: 0 !important; 
+        page-break-after: always !important; 
+        break-after: page !important; 
+    }
+    .folha-a4:last-child {
+        page-break-after: auto !important;
+        break-after: auto !important;
+    }
+    .bloco-mes { 
+        page-break-inside: avoid !important; 
+        break-inside: avoid !important; 
+    }
+    .bloco-mes-titulo { background-color: var(--primary) !important; color: #fff !important; }
     table.tabela-mes th { background-color: #fdf2f8 !important; color: #831843 !important; }
 }
 </style>
 </head>
 <body>
+
+    <div id="toastNotificacao">Mensagem</div>
+    <input type="file" id="arquivoBackupAniver" style="display:none;" accept=".json" onchange="processarArquivoBackup(this)">
 
     <div class="painel-controle">
         <div class="topo-modulo-info">
@@ -78,13 +345,27 @@ tr:hover .botoes-acoes { opacity: 1; }
             <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
         </div>
         <div class="campos-painel">
-            <div class="campo-grupo"><label>Ano do Cronograma:</label><input type="text" id="anoInputAniver" value="2026" oninput="atualizarAnoTitulo()"></div>
+            <div class="campo-grupo">
+                <label>Ano:</label>
+                <input type="text" id="anoInputAniver" value="2026" oninput="sincronizarCabecalhosAniver()">
+            </div>
+            <div class="campo-grupo">
+                <label>Área / Gerência:</label>
+                <input type="text" id="areaInputAniver" placeholder="Operação / Logística" oninput="sincronizarCabecalhosAniver()">
+            </div>
+        </div>
+        <div class="campo-grupo">
+            <label>Importação Rápida de Nomes (Formato: NOME - DD/MM):</label>
+            <textarea id="importarTextoAniver" placeholder="COLE AQUI: FULANO DA SILVA - 15/03&#10;CICLANO OLIVEIRA - 22/07"></textarea>
         </div>
         <div class="botoes-painel">
-            <button type="button" class="btn btn-pink" onclick="gerarEstruturaAniversarios()">Restaurar Meses Padrão</button>
-            <button type="button" class="btn btn-add-folha" onclick="adicionarFolhaAniver()">📄➕ Folha Extra</button>
-            <button type="button" class="btn btn-salvar" onclick="salvarTudoAniver()">💾 Guardar</button>
+            <button type="button" class="btn btn-pink" onclick="distribuirNomesImportados()">⚡ Distribuir nos Meses</button>
+            <button type="button" class="btn btn-ordenar" onclick="ordenarAniversariosPorDia()">📅 Ordenar por Dia</button>
+            <button type="button" class="btn btn-pink" onclick="restaurarPadrao()">↺ Restaurar Padrão</button>
+            <button type="button" class="btn btn-salvar" onclick="salvarTudoAniver()">💾 Salvar</button>
             <button type="button" class="btn btn-carregar" onclick="carregarTudoAniver()">📂 Carregar</button>
+            <button type="button" class="btn btn-exportar" onclick="exportarBackupJSON()">⬇️ Backup</button>
+            <button type="button" class="btn btn-exportar" onclick="document.getElementById('arquivoBackupAniver').click()">⬆️ Restaurar</button>
             <button type="button" class="btn btn-limpar" onclick="limparTudoAniver()">Limpar</button>
             <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
         </div>
@@ -93,35 +374,58 @@ tr:hover .botoes-acoes { opacity: 1; }
     <div id="contentorFolhasAniver"></div>
 
     <script>
+        const MESES_ANO = [
+            "JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO",
+            "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"
+        ];
+
         const DADOS_INICIAIS_A = {
             "JANEIRO": ["MARIANA PEREIRA CRUZ - 11/01", "RICARDO GONCALVES DE MELLO LEITE - 13/01", "JOAO SILVA RAMOS - 18/01", "ALFREDO AUGUSTO RAMOS NETO - 22/01"],
             "FEVEREIRO": ["MARCOS AURELIO CATALLARES MATTOS - 01/02", "VANDERSON TEIXEIRA - 04/02", "BRUNO RICARDO - 07/02", "GABRIEL CARNEIRO - 07/02"],
             "MARÇO": ["GLEIVSTON SILVA MENDES - 22/03"],
+            "ABRIL": [],
+            "MAIO": [],
             "JUNHO": ["ROBSON DE SOUZA MENDONCA - 04/06", "PAULO HENRIQUE - 08/06"],
             "JULHO": ["BRUNO GOMES FIDELIS - 02/07", "ATMISTO SILVA - 20/07"],
             "AGOSTO": ["CAIO HENRIQUE - 06/08", "PABLO MESQUITA - 25/08", "DAVID MARCELO DELGADO DOS SANTOS - 26/08"],
+            "SETEMBRO": [],
+            "OUTUBRO": [],
             "NOVEMBRO": ["DOMINIQUE SILVA - 02/11", "RICHARD SILVA - 24/11"],
             "DEZEMBRO": ["EMERSON RIBEIRO DOS SANTOS - 04/12", "ALLAN SOUZA DE CARVALHO - 15/12", "TITO DACAL - 27/12"]
         };
 
-        function atualizarAnoTitulo() {
-            const ano = document.getElementById('anoInputAniver').value;
-            document.querySelectorAll('.titulo-ano-txt').forEach(el => el.innerText = ano);
+        function mostrarToast(msg) {
+            const toast = document.getElementById('toastNotificacao');
+            toast.innerText = msg;
+            toast.classList.add('ativo');
+            setTimeout(() => { toast.classList.remove('ativo'); }, 2600);
         }
 
-        function criarBlocoMes(mesNome, itens) {
+        function sincronizarCabecalhosAniver() {
+            const ano = document.getElementById('anoInputAniver').value || '2026';
+            const area = document.getElementById('areaInputAniver').value || '---';
+
+            document.querySelectorAll('#contentorFolhasAniver .folha-a4').forEach(f => {
+                const elAno = f.querySelector('.val-ano');
+                const elArea = f.querySelector('.val-area');
+                if (elAno) elAno.innerText = ano;
+                if (elArea) elArea.innerText = area;
+            });
+        }
+
+        function criarBlocoMes(mesNome, itens = []) {
             let linhas = '';
-            if(!itens || itens.length === 0) itens = [" - "];
+            const lista = (!itens || itens.length === 0) ? [" - "] : itens;
             
-            itens.forEach(item => {
+            lista.forEach(item => {
                 let partes = item.split('-');
                 let nome = partes[0] ? partes[0].trim() : '';
                 let data = partes[1] ? partes[1].trim() : '';
                 if(nome === "-") nome = "";
                 linhas += `<tr>` +
                     `<td class="col-nome-aniver" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()">${nome}</td>` +
-                    `<td class="col-data-aniver" contenteditable="true">${data}</td>` +
-                    `<td class="col-acoes-aniver"><div class="botoes-acoes"><button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaBloco(this)" title="Adicionar">➕</button><button type="button" class="btn-acao btn-lixeira" onclick="removerLinhaBloco(this)" title="Apagar">🗑️</button></div></td>` +
+                    `<td class="col-data-aniver" contenteditable="true" placeholder="DD/MM">${data}</td>` +
+                    `<td class="col-acoes-aniver"><div class="botoes-acoes"><button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaBloco(this)" title="Adicionar Linha">➕</button><button type="button" class="btn-acao btn-lixeira" onclick="removerLinhaBloco(this)" title="Limpar">🗑️</button></div></td>` +
                 `</tr>`;
             });
 
@@ -129,12 +433,11 @@ tr:hover .botoes-acoes { opacity: 1; }
                 <div class="bloco-mes-titulo">
                     <span>📅 ${mesNome}</span>
                     <div class="btn-acoes-bloco" style="display:flex; gap:4px;">
-                        <button type="button" onclick="adicionarLinhaPorCabecalho(this)" title="Adicionar linha" style="background:#fff; color:#db2777; border:none; padding:1px 4px; border-radius:3px; font-weight:800; cursor:pointer; font-size:8px;">➕</button>
-                        <button type="button" onclick="removerBlocoMes(this)" title="Remover mês" style="background:#fee2e2; color:#ef4444; border:none; padding:1px 4px; border-radius:3px; font-weight:800; cursor:pointer; font-size:8px;">✕</button>
+                        <button type="button" onclick="adicionarLinhaPorCabecalho(this)" title="Adicionar linha" style="background:#fff; color:var(--primary); border:none; padding:1px 5px; border-radius:3px; font-weight:800; cursor:pointer; font-size:8.5px;">➕</button>
                     </div>
                 </div>
                 <table class="tabela-mes">
-                    <thead><tr><th>Nome do Colaborador</th><th>Data de Aniversário</th><th class="col-acoes-aniver">Ações</th></tr></thead>
+                    <thead><tr><th>Nome do Colaborador</th><th>Data</th><th class="col-acoes-aniver th-acoes">Ações</th></tr></thead>
                     <tbody>${linhas}</tbody>
                 </table>
             </div>`;
@@ -160,33 +463,45 @@ tr:hover .botoes-acoes { opacity: 1; }
         function removerLinhaBloco(btn) {
             const tr = btn.closest('tr');
             const tbody = tr.parentNode;
-            if(tbody.querySelectorAll('tr').length > 1) tr.remove();
-            else {
+            if(tbody.querySelectorAll('tr').length > 1) {
+                tr.remove();
+            } else {
                 tr.querySelector('.col-nome-aniver').innerText = '';
                 tr.querySelector('.col-data-aniver').innerText = '';
             }
         }
 
-        function removerBlocoMes(btn) { btn.closest('.bloco-mes').remove(); }
-
         function criarEstruturaFolhaAniver(dadosObj) {
             let blocosHTML = '';
-            for(let m in dadosObj) {
-                blocosHTML += criarBlocoMes(m, dadosObj[m]);
-            }
-            const anoAtual = document.getElementById('anoInputAniver').value;
-            const f = document.createElement('div'); f.className = 'folha-a4';
+            MESES_ANO.forEach(m => {
+                blocosHTML += criarBlocoMes(m, dadosObj[m] || []);
+            });
+
+            const anoAtual = document.getElementById('anoInputAniver').value || '2026';
+            const areaAtual = document.getElementById('areaInputAniver').value || '---';
+
+            const f = document.createElement('div'); 
+            f.className = 'folha-a4';
             f.innerHTML = `
                 <div class="barra-controle-folha">
-                    <div class="grupo-acoes-linhas"><span><strong>Cronograma de Aniversários</strong></span></div>
-                    <button type="button" class="btn-remover-folha" onclick="removerFolhaAniver(this)">Remover Folha ✕</button>
+                    <div class="grupo-acoes-linhas"><span><strong>Quadro Anual de Aniversariantes da Equipe</strong></span></div>
                 </div>
-                <div class="cabecalho-aniver">
-                    <div class="cab-logo">VALE</div>
-                    <div class="cab-titulo">🎂 CRONOGRAMA DE ANIVERSÁRIOS DA EQUIPA - <span class="titulo-ano-txt">${anoAtual}</span></div>
-                    <div class="cab-meta"><span class="indicador-folha"><strong>Página:</strong> 01 / 01</span></div>
-                </div>
-                <div class="contentor-blocos">${blocosHTML}</div>`;
+                <table class="cabecalho-container">
+                    <tr>
+                        <td class="logo-box">VALE</td>
+                        <td class="titulo-box">🎂 CRONOGRAMA ANUAL DE ANIVERSÁRIOS DA EQUIPE</td>
+                        <td class="meta-box">
+                            <strong>Ano:</strong> <span class="val-ano">${anoAtual}</span><br>
+                            <span class="indicador-folha"><strong>Página:</strong> 01 / 01</span>
+                        </td>
+                    </tr>
+                </table>
+                <table class="info-aniver-bar">
+                    <tr>
+                        <td><strong>Área / Gerência:</strong> <span class="val-area campo-editavel" contenteditable="true">${areaAtual}</span></td>
+                    </tr>
+                </table>
+                <div class="contentor-blocos-grid">${blocosHTML}</div>`;
             return f;
         }
 
@@ -194,27 +509,10 @@ tr:hover .botoes-acoes { opacity: 1; }
             const f = document.querySelectorAll('#contentorFolhasAniver .folha-a4'); 
             f.forEach((folha, idx) => { 
                 const ind = folha.querySelector('.indicador-folha'); 
-                if(ind) ind.innerHTML = `<strong>Página:</strong> 0${idx+1} / 0${f.length}`; 
+                const atual = (idx + 1 < 10 ? '0' + (idx + 1) : (idx + 1));
+                const total = (f.length < 10 ? '0' + f.length : f.length);
+                if(ind) ind.innerHTML = `<strong>Página:</strong> ${atual} / ${total}`; 
             }); 
-        }
-
-        function adicionarFolhaAniver() { 
-            document.getElementById('contentorFolhasAniver').appendChild(criarEstruturaFolhaAniver({})); 
-            atualizarPaginacaoAniver(); 
-        }
-
-        function removerFolhaAniver(btn) {
-            const folhas = document.querySelectorAll('#contentorFolhasAniver .folha-a4');
-            if(folhas.length > 1) {
-                btn.closest('.folha-a4').remove();
-                atualizarPaginacaoAniver();
-            }
-        }
-
-        function gerarEstruturaAniversarios() {
-            const box = document.getElementById('contentorFolhasAniver'); box.innerHTML = '';
-            box.appendChild(criarEstruturaFolhaAniver(DADOS_INICIAIS_A));
-            atualizarPaginacaoAniver();
         }
 
         function capturarDadosAtuais() {
@@ -227,39 +525,140 @@ tr:hover .botoes-acoes { opacity: 1; }
                     let data = tr.querySelector('.col-data-aniver').innerText.trim();
                     if(nome !== "") itens.push(nome + " - " + data);
                 });
-                if(itens.length > 0) obj[mes] = itens;
+                obj[mes] = itens;
             });
             return obj;
         }
 
+        function ordenarAniversariosPorDia() {
+            const dados = capturarDadosAtuais();
+            for(let mes in dados) {
+                dados[mes].sort((a, b) => {
+                    const dataA = (a.split('-')[1] || '').trim();
+                    const dataB = (b.split('-')[1] || '').trim();
+                    const diaA = parseInt(dataA.split('/')[0]) || 99;
+                    const diaB = parseInt(dataB.split('/')[0]) || 99;
+                    return diaA - diaB;
+                });
+            }
+            renderizarComDados(dados);
+            mostrarToast('Aniversários ordenados por dia em cada mês');
+        }
+
+        function distribuirNomesImportados() {
+            const texto = document.getElementById('importarTextoAniver').value;
+            if(!texto.trim()) {
+                mostrarToast('Cole ao menos um aniversariante no formato: NOME - DD/MM');
+                return;
+            }
+            const linhas = texto.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            const dados = capturarDadosAtuais();
+
+            let adicionados = 0;
+            linhas.forEach(linha => {
+                const partes = linha.split('-');
+                if(partes.length >= 2) {
+                    const nome = partes[0].trim().toUpperCase();
+                    const data = partes[1].trim();
+                    const pedacosData = data.split('/');
+                    if(pedacosData.length >= 2) {
+                        const mesNum = parseInt(pedacosData[1], 10);
+                        if(mesNum >= 1 && mesNum <= 12) {
+                            const mesNome = MESES_ANO[mesNum - 1];
+                            if(!dados[mesNome]) dados[mesNome] = [];
+                            dados[mesNome].push(`${nome} - ${data}`);
+                            adicionados++;
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('importarTextoAniver').value = '';
+            renderizarComDados(dados);
+            mostrarToast(`${adicionados} aniversariante(s) distribuído(s) com sucesso!`);
+        }
+
+        function renderizarComDados(dados) {
+            const box = document.getElementById('contentorFolhasAniver');
+            box.innerHTML = '';
+            box.appendChild(criarEstruturaFolhaAniver(dados));
+            atualizarPaginacaoAniver();
+            sincronizarCabecalhosAniver();
+        }
+
+        function restaurarPadrao() {
+            renderizarComDados(DADOS_INICIAIS_A);
+            mostrarToast('Estrutura padrão restaurada');
+        }
+
         function salvarTudoAniver() { 
-            let dados = capturarDadosAtuais();
-            localStorage.setItem('valeaniversarios_v07', JSON.stringify({dados, ano: document.getElementById('anoInputAniver').value})); 
-            alert('Aniversários Guardados com sucesso! (v07)'); 
+            const backup = {
+                ano: document.getElementById('anoInputAniver').value,
+                area: document.getElementById('areaInputAniver').value,
+                dados: capturarDadosAtuais()
+            };
+            localStorage.setItem('valeaniversarios_v07', JSON.stringify(backup)); 
+            mostrarToast('Aniversários salvos com sucesso!'); 
         }
 
         function carregarTudoAniver() { 
             const s = localStorage.getItem('valeaniversarios_v07'); 
             if(s) { 
-                let res = JSON.parse(s);
+                const res = JSON.parse(s);
                 if(res.ano) document.getElementById('anoInputAniver').value = res.ano;
-                const box = document.getElementById('contentorFolhasAniver'); box.innerHTML = '';
-                box.appendChild(criarEstruturaFolhaAniver(res.dados || res));
-                atualizarPaginacaoAniver();
-                alert('Aniversários Carregados!'); 
+                if(res.area) document.getElementById('areaInputAniver').value = res.area;
+                renderizarComDados(res.dados || {});
+                mostrarToast('Aniversários carregados com sucesso!'); 
             } else {
-                alert('Nenhum dado guardado encontrado.');
+                mostrarToast('Nenhum dado salvo encontrado.');
             }
         }
 
-        function limparTudoAniver() { 
-            document.getElementById('contentorFolhasAniver').innerHTML = ''; 
-            box = document.getElementById('contentorFolhasAniver');
-            box.appendChild(criarEstruturaFolhaAniver({"JANEIRO": []}));
-            atualizarPaginacaoAniver();
+        function exportarBackupJSON() {
+            const backup = {
+                ano: document.getElementById('anoInputAniver').value,
+                area: document.getElementById('areaInputAniver').value,
+                dados: capturarDadosAtuais()
+            };
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_aniversarios_${document.getElementById('anoInputAniver').value || '2026'}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            mostrarToast('Backup exportado com sucesso!');
         }
 
-        window.onload = function() { gerarEstruturaAniversarios(); };
+        function processarArquivoBackup(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const dados = JSON.parse(e.target.result);
+                    if(dados.ano) document.getElementById('anoInputAniver').value = dados.ano;
+                    if(dados.area) document.getElementById('areaInputAniver').value = dados.area;
+                    renderizarComDados(dados.dados || {});
+                    mostrarToast('Backup restaurado com sucesso!');
+                } catch(err) {
+                    mostrarToast('Erro ao ler arquivo de backup.');
+                }
+            };
+            reader.readAsText(file);
+            input.value = '';
+        }
+
+        function limparTudoAniver() { 
+            let vazio = {};
+            MESES_ANO.forEach(m => vazio[m] = []);
+            renderizarComDados(vazio);
+            mostrarToast('Todos os meses foram limpos.');
+        }
+
+        window.onload = function() { 
+            restaurarPadrao(); 
+        };
     </script>
 </body>
 </html>
