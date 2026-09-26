@@ -1,100 +1,214 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo de Treinamentos (v1.3 Nuvem)</title>
+    <title>Módulo 6 - Gestão de Treinamentos | Portal Vale v1.4</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = { darkMode: 'class' }
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        vale: {
+                            DEFAULT: '#007e7a',
+                            dark: '#005a57',
+                            light: '#e6f4f4',
+                            amber: '#f59e0b'
+                        }
+                    }
+                }
+            }
+        }
     </script>
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
-        :root {
-            --primary-color: #1b5e20;
-            --secondary-color: #e8f5e9;
-            --bg-color: #f9f9f9;
-            --card-bg: #ffffff;
-            --text-color: #333333;
-            --border-color: #d0d0d0;
+        @media print {
+            @page { size: A4 landscape; margin: 6mm 8mm; }
+            body { background: #fff !important; color: #000 !important; padding: 0 !important; }
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            .folha-impressao { box-shadow: none !important; border: none !important; width: 100% !important; margin: 0 !important; padding: 0 !important; }
+            table { border-collapse: collapse !important; width: 100% !important; }
+            th, td { border: 1px solid #334155 !important; }
+            th { background-color: #007e7a !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
-        * { box-sizing: border-box; }
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            margin: 0;
-            padding: 20px;
-        }
-        .container {
-            max-width: 800px;
-            margin: 0 auto;
-        }
+        .print-only { display: none; }
     </style>
 </head>
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100 transition-colors duration-200 pb-20">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-height-screen font-sans pb-16 transition-colors">
 
-    <div class="container space-y-6">
-        <!-- CABEÇALHO COM BOTÃO DE VOLTAR AO ÍNDICE -->
-        <div class="flex justify-between items-center bg-white dark:bg-gray-800 p-4 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700">
-            <a href="index.html" class="bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-xl text-xs font-bold transition hover:bg-gray-200">⬅️ Voltar ao Menu</a>
-            <h2 class="text-lg font-black uppercase text-green-800 dark:text-green-400">🎓 Gestão de Treinamentos</h2>
-            <button onclick="sincronizarTreinamentos()" class="bg-green-100 dark:bg-green-950 text-green-800 dark:text-green-300 px-3 py-1.5 rounded-xl text-xs font-bold transition">🔄 Sincronizar</button>
+    <!-- TOAST NOTIFICAÇÃO -->
+    <div id="toastNotificacao" class="fixed bottom-6 right-6 bg-slate-900 text-white text-xs font-bold px-4 py-2.5 rounded-lg shadow-xl opacity-0 translate-y-3 pointer-events-none transition-all duration-300 z-50">
+        Mensagem
+    </div>
+
+    <!-- ÁREA DE TELA PRINCIPAL (NÃO SAI NA IMPRESSÃO) -->
+    <div class="max-w-5xl mx-auto p-4 space-y-5 no-print">
+
+        <!-- CABEÇALHO -->
+        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 gap-3">
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-1.5 rounded-lg text-xs font-bold transition">
+                    ⬅ Menu
+                </a>
+                <div>
+                    <h1 class="text-base font-extrabold uppercase text-[#007e7a] dark:text-teal-400 flex items-center gap-2">
+                        🎓 Módulo 6: Gestão de Treinamentos
+                        <span class="bg-amber-500 text-white text-[9px] font-black px-2 py-0.5 rounded">v1.4 Nuvem</span>
+                    </h1>
+                    <p class="text-[10px] text-slate-400 font-semibold">Registro corporativo de capacitações, NRs e RACs</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2 self-end sm:self-auto">
+                <span id="syncStatus" class="text-[10px] font-bold text-teal-700 dark:text-teal-300 bg-teal-50 dark:bg-slate-700 px-2.5 py-1 rounded-md border border-teal-200 dark:border-slate-600">
+                    ● Nuvem Ativa
+                </span>
+                <button onclick="sincronizarTreinamentos()" class="bg-[#007e7a] hover:bg-[#005a57] text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1">
+                    🔄 Sincronizar
+                </button>
+            </div>
         </div>
 
-        <!-- FORMULÁRIO DE CADASTRO / EDIÇÃO -->
-        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-4">
-            <h3 class="text-xs font-bold uppercase text-green-800 dark:text-green-400">✨ Registar ou Editar Treinamento</h3>
+        <!-- FORMULÁRIO DE CADASTRO -->
+        <div class="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
+                <h2 id="formTitulo" class="text-xs font-extrabold uppercase text-[#007e7a] dark:text-teal-400 flex items-center gap-1.5">
+                    ✨ Novo Registro de Treinamento
+                </h2>
+                <button type="button" onclick="alternarModoTurma()" id="btnModoTurma" class="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
+                    👥 Modo Turma (Vários Nomes)
+                </button>
+            </div>
             
             <input type="hidden" id="editId" value="">
 
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Data Início</label>
+                    <input type="date" id="treinamentoInicio" class="w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg font-bold">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Data Fim</label>
+                    <input type="date" id="treinamentoFim" class="w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg font-bold">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Carga Horária</label>
+                    <input type="text" id="treinamentoHoras" placeholder="Ex: 8h, 16h..." class="w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg font-bold uppercase">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Status</label>
+                    <select id="treinamentoStatus" class="w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg font-bold">
+                        <option value="Agendado">🟡 Agendado</option>
+                        <option value="Concluído" selected>🟢 Concluído</option>
+                        <option value="Em Andamento">🔵 Em Andamento</option>
+                        <option value="Cancelado">🔴 Cancelado</option>
+                    </select>
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Data de Início</label>
-                    <input type="date" id="treinamentoInicio" class="w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
+                    <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Nome do Treinamento (NR / RAC / Técnico)</label>
+                    <input type="text" id="treinamentoNome" placeholder="Ex: RAC 01 - TRABALHO EM ALTURA..." class="uppercase w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg font-bold">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Data de Fim</label>
-                    <input type="date" id="treinamentoFim" class="w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
+                    <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Local / Sala</label>
+                    <input type="text" id="treinamentoLocal" placeholder="Ex: CENTRO DE FORMAÇÃO / SALA 02..." class="uppercase w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg font-bold">
                 </div>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <div>
-                    <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Nome do Treinamento</label>
-                    <input type="text" id="treinamentoNome" placeholder="Ex: SEGURANÇA EM MÁQUINAS..." class="uppercase w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Local</label>
-                    <input type="text" id="treinamentoLocal" placeholder="Ex: SALA DE AUDIÊNCIAS..." class="uppercase w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-semibold uppercase text-gray-500 mb-1">Nome da Pessoa</label>
-                    <input type="text" id="treinamentoPessoa" placeholder="Ex: MARIANA..." class="uppercase w-full text-xs p-2.5 bg-gray-50 dark:bg-gray-900 border border-gray-300 dark:border-gray-600 rounded-lg dark:text-white font-bold">
-                </div>
+            <!-- MODO INDIVIDUAL -->
+            <div id="campoPessoaIndividual">
+                <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1">Nome do Participante</label>
+                <input type="text" id="treinamentoPessoa" placeholder="Ex: MARIANA PEREIRA CRUZ..." class="uppercase w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg font-bold">
             </div>
 
-            <div class="flex gap-2 pt-2">
-                <button onclick="salvarTreinamento()" class="flex-1 bg-green-700 hover:bg-green-800 text-white font-bold py-2.5 rounded-xl text-xs transition shadow-sm">✓ Guardar Treinamento (OK)</button>
-                <button onclick="limparFormulario()" class="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-4 py-2.5 rounded-xl text-xs font-bold">Limpar</button>
+            <!-- MODO TURMA (MÚLTIPLOS PARTICIPANTES) -->
+            <div id="campoPessoasTurma" class="hidden">
+                <label class="block text-[10px] font-bold uppercase text-indigo-600 dark:text-indigo-400 mb-1">
+                    Lista de Participantes da Turma (Cole os nomes, um por linha):
+                </label>
+                <textarea id="treinamentoTurma" rows="3" placeholder="COLE OS NOMES DA TURMA AQUI..." class="uppercase w-full text-xs p-2 bg-indigo-50/40 dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800 rounded-lg font-bold"></textarea>
+            </div>
+
+            <div class="flex gap-2 pt-1">
+                <button type="button" onclick="salvarTreinamento()" class="flex-1 bg-[#007e7a] hover:bg-[#005a57] text-white font-bold py-2.5 rounded-lg text-xs transition shadow-sm">
+                    💾 Gravar Registro(s)
+                </button>
+                <button type="button" onclick="limparFormulario()" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 px-4 py-2.5 rounded-lg text-xs font-bold">
+                    Limpar
+                </button>
             </div>
         </div>
 
-        <!-- BOTÃO DE IMPRESSÃO -->
-        <div class="flex justify-center">
-            <button onclick="imprimirTreinamentos()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl text-xs font-bold shadow-sm transition flex items-center gap-2">
-                🖨️ Imprimir Relatório de Treinamentos (PDF Limpo)
-            </button>
+        <!-- BARRA DE AÇÕES, PESQUISA E INDICADORES -->
+        <div class="flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
+            <div class="flex-1 relative">
+                <input type="text" id="campoBusca" oninput="renderizarListaTreinamentos()" placeholder="🔍 Buscar por colaborador, treinamento ou local..." class="w-full text-xs p-2.5 pl-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl shadow-sm outline-none font-semibold">
+            </div>
+            <div class="flex gap-2 flex-wrap">
+                <button onclick="exportarCSV()" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                    📊 Excel (CSV)
+                </button>
+                <button onclick="acionarImpressao()" class="bg-[#0f172a] hover:bg-slate-800 text-white px-4 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1.5 shadow-sm">
+                    🖨️ Imprimir A4
+                </button>
+            </div>
         </div>
 
-        <!-- LISTA DE TREINAMENTOS CADASTRADOS -->
-        <div class="bg-white dark:bg-gray-800 p-5 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 space-y-3">
-            <h3 class="text-xs font-bold uppercase text-gray-700 dark:text-gray-300">📋 Treinamentos Registados</h3>
+        <!-- LISTA DE TREINAMENTOS -->
+        <div class="bg-white dark:bg-slate-800 p-5 rounded-xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
+                <h3 class="text-xs font-extrabold uppercase text-slate-700 dark:text-slate-300">
+                    📋 Capacitações Registradas
+                </h3>
+                <span id="contadorRegistros" class="text-[10px] font-bold text-slate-400">0 registro(s)</span>
+            </div>
             <div id="listaTreinamentos" class="space-y-2">
                 <!-- Preenchido dinamicamente -->
             </div>
+        </div>
+    </div>
+
+    <!-- DOCUMENTO FORMATADO PARA IMPRESSÃO EM A4 PAISAGEM -->
+    <div id="relatorioImpressaoA4" class="print-only">
+        <div style="width:100%; border:1.2px solid #0f172a; margin-bottom:6px; border-collapse:collapse;">
+            <table style="width:100%; border-collapse:collapse;">
+                <tr>
+                    <td style="width:100px; text-align:center; font-weight:900; font-size:16px; color:#007e7a; padding:6px; border-right:1px solid #334155; background:#f8fafc;">VALE</td>
+                    <td style="text-align:center; font-weight:800; font-size:11px; text-transform:uppercase; color:#0f172a; padding:6px;">RELATÓRIO CORPORATIVO DE GESTÃO DE TREINAMENTOS E CAPACITAÇÕES</td>
+                    <td style="width:120px; font-size:8px; text-align:left; padding:4px 8px; border-left:1px solid #334155; background:#f8fafc;">
+                        <strong>Emissão:</strong> <span id="dataEmissaoPrint"></span><br>
+                        <strong>Status:</strong> Ativo
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+        <table style="width:100%; border-collapse:collapse; font-size:9px; text-align:center;">
+            <thead>
+                <tr style="background-color:#007e7a; color:#fff;">
+                    <th style="padding:5px 4px; width:35px;">Nº</th>
+                    <th style="padding:5px 6px; text-align:left; width:220px;">PARTICIPANTE</th>
+                    <th style="padding:5px 6px; text-align:left;">TREINAMENTO</th>
+                    <th style="padding:5px 6px; width:130px;">LOCAL</th>
+                    <th style="padding:5px 4px; width:45px;">CH</th>
+                    <th style="padding:5px 4px; width:75px;">STATUS</th>
+                    <th style="padding:5px 4px; width:120px;">PERÍODO</th>
+                </tr>
+            </thead>
+            <tbody id="corpoTabelaPrint">
+                <!-- Inserido dinamicamente antes de imprimir -->
+            </tbody>
+        </table>
+
+        <div style="display:flex; justify-content:space-between; margin-top:28px; font-size:9px; text-align:center;">
+            <div style="width:250px; border-top:1px solid #000; padding-top:4px;">Assinatura do Instrutor / Facilitador</div>
+            <div style="width:250px; border-top:1px solid #000; padding-top:4px;">Liderança Imediata / SSMA</div>
         </div>
     </div>
 
@@ -104,14 +218,36 @@
         const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         
         const CHAVE_LOCAL_TREINOS = "modulo_treinamentos_dados_nuvem";
+        let modoTurmaAtivo = false;
+
+        function mostrarToast(msg) {
+            const toast = document.getElementById('toastNotificacao');
+            toast.innerText = msg;
+            toast.classList.remove('opacity-0', 'translate-y-3');
+            toast.classList.add('opacity-100', 'translate-y-0');
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'translate-y-3');
+                toast.classList.remove('opacity-100', 'translate-y-0');
+            }, 2600);
+        }
 
         window.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('treinamentoInicio').valueAsDate = new Date();
             document.getElementById('treinamentoFim').valueAsDate = new Date();
+            renderizarListaTreinamentos();
             await sincronizarTreinamentos();
         });
 
+        function alternarModoTurma() {
+            modoTurmaAtivo = !modoTurmaAtivo;
+            document.getElementById('campoPessoaIndividual').classList.toggle('hidden', modoTurmaAtivo);
+            document.getElementById('campoPessoasTurma').classList.toggle('hidden', !modoTurmaAtivo);
+            document.getElementById('btnModoTurma').innerText = modoTurmaAtivo ? '👤 Modo Individual' : '👥 Modo Turma (Vários Nomes)';
+        }
+
         async function sincronizarTreinamentos() {
+            const statusEl = document.getElementById('syncStatus');
+            statusEl.innerText = "🔄 Conectando...";
             try {
                 let { data, error } = await supabaseClient
                     .from('app_dados_programacao')
@@ -121,9 +257,12 @@
 
                 if (data && data.conteudo && data.conteudo.treinamentos) {
                     localStorage.setItem(CHAVE_LOCAL_TREINOS, JSON.stringify(data.conteudo.treinamentos));
+                    statusEl.innerText = "● Nuvem Ativa";
+                    mostrarToast("Dados sincronizados com a nuvem!");
                 }
             } catch (e) {
                 console.error("Erro ao sincronizar treinamentos:", e);
+                statusEl.innerText = "⚠️ Modo Offline";
             }
             renderizarListaTreinamentos();
         }
@@ -149,77 +288,134 @@
         async function salvarTreinamento() {
             const inicio = document.getElementById('treinamentoInicio').value;
             const fim = document.getElementById('treinamentoFim').value;
+            const horas = document.getElementById('treinamentoHoras').value.trim().toUpperCase() || '8H';
+            const status = document.getElementById('treinamentoStatus').value;
             const nome = document.getElementById('treinamentoNome').value.trim().toUpperCase();
             const local = document.getElementById('treinamentoLocal').value.trim().toUpperCase();
-            const pessoa = document.getElementById('treinamentoPessoa').value.trim().toUpperCase();
             const editId = document.getElementById('editId').value;
 
-            if (!inicio || !fim || !nome || !local || !pessoa) {
-                alert("Por favor, preencha todos os campos do treinamento.");
+            if (!inicio || !fim || !nome || !local) {
+                mostrarToast("Preencha as datas, nome do treinamento e local.");
                 return;
             }
 
             if (new Date(inicio) > new Date(fim)) {
-                alert("A data de início não pode ser posterior à data de fim.");
+                mostrarToast("Data de início não pode ser maior que o fim.");
                 return;
             }
 
             let treinamentos = obterTreinamentos();
-            const itemObj = {
-                id: editId !== "" ? editId : 'treino_' + Date.now(),
-                inicio, fim, nome, local, pessoa
-            };
 
-            if (editId !== "") {
-                const index = treinamentos.findIndex(t => t.id === editId);
-                if (index !== -1) {
-                    treinamentos[index] = itemObj;
+            if (modoTurmaAtivo && editId === "") {
+                const turmaTexto = document.getElementById('treinamentoTurma').value;
+                const pessoas = turmaTexto.split('\n').map(p => p.trim().toUpperCase()).filter(p => p.length > 0);
+                
+                if (pessoas.length === 0) {
+                    mostrarToast("Cole os nomes dos participantes da turma.");
+                    return;
                 }
-                document.getElementById('editId').value = "";
+
+                pessoas.forEach(pessoa => {
+                    treinamentos.push({
+                        id: 'treino_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                        inicio, fim, horas, status, nome, local, pessoa
+                    });
+                });
+                mostrarToast(`Turma cadastrada: ${pessoas.length} participante(s)!`);
             } else {
-                treinamentos.push(itemObj);
+                const pessoa = document.getElementById('treinamentoPessoa').value.trim().toUpperCase();
+                if (!pessoa) {
+                    mostrarToast("Informe o nome do participante.");
+                    return;
+                }
+
+                const itemObj = {
+                    id: editId !== "" ? editId : 'treino_' + Date.now(),
+                    inicio, fim, horas, status, nome, local, pessoa
+                };
+
+                if (editId !== "") {
+                    const idx = treinamentos.findIndex(t => t.id === editId);
+                    if (idx !== -1) treinamentos[idx] = itemObj;
+                    document.getElementById('editId').value = "";
+                    document.getElementById('formTitulo').innerText = "✨ Novo Registro de Treinamento";
+                    mostrarToast("Registro atualizado!");
+                } else {
+                    treinamentos.push(itemObj);
+                    mostrarToast("Treinamento cadastrado com sucesso!");
+                }
             }
 
             localStorage.setItem(CHAVE_LOCAL_TREINOS, JSON.stringify(treinamentos));
-            await salvarNaNuvemGeral(treinamentos);
-
-            limparFormulario();
             renderizarListaTreinamentos();
-            alert("✅ Treinamento guardado e sincronizado com sucesso!");
+            limparFormulario();
+            salvarNaNuvemGeral(treinamentos);
         }
 
         function limparFormulario() {
             document.getElementById('treinamentoInicio').valueAsDate = new Date();
             document.getElementById('treinamentoFim').valueAsDate = new Date();
+            document.getElementById('treinamentoHoras').value = '';
             document.getElementById('treinamentoNome').value = '';
             document.getElementById('treinamentoLocal').value = '';
             document.getElementById('treinamentoPessoa').value = '';
+            document.getElementById('treinamentoTurma').value = '';
             document.getElementById('editId').value = '';
+            document.getElementById('formTitulo').innerText = "✨ Novo Registro de Treinamento";
+            if (modoTurmaAtivo) alternarModoTurma();
         }
 
         function renderizarListaTreinamentos() {
             const container = document.getElementById('listaTreinamentos');
             container.innerHTML = '';
             let treinamentos = obterTreinamentos();
+            const termoBusca = (document.getElementById('campoBusca')?.value || '').toLowerCase();
+
+            if (termoBusca) {
+                treinamentos = treinamentos.filter(t => 
+                    (t.nome && t.nome.toLowerCase().includes(termoBusca)) ||
+                    (t.pessoa && t.pessoa.toLowerCase().includes(termoBusca)) ||
+                    (t.local && t.local.toLowerCase().includes(termoBusca)) ||
+                    (t.status && t.status.toLowerCase().includes(termoBusca))
+                );
+            }
+
+            document.getElementById('contadorRegistros').innerText = `${treinamentos.length} registro(s)`;
 
             if (treinamentos.length === 0) {
-                container.innerHTML = '<p class="text-xs text-gray-400 italic text-center py-4">Nenhum treinamento registado.</p>';
+                container.innerHTML = '<p class="text-xs text-slate-400 italic text-center py-6">Nenhum treinamento encontrado.</p>';
                 return;
             }
 
+            // Ordena os mais recentes primeiro
+            treinamentos.sort((a,b) => new Date(b.inicio) - new Date(a.inicio));
+
             treinamentos.forEach((t) => {
+                let badgeStatus = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300';
+                if (t.status === 'Agendado') badgeStatus = 'bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-300';
+                if (t.status === 'Em Andamento') badgeStatus = 'bg-blue-100 text-blue-800 dark:bg-blue-950 dark:text-blue-300';
+                if (t.status === 'Cancelado') badgeStatus = 'bg-rose-100 text-rose-800 dark:bg-rose-950 dark:text-rose-300';
+
                 const div = document.createElement('div');
-                div.className = 'flex flex-col sm:flex-row justify-between items-start sm:items-center bg-gray-50 dark:bg-gray-900 p-3 rounded-xl border border-gray-200 dark:border-gray-700 text-xs gap-2';
+                div.className = 'flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-50 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700 text-xs gap-3 hover:border-teal-300 transition-colors';
                 div.innerHTML = `
-                    <div>
-                        <span class="font-bold text-green-800 dark:text-green-300 block text-sm">🎓 ${t.nome}</span>
-                        <span class="text-gray-600 dark:text-gray-300 font-semibold">📍 Local: ${t.local} | 👤 Participante: ${t.pessoa}</span>
-                        <small class="text-gray-400 block mt-0.5">Período: ${t.inicio.split('-').reverse().join('/')} até ${t.fim.split('-').reverse().join('/')}</small>
+                    <div class="space-y-1">
+                        <div class="flex items-center gap-2">
+                            <span class="font-extrabold text-[#007e7a] dark:text-teal-400 text-sm">🎓 ${t.nome}</span>
+                            <span class="text-[9px] font-bold px-2 py-0.5 rounded-full ${badgeStatus}">${t.status || 'Concluído'}</span>
+                            <span class="text-[10px] text-slate-400 font-bold">⏱️ ${t.horas || '8H'}</span>
+                        </div>
+                        <div class="text-slate-600 dark:text-slate-300 font-semibold">
+                            👤 <strong class="text-slate-900 dark:text-white">${t.pessoa}</strong> &nbsp;|&nbsp; 📍 Local: ${t.local}
+                        </div>
+                        <div class="text-slate-400 text-[10px]">
+                            Período: ${t.inicio.split('-').reverse().join('/')} até ${t.fim.split('-').reverse().join('/')}
+                        </div>
                     </div>
                     <div class="flex gap-1.5 self-end sm:self-center">
-                        <button onclick="duplicarTreinamento('${t.id}')" class="bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-1 rounded-lg font-bold" title="Duplicar para outra pessoa/data">📋 Duplicar</button>
-                        <button onclick="editarTreinamento('${t.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg font-bold">Editar</button>
-                        <button onclick="apagarTreinamento('${t.id}')" class="bg-red-100 text-red-700 dark:bg-red-950 dark:text-red-300 px-2.5 py-1 rounded-lg font-bold">Apagar</button>
+                        <button onclick="duplicarTreinamento('${t.id}')" class="bg-teal-600 hover:bg-teal-700 text-white px-2.5 py-1 rounded-lg text-[11px] font-bold shadow-sm" title="Criar outro registro com mesmo treinamento e local">📋 Duplicar</button>
+                        <button onclick="editarTreinamento('${t.id}')" class="bg-blue-600 hover:bg-blue-700 text-white px-2.5 py-1 rounded-lg text-[11px] font-bold shadow-sm">Editar</button>
+                        <button onclick="apagarTreinamento('${t.id}')" class="bg-rose-100 hover:bg-rose-200 text-rose-700 dark:bg-rose-950 dark:text-rose-300 px-2.5 py-1 rounded-lg text-[11px] font-bold">Apagar</button>
                     </div>
                 `;
                 container.appendChild(div);
@@ -230,12 +426,16 @@
             let treinamentos = obterTreinamentos();
             let t = treinamentos.find(item => item.id === id);
             if (t) {
+                if (modoTurmaAtivo) alternarModoTurma();
                 document.getElementById('treinamentoInicio').value = t.inicio;
                 document.getElementById('treinamentoFim').value = t.fim;
+                document.getElementById('treinamentoHoras').value = t.horas || '';
+                document.getElementById('treinamentoStatus').value = t.status || 'Concluído';
                 document.getElementById('treinamentoNome').value = t.nome;
                 document.getElementById('treinamentoLocal').value = t.local;
                 document.getElementById('treinamentoPessoa').value = t.pessoa;
                 document.getElementById('editId').value = t.id;
+                document.getElementById('formTitulo').innerText = "✏️ Editando Registro de " + t.pessoa;
                 window.scrollTo({ top: 0, behavior: 'smooth' });
             }
         }
@@ -246,6 +446,8 @@
             if (t) {
                 document.getElementById('treinamentoInicio').value = t.inicio;
                 document.getElementById('treinamentoFim').value = t.fim;
+                document.getElementById('treinamentoHoras').value = t.horas || '';
+                document.getElementById('treinamentoStatus').value = t.status || 'Concluído';
                 document.getElementById('treinamentoNome').value = t.nome;
                 document.getElementById('treinamentoLocal').value = t.local;
                 document.getElementById('treinamentoPessoa').value = '';
@@ -253,74 +455,81 @@
                 
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 document.getElementById('treinamentoPessoa').focus();
-                alert("📋 Dados duplicados! Altere o nome da pessoa ou as datas e clique em 'Guardar Treinamento'.");
+                mostrarToast("Dados do curso carregados! Preencha a nova pessoa.");
             }
         }
 
         async function apagarTreinamento(id) {
-            if (confirm("Tem certeza que deseja apagar este registo de treinamento?")) {
+            if (confirm("Confirmar a exclusão deste treinamento?")) {
                 let treinamentos = obterTreinamentos();
                 treinamentos = treinamentos.filter(item => item.id !== id);
                 localStorage.setItem(CHAVE_LOCAL_TREINOS, JSON.stringify(treinamentos));
-                await salvarNaNuvemGeral(treinamentos);
                 renderizarListaTreinamentos();
+                mostrarToast("Registro excluído.");
+                await salvarNaNuvemGeral(treinamentos);
             }
         }
 
-        function imprimirTreinamentos() {
+        function acionarImpressao() {
             let treinamentos = obterTreinamentos();
-            const janelaImpressao = window.open('', '_blank', 'width=900,height=700');
-            
-            let htmlItens = '';
+            const termoBusca = (document.getElementById('campoBusca')?.value || '').toLowerCase();
+            if (termoBusca) {
+                treinamentos = treinamentos.filter(t => 
+                    (t.nome && t.nome.toLowerCase().includes(termoBusca)) ||
+                    (t.pessoa && t.pessoa.toLowerCase().includes(termoBusca)) ||
+                    (t.local && t.local.toLowerCase().includes(termoBusca))
+                );
+            }
+
+            const corpo = document.getElementById('corpoTabelaPrint');
+            corpo.innerHTML = '';
+
+            const hoje = new Date();
+            document.getElementById('dataEmissaoPrint').innerText = 
+                hoje.toLocaleDateString('pt-BR') + ' às ' + hoje.toLocaleTimeString('pt-BR', {hour:'2-digit', minute:'2-digit'});
+
             if (treinamentos.length === 0) {
-                htmlItens = '<tr><td colspan="4" style="text-align: center; padding: 20px; color: #666;">Nenhum treinamento registado.</td></tr>';
+                corpo.innerHTML = '<tr><td colspan="7" style="padding:15px; text-align:center; color:#666;">Nenhum treinamento registrado para emissão.</td></tr>';
             } else {
-                treinamentos.forEach(t => {
-                    htmlItens += `
-                        <tr>
-                            <td style="padding: 10px; border-bottom: 1px solid #ddd; font-weight: bold;">${t.nome}</td>
-                            <td style="padding: 10px; border-bottom: 1px solid #ddd;">${t.pessoa}</td>
-                            <td style="padding: 10px; border-bottom: 1px solid #ddd;">${t.local}</td>
-                            <td style="padding: 10px; border-bottom: 1px solid #ddd; text-align: center;">${t.inicio.split('-').reverse().join('/')} até ${t.fim.split('-').reverse().join('/')}</td>
-                        </tr>
+                treinamentos.forEach((t, idx) => {
+                    const tr = document.createElement('tr');
+                    tr.style.backgroundColor = idx % 2 === 0 ? '#fff' : '#f8fafc';
+                    tr.innerHTML = `
+                        <td style="padding:4px;">${idx + 1 < 10 ? '0' + (idx + 1) : idx + 1}</td>
+                        <td style="padding:4px 6px; text-align:left; font-weight:bold;">${t.pessoa}</td>
+                        <td style="padding:4px 6px; text-align:left;">${t.nome}</td>
+                        <td style="padding:4px 6px;">${t.local}</td>
+                        <td style="padding:4px;">${t.horas || '8H'}</td>
+                        <td style="padding:4px;">${t.status || 'Concluído'}</td>
+                        <td style="padding:4px;">${t.inicio.split('-').reverse().join('/')} a ${t.fim.split('-').reverse().join('/')}</td>
                     `;
+                    corpo.appendChild(tr);
                 });
             }
 
-            janelaImpressao.document.write(`
-                <!DOCTYPE html>
-                <html lang="pt-PT">
-                <head>
-                    <meta charset="UTF-8">
-                    <title>Relatório de Treinamentos</title>
-                    <style>
-                        body { font-family: 'Segoe UI', Tahoma, sans-serif; padding: 30px; background: #fff; color: #333; }
-                        h2 { color: #1b5e20; text-align: center; text-transform: uppercase; margin-bottom: 20px; }
-                        table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 12px; }
-                        th { background-color: #1b5e20; color: white; padding: 10px; text-align: left; }
-                        * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-                    </style>
-                </head>
-                <body>
-                    <h2>Relatório de Treinamentos</h2>
-                    <table>
-                        <thead>
-                            <tr>
-                                <th>Treinamento</th>
-                                <th>Participante</th>
-                                <th>Local</th>
-                                <th style="text-align: center;">Período</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${htmlItens}
-                        </tbody>
-                    </table>
-                    <script>window.onload = function() { setTimeout(function() { window.print(); }, 500); }<\/script>
-                </body>
-                </html>
-            `);
-            janelaImpressao.document.close();
+            window.print();
+        }
+
+        function exportarCSV() {
+            let treinamentos = obterTreinamentos();
+            if (treinamentos.length === 0) {
+                mostrarToast("Nenhum dado para exportar.");
+                return;
+            }
+
+            let csv = "ID;Participante;Treinamento;Local;Carga Horaria;Status;Data Inicio;Data Fim\n";
+            treinamentos.forEach((t, i) => {
+                csv += `${i+1};"${t.pessoa}";"${t.nome}";"${t.local}";"${t.horas||'8H'}";"${t.status||'Concluído'}";"${t.inicio}";"${t.fim}"\n`;
+            });
+
+            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `treinamentos_vale_${new Date().toISOString().slice(0,10)}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+            mostrarToast("Planilha CSV gerada com sucesso!");
         }
     </script>
 </body>
