@@ -1,83 +1,383 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Módulo 5 - Absenteísmo e Justificativas | Portal Vale v02</title>
 <style>
+:root {
+    --primary: #db2777;
+    --primary-dark: #be185d;
+    --primary-light: #fce7f3;
+    --primary-border: #f472b6;
+    --primary-bg: #fff5f8;
+    --accent: #f59e0b;
+    --danger: #ef4444;
+    --success: #10b981;
+    --slate-900: #0f172a;
+    --slate-700: #334155;
+    --slate-600: #475569;
+    --slate-300: #cbd5e1;
+    --slate-200: #e2e8f0;
+    --slate-100: #f1f5f9;
+    --slate-50: #f8fafc;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #fff5f8; color: #1e293b; min-height: 100vh; padding: 16px; }
+body { 
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+    background: #fff5f8; 
+    color: var(--slate-900); 
+    min-height: 100vh; 
+    padding: 16px; 
+}
 
-/* PAINEL DE CONTROLO */
-.painel-controle { background: #ffffff; padding: 18px 22px; margin: 0 auto 16px auto; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(219, 39, 119, 0.08); border: 1px solid #fce7f3; max-width: 900px; }
-.topo-modulo-info { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; border-bottom: 2px solid #db2777; padding-bottom: 8px; }
-.badge-modulo { background: linear-gradient(135deg, #db2777, #be185d); color: #fff; font-size: 11.5px; font-weight: 800; padding: 5px 12px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.8px; }
-.tag-v02 { background-color: #f59e0b; color: #fff; font-weight: 800; font-size: 10px; padding: 2px 7px; border-radius: 4px; margin-left: 6px; }
+/* NOTIFICAÇÃO TOAST */
+#toastNotificacao {
+    position: fixed; 
+    bottom: 24px; 
+    right: 24px; 
+    background: var(--slate-900); 
+    color: #fff;
+    padding: 10px 18px; 
+    border-radius: 6px; 
+    font-size: 11.5px; 
+    font-weight: 600;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.25); 
+    opacity: 0; 
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease; 
+    transform: translateY(12px); 
+    z-index: 9999;
+}
+#toastNotificacao.ativo { opacity: 1; transform: translateY(0); }
 
-.campos-painel { display: grid; gap: 12px; margin-bottom: 12px; grid-template-columns: 200px 1fr; }
-.campo-grupo label { display: block; font-weight: 700; margin-bottom: 4px; font-size: 10px; color: #9d174d; text-transform: uppercase; }
-.painel-controle input[type="text"] { width: 100%; font-family: inherit; font-size: 12px; padding: 8px 10px; border: 1px solid #fbcfe8; border-radius: 6px; background: #fff5f8; outline: none; }
+/* PAINEL DE CONTROLE */
+.painel-controle { 
+    background: #ffffff; 
+    padding: 18px 22px; 
+    margin: 0 auto 16px auto; 
+    border-radius: 12px; 
+    box-shadow: 0 10px 25px -5px rgba(219, 39, 119, 0.08); 
+    border: 1px solid #fce7f3; 
+    max-width: 960px; 
+}
+.topo-modulo-info { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    margin-bottom: 12px; 
+    border-bottom: 2px solid var(--primary); 
+    padding-bottom: 8px; 
+}
+.badge-modulo { 
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
+    color: #fff; 
+    font-size: 11.5px; 
+    font-weight: 800; 
+    padding: 5px 12px; 
+    border-radius: 6px; 
+    text-transform: uppercase; 
+    letter-spacing: 0.8px; 
+}
+.tag-v02 { 
+    background-color: var(--accent); 
+    color: #fff; 
+    font-weight: 800; 
+    font-size: 10px; 
+    padding: 2px 7px; 
+    border-radius: 4px; 
+    margin-left: 6px; 
+}
 
-.botoes-painel { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 4px; }
-.btn { cursor: pointer; padding: 7px 14px; font-size: 11px; font-weight: 700; border: none; border-radius: 6px; color: #fff; display: inline-flex; align-items: center; gap: 5px; }
-.btn-pink { background-color: #db2777; } 
+.campos-painel { 
+    display: grid; 
+    gap: 12px; 
+    margin-bottom: 10px; 
+    grid-template-columns: 130px 1.5fr 1fr; 
+}
+.campo-grupo label { 
+    display: block; 
+    font-weight: 700; 
+    margin-bottom: 4px; 
+    font-size: 10.5px; 
+    color: #9d174d; 
+    text-transform: uppercase; 
+}
+.painel-controle input[type="text"] { 
+    width: 100%; 
+    font-family: inherit; 
+    font-size: 12px; 
+    padding: 8px 10px; 
+    border: 1px solid var(--primary-border); 
+    border-radius: 6px; 
+    background: var(--primary-bg); 
+    outline: none; 
+    transition: border-color 0.2s, background-color 0.2s;
+}
+.painel-controle input[type="text"]:focus { 
+    border-color: var(--primary); 
+    background: #fff; 
+}
+
+/* FORMULÁRIO DE LANÇAMENTO RÁPIDO */
+.painel-registro-rapido {
+    background: #fff0f5;
+    border: 1px dashed var(--primary-border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+}
+.titulo-registro-rapido {
+    font-size: 10.5px;
+    font-weight: 800;
+    text-transform: uppercase;
+    color: #9d174d;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+}
+.grid-registro-rapido {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 2.5fr auto;
+    gap: 8px;
+    align-items: end;
+}
+.grid-registro-rapido input {
+    width: 100%;
+    font-family: inherit;
+    font-size: 11px;
+    padding: 6px 8px;
+    border: 1px solid var(--primary-border);
+    border-radius: 5px;
+    background: #fff;
+    outline: none;
+}
+.grid-registro-rapido input:focus {
+    border-color: var(--primary);
+}
+
+/* RESUMO / ESTATÍSTICA */
+.resumo-cards {
+    display: flex;
+    gap: 10px;
+    font-size: 10.5px;
+    font-weight: 700;
+}
+.card-stat {
+    background: #fff;
+    border: 1px solid #fbcfe8;
+    padding: 2px 8px;
+    border-radius: 4px;
+    color: #9d174d;
+}
+
+.botoes-painel { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
+.btn { 
+    cursor: pointer; 
+    padding: 7px 14px; 
+    font-size: 11px; 
+    font-weight: 700; 
+    border: none; 
+    border-radius: 6px; 
+    color: #fff; 
+    display: inline-flex; 
+    align-items: center; 
+    gap: 5px; 
+    transition: filter 0.15s ease, transform 0.05s ease;
+}
+.btn:hover { filter: brightness(1.08); }
+.btn:active { transform: translateY(1px); }
+
+.btn-pink { background-color: var(--primary); } 
 .btn-add-folha { background-color: #7c3aed; }
+.btn-renumerar { background-color: #ea580c; }
 .btn-salvar { background-color: #2563eb; } 
-.btn-carregar { background-color: #0284c7; } 
-.btn-limpar { background-color: #fdf2f8; color: #9d174d; border: 1px solid #f472b6; } 
-.btn-voltar { background-color: #475569; text-decoration: none; } 
-.btn-imprimir { background-color: #0f172a; margin-left: auto; }
+.btn-carregar { background-color: #0891b2; } 
+.btn-exportar { background-color: #4f46e5; }
+.btn-limpar { background-color: var(--slate-100); color: var(--slate-600); border: 1px solid var(--slate-300); } 
+.btn-voltar { background-color: var(--slate-600); text-decoration: none; } 
+.btn-imprimir { background-color: var(--slate-900); margin-left: auto; }
 
-/* FOLHA A4 */
-.folha-a4 { width: 100%; max-width: 900px; background: #fff; padding: 18px 24px; margin: 0 auto 20px auto; box-shadow: 0 10px 30px rgba(219, 39, 119, 0.06); border-radius: 12px; border: 1px solid #fbcfe8; position: relative; }
+/* FOLHA A4 RETRATO */
+.folha-a4 { 
+    width: 100%; 
+    max-width: 960px; 
+    background: #fff; 
+    padding: 16px 20px; 
+    margin: 0 auto 20px auto; 
+    box-shadow: 0 10px 30px rgba(219, 39, 119, 0.06); 
+    border-radius: 12px; 
+    border: 1px solid #fbcfe8; 
+    position: relative; 
+}
 
-.barra-controle-folha { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; background: #fff5f8; padding: 6px 10px; border: 1px solid #fce7f3; border-radius: 6px; }
-.btn-remover-folha { background: #fff; color: #ef4444; border: 1px solid #fca5a5; border-radius: 4px; font-size: 9px; font-weight: 700; padding: 3px 8px; cursor: pointer; }
+.barra-controle-folha { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 8px; 
+    background: var(--primary-bg); 
+    padding: 5px 10px; 
+    border: 1px solid #fce7f3; 
+    border-radius: 6px; 
+}
+.grupo-acoes-linhas { display: flex; align-items: center; gap: 6px; }
+.btn-linha-topo { 
+    border: 1px solid var(--primary); 
+    border-radius: 4px; 
+    font-size: 9px; 
+    font-weight: 700; 
+    padding: 3px 8px; 
+    cursor: pointer; 
+    background: #fff; 
+    color: var(--primary); 
+}
+.btn-remover-folha { 
+    background: #fff; 
+    color: var(--danger); 
+    border: 1px solid #fca5a5; 
+    border-radius: 4px; 
+    font-size: 9px; 
+    font-weight: 700; 
+    padding: 3px 8px; 
+    cursor: pointer; 
+}
 
-/* CABEÇALHO */
-.cabecalho-abs { display: flex; align-items: center; justify-content: space-between; border: 1.5px solid #db2777; background: #fff5f8; margin-bottom: 12px; border-radius: 6px; overflow: hidden; }
-.cab-logo { width: 110px; background: #db2777; color: #fff; font-weight: 900; font-size: 15px; text-align: center; padding: 8px; letter-spacing: 1px; }
-.cab-titulo { flex-grow: 1; text-align: center; font-weight: 800; font-size: 11px; text-transform: uppercase; color: #831843; padding: 0 10px; }
-.cab-meta { width: 130px; font-size: 8.5px; padding: 4px 8px; text-align: left; background: #fff; border-left: 1.5px solid #db2777; line-height: 1.3; }
+/* CABEÇALHO PADRÃO VALE */
+.cabecalho-container, .info-abs-bar, table.tabela-abs { 
+    width: 100%; 
+    border-collapse: collapse; 
+    border: 1.2px solid var(--slate-900); 
+    margin-bottom: 4px; 
+    table-layout: fixed; 
+}
+.cabecalho-container td, .info-abs-bar td { 
+    border: 1px solid var(--slate-700); 
+    padding: 3px 8px; 
+    vertical-align: middle; 
+    text-align: center; 
+}
+.logo-box { 
+    width: 90px; 
+    font-weight: 900; 
+    font-size: 16px; 
+    color: #007e7a; 
+    letter-spacing: 1.5px;
+    background-color: var(--slate-50); 
+}
+.titulo-box { 
+    font-size: 11px; 
+    font-weight: 800; 
+    text-transform: uppercase; 
+    color: var(--slate-900); 
+    padding: 0 10px; 
+}
+.meta-box { 
+    width: 130px; 
+    font-size: 8.5px; 
+    text-align: left !important; 
+    padding-left: 8px !important; 
+    background-color: var(--slate-50); 
+    line-height: 1.35; 
+}
 
-/* TABELA DE ABSENTEÍSMO EM TOM ROSINHA CLARINHO HARMONIZADO */
-table.tabela-abs { width: 100%; border-collapse: collapse; border: 1.5px solid #db2777; }
-table.tabela-abs th, table.tabela-abs td { border: 1px solid #f9a8d4; text-align: center; vertical-align: middle; font-size: 9.5px; height: 25px; padding: 2px 6px; }
-table.tabela-abs th { background-color: #db2777; color: #fff; font-weight: 800; text-transform: uppercase; font-size: 9px; letter-spacing: 0.5px; }
+.info-abs-bar { 
+    font-size: 8.5px; 
+    font-weight: 700; 
+    background-color: var(--slate-50); 
+}
+.info-abs-bar td { text-align: left; padding: 2px 8px; }
+.campo-editavel { outline: none; display: inline-block; min-width: 25px; font-weight: 600; color: var(--slate-900); }
 
-/* LINHAS DA TABELA (TODAS EM ROSINHA CLARO) */
+/* TABELA DE ABSENTEÍSMO */
+table.tabela-abs { border: 1.5px solid var(--primary); }
+table.tabela-abs th, table.tabela-abs td { 
+    border: 1px solid #f9a8d4; 
+    text-align: center; 
+    vertical-align: middle; 
+    font-size: 9px; 
+    height: 25px; 
+    padding: 2px 6px; 
+}
+table.tabela-abs th { 
+    background-color: var(--primary); 
+    color: #fff; 
+    font-weight: 800; 
+    text-transform: uppercase; 
+    font-size: 8.5px; 
+    letter-spacing: 0.5px; 
+}
+
 table.tabela-abs tbody tr { background-color: #fff5f7; }
 table.tabela-abs tbody tr:nth-child(even) { background-color: #fef0f4; }
 
-.col-id { width: 40px; font-weight: 800; color: #9d174d; background: rgba(251, 207, 232, 0.35); }
-.col-nome { text-align: left !important; font-weight: 700; text-transform: uppercase; padding-left: 10px; color: #831843; width: 230px; }
-.col-data { width: 100px; font-weight: 700; color: #831843; }
-.col-motivo { text-align: left !important; font-weight: 600; padding-left: 8px; color: #374151; }
-.col-acoes { width: 60px; background: #fff !important; }
+.col-id { width: 36px; font-weight: 800; color: #9d174d; background: rgba(251, 207, 232, 0.4); }
+.col-id-texto { outline: none; display: inline-block; width: 100%; text-align: center; }
 
-.botoes-acoes { display: flex; align-items: center; justify-content: center; gap: 4px; opacity: 0.3; transition: opacity 0.2s; }
+.col-nome { text-align: left !important; font-weight: 700; text-transform: uppercase; padding-left: 8px !important; color: #831843; width: 220px; outline: none; }
+.col-data { width: 90px; font-weight: 700; color: #831843; outline: none; }
+.col-tipo { width: 65px; font-weight: 800; color: #9d174d; outline: none; background: #fff; }
+.col-motivo { text-align: left !important; font-weight: 600; padding-left: 8px !important; color: #374151; outline: none; }
+.col-acoes { width: 50px; background: #fff !important; }
+
+.botoes-acoes { display: flex; align-items: center; justify-content: center; gap: 3px; opacity: 0.3; transition: opacity 0.2s; }
 tr:hover .botoes-acoes { opacity: 1; }
-.btn-acao { background: #fff; border: 1px solid #fbcfe8; border-radius: 4px; cursor: pointer; padding: 2px 4px; font-size: 8.5px; }
-.btn-mais-linha { color: #10b981; border-color: #a7f3d0; font-weight: 900; }
-.btn-lixeira { color: #ef4444; border-color: #fecaca; }
+.btn-acao { 
+    background: #fff; 
+    border: 1px solid #fbcfe8; 
+    border-radius: 3px; 
+    cursor: pointer; 
+    padding: 1px 3px; 
+    font-size: 8px; 
+}
+.btn-mais-linha { color: var(--success); font-weight: 900; }
+.btn-lixeira { color: var(--danger); }
 
-/* CONFIGURAÇÃO PARA IMPRESSÃO EM FOLHA A4 */
+/* IMPRESSÃO A4 RETRATO */
 @media print {
-    @page { size: A4 portrait; margin: 0mm; }
-    html, body { background: #fff !important; width: 210mm; height: 297mm; margin: 0 !important; padding: 8mm !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-    .painel-controle, .botoes-acoes, .barra-controle-folha, .col-acoes, th:last-child { display: none !important; }
-    .folha-a4 { box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
-    table.tabela-abs { border: 1.5px solid #db2777 !important; }
-    table.tabela-abs th { background-color: #db2777 !important; color: #fff !important; }
+    @page { 
+        size: A4 portrait; 
+        margin: 5mm 6mm; 
+    }
+    body { 
+        background: #fff !important; 
+        margin: 0 !important; 
+        padding: 0 !important; 
+        -webkit-print-color-adjust: exact !important; 
+        print-color-adjust: exact !important; 
+    }
+    .painel-controle, .botoes-acoes, .barra-controle-folha, .col-acoes, th.th-acoes, #toastNotificacao { 
+        display: none !important; 
+    }
+    .folha-a4 { 
+        box-shadow: none !important; 
+        border: none !important; 
+        width: 100% !important; 
+        max-width: 100% !important; 
+        padding: 0 !important; 
+        margin: 0 !important; 
+        page-break-after: always !important; 
+        break-after: page !important; 
+    }
+    .folha-a4:last-child {
+        page-break-after: auto !important;
+        break-after: auto !important;
+    }
+    table.tabela-abs { border: 1.5px solid var(--primary) !important; }
+    table.tabela-abs th { background-color: var(--primary) !important; color: #fff !important; }
     table.tabela-abs td { border: 1px solid #f9a8d4 !important; }
     table.tabela-abs tbody tr { background-color: #fff5f7 !important; }
     table.tabela-abs tbody tr:nth-child(even) { background-color: #fef0f4 !important; }
     .col-id { background: #fce7f3 !important; color: #9d174d !important; }
-    .col-nome { color: #831843 !important; }
-    .col-data { color: #831843 !important; }
+    .col-nome, .col-data { color: #831843 !important; }
 }
 </style>
 </head>
 <body>
+
+    <div id="toastNotificacao">Mensagem</div>
+    <input type="file" id="arquivoBackupAbs" style="display:none;" accept=".json" onchange="processarArquivoBackup(this)">
 
     <div class="painel-controle">
         <div class="topo-modulo-info">
@@ -85,13 +385,59 @@ tr:hover .botoes-acoes { opacity: 1; }
             <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
         </div>
         <div class="campos-painel">
-            <div class="campo-grupo"><label>Ano do Controlo:</label><input type="text" id="anoInputAbs" value="2026" oninput="atualizarAnoTitulo()"></div>
+            <div class="campo-grupo">
+                <label>Ano:</label>
+                <input type="text" id="anoInputAbs" value="2026" oninput="sincronizarCabecalhosAbs()">
+            </div>
+            <div class="campo-grupo">
+                <label>Área / Gerência:</label>
+                <input type="text" id="areaInputAbs" placeholder="Operação / Mina" oninput="sincronizarCabecalhosAbs()">
+            </div>
+            <div class="campo-grupo">
+                <label>Turno / Setor:</label>
+                <input type="text" id="turnoInputAbs" placeholder="Turno A" oninput="sincronizarCabecalhosAbs()">
+            </div>
         </div>
+
+        <!-- FORMULÁRIO DE LANÇAMENTO RÁPIDO -->
+        <div class="painel-registro-rapido">
+            <div class="titulo-registro-rapido">
+                <span>➕ Lançamento Rápido de Ocorrência</span>
+                <div class="resumo-cards">
+                    <span class="card-stat" id="statTotal">Total: 0</span>
+                    <span class="card-stat" id="statAT">Atestados (AT): 0</span>
+                    <span class="card-stat" id="statFA">Faltas (FA): 0</span>
+                </div>
+            </div>
+            <div class="grid-registro-rapido">
+                <div>
+                    <label style="font-size:9px; font-weight:700; color:#9d174d;">COLABORADOR:</label>
+                    <input type="text" id="rapidoNome" placeholder="NOME DO COLABORADOR" oninput="this.value=this.value.toUpperCase()">
+                </div>
+                <div>
+                    <label style="font-size:9px; font-weight:700; color:#9d174d;">DATA:</label>
+                    <input type="text" id="rapidoData" placeholder="DD/MM/AAAA">
+                </div>
+                <div>
+                    <label style="font-size:9px; font-weight:700; color:#9d174d;">TIPO (SIGLA):</label>
+                    <input type="text" id="rapidoTipo" placeholder="AT, FA, CO..." oninput="this.value=this.value.toUpperCase()">
+                </div>
+                <div>
+                    <label style="font-size:9px; font-weight:700; color:#9d174d;">MOTIVO / JUSTIFICATIVA:</label>
+                    <input type="text" id="rapidoMotivo" placeholder="DESCREVA A JUSTIFICATIVA OU CID">
+                </div>
+                <button type="button" class="btn btn-pink" onclick="inserirRegistroRapido()" style="padding:6px 12px;">Inserir</button>
+            </div>
+        </div>
+
         <div class="botoes-painel">
-            <button type="button" class="btn btn-pink" onclick="adicionarLinhaAbs('', '', '')">➕ Adicionar Registo</button>
+            <button type="button" class="btn btn-pink" onclick="adicionarLinhaVazia()">➕ Linha em Branco</button>
             <button type="button" class="btn btn-add-folha" onclick="adicionarFolhaAbs()">📄➕ Folha Extra</button>
-            <button type="button" class="btn btn-salvar" onclick="salvarTudoAbs()">💾 Guardar</button>
+            <button type="button" class="btn btn-renumerar" onclick="reordenarIdsGeral()">🔢 Renumerar</button>
+            <button type="button" class="btn btn-salvar" onclick="salvarTudoAbs()">💾 Salvar</button>
             <button type="button" class="btn btn-carregar" onclick="carregarTudoAbs()">📂 Carregar</button>
+            <button type="button" class="btn btn-exportar" onclick="exportarBackupJSON()">⬇️ Backup</button>
+            <button type="button" class="btn btn-exportar" onclick="document.getElementById('arquivoBackupAbs').click()">⬆️ Restaurar</button>
             <button type="button" class="btn btn-limpar" onclick="limparTudoAbs()">Limpar</button>
             <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
         </div>
@@ -100,46 +446,108 @@ tr:hover .botoes-acoes { opacity: 1; }
     <div id="contentorFolhasAbs"></div>
 
     <script>
-        function atualizarAnoTitulo() {
-            const ano = document.getElementById('anoInputAbs').value;
-            document.querySelectorAll('.titulo-ano-txt').forEach(el => el.innerText = ano);
+        const LINHAS_POR_FOLHA = 24;
+
+        function mostrarToast(msg) {
+            const toast = document.getElementById('toastNotificacao');
+            toast.innerText = msg;
+            toast.classList.add('ativo');
+            setTimeout(() => { toast.classList.remove('ativo'); }, 2600);
         }
 
-        function criarTabelaAbsHTML(dadosArr) {
-            let linhas = '';
-            const lista = dadosArr.length > 0 ? dadosArr : Array(24).fill({n:'', d:'', m:''});
-            
-            lista.forEach((item, idx) => {
-                let numStr = (idx+1 < 10 ? '0'+(idx+1) : (idx+1));
-                linhas += `<tr>` +
-                    `<td class="col-id">${numStr}</td>` +
-                    `<td class="col-nome" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()">${item.n || ''}</td>` +
-                    `<td class="col-data" contenteditable="true">${item.d || ''}</td>` +
-                    `<td class="col-motivo" contenteditable="true">${item.m || ''}</td>` +
-                    `<td class="col-acoes"><div class="botoes-acoes"><button type="button" class="btn-acao btn-mais-linha" onclick="adicionarAbaixo(this)" title="Adicionar">➕</button><button type="button" class="btn-acao btn-lixeira" onclick="removerLinhaAbs(this)" title="Apagar">🗑️</button></div></td>` +
-                `</tr>`;
+        function sincronizarCabecalhosAbs() {
+            const ano = document.getElementById('anoInputAbs').value || '2026';
+            const area = document.getElementById('areaInputAbs').value || '---';
+            const turno = document.getElementById('turnoInputAbs').value || '---';
+
+            document.querySelectorAll('#contentorFolhasAbs .folha-a4').forEach(f => {
+                const elAno = f.querySelector('.val-ano');
+                const elArea = f.querySelector('.val-area');
+                const elTurno = f.querySelector('.val-turno');
+
+                if (elAno) elAno.innerText = ano;
+                if (elArea) elArea.innerText = area;
+                if (elTurno) elTurno.innerText = turno;
+            });
+        }
+
+        function atualizarEstatisticas() {
+            let total = 0;
+            let countAT = 0;
+            let countFA = 0;
+
+            document.querySelectorAll('#contentorFolhasAbs tbody tr').forEach(tr => {
+                const nome = tr.querySelector('.col-nome').innerText.trim();
+                const tipo = tr.querySelector('.col-tipo').innerText.trim().toUpperCase();
+
+                if (nome !== '') {
+                    total++;
+                    if (tipo.includes('AT')) countAT++;
+                    if (tipo.includes('FA')) countFA++;
+                }
             });
 
-            const anoAtual = document.getElementById('anoInputAbs').value;
-            const f = document.createElement('div'); f.className = 'folha-a4';
+            document.getElementById('statTotal').innerText = `Total: ${total}`;
+            document.getElementById('statAT').innerText = `Atestados (AT): ${countAT}`;
+            document.getElementById('statFA').innerText = `Faltas (FA): ${countFA}`;
+        }
+
+        function criarLinhaAbsHTML(numStr, n = '', d = '', t = '', m = '') {
+            return `<td class="col-id"><span class="col-id-texto" contenteditable="true">${numStr}</span></td>` +
+                `<td class="col-nome" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase(); atualizarEstatisticas();">${n}</td>` +
+                `<td class="col-data" contenteditable="true">${d}</td>` +
+                `<td class="col-tipo" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase(); atualizarEstatisticas();" title="Ex: AT, FA, CO, FO">${t}</td>` +
+                `<td class="col-motivo" contenteditable="true">${m}</td>` +
+                `<td class="col-acoes"><div class="botoes-acoes"><button type="button" class="btn-acao btn-mais-linha" onclick="adicionarAbaixo(this)" title="Adicionar Linha Abaixo">➕</button><button type="button" class="btn-acao btn-lixeira" onclick="removerLinhaAbs(this)" title="Apagar Registro">🗑️</button></div></td>`;
+        }
+
+        function criarEstruturaFolhaAbs(dadosArr) {
+            let linhas = '';
+            const lista = dadosArr.length > 0 ? dadosArr : Array(LINHAS_POR_FOLHA).fill({n:'', d:'', t:'', m:''});
+            
+            lista.forEach((item, idx) => {
+                let numStr = (idx + 1 < 10 ? '0' + (idx + 1) : (idx + 1));
+                linhas += `<tr>${criarLinhaAbsHTML(numStr, item.n || '', item.d || '', item.t || '', item.m || '')}</tr>`;
+            });
+
+            const anoAtual = document.getElementById('anoInputAbs').value || '2026';
+            const areaAtual = document.getElementById('areaInputAbs').value || '---';
+            const turnoAtual = document.getElementById('turnoInputAbs').value || '---';
+
+            const f = document.createElement('div'); 
+            f.className = 'folha-a4';
             f.innerHTML = `
                 <div class="barra-controle-folha">
-                    <div class="grupo-acoes-linhas"><span><strong>Controlo de Absenteísmo</strong></span></div>
+                    <div class="grupo-acoes-linhas">
+                        <button type="button" class="btn-linha-topo" onclick="adicionarLinhaFimFolha(this)">➕ Linha no Fim</button>
+                    </div>
                     <button type="button" class="btn-remover-folha" onclick="removerFolhaAbs(this)">Remover Folha ✕</button>
                 </div>
-                <div class="cabecalho-abs">
-                    <div class="cab-logo">VALE</div>
-                    <div class="cab-titulo">📋 REGISTO DE ABSENTEÍSMO E JUSTIFICATIVAS - <span class="titulo-ano-txt">${anoAtual}</span></div>
-                    <div class="cab-meta"><span class="indicador-folha"><strong>Página:</strong> 01 / 01</span></div>
-                </div>
+                <table class="cabecalho-container">
+                    <tr>
+                        <td class="logo-box">VALE</td>
+                        <td class="titulo-box">📋 REGISTRO DE ABSENTEÍSMO E JUSTIFICATIVAS</td>
+                        <td class="meta-box">
+                            <strong>Ano:</strong> <span class="val-ano">${anoAtual}</span><br>
+                            <span class="indicador-folha"><strong>Página:</strong> 01 / 01</span>
+                        </td>
+                    </tr>
+                </table>
+                <table class="info-abs-bar">
+                    <tr>
+                        <td><strong>Área / Gerência:</strong> <span class="val-area campo-editavel" contenteditable="true">${areaAtual}</span></td>
+                        <td><strong>Turno / Setor:</strong> <span class="val-turno campo-editavel" contenteditable="true">${turnoAtual}</span></td>
+                    </tr>
+                </table>
                 <table class="tabela-abs">
                     <thead>
                         <tr>
-                            <th style="width:40px;">Nº</th>
-                            <th>COLABORADOR</th>
-                            <th style="width:100px;">DATA</th>
+                            <th style="width:36px;">Nº</th>
+                            <th style="width:220px;">COLABORADOR</th>
+                            <th style="width:90px;">DATA</th>
+                            <th style="width:65px;">TIPO</th>
                             <th>MOTIVO / JUSTIFICATIVA</th>
-                            <th class="col-acoes">AÇÕES</th>
+                            <th class="col-acoes th-acoes">AÇÕES</th>
                         </tr>
                     </thead>
                     <tbody class="corpo-abs">${linhas}</tbody>
@@ -151,33 +559,88 @@ tr:hover .botoes-acoes { opacity: 1; }
             const folhas = document.querySelectorAll('#contentorFolhasAbs .folha-a4');
             folhas.forEach((folha, idx) => {
                 const ind = folha.querySelector('.indicador-folha');
-                if(ind) ind.innerHTML = `<strong>Página:</strong> 0${idx+1} / 0${folhas.length}`;
+                const atual = (idx + 1 < 10 ? '0' + (idx + 1) : (idx + 1));
+                const total = (folhas.length < 10 ? '0' + folhas.length : folhas.length);
+                if(ind) ind.innerHTML = `<strong>Página:</strong> ${atual} / ${total}`;
             });
+            atualizarEstatisticas();
         }
 
-        function adicionarLinhaAbs(n='', d='', m='') {
+        function inserirRegistroRapido() {
+            const n = document.getElementById('rapidoNome').value.trim().toUpperCase();
+            const d = document.getElementById('rapidoData').value.trim();
+            const t = document.getElementById('rapidoTipo').value.trim().toUpperCase();
+            const m = document.getElementById('rapidoMotivo').value.trim();
+
+            if (!n) {
+                mostrarToast('Informe ao menos o nome do colaborador.');
+                return;
+            }
+
+            // Tenta encontrar a primeira linha vazia
+            let preenchido = false;
+            const linhas = document.querySelectorAll('#contentorFolhasAbs tbody tr');
+            for (let tr of linhas) {
+                const nomeTd = tr.querySelector('.col-nome');
+                if (nomeTd && nomeTd.innerText.trim() === '') {
+                    nomeTd.innerText = n;
+                    tr.querySelector('.col-data').innerText = d;
+                    tr.querySelector('.col-tipo').innerText = t;
+                    tr.querySelector('.col-motivo').innerText = m;
+                    preenchido = true;
+                    break;
+                }
+            }
+
+            // Se não houver linha vazia, adiciona no final da última folha
+            if (!preenchido) {
+                const ultimaFolha = document.querySelector('#contentorFolhasAbs .folha-a4:last-child tbody');
+                if (ultimaFolha) {
+                    const qtd = ultimaFolha.querySelectorAll('tr').length + 1;
+                    const numStr = qtd < 10 ? '0' + qtd : qtd;
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = criarLinhaAbsHTML(numStr, n, d, t, m);
+                    ultimaFolha.appendChild(tr);
+                }
+            }
+
+            // Limpa os campos rápidos
+            document.getElementById('rapidoNome').value = '';
+            document.getElementById('rapidoData').value = '';
+            document.getElementById('rapidoTipo').value = '';
+            document.getElementById('rapidoMotivo').value = '';
+            document.getElementById('rapidoNome').focus();
+
+            atualizarEstatisticas();
+            mostrarToast('Ocorrência inserida com sucesso!');
+        }
+
+        function adicionarLinhaVazia() {
             const ultimaFolha = document.querySelector('#contentorFolhasAbs .folha-a4:last-child tbody');
             if(ultimaFolha) {
                 const qtd = ultimaFolha.querySelectorAll('tr').length + 1;
+                const numStr = qtd < 10 ? '0' + qtd : qtd;
                 const tr = document.createElement('tr');
-                tr.innerHTML = `<td class="col-id">${qtd < 10 ? '0'+qtd : qtd}</td>` +
-                    `<td class="col-nome" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()">${n}</td>` +
-                    `<td class="col-data" contenteditable="true">${d}</td>` +
-                    `<td class="col-motivo" contenteditable="true">${m}</td>` +
-                    `<td class="col-acoes"><div class="botoes-acoes"><button type="button" class="btn-acao btn-mais-linha" onclick="adicionarAbaixo(this)" title="Adicionar">➕</button><button type="button" class="btn-acao btn-lixeira" onclick="removerLinhaAbs(this)" title="Apagar">🗑️</button></div></td>`;
+                tr.innerHTML = criarLinhaAbsHTML(numStr, '', '', '', '');
                 ultimaFolha.appendChild(tr);
+                mostrarToast('Linha adicionada');
             }
         }
 
         function adicionarAbaixo(btn) {
             const tr = document.createElement('tr');
-            tr.innerHTML = `<td class="col-id">00</td>` +
-                `<td class="col-nome" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()"></td>` +
-                `<td class="col-data" contenteditable="true"></td>` +
-                `<td class="col-motivo" contenteditable="true"></td>` +
-                `<td class="col-acoes"><div class="botoes-acoes"><button type="button" class="btn-acao btn-mais-linha" onclick="adicionarAbaixo(this)" title="Adicionar">➕</button><button type="button" class="btn-acao btn-lixeira" onclick="removerLinhaAbs(this)" title="Apagar">🗑️</button></div></td>`;
+            tr.innerHTML = criarLinhaAbsHTML('00', '', '', '', '');
             btn.closest('tr').after(tr);
-            reordenarIdsAbs(btn.closest('tbody'));
+            reordenarIdsGeral();
+        }
+
+        function adicionarLinhaFimFolha(btn) {
+            const corpo = btn.closest('.folha-a4').querySelector('tbody');
+            const total = corpo.querySelectorAll('tr').length + 1;
+            const numStr = total < 10 ? '0' + total : total;
+            const tr = document.createElement('tr');
+            tr.innerHTML = criarLinhaAbsHTML(numStr, '', '', '', '');
+            corpo.appendChild(tr);
         }
 
         function removerLinhaAbs(btn) {
@@ -185,24 +648,31 @@ tr:hover .botoes-acoes { opacity: 1; }
             const tbody = tr.parentNode;
             if(tbody.querySelectorAll('tr').length > 1) {
                 tr.remove();
-                reordenarIdsAbs(tbody);
+                reordenarIdsGeral();
             } else {
                 tr.querySelector('.col-nome').innerText = '';
                 tr.querySelector('.col-data').innerText = '';
+                tr.querySelector('.col-tipo').innerText = '';
                 tr.querySelector('.col-motivo').innerText = '';
             }
+            atualizarEstatisticas();
         }
 
-        function reordenarIdsAbs(tbody) {
-            tbody.querySelectorAll('tr').forEach((row, idx) => {
-                const n = idx + 1;
-                row.querySelector('.col-id').innerText = n < 10 ? '0'+n : n;
+        function reordenarIdsGeral() {
+            document.querySelectorAll('#contentorFolhasAbs .folha-a4').forEach(folha => {
+                folha.querySelectorAll('tbody tr').forEach((row, idx) => {
+                    const n = idx + 1;
+                    const span = row.querySelector('.col-id-texto');
+                    if(span) span.innerText = n < 10 ? '0' + n : n;
+                });
             });
+            mostrarToast('Numeração reorganizada sequencialmente');
         }
 
         function adicionarFolhaAbs() {
-            document.getElementById('contentorFolhasAbs').appendChild(criarTabelaAbsHTML([]));
+            document.getElementById('contentorFolhasAbs').appendChild(criarEstruturaFolhaAbs([]));
             atualizarPaginacaoAbs();
+            mostrarToast('Nova folha adicionada');
         }
 
         function removerFolhaAbs(btn) {
@@ -210,46 +680,111 @@ tr:hover .botoes-acoes { opacity: 1; }
             if(folhas.length > 1) {
                 btn.closest('.folha-a4').remove();
                 atualizarPaginacaoAbs();
+            } else {
+                mostrarToast('Mantenha ao menos uma folha na tela.');
             }
         }
 
-        function salvarTudoAbs() {
+        function capturarDadosAtuais() {
             let dados = [];
             document.querySelectorAll('#contentorFolhasAbs .folha-a4').forEach(folha => {
                 folha.querySelectorAll('tbody tr').forEach(tr => {
                     let n = tr.querySelector('.col-nome').innerText.trim();
                     let d = tr.querySelector('.col-data').innerText.trim();
+                    let t = tr.querySelector('.col-tipo').innerText.trim();
                     let m = tr.querySelector('.col-motivo').innerText.trim();
-                    if(n !== "") dados.push({n, d, m});
+                    if(n !== "") dados.push({n, d, t, m});
                 });
             });
-            localStorage.setItem('valeabsenteismo_v02', JSON.stringify({dados, ano: document.getElementById('anoInputAbs').value}));
-            alert('Absenteísmo Guardado com sucesso! (v02)');
+            return dados;
+        }
+
+        function salvarTudoAbs() {
+            const backup = {
+                ano: document.getElementById('anoInputAbs').value,
+                area: document.getElementById('areaInputAbs').value,
+                turno: document.getElementById('turnoInputAbs').value,
+                dados: capturarDadosAtuais()
+            };
+            localStorage.setItem('valeabsenteismo_v02', JSON.stringify(backup));
+            mostrarToast('Registros de Absenteísmo salvos com sucesso!');
         }
 
         function carregarTudoAbs() {
             const s = localStorage.getItem('valeabsenteismo_v02');
             if(s) {
-                let res = JSON.parse(s);
+                const res = JSON.parse(s);
                 if(res.ano) document.getElementById('anoInputAbs').value = res.ano;
-                const box = document.getElementById('contentorFolhasAbs'); box.innerHTML = '';
-                box.appendChild(criarTabelaAbsHTML(res.dados || res));
-                atualizarPaginacaoAbs();
-                alert('Absenteísmo Carregado!');
+                if(res.area) document.getElementById('areaInputAbs').value = res.area;
+                if(res.turno) document.getElementById('turnoInputAbs').value = res.turno;
+                renderizarComDados(res.dados || []);
+                mostrarToast('Registros carregados com sucesso!');
             } else {
-                alert('Nenhum dado guardado encontrado.');
+                mostrarToast('Nenhum dado salvo encontrado.');
             }
         }
 
-        function limparTudoAbs() {
-            const box = document.getElementById('contentorFolhasAbs'); box.innerHTML = '';
-            box.appendChild(criarTabelaAbsHTML([]));
+        function renderizarComDados(dados) {
+            const box = document.getElementById('contentorFolhasAbs');
+            box.innerHTML = '';
+            
+            let blocos = [];
+            if(dados.length === 0) {
+                blocos.push([]);
+            } else {
+                for(let i = 0; i < dados.length; i += LINHAS_POR_FOLHA) {
+                    blocos.push(dados.slice(i, i + LINHAS_POR_FOLHA));
+                }
+            }
+            blocos.forEach(b => box.appendChild(criarEstruturaFolhaAbs(b)));
             atualizarPaginacaoAbs();
+            sincronizarCabecalhosAbs();
+        }
+
+        function exportarBackupJSON() {
+            const backup = {
+                ano: document.getElementById('anoInputAbs').value,
+                area: document.getElementById('areaInputAbs').value,
+                turno: document.getElementById('turnoInputAbs').value,
+                dados: capturarDadosAtuais()
+            };
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_absenteismo_${document.getElementById('anoInputAbs').value || '2026'}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            mostrarToast('Backup exportado com sucesso!');
+        }
+
+        function processarArquivoBackup(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const dados = JSON.parse(e.target.result);
+                    if(dados.ano) document.getElementById('anoInputAbs').value = dados.ano;
+                    if(dados.area) document.getElementById('areaInputAbs').value = dados.area;
+                    if(dados.turno) document.getElementById('turnoInputAbs').value = dados.turno;
+                    renderizarComDados(dados.dados || []);
+                    mostrarToast('Backup restaurado com sucesso!');
+                } catch(err) {
+                    mostrarToast('Erro ao ler arquivo de backup.');
+                }
+            };
+            reader.readAsText(file);
+            input.value = '';
+        }
+
+        function limparTudoAbs() {
+            renderizarComDados([]);
+            mostrarToast('Tabela de absenteísmo resetada.');
         }
 
         window.onload = function() {
-            document.getElementById('contentorFolhasAbs').appendChild(criarTabelaAbsHTML([]));
-            atualizarPaginacaoAbs();
+            renderizarComDados([]);
         };
     </script>
 </body>
