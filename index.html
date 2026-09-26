@@ -2,7 +2,10 @@
 <html lang="pt-PT">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Operacional - Vale (Menu Mestre)</title>
+    <!-- Tailwind CSS para controle responsivo e modal -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #f0f4f8; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
@@ -21,7 +24,7 @@
         .card-modulo.m2::before { background: #007e7a; }
         .card-modulo.m3::before { background: #db2777; }
         .card-modulo.m4::before { background: #db2777; }
-        .card-modulo.m5::before { background: #db2777; }
+        .card-modulo.m5::before { background: #0284c7; }
         
         .card-modulo:hover { transform: translateY(-4px); box-shadow: 0 12px 20px -3px rgba(0, 0, 0, 0.08); }
         
@@ -32,7 +35,7 @@
         .m2 .card-icone { background: #e6f4f4; color: #007e7a; }
         .m3 .card-icone { background: #fff1f2; color: #db2777; }
         .m4 .card-icone { background: #fff1f2; color: #db2777; }
-        .m5 .card-icone { background: #fff1f2; color: #db2777; }
+        .m5 .card-icone { background: #e0f2fe; color: #0284c7; }
         
         .card-titulo { font-size: 14px; font-weight: 700; margin-bottom: 5px; color: #1e293b; }
         .card-descricao { font-size: 11px; color: #64748b; line-height: 1.4; margin-bottom: 14px; }
@@ -42,14 +45,39 @@
         .m2 .card-rodape { color: #007e7a; } 
         .m3 .card-rodape { color: #db2777; } 
         .m4 .card-rodape { color: #db2777; }
-        .m5 .card-rodape { color: #db2777; }
+        .m5 .card-rodape { color: #0284c7; }
         
         footer { margin-top: 25px; font-size: 11px; color: #64748b; font-weight: 500; }
     </style>
 </head>
-<body>
+<body class="select-none">
 
-    <div class="container">
+    <!-- ========================================================================= -->
+    <!-- CAPA DE BLOQUEIO 100% BIOMÉTRICA (EXCLUSIVA PARA CELULAR: md:hidden)     -->
+    <!-- ========================================================================= -->
+    <div id="tela-bloqueio-mobile" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-sm flex items-center justify-center p-4 md:hidden">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-xs w-full text-center space-y-5 border border-slate-100">
+            <div class="w-16 h-16 bg-teal-50 text-teal-700 rounded-3xl mx-auto flex items-center justify-center text-3xl font-black shadow-inner">
+                👆
+            </div>
+            
+            <div>
+                <h2 class="text-base font-black text-slate-900">Portal Operacional</h2>
+                <p class="text-slate-500 mt-1 text-[11px] leading-relaxed">Valide sua digital ou Face ID para liberar o acesso aos módulos.</p>
+            </div>
+
+            <!-- BOTÃO ÚNICO DE BIOMETRIA -->
+            <button type="button" onclick="desbloquearPorBiometria()" class="w-full bg-[#007e7a] hover:bg-[#005a57] active:scale-95 text-white font-bold py-3.5 rounded-2xl transition shadow-lg text-xs flex items-center justify-center gap-2 cursor-pointer">
+                <span>🔐</span>
+                <span>Validar Digital</span>
+            </button>
+
+            <p id="erro-biometria" class="text-red-500 font-bold text-[11px] hidden">Leitura não reconhecida. Tente novamente.</p>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO DO PORTAL (ABRE DIRETO NO COMPUTADOR) -->
+    <div id="conteudo-portal" class="container">
         <header>
             <div class="header-logo">
                 VALE <span>Portal Operacional</span> <span class="tag-v03">v03</span>
@@ -101,7 +129,7 @@
             <!-- MÓDULO 5 -->
             <a href="modulo5.html" class="card-modulo m5">
                 <div>
-                    <div class="card-topo"><div class="card-icone">📋</div></div>
+                    <div class="card-topo"><div class="card-icone">📊</div></div>
                     <div class="card-titulo">Absenteísmo</div>
                     <div class="card-descricao">Registo de faltas, datas e respetivas justificativas da equipa.</div>
                 </div>
@@ -114,5 +142,114 @@
         </footer>
     </div>
 
+    <script>
+        function ehDispositivoMovel() {
+            return window.innerWidth < 768;
+        }
+
+        function liberarAcesso() {
+            const tela = document.getElementById('tela-bloqueio-mobile');
+            if (tela) {
+                tela.classList.add('transition-opacity', 'duration-200', 'opacity-0');
+                setTimeout(() => {
+                    tela.style.display = 'none';
+                    tela.classList.remove('opacity-0');
+                }, 200);
+            }
+        }
+
+        function bloquearAcesso() {
+            if (!ehDispositivoMovel()) return; // PC permanece sempre desbloqueado
+            sessionStorage.removeItem('vale_sessao_biometria');
+            const tela = document.getElementById('tela-bloqueio-mobile');
+            if (tela) {
+                document.getElementById('erro-biometria').classList.add('hidden');
+                tela.style.display = 'flex';
+            }
+        }
+
+        async function desbloquearPorBiometria() {
+            const erroEl = document.getElementById('erro-biometria');
+            erroEl.classList.add('hidden');
+
+            if (!window.PublicKeyCredential) {
+                erroEl.innerText = "Biometria indisponível neste navegador.";
+                erroEl.classList.remove('hidden');
+                return;
+            }
+
+            try {
+                const disponivel = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+                if (!disponivel) {
+                    erroEl.innerText = "Nenhuma biometria ativa configurada no aparelho.";
+                    erroEl.classList.remove('hidden');
+                    return;
+                }
+
+                const challenge = new Uint8Array(32);
+                window.crypto.getRandomValues(challenge);
+
+                const options = {
+                    publicKey: {
+                        challenge: challenge,
+                        rp: { name: "Portal Vale" },
+                        user: {
+                            id: new Uint8Array([10, 20, 30, 40]),
+                            name: "operacional@vale",
+                            displayName: "Operador Vale"
+                        },
+                        pubKeyCredParams: [{ type: "public-key", alg: -7 }],
+                        authenticatorSelection: {
+                            authenticatorAttachment: "platform",
+                            userVerification: "required"
+                        },
+                        timeout: 60000
+                    }
+                };
+
+                const cred = await navigator.credentials.create(options);
+                if (cred) {
+                    sessionStorage.setItem('vale_sessao_biometria', 'true');
+                    liberarAcesso();
+                }
+            } catch (err) {
+                if (err.name !== "NotAllowedError") {
+                    erroEl.innerText = "Falha ao validar biometria. Tente novamente.";
+                    erroEl.classList.remove('hidden');
+                }
+            }
+        }
+
+        // Auto-lock imediato ao minimizar, desligar a tela ou alternar abas no celular
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                bloquearAcesso();
+            } else if (ehDispositivoMovel() && sessionStorage.getItem('vale_sessao_biometria') !== 'true') {
+                setTimeout(desbloquearPorBiometria, 300);
+            }
+        });
+
+        window.addEventListener('blur', () => {
+            bloquearAcesso();
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            // No computador/desktop abre sem travas
+            if (!ehDispositivoMovel()) {
+                sessionStorage.setItem('vale_sessao_biometria', 'true');
+                const tela = document.getElementById('tela-bloqueio-mobile');
+                if (tela) tela.style.display = 'none';
+                return;
+            }
+
+            // No celular abre solicitando a digital
+            if (sessionStorage.getItem('vale_sessao_biometria') === 'true') {
+                liberarAcesso();
+            } else {
+                bloquearAcesso();
+                setTimeout(desbloquearPorBiometria, 400);
+            }
+        });
+    </script>
 </body>
 </html>
