@@ -25,6 +25,7 @@
         .card-modulo.m3::before { background: #db2777; }
         .card-modulo.m4::before { background: #db2777; }
         .card-modulo.m5::before { background: #0284c7; }
+        .card-modulo.m6::before { background: #059669; }
         
         .card-modulo:hover { transform: translateY(-4px); box-shadow: 0 12px 20px -3px rgba(0, 0, 0, 0.08); }
         
@@ -36,6 +37,7 @@
         .m3 .card-icone { background: #fff1f2; color: #db2777; }
         .m4 .card-icone { background: #fff1f2; color: #db2777; }
         .m5 .card-icone { background: #e0f2fe; color: #0284c7; }
+        .m6 .card-icone { background: #ecfdf5; color: #059669; }
         
         .card-titulo { font-size: 14px; font-weight: 700; margin-bottom: 5px; color: #1e293b; }
         .card-descricao { font-size: 11px; color: #64748b; line-height: 1.4; margin-bottom: 14px; }
@@ -46,6 +48,7 @@
         .m3 .card-rodape { color: #db2777; } 
         .m4 .card-rodape { color: #db2777; }
         .m5 .card-rodape { color: #0284c7; }
+        .m6 .card-rodape { color: #059669; }
         
         footer { margin-top: 25px; font-size: 11px; color: #64748b; font-weight: 500; }
     </style>
@@ -135,6 +138,16 @@
                 </div>
                 <div class="card-rodape"><span>Abrir Módulo</span><span>➔</span></div>
             </a>
+
+            <!-- MÓDULO 6 -->
+            <a href="modulo6.html" class="card-modulo m6">
+                <div>
+                    <div class="card-topo"><div class="card-icone">🎓</div></div>
+                    <div class="card-titulo">Treinamentos</div>
+                    <div class="card-descricao">Gestão, controlo e planeamento de cursos e capacitações da equipa.</div>
+                </div>
+                <div class="card-rodape"><span>Abrir Módulo</span><span>➔</span></div>
+            </a>
         </div>
 
         <footer>
@@ -159,7 +172,7 @@
         }
 
         function bloquearAcesso() {
-            if (!ehDispositivoMovel()) return; // PC permanece sempre desbloqueado
+            if (!ehDispositivoMovel()) return; // Computador permanece sempre desbloqueado
             sessionStorage.removeItem('vale_sessao_biometria');
             const tela = document.getElementById('tela-bloqueio-mobile');
             if (tela) {
