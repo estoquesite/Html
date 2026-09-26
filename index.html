@@ -1,161 +1,315 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Operacional - Vale (Menu Mestre)</title>
-    <!-- Tailwind CSS para controle responsivo e modal -->
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        vale: {
+                            DEFAULT: '#007e7a',
+                            dark: '#005a57',
+                            light: '#e6f4f4',
+                            amber: '#f59e0b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #f0f4f8; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
-        .container { max-width: 1100px; width: 100%; text-align: center; }
+        body { 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            background: #f0f4f8; 
+            color: #1e293b; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px 16px; 
+        }
+        .container-menu { max-width: 1100px; width: 100%; }
         
-        header { background: linear-gradient(135deg, #007e7a 0%, #005a57 100%); color: #fff; padding: 28px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 126, 122, 0.15); margin-bottom: 25px; }
-        .header-logo { font-size: 24px; font-weight: 800; letter-spacing: 1.5px; display: flex; align-items: center; justify-content: center; gap: 12px; }
-        .tag-v03 { background-color: #f59e0b; color: #fff; font-weight: 800; font-size: 11px; padding: 3px 8px; border-radius: 4px; }
-        p.sub { font-size: 13.5px; color: rgba(255, 255, 255, 0.85); margin-top: 8px; font-weight: 500; }
+        /* CARD DOS MÓDULOS */
+        .card-modulo { 
+            background: #fff; 
+            border-radius: 12px; 
+            border: 1px solid #e2e8f0; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03); 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            text-decoration: none; 
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); 
+            position: relative; 
+            overflow: hidden; 
+            min-height: 180px; 
+        }
+        .card-modulo::before { 
+            content: ''; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            height: 4px; 
+        }
         
-        .grid-modulos { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 16px; text-align: left; }
-        .card-modulo { background: #fff; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04); padding: 18px; display: flex; flex-direction: column; justify-content: space-between; text-decoration: none; transition: all 0.25s ease; position: relative; overflow: hidden; min-height: 170px; }
-        .card-modulo::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; }
-        
-        .card-modulo.m1::before { background: #007e7a; }
-        .card-modulo.m2::before { background: #007e7a; }
-        .card-modulo.m3::before { background: #db2777; }
-        .card-modulo.m4::before { background: #db2777; }
-        .card-modulo.m5::before { background: #0284c7; }
+        .card-modulo.m1::before, .card-modulo.m2::before { background: #007e7a; }
+        .card-modulo.m3::before, .card-modulo.m4::before, .card-modulo.m5::before { background: #db2777; }
         .card-modulo.m6::before { background: #059669; }
         
-        .card-modulo:hover { transform: translateY(-4px); box-shadow: 0 12px 20px -3px rgba(0, 0, 0, 0.08); }
+        .card-modulo:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 14px 25px -4px rgba(0, 0, 0, 0.08); 
+            border-color: #cbd5e1;
+        }
         
-        .card-topo { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
-        .card-icone { width: 38px; height: 38px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+        .card-icone { 
+            width: 42px; 
+            height: 42px; 
+            border-radius: 10px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 20px; 
+        }
         
-        .m1 .card-icone { background: #e6f4f4; color: #007e7a; }
-        .m2 .card-icone { background: #e6f4f4; color: #007e7a; }
-        .m3 .card-icone { background: #fff1f2; color: #db2777; }
-        .m4 .card-icone { background: #fff1f2; color: #db2777; }
-        .m5 .card-icone { background: #e0f2fe; color: #0284c7; }
+        .m1 .card-icone, .m2 .card-icone { background: #e6f4f4; color: #007e7a; }
+        .m3 .card-icone, .m4 .card-icone, .m5 .card-icone { background: #fce7f3; color: #db2777; }
         .m6 .card-icone { background: #ecfdf5; color: #059669; }
         
-        .card-titulo { font-size: 14px; font-weight: 700; margin-bottom: 5px; color: #1e293b; }
-        .card-descricao { font-size: 11px; color: #64748b; line-height: 1.4; margin-bottom: 14px; }
-        
-        .card-rodape { border-top: 1px solid #f1f5f9; padding-top: 10px; display: flex; align-items: center; justify-content: space-between; font-size: 11px; font-weight: 700; }
-        .m1 .card-rodape { color: #007e7a; } 
-        .m2 .card-rodape { color: #007e7a; } 
-        .m3 .card-rodape { color: #db2777; } 
-        .m4 .card-rodape { color: #db2777; }
-        .m5 .card-rodape { color: #0284c7; }
-        .m6 .card-rodape { color: #059669; }
-        
-        footer { margin-top: 25px; font-size: 11px; color: #64748b; font-weight: 500; }
+        .tecla-atalho {
+            font-size: 10px;
+            font-weight: 800;
+            background: #f1f5f9;
+            color: #64748b;
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+        }
     </style>
 </head>
 <body class="select-none">
 
     <!-- ========================================================================= -->
-    <!-- CAPA DE BLOQUEIO 100% BIOMÉTRICA (EXCLUSIVA PARA CELULAR: md:hidden)     -->
+    <!-- CAPA DE BLOQUEIO DE SEGURANÇA MOBILE (BIOMETRIA COM FALLBACK DE PIN)      -->
     <!-- ========================================================================= -->
-    <div id="tela-bloqueio-mobile" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-sm flex items-center justify-center p-4 md:hidden">
-        <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-xs w-full text-center space-y-5 border border-slate-100">
+    <div id="tela-bloqueio-mobile" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 md:hidden">
+        <div class="bg-white p-7 rounded-3xl shadow-2xl max-w-xs w-full text-center space-y-4 border border-slate-100">
             <div class="w-16 h-16 bg-teal-50 text-teal-700 rounded-3xl mx-auto flex items-center justify-center text-3xl font-black shadow-inner">
-                👆
+                🔒
             </div>
             
             <div>
-                <h2 class="text-base font-black text-slate-900">Portal Operacional</h2>
-                <p class="text-slate-500 mt-1 text-[11px] leading-relaxed">Valide sua digital ou Face ID para liberar o acesso aos módulos.</p>
+                <h2 class="text-base font-black text-slate-900">Portal Vale Operacional</h2>
+                <p class="text-slate-500 mt-1 text-[11px] leading-relaxed">Autentique sua identidade para liberar o acesso móvel.</p>
             </div>
 
-            <!-- BOTÃO ÚNICO DE BIOMETRIA -->
-            <button type="button" onclick="desbloquearPorBiometria()" class="w-full bg-[#007e7a] hover:bg-[#005a57] active:scale-95 text-white font-bold py-3.5 rounded-2xl transition shadow-lg text-xs flex items-center justify-center gap-2 cursor-pointer">
-                <span>🔐</span>
-                <span>Validar Digital</span>
+            <!-- OPÇÃO 1: BIOMETRIA -->
+            <button type="button" id="btnBiometria" onclick="desbloquearPorBiometria()" class="w-full bg-[#007e7a] hover:bg-[#005a57] active:scale-95 text-white font-bold py-3 rounded-2xl transition shadow-md text-xs flex items-center justify-center gap-2 cursor-pointer">
+                <span>👆</span>
+                <span>Validar Digital / Face ID</span>
             </button>
 
-            <p id="erro-biometria" class="text-red-500 font-bold text-[11px] hidden">Leitura não reconhecida. Tente novamente.</p>
+            <!-- OPÇÃO 2: FALLBACK COM PIN NUMÉRICO -->
+            <div id="area-pin" class="space-y-2 pt-2 border-t border-slate-100">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase">Ou digite o PIN de Segurança:</label>
+                <div class="flex gap-2 justify-center">
+                    <input type="password" id="pinInput" maxlength="4" placeholder="••••" class="w-28 text-center text-lg font-black tracking-widest py-1.5 border border-slate-300 rounded-xl bg-slate-50 outline-none focus:border-teal-600">
+                    <button type="button" onclick="verificarPIN()" class="bg-slate-800 text-white font-bold px-3 py-1.5 rounded-xl text-xs">Entrar</button>
+                </div>
+            </div>
+
+            <p id="erro-auth" class="text-rose-500 font-bold text-[11px] hidden"></p>
         </div>
     </div>
 
-    <!-- CONTEÚDO DO PORTAL (ABRE DIRETO NO COMPUTADOR) -->
-    <div id="conteudo-portal" class="container">
-        <header>
-            <div class="header-logo">
-                VALE <span>Portal Operacional</span> <span class="tag-v03">v03</span>
+    <!-- ========================================================================= -->
+    <!-- CONTEÚDO PRINCIPAL DO PORTAL                                              -->
+    <!-- ========================================================================= -->
+    <div id="conteudo-portal" class="container-menu">
+        
+        <!-- CABEÇALHO CORPORATIVO VALE -->
+        <header class="bg-gradient-to-r from-[#007e7a] to-[#005a57] text-white p-6 sm:p-7 rounded-2xl shadow-lg shadow-teal-900/10 mb-6">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="text-center sm:text-left">
+                    <div class="flex items-center justify-center sm:justify-start gap-3">
+                        <span class="text-2xl font-black tracking-widest text-teal-100">VALE</span>
+                        <div class="h-5 w-px bg-teal-300/40"></div>
+                        <span class="text-lg font-extrabold tracking-wide">Portal Operacional</span>
+                        <span class="bg-amber-500 text-white font-black text-[10px] px-2 py-0.5 rounded shadow-sm">v03</span>
+                    </div>
+                    <p class="text-xs text-teal-100/90 mt-1 font-medium">Suíte integrada de gestão diária, segurança e controle de equipes</p>
+                </div>
+
+                <div class="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-3.5 py-1.5 rounded-xl text-xs font-semibold border border-white/10">
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="relogioTopo">--:--:--</span>
+                    <span class="text-teal-200">|</span>
+                    <span id="dataTopo">--/--/----</span>
+                </div>
             </div>
-            <p class="sub">Selecione o módulo pretendido abaixo:</p>
         </header>
 
-        <div class="grid-modulos">
+        <!-- GRADE DE MÓDULOS (6 APLICAÇÕES) -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-left">
+            
             <!-- MÓDULO 1 -->
-            <a href="modulo1.html" class="card-modulo m1">
+            <a href="modulo1.html" class="card-modulo m1" title="Pressione [1] no teclado">
                 <div>
-                    <div class="card-topo"><div class="card-icone">📋</div></div>
-                    <div class="card-titulo">DDS & Emociograma</div>
-                    <div class="card-descricao">Folhas com linhas, emociograma, números editáveis e legendas completas.</div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">📋</div>
+                        <span class="tecla-atalho">Tecla 1</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">DDS & Emociograma</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Controle semanal com carinhas de emociograma, registro de rubricas e impressão A4 paisagem.
+                    </div>
                 </div>
-                <div class="card-rodape"><span>Abrir Módulo</span><span>➔</span></div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#007e7a]">
+                    <span>Abrir Módulo 1</span><span>➔</span>
+                </div>
             </a>
 
             <!-- MÓDULO 2 -->
-            <a href="modulo2.html" class="card-modulo m2">
+            <a href="modulo2.html" class="card-modulo m2" title="Pressione [2] no teclado">
                 <div>
-                    <div class="card-topo"><div class="card-icone">📅</div></div>
-                    <div class="card-titulo">Matriz Anual de DDS</div>
-                    <div class="card-descricao">Controlo de 12 meses com visibilidade dinâmica e rolagem horizontal tipo Excel.</div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">📅</div>
+                        <span class="tecla-atalho">Tecla 2</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Matriz Anual de DDS</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Grelha anual completa (12 meses) com visibilidade dinâmica por semestre/trimestre e autoajuste.
+                    </div>
                 </div>
-                <div class="card-rodape"><span>Abrir Módulo</span><span>➔</span></div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#007e7a]">
+                    <span>Abrir Módulo 2</span><span>➔</span>
+                </div>
             </a>
 
             <!-- MÓDULO 3 -->
-            <a href="modulo3.html" class="card-modulo m3">
+            <a href="modulo3.html" class="card-modulo m3" title="Pressione [3] no teclado">
                 <div>
-                    <div class="card-topo"><div class="card-icone">🏖️</div></div>
-                    <div class="card-titulo">Cronograma de Férias</div>
-                    <div class="card-descricao">Grelha anual dedicada ao controlo e marcação de férias da equipa.</div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">🏖️</div>
+                        <span class="tecla-atalho">Tecla 3</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Cronograma de Férias</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Planejamento anual de início e término das férias da equipe com controle de saldo de dias.
+                    </div>
                 </div>
-                <div class="card-rodape"><span>Abrir Módulo</span><span>➔</span></div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#db2777]">
+                    <span>Abrir Módulo 3</span><span>➔</span>
+                </div>
             </a>
 
             <!-- MÓDULO 4 -->
-            <a href="modulo4.html" class="card-modulo m4">
+            <a href="modulo4.html" class="card-modulo m4" title="Pressione [4] no teclado">
                 <div>
-                    <div class="card-topo"><div class="card-icone">🎂</div></div>
-                    <div class="card-titulo">Aniversariantes</div>
-                    <div class="card-descricao">Lista organizada por mês com as datas de aniversário dos colaboradores.</div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">🎂</div>
+                        <span class="tecla-atalho">Tecla 4</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Aniversariantes do Ano</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Grade bimestral dos 12 meses com distribuição automática e ordenação cronológica por dia.
+                    </div>
                 </div>
-                <div class="card-rodape"><span>Abrir Módulo</span><span>➔</span></div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#db2777]">
+                    <span>Abrir Módulo 4</span><span>➔</span>
+                </div>
             </a>
 
             <!-- MÓDULO 5 -->
-            <a href="modulo5.html" class="card-modulo m5">
+            <a href="modulo5.html" class="card-modulo m5" title="Pressione [5] no teclado">
                 <div>
-                    <div class="card-topo"><div class="card-icone">📊</div></div>
-                    <div class="card-titulo">Absenteísmo</div>
-                    <div class="card-descricao">Registo de faltas, datas e respetivas justificativas da equipa.</div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">📊</div>
+                        <span class="tecla-atalho">Tecla 5</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Absenteísmo & Justificativas</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Registro padronizado de ocorrências (AT, FA, CO, FO) com resumo e lançamento rápido.
+                    </div>
                 </div>
-                <div class="card-rodape"><span>Abrir Módulo</span><span>➔</span></div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#db2777]">
+                    <span>Abrir Módulo 5</span><span>➔</span>
+                </div>
             </a>
 
             <!-- MÓDULO 6 -->
-            <a href="modulo6.html" class="card-modulo m6">
+            <a href="modulo6.html" class="card-modulo m6" title="Pressione [6] no teclado">
                 <div>
-                    <div class="card-topo"><div class="card-icone">🎓</div></div>
-                    <div class="card-titulo">Treinamentos</div>
-                    <div class="card-descricao">Gestão, controlo e planeamento de cursos e capacitações da equipa.</div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">🎓</div>
+                        <span class="tecla-atalho">Tecla 6</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Gestão de Treinamentos</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Capacitações com suporte à turma em lote, sincronização em nuvem e exportação em Excel.
+                    </div>
                 </div>
-                <div class="card-rodape"><span>Abrir Módulo</span><span>➔</span></div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#059669]">
+                    <span>Abrir Módulo 6</span><span>➔</span>
+                </div>
             </a>
         </div>
 
-        <footer>
-            Sistema Operacional Integrado • GitHub Pages
+        <!-- RODAPÉ -->
+        <footer class="mt-8 text-center text-xs text-slate-400 font-medium space-y-1">
+            <p>Sistema Operacional Integrado • Portal Vale Corporativo</p>
+            <p class="text-[10px] text-slate-400/80">Dica: Utilize os números de 1 a 6 no teclado para navegação rápida entre os módulos.</p>
         </footer>
     </div>
 
+    <!-- ========================================================================= -->
+    <!-- LÓGICA JAVASCRIPT: RELÓGIO, ATALHOS DE TECLADO E SEGURANÇA COM FALLBACK    -->
+    <!-- ========================================================================= -->
     <script>
+        const PIN_CORRETO = "1234"; // PIN de contingência padrão corporativo
+
+        // Atualização contínua do relógio institucional
+        function atualizarRelogio() {
+            const agora = new Date();
+            const relogioEl = document.getElementById('relogioTopo');
+            const dataEl = document.getElementById('dataTopo');
+            if (relogioEl) relogioEl.innerText = agora.toLocaleTimeString('pt-BR');
+            if (dataEl) dataEl.innerText = agora.toLocaleDateString('pt-BR');
+        }
+        setInterval(atualizarRelogio, 1000);
+        atualizarRelogio();
+
+        // Atalhos Numéricos de Teclado (1 a 6) para navegação rápida em desktop
+        document.addEventListener('keydown', (e) => {
+            // Ignora se estiver digitando em campos de texto
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+            const rotas = {
+                '1': 'modulo1.html',
+                '2': 'modulo2.html',
+                '3': 'modulo3.html',
+                '4': 'modulo4.html',
+                '5': 'modulo5.html',
+                '6': 'modulo6.html'
+            };
+
+            if (rotas[e.key]) {
+                window.location.href = rotas[e.key];
+            }
+        });
+
+        // Detecção de Dispositivo Móvel
         function ehDispositivoMovel() {
             return window.innerWidth < 768;
         }
@@ -163,39 +317,64 @@
         function liberarAcesso() {
             const tela = document.getElementById('tela-bloqueio-mobile');
             if (tela) {
-                tela.classList.add('transition-opacity', 'duration-200', 'opacity-0');
+                tela.classList.add('transition-opacity', 'duration-300', 'opacity-0');
                 setTimeout(() => {
                     tela.style.display = 'none';
                     tela.classList.remove('opacity-0');
-                }, 200);
+                }, 300);
             }
         }
 
         function bloquearAcesso() {
-            if (!ehDispositivoMovel()) return; // Computador permanece sempre desbloqueado
+            if (!ehDispositivoMovel()) return;
             sessionStorage.removeItem('vale_sessao_biometria');
             const tela = document.getElementById('tela-bloqueio-mobile');
             if (tela) {
-                document.getElementById('erro-biometria').classList.add('hidden');
+                document.getElementById('erro-auth').classList.add('hidden');
+                document.getElementById('pinInput').value = '';
                 tela.style.display = 'flex';
             }
         }
 
+        // Validação de PIN de Contingência
+        function verificarPIN() {
+            const input = document.getElementById('pinInput');
+            const erroEl = document.getElementById('erro-auth');
+
+            if (input.value === PIN_CORRETO) {
+                sessionStorage.setItem('vale_sessao_biometria', 'true');
+                liberarAcesso();
+            } else {
+                erroEl.innerText = "PIN incorreto. Tente novamente.";
+                erroEl.classList.remove('hidden');
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        // Suporte ao Enter no campo de PIN
+        document.getElementById('pinInput')?.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') verificarPIN();
+        });
+
+        // Validação Biometria Segura (com fallback automático se indisponível)
         async function desbloquearPorBiometria() {
-            const erroEl = document.getElementById('erro-biometria');
+            const erroEl = document.getElementById('erro-auth');
             erroEl.classList.add('hidden');
 
-            if (!window.PublicKeyCredential) {
-                erroEl.innerText = "Biometria indisponível neste navegador.";
+            if (!window.isSecureContext || !window.PublicKeyCredential) {
+                erroEl.innerText = "Biometria indisponível. Utilize o PIN de segurança.";
                 erroEl.classList.remove('hidden');
+                document.getElementById('pinInput').focus();
                 return;
             }
 
             try {
                 const disponivel = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
                 if (!disponivel) {
-                    erroEl.innerText = "Nenhuma biometria ativa configurada no aparelho.";
+                    erroEl.innerText = "Nenhuma biometria ativa no aparelho. Utilize o PIN.";
                     erroEl.classList.remove('hidden');
+                    document.getElementById('pinInput').focus();
                     return;
                 }
 
@@ -207,7 +386,7 @@
                         challenge: challenge,
                         rp: { name: "Portal Vale" },
                         user: {
-                            id: new Uint8Array([10, 20, 30, 40]),
+                            id: new Uint8Array([1, 2, 3, 4]),
                             name: "operacional@vale",
                             displayName: "Operador Vale"
                         },
@@ -216,7 +395,7 @@
                             authenticatorAttachment: "platform",
                             userVerification: "required"
                         },
-                        timeout: 60000
+                        timeout: 30000
                     }
                 };
 
@@ -227,27 +406,23 @@
                 }
             } catch (err) {
                 if (err.name !== "NotAllowedError") {
-                    erroEl.innerText = "Falha ao validar biometria. Tente novamente.";
+                    erroEl.innerText = "Validação não concluída. Digite o PIN de 4 dígitos.";
                     erroEl.classList.remove('hidden');
+                    document.getElementById('pinInput').focus();
                 }
             }
         }
 
-        // Auto-lock imediato ao minimizar, desligar a tela ou alternar abas no celular
+        // Auto-lock seguro ao minimizar a aba ou bloquear a tela do celular
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 bloquearAcesso();
             } else if (ehDispositivoMovel() && sessionStorage.getItem('vale_sessao_biometria') !== 'true') {
-                setTimeout(desbloquearPorBiometria, 300);
+                setTimeout(desbloquearPorBiometria, 350);
             }
         });
 
-        window.addEventListener('blur', () => {
-            bloquearAcesso();
-        });
-
         window.addEventListener('DOMContentLoaded', () => {
-            // No computador/desktop abre sem travas
             if (!ehDispositivoMovel()) {
                 sessionStorage.setItem('vale_sessao_biometria', 'true');
                 const tela = document.getElementById('tela-bloqueio-mobile');
@@ -255,7 +430,6 @@
                 return;
             }
 
-            // No celular abre solicitando a digital
             if (sessionStorage.getItem('vale_sessao_biometria') === 'true') {
                 liberarAcesso();
             } else {
