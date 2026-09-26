@@ -1,86 +1,389 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Módulo 2 - Matriz Anual de DDS | Portal Vale v06</title>
 <style>
+:root {
+    --primary: #007e7a;
+    --primary-dark: #005a57;
+    --primary-light: #e6f4f4;
+    --accent: #f59e0b;
+    --danger: #ef4444;
+    --success: #10b981;
+    --slate-900: #0f172a;
+    --slate-700: #334155;
+    --slate-600: #475569;
+    --slate-300: #cbd5e1;
+    --slate-200: #e2e8f0;
+    --slate-100: #f1f5f9;
+    --slate-50: #f8fafc;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #f0f4f8; color: #1e293b; min-height: 100vh; padding: 16px; }
+body { 
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+    background: #edf2f7; 
+    color: var(--slate-900); 
+    min-height: 100vh; 
+    padding: 16px; 
+}
 
-/* PAINEL DE CONTROLO */
-.painel-controle { background: #ffffff; padding: 18px 22px; margin: 0 auto 16px auto; border-radius: 12px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid #e2e8f0; max-width: 1100px; }
-.topo-modulo-info { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; border-bottom: 2px solid #007e7a; padding-bottom: 10px; }
-.badge-modulo { background: linear-gradient(135deg, #007e7a, #005a57); color: #fff; font-size: 11.5px; font-weight: 800; padding: 5px 12px; border-radius: 6px; text-transform: uppercase; letter-spacing: 0.8px; }
-.tag-v06 { background-color: #f59e0b; color: #fff; font-weight: 800; font-size: 10px; padding: 2px 7px; border-radius: 4px; margin-left: 6px; }
+/* TOAST NOTIFICAÇÃO */
+#toastNotificacao {
+    position: fixed; 
+    bottom: 24px; 
+    right: 24px; 
+    background: var(--slate-900); 
+    color: #fff;
+    padding: 10px 18px; 
+    border-radius: 6px; 
+    font-size: 11.5px; 
+    font-weight: 600;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.25); 
+    opacity: 0; 
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease; 
+    transform: translateY(12px); 
+    z-index: 9999;
+}
+#toastNotificacao.ativo { opacity: 1; transform: translateY(0); }
 
-.campos-painel { display: grid; gap: 12px; margin-bottom: 12px; grid-template-columns: 2fr 1fr 1fr 1fr; }
-.campo-grupo label { display: block; font-weight: 700; margin-bottom: 5px; font-size: 10.5px; color: #475569; text-transform: uppercase; }
-.painel-controle input[type="text"] { width: 100%; font-family: inherit; font-size: 12px; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; background: #f8fafc; outline: none; }
-.painel-controle textarea { width: 100%; height: 70px; font-family: inherit; font-size: 12px; padding: 8px 10px; border: 1px solid #cbd5e1; border-radius: 6px; resize: vertical; text-transform: uppercase; background: #f8fafc; outline: none; }
+/* PAINEL DE CONTROLE */
+.painel-controle { 
+    background: #ffffff; 
+    padding: 18px 22px; 
+    margin: 0 auto 16px auto; 
+    border-radius: 12px; 
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); 
+    border: 1px solid var(--slate-200); 
+    max-width: 1100px; 
+}
+.topo-modulo-info { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    margin-bottom: 14px; 
+    border-bottom: 2px solid var(--primary); 
+    padding-bottom: 10px; 
+}
+.badge-modulo { 
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
+    color: #fff; 
+    font-size: 11.5px; 
+    font-weight: 800; 
+    padding: 5px 12px; 
+    border-radius: 6px; 
+    text-transform: uppercase; 
+    letter-spacing: 0.8px; 
+}
+.tag-v06 { 
+    background-color: var(--accent); 
+    color: #fff; 
+    font-weight: 800; 
+    font-size: 10px; 
+    padding: 2px 7px; 
+    border-radius: 4px; 
+    margin-left: 6px; 
+}
 
-.painel-meses-toggle { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 14px; margin-bottom: 12px; }
-.titulo-meses-toggle { font-size: 10.5px; font-weight: 800; text-transform: uppercase; color: #334155; margin-bottom: 8px; display: flex; align-items: center; justify-content: space-between; }
+.campos-painel { 
+    display: grid; 
+    gap: 12px; 
+    margin-bottom: 12px; 
+    grid-template-columns: 1.5fr 1fr 1fr 1.5fr; 
+}
+.campo-grupo label { 
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700; 
+    margin-bottom: 5px; 
+    font-size: 10.5px; 
+    color: var(--slate-600); 
+    text-transform: uppercase; 
+}
+.painel-controle input[type="text"] { 
+    width: 100%; 
+    font-family: inherit; 
+    font-size: 12px; 
+    padding: 8px 10px; 
+    border: 1px solid var(--slate-300); 
+    border-radius: 6px; 
+    background: var(--slate-50); 
+    outline: none; 
+    transition: border-color 0.2s, background-color 0.2s;
+}
+.painel-controle input[type="text"]:focus, .painel-controle textarea:focus { 
+    border-color: var(--primary); 
+    background: #fff; 
+}
+.painel-controle textarea { 
+    width: 100%; 
+    height: 70px; 
+    font-family: inherit; 
+    font-size: 12px; 
+    padding: 8px 10px; 
+    border: 1px solid var(--slate-300); 
+    border-radius: 6px; 
+    resize: vertical; 
+    text-transform: uppercase; 
+    background: var(--slate-50); 
+    outline: none; 
+    transition: border-color 0.2s, background-color 0.2s;
+}
+
+.contador-colaboradores {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: none;
+}
+
+/* TOGGLE DE MESES */
+.painel-meses-toggle { 
+    background: var(--slate-50); 
+    border: 1px solid var(--slate-300); 
+    border-radius: 8px; 
+    padding: 10px 14px; 
+    margin-bottom: 12px; 
+}
+.titulo-meses-toggle { 
+    font-size: 10.5px; 
+    font-weight: 800; 
+    text-transform: uppercase; 
+    color: var(--slate-700); 
+    margin-bottom: 8px; 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+}
 .container-meses-btns { display: flex; flex-wrap: wrap; gap: 6px; }
-.btn-mes-tag { border: 1px solid #007e7a; background-color: #e6f4f4; color: #005a57; font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 5px; cursor: pointer; user-select: none; transition: 0.15s; }
+.btn-mes-tag { 
+    border: 1px solid var(--primary); 
+    background-color: var(--primary-light); 
+    color: var(--primary-dark); 
+    font-size: 10px; 
+    font-weight: 800; 
+    padding: 5px 12px; 
+    border-radius: 5px; 
+    cursor: pointer; 
+    user-select: none; 
+    transition: 0.15s ease; 
+}
 .btn-mes-tag:hover { filter: brightness(0.95); }
-.btn-mes-tag.inativo { background-color: #f1f5f9; border-color: #cbd5e1; color: #94a3b8; text-decoration: line-through; }
-.links-rapidos-meses { display: flex; gap: 8px; }
-.link-rapido { font-size: 9.5px; font-weight: 700; color: #1e40af; cursor: pointer; text-decoration: underline; background: none; border: none; }
+.btn-mes-tag.inativo { 
+    background-color: var(--slate-100); 
+    border-color: var(--slate-300); 
+    color: #94a3b8; 
+    text-decoration: line-through; 
+}
+.links-rapidos-meses { display: flex; gap: 8px; flex-wrap: wrap; }
+.link-rapido { 
+    font-size: 9.5px; 
+    font-weight: 700; 
+    color: #1e40af; 
+    cursor: pointer; 
+    background: none; 
+    border: none; 
+    padding: 2px 4px;
+}
+.link-rapido:hover { text-decoration: underline; }
 
 .botoes-painel { display: flex; gap: 8px; flex-wrap: wrap; }
-.btn { cursor: pointer; padding: 7px 14px; font-size: 11px; font-weight: 700; border: none; border-radius: 6px; color: #fff; display: inline-flex; align-items: center; gap: 5px; }
-.btn-verde { background-color: #007e7a; } .btn-azul { background-color: #0284c7; } .btn-salvar { background-color: #2563eb; } .btn-carregar { background-color: #0284c7; } .btn-limpar { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; } .btn-voltar { background-color: #475569; text-decoration: none; } .btn-imprimir { background-color: #0f172a; margin-left: auto; }
+.btn { 
+    cursor: pointer; 
+    padding: 7px 14px; 
+    font-size: 11px; 
+    font-weight: 700; 
+    border: none; 
+    border-radius: 6px; 
+    color: #fff; 
+    display: inline-flex; 
+    align-items: center; 
+    gap: 5px; 
+    transition: filter 0.15s ease, transform 0.05s ease;
+}
+.btn:hover { filter: brightness(1.08); }
+.btn:active { transform: translateY(1px); }
 
-/* FOLHA A4 COM LARGURA FIXA PERFEITA E DISTRIBUIÇÃO PROPORCIONAL */
-.wrapper-tabela { width: 100%; overflow-x: auto; margin-bottom: 20px; padding-bottom: 12px; }
-.folha-a4 { width: 1060px; min-width: 1060px; background: #fff; padding: 16px; margin: 0 auto; box-shadow: 0 10px 30px rgba(0,0,0,0.06); border-radius: 10px; border: 1px solid #e2e8f0; }
+.btn-verde { background-color: var(--primary); } 
+.btn-azul { background-color: #0284c7; } 
+.btn-renumerar { background-color: #ea580c; }
+.btn-salvar { background-color: #2563eb; } 
+.btn-carregar { background-color: #0891b2; } 
+.btn-exportar { background-color: #4f46e5; }
+.btn-limpar { background-color: var(--slate-100); color: var(--slate-600); border: 1px solid var(--slate-300); } 
+.btn-voltar { background-color: var(--slate-600); text-decoration: none; } 
+.btn-imprimir { background-color: var(--slate-900); margin-left: auto; }
 
-.barra-controle-folha { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; background: #f8fafc; padding: 6px 10px; border: 1px solid #e2e8f0; border-radius: 6px; }
+/* FOLHA A4 */
+.wrapper-tabela { width: 100%; overflow-x: auto; margin-bottom: 20px; }
+.folha-a4 { 
+    width: 1060px; 
+    min-width: 1060px; 
+    background: #fff; 
+    padding: 14px 16px; 
+    margin: 0 auto; 
+    box-shadow: 0 10px 30px rgba(0,0,0,0.06); 
+    border-radius: 10px; 
+    border: 1px solid var(--slate-200); 
+}
+
+.barra-controle-folha { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 6px; 
+    background: var(--slate-50); 
+    padding: 5px 10px; 
+    border: 1px solid var(--slate-200); 
+    border-radius: 6px; 
+}
 .grupo-acoes-linhas { display: flex; align-items: center; gap: 6px; }
-.btn-linha-topo { border: 1px solid #007e7a; border-radius: 4px; font-size: 9px; font-weight: 700; padding: 3px 8px; cursor: pointer; background: #fff; color: #007e7a; }
-.btn-remover-folha { background: #fff; color: #ef4444; border: 1px solid #fca5a5; border-radius: 4px; font-size: 9px; font-weight: 700; padding: 3px 8px; cursor: pointer; }
+.btn-linha-topo { 
+    border: 1px solid var(--primary); 
+    border-radius: 4px; 
+    font-size: 9px; 
+    font-weight: 700; 
+    padding: 3px 8px; 
+    cursor: pointer; 
+    background: #fff; 
+    color: var(--primary); 
+}
+.btn-remover-folha { 
+    background: #fff; 
+    color: var(--danger); 
+    border: 1px solid #fca5a5; 
+    border-radius: 4px; 
+    font-size: 9px; 
+    font-weight: 700; 
+    padding: 3px 8px; 
+    cursor: pointer; 
+}
 
-.cabecalho-container, table.tabela-matriz { width: 100%; border-collapse: collapse; border: 1.2px solid #0f172a; margin-bottom: 4px; table-layout: fixed; }
-.cabecalho-container td { border: 1px solid #334155; padding: 4px 8px; vertical-align: middle; text-align: center; }
-.logo-box { width: 85px; font-weight: 900; font-size: 15px; color: #007e7a; background-color: #f8fafc; }
-.titulo-box { font-size: 11px; font-weight: 800; text-transform: uppercase; color: #0f172a; padding: 0 10px; }
-.meta-box { width: 120px; font-size: 8.5px; text-align: left !important; padding-left: 6px !important; background-color: #f8fafc; line-height: 1.3; }
+.cabecalho-container, .info-matriz-bar, table.tabela-matriz { 
+    width: 100%; 
+    border-collapse: collapse; 
+    border: 1.2px solid var(--slate-900); 
+    margin-bottom: 4px; 
+    table-layout: fixed; 
+}
+.cabecalho-container td, .info-matriz-bar td { 
+    border: 1px solid var(--slate-700); 
+    padding: 3px 8px; 
+    vertical-align: middle; 
+    text-align: center; 
+}
+.logo-box { 
+    width: 90px; 
+    font-weight: 900; 
+    font-size: 16px; 
+    color: var(--primary); 
+    letter-spacing: 1.5px;
+    background-color: var(--slate-50); 
+}
+.titulo-box { font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--slate-900); padding: 0 10px; }
+.meta-box { width: 130px; font-size: 8.5px; text-align: left !important; padding-left: 8px !important; background-color: var(--slate-50); line-height: 1.35; }
 
-table.tabela-matriz th, table.tabela-matriz td { border: 1px solid #475569; text-align: center; vertical-align: middle; font-size: 9px; }
-.th-matriz-id { width: 38px; background-color: #f1f5f9; font-weight: 800; }
-.th-matriz-colab { width: 240px; background-color: #007e7a; color: #fff; font-size: 10px; font-weight: 800; padding: 6px; text-align: left; padding-left: 8px; }
-.th-mes-anual { background-color: #007e7a; color: #fff; font-size: 9.5px; font-weight: 800; padding: 6px 2px; }
+.info-matriz-bar { font-size: 8.5px; font-weight: 700; background-color: var(--slate-50); }
+.info-matriz-bar td { text-align: left; padding: 2px 8px; }
+.campo-editavel { outline: none; display: inline-block; min-width: 25px; font-weight: 600; color: var(--slate-900); }
 
-table.tabela-matriz tbody tr { height: 26px; }
+table.tabela-matriz th, table.tabela-matriz td { 
+    border: 1px solid #475569; 
+    text-align: center; 
+    vertical-align: middle; 
+    font-size: 9px; 
+}
+.th-matriz-id { width: 38px; background-color: var(--slate-100); font-weight: 800; }
+.th-matriz-colab { 
+    width: 240px; 
+    background-color: var(--primary); 
+    color: #fff; 
+    font-size: 10px; 
+    font-weight: 800; 
+    padding: 6px; 
+    text-align: left; 
+    padding-left: 8px; 
+}
+.th-mes-anual { 
+    background-color: var(--primary); 
+    color: #fff; 
+    font-size: 9.5px; 
+    font-weight: 800; 
+    padding: 5px 2px; 
+}
+
+table.tabela-matriz tbody tr { height: 25px; }
 table.tabela-matriz tbody tr:nth-child(even) { background-color: #fafbfc; }
 
-/* NÚMEROS EDITÁVEIS */
-.td-matriz-id { background-color: #f8fafc; font-weight: 800; padding: 0 1px; }
-.col-id-texto { outline: none; font-size: 9px; font-weight: 800; color: #0f172a; background: #e2e8f0; padding: 1px 4px; border-radius: 3px; display: inline-block; width: 100%; text-align: center; }
+/* NÚMEROS E DADOS */
+.td-matriz-id { background-color: var(--slate-50); font-weight: 800; padding: 0 1px; }
+.col-id-texto { outline: none; font-size: 9px; font-weight: 800; color: var(--slate-900); background: #e2e8f0; padding: 1px 4px; border-radius: 3px; display: inline-block; width: 100%; text-align: center; }
 .col-id-texto:focus { background: #fef3c7; }
 
-.celula-data { outline: none; font-size: 9px; font-weight: 700; color: #0f172a; background-color: #fff; padding: 0 2px; }
-.celula-data:focus { background-color: #e6f4f4; box-shadow: inset 0 0 0 1.5px #007e7a; }
+.celula-data { 
+    outline: none; 
+    font-size: 9px; 
+    font-weight: 700; 
+    color: var(--slate-900); 
+    background-color: #fff; 
+    padding: 0 2px; 
+}
+.celula-data:focus { 
+    background-color: #e6f4f4; 
+    box-shadow: inset 0 0 0 1.5px var(--primary); 
+}
 
 .botoes-acoes { display: flex; align-items: center; gap: 2px; opacity: 0.3; transition: opacity 0.2s; }
 tr:hover .botoes-acoes { opacity: 1; }
-.btn-acao { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 3px; cursor: pointer; padding: 1px 3px; font-size: 8px; }
-.btn-mais-linha { color: #10b981; border-color: #6ee7b7; font-weight: 900; }
-.btn-menos-linha { color: #f59e0b; border-color: #fcd34d; font-weight: 900; }
-.btn-lixeira { color: #ef4444; border-color: #fca5a5; }
+.btn-acao { background: var(--slate-100); border: 1px solid var(--slate-300); border-radius: 3px; cursor: pointer; padding: 1px 3px; font-size: 8px; }
+.btn-mais-linha { color: var(--success); border-color: #6ee7b7; font-weight: 900; }
+.btn-menos-linha { color: var(--accent); border-color: #fcd34d; font-weight: 900; }
+.btn-lixeira { color: var(--danger); border-color: #fca5a5; }
 
 .col-nome-container { display: flex; align-items: center; justify-content: space-between; padding: 0 6px; gap: 4px; width: 100%; }
 .col-nome-texto { flex-grow: 1; text-align: left; outline: none; white-space: nowrap; overflow: hidden; font-size: 9.5px; font-weight: 700; color: #000; text-transform: uppercase; }
 .mes-oculto { display: none !important; }
 
-/* IMPRESSÃO LIMPA SEM URL */
+/* IMPRESSÃO A4 PAISAGEM LIMPA E MULTIFOLHAS */
 @media print {
-    @page { size: A4 landscape; margin: 0mm; }
-    html, body { background: #fff !important; width: 297mm; height: 210mm; margin: 0 !important; padding: 6mm !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-    .painel-controle, .botoes-acoes, .barra-controle-folha { display: none !important; }
-    .wrapper-tabela { overflow: visible !important; width: 100% !important; }
-    .folha-a4 { box-shadow: none !important; border: none !important; width: 100% !important; min-width: 100% !important; padding: 0 !important; margin: 0 !important; }
-    table.tabela-matriz th, .th-matriz-colab, .th-mes-anual { background-color: #007e7a !important; color: #fff !important; }
+    @page { 
+        size: A4 landscape; 
+        margin: 4mm 5mm; 
+    }
+    body { 
+        background: #fff !important; 
+        margin: 0 !important; 
+        padding: 0 !important; 
+        -webkit-print-color-adjust: exact; 
+        print-color-adjust: exact; 
+    }
+    .painel-controle, .botoes-acoes, .barra-controle-folha, #toastNotificacao { display: none !important; }
+    .wrapper-tabela { 
+        overflow: visible !important; 
+        width: 100% !important; 
+        margin: 0 !important;
+        page-break-after: always !important; 
+        break-after: page !important; 
+    }
+    .wrapper-tabela:last-child {
+        page-break-after: auto !important;
+        break-after: auto !important;
+    }
+    .folha-a4 { 
+        box-shadow: none !important; 
+        border: none !important; 
+        width: 100% !important; 
+        min-width: 100% !important; 
+        padding: 0 !important; 
+        margin: 0 !important; 
+    }
+    table.tabela-matriz th, .th-matriz-colab, .th-mes-anual { 
+        background-color: var(--primary) !important; 
+        color: #fff !important; 
+    }
     .td-matriz-id { background-color: #fff !important; }
     .col-id-texto { background-color: transparent !important; border: none !important; }
 }
@@ -88,22 +391,44 @@ tr:hover .botoes-acoes { opacity: 1; }
 </head>
 <body>
 
+    <div id="toastNotificacao">Mensagem</div>
+    <input type="file" id="arquivoBackupMatriz" style="display:none;" accept=".json" onchange="processarArquivoBackup(this)">
+
     <div class="painel-controle">
         <div class="topo-modulo-info">
             <span class="badge-modulo">Módulo 2: Matriz Anual de DDS <span class="tag-v06">v06</span></span>
             <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
         </div>
         <div class="campos-painel">
-            <div class="campo-grupo"><label>Área:</label><input type="text" id="areaInputMatriz" placeholder="Operação"></div>
-            <div class="campo-grupo"><label>Ano:</label><input type="text" id="anoInputMatriz" value="2026" oninput="atualizarAnoMatriz()"></div>
-            <div class="campo-grupo"><label>Turno:</label><input type="text" id="turnoInputMatriz" placeholder="Turno A"></div>
-            <div class="campo-grupo"><label>Facilitador:</label><input type="text" id="facilitadorInputMatriz" placeholder="Mariana"></div>
+            <div class="campo-grupo">
+                <label>Área:</label>
+                <input type="text" id="areaInputMatriz" placeholder="Operação / Logística" oninput="sincronizarCabecalhosMatriz()">
+            </div>
+            <div class="campo-grupo">
+                <label>Ano:</label>
+                <input type="text" id="anoInputMatriz" value="2026" oninput="sincronizarCabecalhosMatriz()">
+            </div>
+            <div class="campo-grupo">
+                <label>Turno:</label>
+                <input type="text" id="turnoInputMatriz" placeholder="Turno A" oninput="sincronizarCabecalhosMatriz()">
+            </div>
+            <div class="campo-grupo">
+                <label>Facilitador:</label>
+                <input type="text" id="facilitadorInputMatriz" placeholder="Mariana Silva" oninput="sincronizarCabecalhosMatriz()">
+            </div>
         </div>
         <div class="painel-meses-toggle">
-            <div class="titulo-meses-toggle"><span>👁️ Visibilidade dos Meses (Preenchimento Automático da Largura):</span>
+            <div class="titulo-meses-toggle">
+                <span>👁️ Visibilidade dos Meses (Distribuição Automática da Largura):</span>
                 <div class="links-rapidos-meses">
-                    <button type="button" class="link-rapido" onclick="definirTodosMeses(true)">Exibir Todos</button>
-                    <button type="button" class="link-rapido" onclick="definirTodosMeses(false)">Ocultar Todos</button>
+                    <button type="button" class="link-rapido" onclick="definirTodosMeses(true)">Todos (12m)</button>
+                    <button type="button" class="link-rapido" onclick="definirSemestre(1)">1º Semestre (Jan-Jun)</button>
+                    <button type="button" class="link-rapido" onclick="definirSemestre(2)">2º Semestre (Jul-Dez)</button>
+                    <button type="button" class="link-rapido" onclick="definirTrimestre(1)">Q1</button>
+                    <button type="button" class="link-rapido" onclick="definirTrimestre(2)">Q2</button>
+                    <button type="button" class="link-rapido" onclick="definirTrimestre(3)">Q3</button>
+                    <button type="button" class="link-rapido" onclick="definirTrimestre(4)">Q4</button>
+                    <button type="button" class="link-rapido" onclick="definirTodosMeses(false)">Limpar</button>
                 </div>
             </div>
             <div class="container-meses-btns">
@@ -121,12 +446,21 @@ tr:hover .botoes-acoes { opacity: 1; }
                 <button type="button" class="btn-mes-tag" data-mes="11" onclick="alternarMes(11)">DEZ</button>
             </div>
         </div>
-        <div class="campo-grupo"><label>Colaboradores (Ordenação A-Z automática):</label><textarea id="nomesInputMatriz" oninput="this.value=this.value.toUpperCase()" placeholder="COLE OS NOMES AQUI..."></textarea></div>
+        <div class="campo-grupo">
+            <label>
+                <span>Colaboradores (Ordenação A-Z automática):</span>
+                <span id="contadorColaboradores" class="contador-colaboradores">0 colaborador(es) | 0 folha(s)</span>
+            </label>
+            <textarea id="nomesInputMatriz" oninput="atualizarContadorNomes()" placeholder="COLE OS NOMES AQUI (UM POR LINHA)..."></textarea>
+        </div>
         <div class="botoes-painel">
             <button type="button" class="btn btn-verde" onclick="gerarTabelaMatriz()">Atualizar Grelha (A-Z)</button>
             <button type="button" class="btn btn-azul" onclick="adicionarFolhaMatriz()">📄➕ Folha Extra</button>
-            <button type="button" class="btn btn-salvar" onclick="salvarTudoMatriz()">💾 Guardar</button>
+            <button type="button" class="btn btn-renumerar" onclick="reordenarNumMatriz()">🔢 Renumerar</button>
+            <button type="button" class="btn btn-salvar" onclick="salvarTudoMatriz()">💾 Salvar</button>
             <button type="button" class="btn btn-carregar" onclick="carregarTudoMatriz()">📂 Carregar</button>
+            <button type="button" class="btn btn-exportar" onclick="exportarBackupJSON()">⬇️ Backup</button>
+            <button type="button" class="btn btn-exportar" onclick="document.getElementById('arquivoBackupMatriz').click()">⬆️ Restaurar</button>
             <button type="button" class="btn btn-limpar" onclick="limparTudoMatriz()">Limpar</button>
             <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
         </div>
@@ -135,23 +469,53 @@ tr:hover .botoes-acoes { opacity: 1; }
     <div id="contentorFolhasMatriz"></div>
 
     <script>
+        const TOTAL_LINHAS_MATRIZ = 24;
         let visMeses = [true,true,true,true,true,true,true,true,true,true,true,true];
 
-        function atualizarAnoMatriz() {
-            const ano = document.getElementById('anoInputMatriz').value;
-            document.querySelectorAll('.ano-txt-val').forEach(el => el.innerText = ano);
+        function mostrarToast(msg) {
+            const toast = document.getElementById('toastNotificacao');
+            toast.innerText = msg;
+            toast.classList.add('ativo');
+            setTimeout(() => { toast.classList.remove('ativo'); }, 2600);
+        }
+
+        function sincronizarCabecalhosMatriz() {
+            const area = document.getElementById('areaInputMatriz').value || '---';
+            const ano = document.getElementById('anoInputMatriz').value || '2026';
+            const turno = document.getElementById('turnoInputMatriz').value || '---';
+            const facilitador = document.getElementById('facilitadorInputMatriz').value || '---';
+
+            document.querySelectorAll('#contentorFolhasMatriz .wrapper-tabela').forEach(f => {
+                const elArea = f.querySelector('.val-area');
+                const elAno = f.querySelector('.ano-txt-val');
+                const elTurno = f.querySelector('.val-turno');
+                const elFacilitador = f.querySelector('.val-facilitador');
+
+                if (elArea) elArea.innerText = area;
+                if (elAno) elAno.innerText = ano;
+                if (elTurno) elTurno.innerText = turno;
+                if (elFacilitador) elFacilitador.innerText = facilitador;
+            });
+        }
+
+        function atualizarContadorNomes() {
+            const textarea = document.getElementById('nomesInputMatriz');
+            textarea.value = textarea.value.toUpperCase();
+            const linhas = textarea.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            const total = linhas.length;
+            const folhas = total === 0 ? 1 : Math.ceil(total / TOTAL_LINHAS_MATRIZ);
+            document.getElementById('contadorColaboradores').innerText = `${total} colaborador(es) | ${folhas} folha(s)`;
         }
 
         function recalcularLargurasMeses() {
             document.querySelectorAll('table.tabela-matriz').forEach(tabela => {
                 const mesesVisiveis = Array.from(tabela.querySelectorAll('th.th-mes-anual')).filter(th => !th.classList.contains('mes-oculto'));
                 if (mesesVisiveis.length > 0) {
-                    const larguraDisponivel = 1060 - 38 - 240; // Largura total da folha menos Nº e Colaborador
+                    const larguraDisponivel = 1060 - 38 - 240; 
                     const larguraCada = Math.floor(larguraDisponivel / mesesVisiveis.length);
                     mesesVisiveis.forEach(th => {
                         th.style.width = larguraCada + 'px';
                     });
-                    // Aplicar também às células de dados correspondentes
                     for(let i=0; i<12; i++) {
                         if(visMeses[i]) {
                             tabela.querySelectorAll(`.col-mes-${i}`).forEach(td => {
@@ -166,27 +530,92 @@ tr:hover .botoes-acoes { opacity: 1; }
         function aplicarVisMeses() {
             for(let i=0; i<12; i++) {
                 const vis = visMeses[i];
-                document.querySelector(`.btn-mes-tag[data-mes="${i}"]`).classList.toggle('inativo', !vis);
+                const btn = document.querySelector(`.btn-mes-tag[data-mes="${i}"]`);
+                if(btn) btn.classList.toggle('inativo', !vis);
                 document.querySelectorAll(`.col-mes-${i}`).forEach(el => el.classList.toggle('mes-oculto', !vis));
             }
             recalcularLargurasMeses();
         }
 
-        function alternarMes(i) { visMeses[i] = !visMeses[i]; aplicarVisMeses(); }
-        function definirTodosMeses(st) { for(let i=0; i<12; i++) visMeses[i] = st; aplicarVisMeses(); }
+        function alternarMes(i) { 
+            visMeses[i] = !visMeses[i]; 
+            aplicarVisMeses(); 
+        }
+
+        function definirTodosMeses(st) { 
+            for(let i=0; i<12; i++) visMeses[i] = st; 
+            aplicarVisMeses(); 
+        }
+
+        function definirSemestre(sem) {
+            for(let i=0; i<12; i++) {
+                visMeses[i] = (sem === 1) ? (i < 6) : (i >= 6);
+            }
+            aplicarVisMeses();
+            mostrarToast(sem === 1 ? 'Exibindo 1º Semestre (Jan-Jun)' : 'Exibindo 2º Semestre (Jul-Dez)');
+        }
+
+        function definirTrimestre(tri) {
+            const inicio = (tri - 1) * 3;
+            const fim = inicio + 2;
+            for(let i=0; i<12; i++) {
+                visMeses[i] = (i >= inicio && i <= fim);
+            }
+            aplicarVisMeses();
+            mostrarToast(`Exibindo Q${tri}`);
+        }
 
         function criarLinhaMatriz(numStr, nome='') {
-            let tds = ''; for(let i=0; i<12; i++) tds += `<td class="celula-data col-mes-${i} ${visMeses[i]?'':'mes-oculto'}" contenteditable="true" title="Preencher DDS"></td>`;
+            let tds = ''; 
+            for(let i=0; i<12; i++) {
+                tds += `<td class="celula-data col-mes-${i} ${visMeses[i]?'':'mes-oculto'}" contenteditable="true" title="Preencher DDS"></td>`;
+            }
             return `<td class="td-matriz-id"><div class="col-id-container"><span class="col-id-texto" contenteditable="true" title="Editar número">${numStr}</span></div></td>` +
                    `<td><div class="col-nome-container"><span class="col-nome-texto" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()" title="Nome do colaborador">${nome}</span>` +
                    `<div class="botoes-acoes"><button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixoMatriz(this)" title="Adicionar linha abaixo">➕</button><button type="button" class="btn-acao btn-menos-linha" onclick="removerLinhaMatriz(this)" title="Remover linha">➖</button><button type="button" class="btn-acao btn-lixeira" onclick="apagarLinhaMatriz(this)" title="Apagar nome">🗑️</button></div></div></td>${tds}`;
         }
 
-        function apagarLinhaMatriz(b) { b.closest('tr').querySelector('.col-nome-texto').innerText = ''; }
-        function adicionarLinhaAbaixoMatriz(btn) { const tr = document.createElement('tr'); tr.innerHTML = criarLinhaMatriz('00',''); btn.closest('tr').after(tr); recalc(); }
-        function adicionarLinhaFimMatriz(btn) { const corpo = btn.closest('.folha-a4').querySelector('.corpo-tabela-matriz'); const tr = document.createElement('tr'); tr.innerHTML = criarLinhaMatriz('00',''); corpo.appendChild(tr); recalc(); }
-        function removerLinhaMatriz(b) { const tr = b.closest('tr'); if(tr.parentNode.querySelectorAll('tr').length > 1) tr.remove(); }
-        function removerFolhaMatriz(b) { b.closest('.wrapper-tabela').remove(); atualizarPaginacaoMatriz(); }
+        function apagarLinhaMatriz(b) { 
+            b.closest('tr').querySelector('.col-nome-texto').innerText = ''; 
+        }
+
+        function adicionarLinhaAbaixoMatriz(btn) { 
+            const tr = document.createElement('tr'); 
+            tr.innerHTML = criarLinhaMatriz('00',''); 
+            btn.closest('tr').after(tr); 
+            recalcularLargurasMeses();
+        }
+
+        function adicionarLinhaFimMatriz(btn) { 
+            const corpo = btn.closest('.folha-a4').querySelector('.corpo-tabela-matriz'); 
+            const tr = document.createElement('tr'); 
+            const total = corpo.querySelectorAll('tr').length + 1;
+            const numStr = total < 10 ? '0' + total : total;
+            tr.innerHTML = criarLinhaMatriz(numStr,''); 
+            corpo.appendChild(tr); 
+            recalcularLargurasMeses();
+        }
+
+        function removerLinhaMatriz(b) { 
+            const tr = b.closest('tr'); 
+            if(tr.parentNode.querySelectorAll('tr').length > 1) tr.remove(); 
+        }
+
+        function removerFolhaMatriz(b) { 
+            b.closest('.wrapper-tabela').remove(); 
+            atualizarPaginacaoMatriz(); 
+        }
+
+        function reordenarNumMatriz() {
+            document.querySelectorAll('#contentorFolhasMatriz .wrapper-tabela').forEach(folha => {
+                const linhas = folha.querySelectorAll('.corpo-tabela-matriz tr');
+                linhas.forEach((tr, i) => {
+                    const spanNum = tr.querySelector('.col-id-texto');
+                    if (spanNum) spanNum.innerText = (i + 1 < 10 ? '0' + (i + 1) : (i + 1));
+                });
+            });
+            mostrarToast('Numeração reorganizada sequencialmente');
+        }
 
         function criarEstruturaFolhaMatriz(nomesArr, tot) {
             let linhas = ''; 
@@ -195,18 +624,36 @@ tr:hover .botoes-acoes { opacity: 1; }
                 let numStr = (i+1 < 10 ? '0'+(i+1) : (i+1)); 
                 linhas += `<tr>${criarLinhaMatriz(numStr, n)}</tr>`; 
             }
-            const anoAtual = document.getElementById('anoInputMatriz').value;
-            const wrapper = document.createElement('div'); wrapper.className = 'wrapper-tabela';
-            wrapper.innerHTML = `<div class="folha-a4">
+            const anoAtual = document.getElementById('anoInputMatriz').value || '2026';
+            const areaAtual = document.getElementById('areaInputMatriz').value || '---';
+            const turnoAtual = document.getElementById('turnoInputMatriz').value || '---';
+            const facilAtual = document.getElementById('facilitadorInputMatriz').value || '---';
+
+            const wrapper = document.createElement('div'); 
+            wrapper.className = 'wrapper-tabela';
+            wrapper.innerHTML = `
+            <div class="folha-a4">
                 <div class="barra-controle-folha">
-                    <div class="grupo-acoes-linhas"><button type="button" class="btn-linha-topo" onclick="adicionarLinhaFimMatriz(this)">➕ Linha no Fim</button></div>
+                    <div class="grupo-acoes-linhas">
+                        <button type="button" class="btn-linha-topo" onclick="adicionarLinhaFimMatriz(this)">➕ Linha no Fim</button>
+                    </div>
                     <button type="button" class="btn-remover-folha" onclick="removerFolhaMatriz(this)">Remover Folha ✕</button>
                 </div>
                 <table class="cabecalho-container">
                     <tr>
                         <td class="logo-box">VALE</td>
-                        <td class="titulo-box">MATRIZ DE REGISTO DE DIÁLOGO DIÁRIO DE SEGURANÇA (DDS)</td>
-                        <td class="meta-box"><strong>Ano:</strong> <span class="ano-txt-val">${anoAtual}</span><br><span class="indicador-folha"><strong>Folha:</strong> 01 / 01</span></td>
+                        <td class="titulo-box">MATRIZ ANUAL DE REGISTRO DE DIÁLOGO DIÁRIO DE SEGURANÇA (DDS)</td>
+                        <td class="meta-box">
+                            <strong>Ano:</strong> <span class="ano-txt-val">${anoAtual}</span><br>
+                            <span class="indicador-folha"><strong>Folha:</strong> 01 / 01</span>
+                        </td>
+                    </tr>
+                </table>
+                <table class="info-matriz-bar">
+                    <tr>
+                        <td><strong>Área:</strong> <span class="val-area campo-editavel" contenteditable="true">${areaAtual}</span></td>
+                        <td><strong>Turno:</strong> <span class="val-turno campo-editavel" contenteditable="true">${turnoAtual}</span></td>
+                        <td><strong>Facilitador:</strong> <span class="val-facilitador campo-editavel" contenteditable="true">${facilAtual}</span></td>
                     </tr>
                 </table>
                 <table class="tabela-matriz">
@@ -228,23 +675,124 @@ tr:hover .botoes-acoes { opacity: 1; }
             return wrapper;
         }
 
-        function atualizarPaginacaoMatriz() { const f = document.querySelectorAll('#contentorFolhasMatriz .wrapper-tabela'); f.forEach((folha, idx) => { const ind = folha.querySelector('.indicador-folha'); if(ind) ind.innerHTML = `<strong>Folha:</strong> 0${idx+1} / 0${f.length}`; }); }
-        function adicionarFolhaMatriz() { document.getElementById('contentorFolhasMatriz').appendChild(criarEstruturaFolhaMatriz([], 24)); atualizarPaginacaoMatriz(); aplicarVisMeses(); }
-
-        function gerarTabelaMatriz() {
-            const box = document.getElementById('contentorFolhasMatriz'); box.innerHTML = '';
-            const nomes = document.getElementById('nomesInputMatriz').value.toUpperCase().split('\n').map(l=>l.trim()).filter(l=>l.length>0).sort((a,b)=>a.localeCompare(b,'pt'));
-            document.getElementById('nomesInputMatriz').value = nomes.join('\n');
-            let blocos = []; if(nomes.length === 0) blocos.push([]); else for(let i=0; i<nomes.length; i+=24) blocos.push(nomes.slice(i, i+24));
-            blocos.forEach(b => box.appendChild(criarEstruturaFolhaMatriz(b, 24)));
-            aplicarVisMeses(); atualizarPaginacaoMatriz();
+        function atualizarPaginacaoMatriz() { 
+            const f = document.querySelectorAll('#contentorFolhasMatriz .wrapper-tabela'); 
+            f.forEach((folha, idx) => { 
+                const ind = folha.querySelector('.indicador-folha'); 
+                const atual = (idx + 1 < 10 ? '0' + (idx + 1) : (idx + 1));
+                const total = (f.length < 10 ? '0' + f.length : f.length);
+                if(ind) ind.innerHTML = `<strong>Folha:</strong> ${atual} / ${total}`; 
+            }); 
         }
 
-        function salvarTudoMatriz() { localStorage.setItem('valematriz_v06', JSON.stringify({html: document.getElementById('contentorFolhasMatriz').innerHTML, ano: document.getElementById('anoInputMatriz').value})); alert('Matriz Guardada com sucesso! (v06)'); }
-        function carregarTudoMatriz() { const s = localStorage.getItem('valematriz_v06'); if(s) { const d = JSON.parse(s); if(d.ano) document.getElementById('anoInputMatriz').value = d.ano; document.getElementById('contentorFolhasMatriz').innerHTML = d.html; atualizarAnoMatriz(); aplicarVisMeses(); alert('Matriz Carregada!'); } }
-        function limparTudoMatriz() { document.getElementById('contentorFolhasMatriz').innerHTML = ''; adicionarFolhaMatriz(); }
+        function adicionarFolhaMatriz() { 
+            document.getElementById('contentorFolhasMatriz').appendChild(criarEstruturaFolhaMatriz([], TOTAL_LINHAS_MATRIZ)); 
+            atualizarPaginacaoMatriz(); 
+            aplicarVisMeses(); 
+        }
 
-        window.onload = function() { adicionarFolhaMatriz(); };
+        function gerarTabelaMatriz() {
+            const box = document.getElementById('contentorFolhasMatriz'); 
+            box.innerHTML = '';
+            const textarea = document.getElementById('nomesInputMatriz');
+            const nomes = textarea.value.toUpperCase().split('\n').map(l=>l.trim()).filter(l=>l.length>0).sort((a,b)=>a.localeCompare(b,'pt-BR'));
+            textarea.value = nomes.join('\n');
+            atualizarContadorNomes();
+
+            let blocos = []; 
+            if(nomes.length === 0) {
+                blocos.push([]); 
+            } else {
+                for(let i=0; i<nomes.length; i+=TOTAL_LINHAS_MATRIZ) {
+                    blocos.push(nomes.slice(i, i+TOTAL_LINHAS_MATRIZ));
+                }
+            }
+            blocos.forEach(b => box.appendChild(criarEstruturaFolhaMatriz(b, TOTAL_LINHAS_MATRIZ)));
+            aplicarVisMeses(); 
+            atualizarPaginacaoMatriz();
+            mostrarToast('Grelha anual gerada em ordem A-Z');
+        }
+
+        function obterEstadoCompleto() {
+            return {
+                area: document.getElementById('areaInputMatriz').value,
+                ano: document.getElementById('anoInputMatriz').value,
+                turno: document.getElementById('turnoInputMatriz').value,
+                facilitador: document.getElementById('facilitadorInputMatriz').value,
+                nomes: document.getElementById('nomesInputMatriz').value,
+                visMeses: visMeses,
+                html: document.getElementById('contentorFolhasMatriz').innerHTML
+            };
+        }
+
+        function salvarTudoMatriz() { 
+            localStorage.setItem('valematriz_v06', JSON.stringify(obterEstadoCompleto())); 
+            mostrarToast('Matriz Anual salva com sucesso!'); 
+        }
+
+        function carregarTudoMatriz() { 
+            const s = localStorage.getItem('valematriz_v06'); 
+            if(s) { 
+                restaurarEstado(JSON.parse(s));
+                mostrarToast('Matriz Carregada com sucesso!'); 
+            } else {
+                mostrarToast('Nenhum dado salvo encontrado.');
+            }
+        }
+
+        function restaurarEstado(dados) {
+            if(dados.area !== undefined) document.getElementById('areaInputMatriz').value = dados.area;
+            if(dados.ano !== undefined) document.getElementById('anoInputMatriz').value = dados.ano;
+            if(dados.turno !== undefined) document.getElementById('turnoInputMatriz').value = dados.turno;
+            if(dados.facilitador !== undefined) document.getElementById('facilitadorInputMatriz').value = dados.facilitador;
+            if(dados.nomes !== undefined) document.getElementById('nomesInputMatriz').value = dados.nomes;
+            if(dados.visMeses !== undefined) visMeses = dados.visMeses;
+            if(dados.html !== undefined) document.getElementById('contentorFolhasMatriz').innerHTML = dados.html;
+
+            sincronizarCabecalhosMatriz();
+            aplicarVisMeses();
+            atualizarPaginacaoMatriz();
+            atualizarContadorNomes();
+        }
+
+        function exportarBackupJSON() {
+            const blob = new Blob([JSON.stringify(obterEstadoCompleto(), null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_matriz_dds_${document.getElementById('anoInputMatriz').value || '2026'}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            mostrarToast('Backup exportado com sucesso!');
+        }
+
+        function processarArquivoBackup(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const dados = JSON.parse(e.target.result);
+                    restaurarEstado(dados);
+                    mostrarToast('Backup restaurado com sucesso!');
+                } catch(err) {
+                    mostrarToast('Erro ao ler arquivo de backup.');
+                }
+            };
+            reader.readAsText(file);
+            input.value = '';
+        }
+
+        function limparTudoMatriz() { 
+            document.getElementById('contentorFolhasMatriz').innerHTML = ''; 
+            adicionarFolhaMatriz(); 
+            mostrarToast('Área resetada.');
+        }
+
+        window.onload = function() { 
+            adicionarFolhaMatriz(); 
+            atualizarContadorNomes();
+        };
     </script>
 </body>
 </html>
