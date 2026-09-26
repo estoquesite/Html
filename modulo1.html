@@ -1,98 +1,345 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Módulo 1 - DDS & Emociograma | Portal Vale v02</title>
 <style>
+:root {
+    --primary: #007e7a;
+    --primary-dark: #005a57;
+    --primary-light: #e6f4f4;
+    --accent: #f59e0b;
+    --danger: #ef4444;
+    --success: #10b981;
+    --slate-900: #0f172a;
+    --slate-700: #334155;
+    --slate-600: #475569;
+    --slate-200: #e2e8f0;
+    --slate-100: #f1f5f9;
+    --slate-50: #f8fafc;
+}
+
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: #f0f4f8; color: #1e293b; min-height: 100vh; padding: 12px; }
+body { 
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+    background: #edf2f7; 
+    color: var(--slate-900); 
+    min-height: 100vh; 
+    padding: 14px; 
+}
 
-/* PAINEL DE CONTROLO */
-.painel-controle { background: #ffffff; padding: 14px 18px; margin: 0 auto 14px auto; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); border: 1px solid #e2e8f0; max-width: 1120px; }
-.topo-modulo-info { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; border-bottom: 2px solid #007e7a; padding-bottom: 6px; }
-.badge-modulo { background: linear-gradient(135deg, #007e7a, #005a57); color: #fff; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 5px; text-transform: uppercase; }
-.tag-v02 { background-color: #f59e0b; color: #fff; font-weight: 800; font-size: 10px; padding: 2px 6px; border-radius: 4px; margin-left: 6px; }
+/* NOTIFICAÇÃO TOAST */
+#toastNotificacao {
+    position: fixed; 
+    bottom: 24px; 
+    right: 24px; 
+    background: var(--slate-900); 
+    color: #fff;
+    padding: 10px 18px; 
+    border-radius: 6px; 
+    font-size: 11.5px; 
+    font-weight: 600;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.2); 
+    opacity: 0; 
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease; 
+    transform: translateY(12px); 
+    z-index: 9999;
+}
+#toastNotificacao.ativo { opacity: 1; transform: translateY(0); }
 
-.campos-painel { display: grid; gap: 10px; margin-bottom: 8px; grid-template-columns: 2fr 1fr 1fr; }
-.campo-grupo label { display: block; font-weight: 700; margin-bottom: 3px; font-size: 10px; color: #475569; text-transform: uppercase; }
-.painel-controle input[type="text"] { width: 100%; font-family: inherit; font-size: 11px; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 5px; background: #f8fafc; outline: none; }
-.painel-controle textarea { width: 100%; height: 55px; font-family: inherit; font-size: 11px; padding: 6px 8px; border: 1px solid #cbd5e1; border-radius: 5px; resize: vertical; text-transform: uppercase; background: #f8fafc; outline: none; }
+/* PAINEL DE CONTROLE */
+.painel-controle { 
+    background: #ffffff; 
+    padding: 16px 20px; 
+    margin: 0 auto 16px auto; 
+    border-radius: 10px; 
+    box-shadow: 0 4px 18px rgba(0,0,0,0.04); 
+    border: 1px solid var(--slate-200); 
+    max-width: 1120px; 
+}
+.topo-modulo-info { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    margin-bottom: 12px; 
+    border-bottom: 2px solid var(--primary); 
+    padding-bottom: 8px; 
+}
+.badge-modulo { 
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
+    color: #fff; 
+    font-size: 11px; 
+    font-weight: 800; 
+    padding: 5px 12px; 
+    border-radius: 6px; 
+    text-transform: uppercase; 
+    letter-spacing: 0.5px; 
+}
+.tag-v02 { 
+    background-color: var(--accent); 
+    color: #fff; 
+    font-weight: 800; 
+    font-size: 9.5px; 
+    padding: 2px 6px; 
+    border-radius: 4px; 
+    margin-left: 6px; 
+}
 
-.botoes-painel { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
-.btn { cursor: pointer; padding: 6px 12px; font-size: 10.5px; font-weight: 700; border: none; border-radius: 5px; color: #fff; display: inline-flex; align-items: center; gap: 4px; }
-.btn-verde { background-color: #10b981; } .btn-azul { background-color: #007e7a; } .btn-add-folha { background-color: #7c3aed; } .btn-salvar { background-color: #2563eb; } .btn-carregar { background-color: #0284c7; } .btn-limpar { background-color: #f1f5f9; color: #475569; border: 1px solid #cbd5e1; } .btn-voltar { background-color: #475569; text-decoration: none; } .btn-imprimir { background-color: #0f172a; margin-left: auto; }
+.campos-painel { 
+    display: grid; 
+    gap: 12px; 
+    margin-bottom: 10px; 
+    grid-template-columns: 2fr 1fr 1fr; 
+}
+.campo-grupo label { 
+    display: flex; 
+    justify-content: space-between; 
+    font-weight: 700; 
+    margin-bottom: 4px; 
+    font-size: 10.5px; 
+    color: var(--slate-600); 
+    text-transform: uppercase; 
+}
+.painel-controle input[type="text"] { 
+    width: 100%; 
+    font-family: inherit; 
+    font-size: 11.5px; 
+    padding: 7px 10px; 
+    border: 1px solid #cbd5e1; 
+    border-radius: 6px; 
+    background: var(--slate-50); 
+    outline: none; 
+    transition: border-color 0.2s, background-color 0.2s;
+}
+.painel-controle input[type="text"]:focus, .painel-controle textarea:focus { 
+    border-color: var(--primary); 
+    background: #fff; 
+}
+.painel-controle textarea { 
+    width: 100%; 
+    height: 65px; 
+    font-family: inherit; 
+    font-size: 11.5px; 
+    padding: 7px 10px; 
+    border: 1px solid #cbd5e1; 
+    border-radius: 6px; 
+    resize: vertical; 
+    text-transform: uppercase; 
+    background: var(--slate-50); 
+    outline: none; 
+    transition: border-color 0.2s, background-color 0.2s;
+}
 
-/* FOLHA A4 OTIMIZADA PARA IMPRESSÃO ÚNICA */
-.folha-a4 { width: 100%; max-width: 1120px; background: #fff; padding: 10px 14px; margin: 0 auto 14px auto; box-shadow: 0 4px 15px rgba(0,0,0,0.06); border-radius: 8px; border: 1px solid #e2e8f0; }
+.contador-colaboradores {
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--primary);
+    text-transform: none;
+}
 
-.barra-controle-folha { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; background: #f8fafc; padding: 4px 8px; border: 1px solid #e2e8f0; border-radius: 4px; }
+.botoes-painel { 
+    display: flex; 
+    gap: 6px; 
+    flex-wrap: wrap; 
+    margin-top: 8px; 
+}
+.btn { 
+    cursor: pointer; 
+    padding: 7px 12px; 
+    font-size: 11px; 
+    font-weight: 700; 
+    border: none; 
+    border-radius: 6px; 
+    color: #fff; 
+    display: inline-flex; 
+    align-items: center; 
+    gap: 5px; 
+    transition: filter 0.15s ease, transform 0.05s ease; 
+}
+.btn:hover { filter: brightness(1.08); }
+.btn:active { transform: translateY(1px); }
+
+.btn-verde { background-color: var(--success); }
+.btn-azul { background-color: var(--primary); }
+.btn-add-folha { background-color: #7c3aed; }
+.btn-renumerar { background-color: #ea580c; }
+.btn-salvar { background-color: #2563eb; }
+.btn-carregar { background-color: #0284c7; }
+.btn-exportar { background-color: #0891b2; }
+.btn-limpar { background-color: var(--slate-100); color: var(--slate-600); border: 1px solid #cbd5e1; }
+.btn-voltar { background-color: var(--slate-600); text-decoration: none; }
+.btn-imprimir { background-color: var(--slate-900); margin-left: auto; }
+
+/* FOLHA A4 PARA TELA E IMPRESSÃO */
+.folha-a4 { 
+    width: 100%; 
+    max-width: 1120px; 
+    background: #fff; 
+    padding: 12px 14px; 
+    margin: 0 auto 16px auto; 
+    box-shadow: 0 4px 18px rgba(0,0,0,0.05); 
+    border-radius: 8px; 
+    border: 1px solid var(--slate-200); 
+}
+
+.barra-controle-folha { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 6px; 
+    background: var(--slate-50); 
+    padding: 5px 10px; 
+    border: 1px solid var(--slate-200); 
+    border-radius: 5px; 
+}
 .grupo-acoes-linhas { display: flex; align-items: center; gap: 6px; }
-.btn-linha-topo { border: 1px solid #007e7a; border-radius: 4px; font-size: 8.5px; font-weight: 700; padding: 2px 8px; cursor: pointer; background: #fff; color: #007e7a; }
-.btn-remover-folha { background: #fff; color: #ef4444; border: 1px solid #fca5a5; border-radius: 4px; font-size: 8.5px; font-weight: 700; padding: 2px 8px; cursor: pointer; }
+.btn-linha-topo { 
+    border: 1px solid var(--primary); 
+    border-radius: 4px; 
+    font-size: 9px; 
+    font-weight: 700; 
+    padding: 3px 8px; 
+    cursor: pointer; 
+    background: #fff; 
+    color: var(--primary); 
+}
+.btn-remover-folha { 
+    background: #fff; 
+    color: var(--danger); 
+    border: 1px solid #fca5a5; 
+    border-radius: 4px; 
+    font-size: 9px; 
+    font-weight: 700; 
+    padding: 3px 8px; 
+    cursor: pointer; 
+}
 
-.cabecalho-container, .info-dds, table.tabela-dds { width: 100%; border-collapse: collapse; border: 1.2px solid #0f172a; margin-bottom: 3px; table-layout: fixed; }
-.cabecalho-container td, .info-dds td { border: 1px solid #334155; padding: 2px 5px; vertical-align: middle; text-align: center; }
-.logo-box { width: 110px; font-weight: 900; font-size: 15px; color: #007e7a; background-color: #f8fafc; }
-.titulo-box { font-size: 10px; font-weight: 800; text-transform: uppercase; color: #0f172a; }
-.meta-box { width: 130px; font-size: 8.5px; text-align: left !important; padding-left: 6px !important; background-color: #f8fafc; }
+.cabecalho-container, .info-dds, table.tabela-dds { 
+    width: 100%; 
+    border-collapse: collapse; 
+    border: 1.2px solid var(--slate-900); 
+    margin-bottom: 3px; 
+    table-layout: fixed; 
+}
+.cabecalho-container td, .info-dds td { 
+    border: 1px solid var(--slate-700); 
+    padding: 3px 6px; 
+    vertical-align: middle; 
+    text-align: center; 
+}
+.logo-box { 
+    width: 115px; 
+    font-weight: 900; 
+    font-size: 16px; 
+    color: var(--primary); 
+    letter-spacing: 1.5px; 
+    background-color: var(--slate-50); 
+}
+.titulo-box { font-size: 10.5px; font-weight: 800; text-transform: uppercase; color: var(--slate-900); }
+.meta-box { width: 130px; font-size: 8.5px; text-align: left !important; padding-left: 8px !important; background-color: var(--slate-50); }
 .campo-editavel { outline: none; display: inline-block; min-width: 25px; font-size: 8.5px; font-weight: 600; }
 
-table.tabela-dds th, table.tabela-dds td { border: 1px solid #334155; text-align: center; vertical-align: middle; }
-table.tabela-dds th { background-color: #f8fafc; font-weight: 800; color: #0f172a; }
+table.tabela-dds th, table.tabela-dds td { border: 1px solid var(--slate-700); text-align: center; vertical-align: middle; }
+table.tabela-dds th { background-color: var(--slate-50); font-weight: 800; color: var(--slate-900); }
 table.tabela-dds tbody tr:nth-child(even) { background-color: #fafbfc; }
 table.tabela-dds td { height: 21.5px; padding: 1px 2px; }
 
-/* COLUNAS E NÚMEROS EDITÁVEIS */
-.tabela-dds .col-id { width: 36px !important; background-color: #f1f5f9 !important; font-weight: 800; }
+/* COLUNAS E CAMPOS */
+.tabela-dds .col-id { width: 36px !important; background-color: var(--slate-100) !important; font-weight: 800; }
 .col-id-container { display: flex; align-items: center; justify-content: center; width: 100%; }
-.col-id-texto { outline: none; font-size: 9px; font-weight: 800; color: #0f172a; background: #e2e8f0; padding: 1px 4px; border-radius: 3px; display: inline-block; width: 100%; text-align: center; }
+.col-id-texto { outline: none; font-size: 9px; font-weight: 800; color: var(--slate-900); background: #e2e8f0; padding: 1px 4px; border-radius: 3px; display: inline-block; width: 100%; text-align: center; }
 .col-id-texto:focus { background: #fef3c7; }
 
 .tabela-dds .col-colaborador { width: 240px !important; text-align: left; }
 .col-nome-container { display: flex; align-items: center; justify-content: space-between; padding: 0 4px; gap: 4px; width: 100%; }
-.col-nome-texto { flex-grow: 1; text-align: left; outline: none; white-space: nowrap; overflow: hidden; font-size: 8.5px; font-weight: 700; color: #0f172a; text-transform: uppercase; }
+.col-nome-texto { flex-grow: 1; text-align: left; outline: none; white-space: nowrap; overflow: hidden; font-size: 8.5px; font-weight: 700; color: var(--slate-900); text-transform: uppercase; }
 
 .botoes-acoes { display: flex; align-items: center; gap: 2px; opacity: 0.3; transition: opacity 0.2s; }
 tr:hover .botoes-acoes { opacity: 1; }
-.btn-acao { background: #f1f5f9; border: 1px solid #cbd5e1; border-radius: 3px; cursor: pointer; padding: 1px 3px; font-size: 8px; line-height: 1; }
-.btn-lixeira { color: #ef4444; border-color: #fca5a5; }
-.btn-mais-linha { color: #10b981; border-color: #6ee7b7; font-weight: 900; }
-.btn-menos-linha { color: #f59e0b; border-color: #fcd34d; font-weight: 900; }
+.btn-acao { background: var(--slate-100); border: 1px solid #cbd5e1; border-radius: 3px; cursor: pointer; padding: 1px 3px; font-size: 8px; line-height: 1; }
+.btn-lixeira { color: var(--danger); border-color: #fca5a5; }
+.btn-mais-linha { color: var(--success); border-color: #6ee7b7; font-weight: 900; }
+.btn-menos-linha { color: var(--accent); border-color: #fcd34d; font-weight: 900; }
 
-.th-dia-semana { font-size: 8.5px; font-weight: 800; text-transform: uppercase; padding: 3px 0; background: linear-gradient(180deg, #e6f4f4 0%, #d8ecec 100%) !important; color: #005a57; }
-.th-sub { font-size: 7.5px !important; font-weight: 800; background-color: #f1f5f9 !important; padding: 2px 0; }
+.th-dia-semana { 
+    font-size: 8.5px; 
+    font-weight: 800; 
+    text-transform: uppercase; 
+    padding: 3px 0; 
+    background: linear-gradient(180deg, var(--primary-light) 0%, #d8ecec 100%) !important; 
+    color: var(--primary-dark); 
+    position: relative;
+}
+.btn-preencher-dia {
+    margin-left: 4px;
+    font-size: 8px;
+    cursor: pointer;
+    background: none;
+    border: none;
+    color: var(--primary-dark);
+}
+.btn-preencher-dia:hover { color: var(--success); }
+
+.th-sub { font-size: 7.5px !important; font-weight: 800; background-color: var(--slate-100) !important; padding: 2px 0; }
 .col-como-estou { width: 55px; min-width: 55px; padding: 1px !important; }
 .col-rubrica { width: 45px; min-width: 45px; outline: none; font-size: 8.5px; background-color: #fff; }
 
-/* CARINHAS DE EMOCIOGRAMA */
+/* EMOCIOGRAMA */
 .grupo-carinhas { display: flex; align-items: center; justify-content: space-evenly; width: 100%; gap: 1px; }
 .carinha-item { display: flex; flex-direction: column; align-items: center; cursor: pointer; user-select: none; line-height: 1; padding: 1px; border-radius: 3px; }
-.carinha-num { font-size: 6px; font-weight: 800; color: #475569; margin-bottom: 0.5px; }
+.carinha-num { font-size: 6px; font-weight: 800; color: var(--slate-600); margin-bottom: 0.5px; }
 .carinha-svg { width: 11px; height: 11px; display: block; }
-.c-verde circle.rosto { stroke: #10b981; stroke-width: 2.2; fill: #ecfdf5; } .c-verde circle.olho { fill: #10b981; } .c-verde path.boca { stroke: #10b981; stroke-width: 2.2; stroke-linecap: round; fill: none; }
-.c-amarela circle.rosto { stroke: #f59e0b; stroke-width: 2.2; fill: #fffbeb; } .c-amarela circle.olho { fill: #f59e0b; } .c-amarela line.boca { stroke: #f59e0b; stroke-width: 2.2; stroke-linecap: round; fill: none; }
-.c-vermelha circle.rosto { stroke: #ef4444; stroke-width: 2.2; fill: #fef2f2; } .c-vermelha circle.olho { fill: #ef4444; } .c-vermelha path.boca { stroke: #ef4444; stroke-width: 2.2; stroke-linecap: round; fill: none; }
+.c-verde circle.rosto { stroke: var(--success); stroke-width: 2.2; fill: #ecfdf5; } 
+.c-verde circle.olho { fill: var(--success); } 
+.c-verde path.boca { stroke: var(--success); stroke-width: 2.2; stroke-linecap: round; fill: none; }
 
-.carinha-item.selecionado-1 { background-color: #d1fae5; outline: 1.2px solid #10b981; }
-.carinha-item.selecionado-2 { background-color: #fef3c7; outline: 1.2px solid #f59e0b; }
-.carinha-item.selecionado-3 { background-color: #fee2e2; outline: 1.2px solid #ef4444; }
+.c-amarela circle.rosto { stroke: var(--accent); stroke-width: 2.2; fill: #fffbeb; } 
+.c-amarela circle.olho { fill: var(--accent); } 
+.c-amarela line.boca { stroke: var(--accent); stroke-width: 2.2; stroke-linecap: round; fill: none; }
 
-/* RODAPÉ COMPLETO EXATAMENTE COMO NA SUA VERSÃO ORIGINAL */
+.c-vermelha circle.rosto { stroke: var(--danger); stroke-width: 2.2; fill: #fef2f2; } 
+.c-vermelha circle.olho { fill: var(--danger); } 
+.c-vermelha path.boca { stroke: var(--danger); stroke-width: 2.2; stroke-linecap: round; fill: none; }
+
+.carinha-item.selecionado-1 { background-color: #d1fae5; outline: 1.2px solid var(--success); }
+.carinha-item.selecionado-2 { background-color: #fef3c7; outline: 1.2px solid var(--accent); }
+.carinha-item.selecionado-3 { background-color: #fee2e2; outline: 1.2px solid var(--danger); }
+
+/* RODAPÉ */
 .rodape-container { display: grid; grid-template-columns: 140px 1.4fr 1.8fr; gap: 6px; width: 100%; font-size: 7.5px; line-height: 1.25; margin-top: 4px; }
-.box-legenda { border: 1px solid #cbd5e1; padding: 4px 6px; background-color: #f8fafc; border-radius: 5px; }
-.box-legenda h4 { margin: 0 0 2px 0; font-size: 8px; font-weight: 800; text-transform: uppercase; border-bottom: 1px solid #e2e8f0; padding-bottom: 2px; color: #005a57; }
+.box-legenda { border: 1px solid #cbd5e1; padding: 4px 6px; background-color: var(--slate-50); border-radius: 5px; }
+.box-legenda h4 { margin: 0 0 2px 0; font-size: 8px; font-weight: 800; text-transform: uppercase; border-bottom: 1px solid var(--slate-200); padding-bottom: 2px; color: var(--primary-dark); }
 .lista-legenda { list-style: none; padding: 0; margin: 0; }
 .lista-legenda li { margin-bottom: 1.5px; }
 
+/* CONFIGURAÇÕES DE IMPRESSÃO A4 */
 @media print {
     @page { size: A4 landscape; margin: 3mm 4mm; }
     body { background: #fff !important; padding: 0 !important; }
-    .painel-controle, .botoes-acoes, .barra-controle-folha { display: none !important; }
-    .folha-a4 { box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
+    .painel-controle, .botoes-acoes, .barra-controle-folha, .btn-preencher-dia, #toastNotificacao { display: none !important; }
+    .folha-a4 { 
+        box-shadow: none !important; 
+        border: none !important; 
+        width: 100% !important; 
+        max-width: 100% !important; 
+        padding: 0 !important; 
+        margin: 0 !important; 
+        page-break-after: always !important; 
+        break-after: page !important; 
+    }
+    .folha-a4:last-child {
+        page-break-after: auto !important;
+        break-after: auto !important;
+    }
 }
 </style>
 </head>
 <body>
+
+    <div id="toastNotificacao">Mensagem</div>
+    <input type="file" id="arquivoBackupDDS" style="display:none;" accept=".json" onchange="processarArquivoBackup(this)">
 
     <div class="painel-controle">
         <div class="topo-modulo-info">
@@ -100,25 +347,76 @@ tr:hover .botoes-acoes { opacity: 1; }
             <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
         </div>
         <div class="campos-painel">
-            <div class="campo-grupo"><label>Período:</label><input type="text" id="periodoInputDDS" placeholder="21/09 a 25/09"></div>
-            <div class="campo-grupo"><label>Semana:</label><input type="text" id="semanaInputDDS" placeholder="38"></div>
-            <div class="campo-grupo"><label>Ano:</label><input type="text" id="anoInputDDS" value="2026"></div>
+            <div class="campo-grupo">
+                <label>Período:</label>
+                <input type="text" id="periodoInputDDS" placeholder="21/09 a 25/09" oninput="sincronizarCabecalhos()">
+            </div>
+            <div class="campo-grupo">
+                <label>Semana:</label>
+                <input type="text" id="semanaInputDDS" placeholder="38" oninput="sincronizarCabecalhos()">
+            </div>
+            <div class="campo-grupo">
+                <label>Ano:</label>
+                <input type="text" id="anoInputDDS" value="2026" oninput="sincronizarCabecalhos()">
+            </div>
         </div>
-        <div class="campo-grupo"><label>Lista de Colaboradores (Ordenação A-Z automática):</label><textarea id="nomesInputDDS" oninput="this.value=this.value.toUpperCase()" placeholder="COLE OS NOMES AQUI (UM POR LINHA)..."></textarea></div>
+        <div class="campo-grupo">
+            <label>
+                <span>Lista de Colaboradores (Ordenação A-Z automática):</span>
+                <span id="contadorColaboradores" class="contador-colaboradores">0 colaboradores | 0 folha(s)</span>
+            </label>
+            <textarea id="nomesInputDDS" oninput="atualizarContadorNomes()" placeholder="COLE OS NOMES AQUI (UM POR LINHA)..."></textarea>
+        </div>
         <div class="botoes-painel">
             <button type="button" class="btn btn-verde" onclick="aplicarDadosDDS('verde')">Gerar c/ Carinha 1 (A-Z)</button>
             <button type="button" class="btn btn-azul" onclick="aplicarDadosDDS('limpo')">Gerar Limpo (A-Z)</button>
             <button type="button" class="btn btn-add-folha" onclick="adicionarFolhaManualDDS()">📄➕ Folha Extra</button>
-            <button type="button" class="btn btn-salvar" onclick="salvarTudoDDS()">💾 Guardar</button>
+            <button type="button" class="btn btn-renumerar" onclick="reordenarNumDDS()">🔢 Renumerar</button>
+            <button type="button" class="btn btn-salvar" onclick="salvarTudoDDS()">💾 Salvar</button>
             <button type="button" class="btn btn-carregar" onclick="carregarTudoDDS()">📂 Carregar</button>
+            <button type="button" class="btn btn-exportar" onclick="exportarBackupJSON()">⬇️ Backup</button>
+            <button type="button" class="btn btn-exportar" onclick="document.getElementById('arquivoBackupDDS').click()">⬆️ Restaurar</button>
             <button type="button" class="btn btn-limpar" onclick="limparTudoDDS()">Limpar</button>
             <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
         </div>
     </div>
+
     <div id="contentorFolhasDDS"></div>
 
     <script>
         const TOTAL_LINHAS_DDS = 24;
+
+        function mostrarToast(msg) {
+            const toast = document.getElementById('toastNotificacao');
+            toast.innerText = msg;
+            toast.classList.add('ativo');
+            setTimeout(() => { toast.classList.remove('ativo'); }, 2600);
+        }
+
+        function sincronizarCabecalhos() {
+            const periodo = document.getElementById('periodoInputDDS').value;
+            const semana = document.getElementById('semanaInputDDS').value;
+            const ano = document.getElementById('anoInputDDS').value;
+
+            document.querySelectorAll('#contentorFolhasDDS .folha-a4').forEach(f => {
+                const elP = f.querySelector('.info-periodo');
+                const elS = f.querySelector('.info-semana');
+                const elA = f.querySelector('.info-ano');
+                if (elP) elP.innerText = periodo;
+                if (elS) elS.innerText = semana;
+                if (elA) elA.innerText = ano;
+            });
+        }
+
+        function atualizarContadorNomes() {
+            const textarea = document.getElementById('nomesInputDDS');
+            textarea.value = textarea.value.toUpperCase();
+            const linhas = textarea.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            const total = linhas.length;
+            const folhas = total === 0 ? 1 : Math.ceil(total / TOTAL_LINHAS_DDS);
+            document.getElementById('contadorColaboradores').innerText = `${total} colaborador(es) | ${folhas} folha(s)`;
+        }
+
         function gerarBlocoComoEstou(sel = null) {
             const c1 = sel === 1 ? 'selecionado-1' : '';
             const c2 = sel === 2 ? 'selecionado-2' : '';
@@ -129,11 +427,33 @@ tr:hover .botoes-acoes { opacity: 1; }
                 <div class="carinha-item c-vermelha ${c3}" onclick="alternarDestaque(this, 3)" title="Sem condições"><span class="carinha-num">3</span><svg class="carinha-svg" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><path class="boca" d="M 9.5 22 C 12 17 20 17 22.5 22"/></svg></div>
             </div>`;
         }
+
         function alternarDestaque(el, tipo) {
             const grupo = el.closest('.grupo-carinhas');
+            const jaSelecionado = el.classList.contains('selecionado-' + tipo);
             grupo.querySelectorAll('.carinha-item').forEach(it => it.classList.remove('selecionado-1', 'selecionado-2', 'selecionado-3'));
-            el.classList.add('selecionado-' + tipo);
+            if (!jaSelecionado) {
+                el.classList.add('selecionado-' + tipo);
+            }
         }
+
+        function preencherColunaDia(botao, indiceDia) {
+            const folha = botao.closest('.folha-a4');
+            const linhas = folha.querySelectorAll('.corpo-tabela-folha tr');
+            linhas.forEach(tr => {
+                const celulasEstou = tr.querySelectorAll('.col-como-estou');
+                if (celulasEstou[indiceDia]) {
+                    const carinhaVerde = celulasEstou[indiceDia].querySelector('.c-verde');
+                    if (carinhaVerde) {
+                        const grupo = carinhaVerde.closest('.grupo-carinhas');
+                        grupo.querySelectorAll('.carinha-item').forEach(it => it.classList.remove('selecionado-1', 'selecionado-2', 'selecionado-3'));
+                        carinhaVerde.classList.add('selecionado-1');
+                    }
+                }
+            });
+            mostrarToast('Coluna do dia preenchida com Carinha 1');
+        }
+
         function criarHTMLLinhaDDS(numStr, nome = '', val = null) {
             return `<td class="col-id"><div class="col-id-container"><span class="col-id-texto" contenteditable="true" title="Editar número">${numStr}</span></div></td>
             <td class="col-colaborador"><div class="col-nome-container"><span class="col-nome-texto" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()" title="Nome do colaborador">${nome}</span>
@@ -144,69 +464,253 @@ tr:hover .botoes-acoes { opacity: 1; }
             <td class="col-como-estou">${gerarBlocoComoEstou(val)}</td><td class="col-rubrica" contenteditable="true" title="Rubrica"></td>
             <td class="col-como-estou">${gerarBlocoComoEstou(val)}</td><td class="col-rubrica" contenteditable="true" title="Rubrica"></td>`;
         }
-        function apagarLinhaDDS(b) { b.closest('tr').querySelector('.col-nome-texto').innerText = ''; }
-        function reordenarNumDDS() { /* Mantém numeração livre para edição manual */ }
-        function adicionarLinhaAbaixoDDS(b) { const tr = b.closest('tr'); const nova = document.createElement('tr'); nova.innerHTML = criarHTMLLinhaDDS('00','',null); tr.after(nova); }
-        function removerLinhaAtualDDS(b) { const tr = b.closest('tr'); if(tr.parentNode.querySelectorAll('tr').length <= 1) return; tr.remove(); }
-        function adicionarLinhaFimDDS(b) { const corpo = b.closest('.folha-a4').querySelector('.corpo-tabela-folha'); const nova = document.createElement('tr'); nova.innerHTML = criarHTMLLinhaDDS('00','',null); corpo.appendChild(nova); }
-        function removerLinhaFimDDS(b) { const corpo = b.closest('.folha-a4').querySelector('.corpo-tabela-folha'); const l = corpo.querySelectorAll('tr'); if(l.length <= 1) return; l[l.length-1].remove(); }
-        function removerFolhaDDS(b) { b.closest('.folha-a4').remove(); atualizarPaginacaoDDS(); }
+
+        function apagarLinhaDDS(b) { 
+            b.closest('tr').querySelector('.col-nome-texto').innerText = ''; 
+        }
+
+        function reordenarNumDDS() {
+            document.querySelectorAll('#contentorFolhasDDS .folha-a4').forEach(folha => {
+                const linhas = folha.querySelectorAll('.corpo-tabela-folha tr');
+                linhas.forEach((tr, i) => {
+                    const spanNum = tr.querySelector('.col-id-texto');
+                    if (spanNum) spanNum.innerText = (i + 1 < 10 ? '0' + (i + 1) : (i + 1));
+                });
+            });
+            mostrarToast('Numeração reorganizada sequencialmente');
+        }
+
+        function adicionarLinhaAbaixoDDS(b) { 
+            const tr = b.closest('tr'); 
+            const nova = document.createElement('tr'); 
+            nova.innerHTML = criarHTMLLinhaDDS('00','',null); 
+            tr.after(nova); 
+        }
+
+        function removerLinhaAtualDDS(b) { 
+            const tr = b.closest('tr'); 
+            if(tr.parentNode.querySelectorAll('tr').length <= 1) return; 
+            tr.remove(); 
+        }
+
+        function adicionarLinhaFimDDS(b) { 
+            const corpo = b.closest('.folha-a4').querySelector('.corpo-tabela-folha'); 
+            const nova = document.createElement('tr'); 
+            const total = corpo.querySelectorAll('tr').length + 1;
+            const numStr = total < 10 ? '0' + total : total;
+            nova.innerHTML = criarHTMLLinhaDDS(numStr, '', null); 
+            corpo.appendChild(nova); 
+        }
+
+        function removerLinhaFimDDS(b) { 
+            const corpo = b.closest('.folha-a4').querySelector('.corpo-tabela-folha'); 
+            const l = corpo.querySelectorAll('tr'); 
+            if(l.length <= 1) return; 
+            l[l.length-1].remove(); 
+        }
+
+        function removerFolhaDDS(b) { 
+            b.closest('.folha-a4').remove(); 
+            atualizarPaginacaoDDS(); 
+        }
+
         function criarEstruturaFolhaDDS(nomes, padrao, tot) {
-            let linhas = ''; for(let i=0; i<tot; i++) { let n = nomes[i] ? nomes[i].trim().toUpperCase() : ''; let numStr = (i+1 < 10 ? '0'+(i+1) : (i+1)); linhas += `<tr>${criarHTMLLinhaDDS(numStr, n, padrao ? 1 : null)}</tr>`; }
-            const f = document.createElement('div'); f.className = 'folha-a4';
-            f.innerHTML = `<div class="barra-controle-folha"><div class="grupo-acoes-linhas"><button type="button" class="btn-linha-topo" onclick="adicionarLinhaFimDDS(this)">➕ Linha no Fim</button><button type="button" class="btn-linha-topo" onclick="removerLinhaFimDDS(this)">➖ Remover Última</button></div><button type="button" class="btn-remover-folha" onclick="removerFolhaDDS(this)">Remover Folha ✕</button></div>
-            <table class="cabecalho-container"><tr><td class="logo-box">VALE</td><td class="titulo-box">DIÁLOGO DIÁRIO DE SEGURANÇA (DDS) E EMOCIOGRAMA</td><td class="meta-box"><span class="indicador-folha"><strong>Folha:</strong> 01 / 01</span></td></tr></table>
-            <table class="info-dds"><tr><td><strong>Período:</strong> <span class="campo-editavel" contenteditable="true">${document.getElementById('periodoInputDDS').value}</span></td><td><strong>Semana:</strong> <span class="campo-editavel" contenteditable="true">${document.getElementById('semanaInputDDS').value}</span></td><td><strong>Ano:</strong> <span class="campo-editavel" contenteditable="true">${document.getElementById('anoInputDDS').value}</span></td></tr></table>
-            <table class="tabela-dds"><thead><tr><th rowspan="2" class="col-id">Nº</th><th rowspan="2" class="col-colaborador" style="padding-left:6px; text-align:left;">Colaborador</th><th colspan="2" class="th-dia-semana">Segunda</th><th colspan="2" class="th-dia-semana">Terça</th><th colspan="2" class="th-dia-semana">Quarta</th><th colspan="2" class="th-dia-semana">Quinta</th><th colspan="2" class="th-dia-semana">Sexta</th></tr><tr><th class="th-sub">Estou</th><th class="th-sub">Rub</th><th class="th-sub">Estou</th><th class="th-sub">Rub</th><th class="th-sub">Estou</th><th class="th-sub">Rub</th><th class="th-sub">Estou</th><th class="th-sub">Rub</th><th class="th-sub">Estou</th><th class="th-sub">Rub</th></tr></thead><tbody class="corpo-tabela-folha">${linhas}</tbody></table>
+            let linhas = ''; 
+            for(let i=0; i<tot; i++) { 
+                let n = nomes[i] ? nomes[i].trim().toUpperCase() : ''; 
+                let numStr = (i+1 < 10 ? '0'+(i+1) : (i+1)); 
+                linhas += `<tr>${criarHTMLLinhaDDS(numStr, n, padrao ? 1 : null)}</tr>`; 
+            }
+            const f = document.createElement('div'); 
+            f.className = 'folha-a4';
+            f.innerHTML = `
+            <div class="barra-controle-folha">
+                <div class="grupo-acoes-linhas">
+                    <button type="button" class="btn-linha-topo" onclick="adicionarLinhaFimDDS(this)">➕ Linha no Fim</button>
+                    <button type="button" class="btn-linha-topo" onclick="removerLinhaFimDDS(this)">➖ Remover Última</button>
+                </div>
+                <button type="button" class="btn-remover-folha" onclick="removerFolhaDDS(this)">Remover Folha ✕</button>
+            </div>
+            <table class="cabecalho-container">
+                <tr>
+                    <td class="logo-box">VALE</td>
+                    <td class="titulo-box">DIÁLOGO DIÁRIO DE SEGURANÇA (DDS) E EMOCIOGRAMA</td>
+                    <td class="meta-box"><span class="indicador-folha"><strong>Folha:</strong> 01 / 01</span></td>
+                </tr>
+            </table>
+            <table class="info-dds">
+                <tr>
+                    <td><strong>Período:</strong> <span class="campo-editavel info-periodo" contenteditable="true">${document.getElementById('periodoInputDDS').value}</span></td>
+                    <td><strong>Semana:</strong> <span class="campo-editavel info-semana" contenteditable="true">${document.getElementById('semanaInputDDS').value}</span></td>
+                    <td><strong>Ano:</strong> <span class="campo-editavel info-ano" contenteditable="true">${document.getElementById('anoInputDDS').value}</span></td>
+                </tr>
+            </table>
+            <table class="tabela-dds">
+                <thead>
+                    <tr>
+                        <th rowspan="2" class="col-id">Nº</th>
+                        <th rowspan="2" class="col-colaborador" style="padding-left:6px; text-align:left;">Colaborador</th>
+                        <th colspan="2" class="th-dia-semana">Segunda <button type="button" class="btn-preencher-dia" onclick="preencherColunaDia(this, 0)" title="Preencher Segunda com 1">⚡</button></th>
+                        <th colspan="2" class="th-dia-semana">Terça <button type="button" class="btn-preencher-dia" onclick="preencherColunaDia(this, 1)" title="Preencher Terça com 1">⚡</button></th>
+                        <th colspan="2" class="th-dia-semana">Quarta <button type="button" class="btn-preencher-dia" onclick="preencherColunaDia(this, 2)" title="Preencher Quarta com 1">⚡</button></th>
+                        <th colspan="2" class="th-dia-semana">Quinta <button type="button" class="btn-preencher-dia" onclick="preencherColunaDia(this, 3)" title="Preencher Quinta com 1">⚡</button></th>
+                        <th colspan="2" class="th-dia-semana">Sexta <button type="button" class="btn-preencher-dia" onclick="preencherColunaDia(this, 4)" title="Preencher Sexta com 1">⚡</button></th>
+                    </tr>
+                    <tr>
+                        <th class="th-sub">Estou</th><th class="th-sub">Rub</th>
+                        <th class="th-sub">Estou</th><th class="th-sub">Rub</th>
+                        <th class="th-sub">Estou</th><th class="th-sub">Rub</th>
+                        <th class="th-sub">Estou</th><th class="th-sub">Rub</th>
+                        <th class="th-sub">Estou</th><th class="th-sub">Rub</th>
+                    </tr>
+                </thead>
+                <tbody class="corpo-tabela-folha">${linhas}</tbody>
+            </table>
             <div class="rodape-container">
                 <div class="box-legenda">
                     <h4>Legenda:</h4>
                     <ul class="lista-legenda">
                         <li><strong>FE</strong> = Feriado</li>
-                        <li><strong>AT</strong> = Atestado Médico[cite: 9]</li>
-                        <li><strong>CO</strong> = Compensação[cite: 9]</li>
-                        <li><strong>FA</strong> = Falta[cite: 9]</li>
-                        <li><strong>FR</strong> = Férias[cite: 9]</li>
-                        <li><strong>FO</strong> = Folga[cite: 9]</li>
+                        <li><strong>AT</strong> = Atestado Médico</li>
+                        <li><strong>CO</strong> = Compensação</li>
+                        <li><strong>FA</strong> = Falta</li>
+                        <li><strong>FR</strong> = Férias</li>
+                        <li><strong>FO</strong> = Folga</li>
                     </ul>
                 </div>
                 <div class="box-legenda">
                     <h4>Ação tomada:</h4>
                     <ul class="lista-legenda">
-                        <li><strong>EST/SUP</strong> = Estratégia/Suprimentos[cite: 9]</li>
-                        <li><strong>ENG</strong> = ADM[cite: 9]</li>
-                        <li><strong>EST</strong> = Estratégia[cite: 9]</li>
-                        <li><strong>ENG</strong> = ADM[cite: 9]</li>
-                        <li><strong>OP</strong> = Operação[cite: 9]</li>
-                        <li><strong>HOFF</strong> = Home Office[cite: 9]</li>
-                        <li><strong>AE</strong> = Área Externa[cite: 9]</li>
+                        <li><strong>EST/SUP</strong> = Estratégia/Suprimentos</li>
+                        <li><strong>ADM</strong> = Administrativo</li>
+                        <li><strong>ENG</strong> = Engenharia</li>
+                        <li><strong>EST</strong> = Estratégia</li>
+                        <li><strong>OP</strong> = Operação</li>
+                        <li><strong>HOFF</strong> = Home Office</li>
+                        <li><strong>AE</strong> = Área Externa</li>
                     </ul>
                 </div>
                 <div class="box-legenda">
                     <h4>Emociograma:</h4>
                     <ul class="lista-legenda">
-                        <li><strong>1:</strong> Funcionário em plenas condições físicas e psicológicas de exercer suas funções[cite: 9].</li>
-                        <li><strong>2:</strong> Funcionário com estado físico ou psicológico alterado, porém em condições de exercer suas atividades compatíveis com seu estado físico ou psicológico. Este deverá ter o acompanhamento[cite: 9].</li>
-                        <li><strong>3:</strong> Funcionário sem condições físicas ou psicológicas de exercer suas atividades compatíveis com sua área[cite: 9].</li>
+                        <li><strong>1:</strong> Funcionário em plenas condições físicas e psicológicas de exercer suas funções.</li>
+                        <li><strong>2:</strong> Funcionário com estado físico ou psicológico alterado, porém em condições de exercer suas atividades compatíveis com seu estado físico ou psicológico. Requer acompanhamento.</li>
+                        <li><strong>3:</strong> Funcionário sem condições físicas ou psicológicas de exercer suas atividades compatíveis com sua área.</li>
                     </ul>
                 </div>
             </div>`;
             return f;
         }
-        function atualizarPaginacaoDDS() { const f = document.querySelectorAll('#contentorFolhasDDS .folha-a4'); f.forEach((folha, idx) => { const ind = folha.querySelector('.indicador-folha'); if(ind) ind.innerHTML = `<strong>Folha:</strong> 0${idx+1} / 0${f.length}`; }); }
-        function adicionarFolhaManualDDS() { document.getElementById('contentorFolhasDDS').appendChild(criarEstruturaFolhaDDS([], null, TOTAL_LINHAS_DDS)); atualizarPaginacaoDDS(); }
+
+        function atualizarPaginacaoDDS() { 
+            const f = document.querySelectorAll('#contentorFolhasDDS .folha-a4'); 
+            f.forEach((folha, idx) => { 
+                const ind = folha.querySelector('.indicador-folha'); 
+                const atual = (idx + 1 < 10 ? '0' + (idx + 1) : (idx + 1));
+                const total = (f.length < 10 ? '0' + f.length : f.length);
+                if(ind) ind.innerHTML = `<strong>Folha:</strong> ${atual} / ${total}`; 
+            }); 
+        }
+
+        function adicionarFolhaManualDDS() { 
+            document.getElementById('contentorFolhasDDS').appendChild(criarEstruturaFolhaDDS([], null, TOTAL_LINHAS_DDS)); 
+            atualizarPaginacaoDDS(); 
+        }
+
         function aplicarDadosDDS(modo) {
-            const box = document.getElementById('contentorFolhasDDS'); box.innerHTML = '';
-            const nomes = document.getElementById('nomesInputDDS').value.toUpperCase().split('\n').map(l => l.trim()).filter(l => l.length > 0).sort((a,b)=>a.localeCompare(b,'pt'));
-            document.getElementById('nomesInputDDS').value = nomes.join('\n');
-            let blocos = []; if(nomes.length === 0) blocos.push([]); else for(let i=0; i<nomes.length; i+=TOTAL_LINHAS_DDS) blocos.push(nomes.slice(i, i+TOTAL_LINHAS_DDS));
+            const box = document.getElementById('contentorFolhasDDS'); 
+            box.innerHTML = '';
+            const textarea = document.getElementById('nomesInputDDS');
+            const nomes = textarea.value.toUpperCase().split('\n').map(l => l.trim()).filter(l => l.length > 0).sort((a,b)=>a.localeCompare(b,'pt-BR'));
+            textarea.value = nomes.join('\n');
+            atualizarContadorNomes();
+            
+            let blocos = []; 
+            if(nomes.length === 0) {
+                blocos.push([]); 
+            } else {
+                for(let i=0; i<nomes.length; i+=TOTAL_LINHAS_DDS) {
+                    blocos.push(nomes.slice(i, i+TOTAL_LINHAS_DDS));
+                }
+            }
             blocos.forEach(b => box.appendChild(criarEstruturaFolhaDDS(b, modo==='verde', TOTAL_LINHAS_DDS)));
             atualizarPaginacaoDDS();
+            mostrarToast('Folhas geradas e ordenadas em A-Z');
         }
-        function salvarTudoDDS() { localStorage.setItem('valedds_v02', JSON.stringify({html: document.getElementById('contentorFolhasDDS').innerHTML})); alert('DDS Guardado com sucesso! (v02)'); }
-        function carregarTudoDDS() { const s = localStorage.getItem('valedds_v02'); if(s) { document.getElementById('contentorFolhasDDS').innerHTML = JSON.parse(s).html; alert('DDS Carregado!'); } }
-        function limparTudoDDS() { document.getElementById('contentorFolhasDDS').innerHTML = ''; adicionarFolhaManualDDS(); }
-        window.onload = function() { adicionarFolhaManualDDS(); };
+
+        function obterEstadoCompleto() {
+            return {
+                periodo: document.getElementById('periodoInputDDS').value,
+                semana: document.getElementById('semanaInputDDS').value,
+                ano: document.getElementById('anoInputDDS').value,
+                nomes: document.getElementById('nomesInputDDS').value,
+                html: document.getElementById('contentorFolhasDDS').innerHTML
+            };
+        }
+
+        function salvarTudoDDS() { 
+            localStorage.setItem('valedds_v02', JSON.stringify(obterEstadoCompleto())); 
+            mostrarToast('DDS salvo com sucesso!'); 
+        }
+
+        function carregarTudoDDS() { 
+            const s = localStorage.getItem('valedds_v02'); 
+            if(s) { 
+                restaurarEstado(JSON.parse(s));
+                mostrarToast('Dados carregados com sucesso!'); 
+            } else {
+                mostrarToast('Nenhum dado salvo encontrado.');
+            }
+        }
+
+        function restaurarEstado(dados) {
+            if(dados.periodo !== undefined) document.getElementById('periodoInputDDS').value = dados.periodo;
+            if(dados.semana !== undefined) document.getElementById('semanaInputDDS').value = dados.semana;
+            if(dados.ano !== undefined) document.getElementById('anoInputDDS').value = dados.ano;
+            if(dados.nomes !== undefined) document.getElementById('nomesInputDDS').value = dados.nomes;
+            if(dados.html !== undefined) document.getElementById('contentorFolhasDDS').innerHTML = dados.html;
+            atualizarContadorNomes();
+            atualizarPaginacaoDDS();
+        }
+
+        function exportarBackupJSON() {
+            const blob = new Blob([JSON.stringify(obterEstadoCompleto(), null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_dds_semana_${document.getElementById('semanaInputDDS').value || 'atual'}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            mostrarToast('Backup exportado com sucesso!');
+        }
+
+        function processarArquivoBackup(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const dados = JSON.parse(e.target.result);
+                    restaurarEstado(dados);
+                    mostrarToast('Backup restaurado com sucesso!');
+                } catch(err) {
+                    mostrarToast('Erro ao ler arquivo de backup.');
+                }
+            };
+            reader.readAsText(file);
+            input.value = '';
+        }
+
+        function limparTudoDDS() { 
+            document.getElementById('contentorFolhasDDS').innerHTML = ''; 
+            adicionarFolhaManualDDS(); 
+            mostrarToast('Área resetada.');
+        }
+
+        window.onload = function() { 
+            adicionarFolhaManualDDS(); 
+            atualizarContadorNomes();
+        };
     </script>
 </body>
 </html>
