@@ -169,7 +169,6 @@ body {
 
 .btn-pink { background-color: var(--primary); } 
 .btn-ordenar { background-color: #ea580c; }
-.btn-toggle-layout { background-color: #7c3aed; }
 .btn-ocultar-vazios { background-color: #0891b2; }
 .btn-salvar { background-color: #2563eb; } 
 .btn-carregar { background-color: #0284c7; } 
@@ -178,7 +177,7 @@ body {
 .btn-voltar { background-color: var(--slate-600); text-decoration: none; } 
 .btn-imprimir { background-color: var(--slate-900); margin-left: auto; }
 
-/* FOLHA A4 RETRATO */
+/* FOLHA A4 RETRATO (LARGURA TOTAL / FOLHA INTEIRA) */
 .folha-a4 { 
     width: 100%; 
     max-width: 960px; 
@@ -251,22 +250,17 @@ body {
 .info-aniver-bar td { text-align: left; padding: 2px 8px; }
 .campo-editavel { outline: none; display: inline-block; min-width: 25px; font-weight: 600; color: var(--slate-900); }
 
-/* CONTENTOR DOS BLOCOS: PADRÃO FOLHA INTEIRA (1 COLUNA) */
+/* CONTENTOR DOS BLOCOS: FOLHA INTEIRA (1 COLUNA 100%) */
 .contentor-blocos {
     display: flex;
     flex-direction: column;
     gap: 8px;
     margin-top: 6px;
-}
-
-/* MODO GRADE OPCIONAL (SE O USUÁRIO QUISER ALTERNAR) */
-.contentor-blocos.modo-grade {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
+    width: 100%;
 }
 
 .bloco-mes { 
+    width: 100%;
     border: 1.2px solid var(--primary); 
     border-radius: 6px; 
     overflow: hidden; 
@@ -305,7 +299,7 @@ body {
     margin-left: 6px;
 }
 
-table.tabela-mes { width: 100%; border-collapse: collapse; }
+table.tabela-mes { width: 100%; border-collapse: collapse; table-layout: fixed; }
 table.tabela-mes th, table.tabela-mes td { 
     border: 1px solid var(--primary-border); 
     text-align: center; 
@@ -416,7 +410,6 @@ tr:hover .botoes-acoes { opacity: 1; }
             <button type="button" class="btn btn-pink" onclick="distribuirNomesImportados()">⚡ Distribuir nos Meses</button>
             <button type="button" class="btn btn-ordenar" onclick="ordenarAniversariosPorDia()">📅 Ordenar por Dia</button>
             <button type="button" class="btn btn-ocultar-vazios" id="btnToggleVazios" onclick="alternarMesesVazios()">👁️ Ocultar Meses Vazios</button>
-            <button type="button" class="btn btn-toggle-layout" id="btnLayout" onclick="alternarLayoutColunas()">↔️ Alternar Grade/Folha Inteira</button>
             <button type="button" class="btn btn-salvar" onclick="salvarTudoAniver()">💾 Salvar</button>
             <button type="button" class="btn btn-carregar" onclick="carregarTudoAniver()">📂 Carregar</button>
             <button type="button" class="btn btn-exportar" onclick="exportarBackupJSON()">⬇️ Backup</button>
@@ -435,7 +428,6 @@ tr:hover .botoes-acoes { opacity: 1; }
         ];
 
         let ocultarVaziosAtivo = false;
-        let modoGradeAtivo = false; // Padrão: Folha Inteira (1 Coluna)
 
         const DADOS_INICIAIS_A = {
             "JANEIRO": ["MARIANA PEREIRA CRUZ - 11/01", "RICARDO GONCALVES DE MELLO LEITE - 13/01", "JOAO SILVA RAMOS - 18/01", "ALFREDO AUGUSTO RAMOS NETO - 22/01"],
@@ -460,7 +452,7 @@ tr:hover .botoes-acoes { opacity: 1; }
         }
 
         function obterIndiceMesAtual() {
-            return new Date().getMonth(); // 0 a 11
+            return new Date().getMonth();
         }
 
         function sincronizarCabecalhosAniver() {
@@ -478,7 +470,7 @@ tr:hover .botoes-acoes { opacity: 1; }
         function atualizarMetricas() {
             const dados = capturarDadosAtuais();
             let total = 0;
-            const mesAtualNome = MESES_ANO[obterIndiceMesAtual()];
+            const mesAtualNome = MESES_ANO.at(obterIndiceMesAtual());
             let totalMesAtual = dados[mesAtualNome] ? dados[mesAtualNome].length : 0;
 
             for (let m in dados) {
@@ -492,13 +484,14 @@ tr:hover .botoes-acoes { opacity: 1; }
         function criarBlocoMes(mesNome, itens = []) {
             let linhas = '';
             const lista = (!itens || itens.length === 0) ? [" - "] : itens;
-            const ehMesAtual = (mesNome === MESES_ANO[obterIndiceMesAtual()]);
+            const ehMesAtual = (mesNome === MESES_ANO.at(obterIndiceMesAtual()));
             
             lista.forEach(item => {
-                let partes = item.split('-');
-                let nome = partes[0] ? partes[0].trim() : '';
-                let data = partes ? partes.trim() : '';
+                const [nomeBruto, dataBruta] = item.split('-');
+                let nome = (nomeBruto || '').trim();
+                let data = (dataBruta || '').trim();
                 if(nome === "-") nome = "";
+
                 linhas += `<tr>` +
                     `<td class="col-nome-aniver" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase(); atualizarMetricas();">${nome}</td>` +
                     `<td class="col-data-aniver" contenteditable="true" placeholder="DD/MM">${data}</td>` +
@@ -521,7 +514,7 @@ tr:hover .botoes-acoes { opacity: 1; }
                     </div>
                 </div>
                 <table class="tabela-mes">
-                    <thead><tr><th>Nome do Colaborador</th><th>Data</th><th class="col-acoes-aniver th-acoes">Ações</th></tr></thead>
+                    <thead><tr><th>Nome do Colaborador</th><th style="width:90px;">Data</th><th class="col-acoes-aniver th-acoes">Ações</th></tr></thead>
                     <tbody>${linhas}</tbody>
                 </table>
             </div>`;
@@ -534,9 +527,10 @@ tr:hover .botoes-acoes { opacity: 1; }
                 mostrarToast('Linha sem nome para parabenizar.');
                 return;
             }
-            const msg = `🎉 Parabéns, ${nome}! Que seu novo ciclo seja de muita saúde, paz e conquistas. Grande abraço de toda a equipe Vale! 🎂✨`;
+            const [primeiroNome] = nome.split(' ');
+            const msg = `🎉 Parabéns, ${primeiroNome}! Que seu novo ciclo seja de muita saúde, paz e conquistas. Grande abraço de toda a equipe Vale! 🎂✨`;
             navigator.clipboard.writeText(msg).then(() => {
-                mostrarToast(`Mensagem copiada para parabenizar ${nome.split(' ')[0]}!`);
+                mostrarToast(`Mensagem copiada para parabenizar ${primeiroNome}!`);
             });
         }
 
@@ -575,15 +569,6 @@ tr:hover .botoes-acoes { opacity: 1; }
             atualizarMetricas();
         }
 
-        function alternarLayoutColunas() {
-            modoGradeAtivo = !modoGradeAtivo;
-            const container = document.querySelector('.contentor-blocos');
-            if (container) {
-                container.classList.toggle('modo-grade', modoGradeAtivo);
-                mostrarToast(modoGradeAtivo ? 'Visualização em Grade (2 Colunas)' : 'Visualização em Folha Inteira (1 Coluna)');
-            }
-        }
-
         function alternarMesesVazios() {
             ocultarVaziosAtivo = !ocultarVaziosAtivo;
             const blocos = document.querySelectorAll('.bloco-mes');
@@ -604,7 +589,7 @@ tr:hover .botoes-acoes { opacity: 1; }
             });
 
             document.getElementById('btnToggleVazios').innerText = ocultarVaziosAtivo ? '👁️ Mostrar Todos os Meses' : '👁️ Ocultar Meses Vazios';
-            mostrarToast(ocultarVaziosAtivo ? 'Meses vazios ocultados para impressão limpa' : 'Todos os meses visíveis');
+            mostrarToast(ocultarVaziosAtivo ? 'Meses vazios ocultados' : 'Todos os meses visíveis');
         }
 
         function criarEstruturaFolhaAniver(dadosObj) {
@@ -638,7 +623,7 @@ tr:hover .botoes-acoes { opacity: 1; }
                         <td><strong>Área / Gerência:</strong> <span class="val-area campo-editavel" contenteditable="true">${areaAtual}</span></td>
                     </tr>
                 </table>
-                <div class="contentor-blocos ${modoGradeAtivo ? 'modo-grade' : ''}">${blocosHTML}</div>`;
+                <div class="contentor-blocos">${blocosHTML}</div>`;
             return f;
         }
 
@@ -659,12 +644,14 @@ tr:hover .botoes-acoes { opacity: 1; }
 
         function ordenarAniversariosPorDia() {
             const dados = capturarDadosAtuais();
-            for(let mes in dados) {
+            for (let mes in dados) {
                 dados[mes].sort((a, b) => {
-                    const dataA = (a.split('-') || '').trim();
-                    const dataB = (b.split('-') || '').trim();
-                    const diaA = parseInt(dataA.split('/')[0]) || 99;
-                    const diaB = parseInt(dataB.split('/')[0]) || 99;
+                    const [, dataA = ''] = a.split('-');
+                    const [, dataB = ''] = b.split('-');
+                    const [diaAStr = '99'] = dataA.trim().split('/');
+                    const [diaBStr = '99'] = dataB.trim().split('/');
+                    const diaA = parseInt(diaAStr, 10) || 99;
+                    const diaB = parseInt(diaBStr, 10) || 99;
                     return diaA - diaB;
                 });
             }
@@ -683,16 +670,16 @@ tr:hover .botoes-acoes { opacity: 1; }
 
             let adicionados = 0;
             linhas.forEach(linha => {
-                const partes = linha.split('-');
-                if(partes.length >= 2) {
-                    const nome = partes[0].trim().toUpperCase();
-                    const data = partes.trim();
-                    const pedacosData = data.split('/');
-                    if(pedacosData.length >= 2) {
-                        const mesNum = parseInt(pedacosData, 10);
-                        if(mesNum >= 1 && mesNum <= 12) {
-                            const mesNome = MESES_ANO[mesNum - 1];
-                            if(!dados[mesNome]) dados[mesNome] = [];
+                const [nomePart, dataPart] = linha.split('-');
+                if (nomePart && dataPart) {
+                    const nome = nomePart.trim().toUpperCase();
+                    const data = dataPart.trim();
+                    const [, mesPart] = data.split('/');
+                    if (mesPart) {
+                        const mesNum = parseInt(mesPart.trim(), 10);
+                        if (mesNum >= 1 && mesNum <= 12) {
+                            const mesNome = MESES_ANO.at(mesNum - 1);
+                            if (!dados[mesNome]) dados[mesNome] = [];
                             dados[mesNome].push(`${nome} - ${data}`);
                             adicionados++;
                         }
