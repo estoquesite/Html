@@ -99,7 +99,7 @@
                     <input type="text" id="inputLink" placeholder="Cole o link oficial do PDF..." class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
 
-                <!-- PROCESSO 2: SEGUNDA CÂMERA / ANEXO SEPARADO (OPCIONAL LÁ EMBAIXO) -->
+                <!-- PROCESSO 2: SEGUNDA CÂMERA / ANEXO SEPARADO -->
                 <div class="md:col-span-12 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase block">2. Anexo Opcional de Documento/Arquivo</span>
@@ -117,13 +117,19 @@
             </div>
         </div>
 
-        <!-- LISTA DE FDS CADASTRADAS (COMPACTA) -->
-        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
-            <div class="flex justify-between items-center">
+        <!-- LISTA DE FDS CADASTRADAS COM BARRA DE PESQUISA RÁPIDA -->
+        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
+            <div class="flex flex-wrap justify-between items-center gap-3 border-b pb-3">
                 <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">
                     📚 Fichas de Dados de Segurança (FDS) Cadastradas
                 </h3>
                 <span id="labelContadorFds" class="text-[11px] text-slate-400 font-bold">0 DOCUMENTOS</span>
+            </div>
+
+            <!-- BARRA DE BUSCA RÁPIDA -->
+            <div class="relative">
+                <input type="text" id="filtroPesquisa" oninput="renderizarCardsFds()" placeholder="🔍 Pesquisar FDS por nome do produto ou fabricante..." class="uppercase-input w-full text-xs p-3 pl-9 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl outline-none font-bold text-slate-800 dark:text-white">
+                <span class="absolute left-3 top-3.5 text-xs text-slate-400">🔍</span>
             </div>
 
             <div id="gridFds" class="space-y-2"></div>
@@ -305,13 +311,18 @@
             const grid = document.getElementById('gridFds');
             grid.innerHTML = '';
 
-            if (listaFds.length === 0) {
-                grid.innerHTML = `<div class="text-center py-6 text-slate-400 italic text-xs">Nenhum documento cadastrado.</div>`;
-                document.getElementById('labelContadorFds').innerText = `0 DOCUMENTOS`;
+            const termoBusca = (document.getElementById('filtroPesquisa')?.value || '').trim().toUpperCase();
+            const itensFiltrados = listaFds.filter(item => 
+                item.produto.includes(termoBusca) || item.fabricante.includes(termoBusca)
+            );
+
+            if (itensFiltrados.length === 0) {
+                grid.innerHTML = `<div class="text-center py-6 text-slate-400 italic text-xs">Nenhum documento encontrado.</div>`;
+                document.getElementById('labelContadorFds').innerText = `0 / ${listaFds.length} DOCUMENTOS`;
                 return;
             }
 
-            listaFds.forEach((item) => {
+            itensFiltrados.forEach((item) => {
                 const card = document.createElement('div');
                 card.className = "bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 p-3 rounded-xl shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3 text-xs";
                 
@@ -333,7 +344,7 @@
                 grid.appendChild(card);
             });
 
-            document.getElementById('labelContadorFds').innerText = `${listaFds.length} DOCUMENTO(S)`;
+            document.getElementById('labelContadorFds').innerText = `${itensFiltrados.length} / ${listaFds.length} DOCUMENTO(S)`;
         }
 
         function abrirModalEdicao(id) {
