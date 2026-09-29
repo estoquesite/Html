@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 8 - Fila de Impressão em Lote | Portal Vale</title>
+    <title>Módulo 8 - Gestão e Impressão em Lote de FDS | Portal Vale</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -42,10 +42,10 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-cyan-100 dark:bg-cyan-900 text-cyan-700 dark:text-cyan-300">Módulo 8</span>
-                        <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Fila de Impressão em Lote de FDS</h1>
+                        <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Gestão e Impressão em Lote de FDS</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Seleção Múltipla & Nuvem Supabase</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Anexo Direto & Nuvem Supabase</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
@@ -69,7 +69,7 @@
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                 <span class="text-xs font-black text-cyan-900 dark:text-cyan-300 uppercase flex items-center gap-1.5">
-                    <span>⚡</span> Reconhecimento por Câmera e Cadastro de FDS
+                    <span>⚡</span> Reconhecimento por Câmera e Anexo de FDS
                 </span>
                 <span class="text-[10px] font-bold text-slate-400">Verificação de duplicidade ativa</span>
             </div>
@@ -102,28 +102,29 @@
                 </div>
 
                 <div class="md:col-span-4">
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Link Direto da FDS (PDF)</label>
-                    <input type="text" id="inputLink" placeholder="Cole o link oficial do PDF..." class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Link Externo (Opcional)</label>
+                    <input type="text" id="inputLink" placeholder="Cole o link do PDF se houver..." class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
 
-                <!-- BOTÕES -->
+                <!-- ANEXO DIRETO DO PDF E BOTÕES -->
                 <div class="md:col-span-12 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3">
-                    <div class="text-[11px] text-slate-500 font-semibold">
-                        💡 Cadastre o link do PDF do fabricante para habilitar a fila em lote.
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase block">2. Anexar Arquivo PDF Oficial do Computador/Celular</span>
+                        <input type="file" id="inputArquivoPdf" accept="application/pdf" class="text-xs mt-1 text-slate-500 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700 cursor-pointer">
                     </div>
                     <div class="flex gap-2">
                         <button type="button" onclick="pesquisarWebFds()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer">
                             <span>🌐</span> <span>Pesquisar FDS na Web</span>
                         </button>
                         <button type="button" onclick="salvarFdsSistema()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2.5 px-6 rounded-xl text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer">
-                            <span>💾</span> <span>Salvar FDS na Nuvem</span>
+                            <span>💾</span> <span>Salvar FDS com PDF na Nuvem</span>
                         </button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- LISTA DE FDS CADASTRADAS COM SELEÇÃO E FILA EM LOTE -->
+        <!-- LISTA DE FDS CADASTRADAS COM SELEÇÃO E IMPRESSÃO EM LOTE -->
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
             <div class="flex flex-wrap justify-between items-center gap-3 border-b pb-3">
                 <div class="flex items-center gap-2">
@@ -133,9 +134,9 @@
                     <span id="labelContadorFds" class="text-[11px] text-slate-400 font-bold">0 DOCUMENTOS</span>
                 </div>
                 
-                <!-- BOTÃO DE IMPRESSÃO EM LOTE DIRETA -->
-                <button type="button" onclick="dispararImpressaoLote()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-black py-2.5 px-5 rounded-xl text-xs shadow-md flex items-center gap-1.5 cursor-pointer">
-                    <span>🖨️</span> <span>Imprimir Selecionadas em Lote (Fila)</span>
+                <!-- BOTÃO DE IMPRESSÃO EM LOTE DE ARQUIVOS ANEXADOS -->
+                <button type="button" onclick="imprimirLoteAnexos()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-black py-2.5 px-5 rounded-xl text-xs shadow-md flex items-center gap-1.5 cursor-pointer">
+                    <span>🖨️</span> <span>Baixar / Imprimir Selecionadas em Lote</span>
                 </button>
             </div>
 
@@ -205,13 +206,22 @@
             try {
                 const { data } = await supabaseClient.from('fds_corporativas').select('*').order('id', { ascending: false });
                 if (data) {
-                    listaFds = data.map(remoto => ({
-                        id: remoto.id,
-                        produto: remoto.produto,
-                        fabricante: remoto.fabricante || 'NÃO INFORMADO',
-                        linkPdf: remoto.link || '',
-                        dataRegistro: remoto.data_registro || new Date().toLocaleDateString('pt-BR')
-                    }));
+                    const localSalvo = JSON.parse(localStorage.getItem('portal_vale_fds_base') || '[]');
+                    const mapLocal = new Map();
+                    localSalvo.forEach(item => mapLocal.set(String(item.id), item));
+
+                    listaFds = data.map(remoto => {
+                        const local = mapLocal.get(String(remoto.id));
+                        return {
+                            id: remoto.id,
+                            produto: remoto.produto,
+                            fabricante: remoto.fabricante || 'NÃO INFORMADO',
+                            linkPdf: remoto.link || '',
+                            pdfBlob: (local && local.pdfBlob) ? local.pdfBlob : (remoto.pdf_blob || ''),
+                            pdfNome: (local && local.pdfNome) ? local.pdfNome : (remoto.pdf_nome || 'documento.pdf'),
+                            dataRegistro: remoto.data_registro || new Date().toLocaleDateString('pt-BR')
+                        };
+                    });
                     salvarFdsLocal();
                     renderizarCardsFds();
                     mostrarAviso("✅ FDS sincronizadas com a nuvem!");
@@ -271,7 +281,7 @@
                 }
             } catch (err) {
                 console.error(err);
-                mostrarAviso("ℹ️️ Erro na leitura automática. Preencha manualmente.");
+                mostrarAviso("ℹ️ Erro na leitura automática. Preencha manualmente.");
             }
         }
 
@@ -316,6 +326,7 @@
             const produto = document.getElementById('inputProduto').value.trim().toUpperCase();
             const fabricante = document.getElementById('inputFabricante').value.trim().toUpperCase();
             const linkPdf = document.getElementById('inputLink').value.trim();
+            const inputArquivo = document.getElementById('inputArquivoPdf');
 
             if (!produto) {
                 alert("Por favor, informe o nome do produto!");
@@ -323,11 +334,26 @@
                 return;
             }
 
+            let pdfBlob = "";
+            let pdfNome = "";
+
+            if (inputArquivo.files && inputArquivo.files[0]) {
+                const arquivo = inputArquivo.files[0];
+                pdfNome = arquivo.name;
+                pdfBlob = await new Promise((resolve) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result);
+                    reader.readAsDataURL(arquivo);
+                });
+            }
+
             const novoItem = {
                 id: Date.now(),
                 produto,
                 fabricante: fabricante || "NÃO INFORMADO",
                 linkPdf: linkPdf || "#",
+                pdfBlob,
+                pdfNome,
                 dataRegistro: new Date().toLocaleDateString('pt-BR')
             };
 
@@ -335,24 +361,23 @@
             salvarFdsLocal();
             renderizarCardsFds();
             verificarDuplicidadeInput();
-            mostrarAviso(`✅ FDS do produto "${produto}" salva!`);
+            mostrarAviso(`✅ FDS do produto "${produto}" salva com sucesso!`);
 
             document.getElementById('inputProduto').value = '';
             document.getElementById('inputFabricante').value = '';
             document.getElementById('inputLink').value = '';
+            inputArquivo.value = '';
 
             if (supabaseClient) {
                 try {
-                    const { data } = await supabaseClient.from('fds_corporativas').insert([{
+                    await supabaseClient.from('fds_corporativas').insert([{
                         produto: novoItem.produto,
                         fabricante: novoItem.fabricante,
                         link: novoItem.linkPdf,
+                        pdf_blob: novoItem.pdfBlob,
+                        pdf_nome: novoItem.pdfNome,
                         data_registro: novoItem.dataRegistro
-                    }]).select();
-                    if (data && data[0]) {
-                        novoItem.id = data[0].id;
-                        salvarFdsLocal();
-                    }
+                    }]);
                 } catch(e) {}
             }
         }
@@ -376,18 +401,23 @@
                 const card = document.createElement('div');
                 card.className = "bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 p-3 rounded-xl shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3 text-xs";
                 
+                let botaoAcao = `<a href="${item.linkPdf}" target="_blank" class="bg-cyan-50 hover:bg-cyan-100 text-cyan-700 font-bold py-1.5 px-3 rounded-lg text-[11px] text-center">Abrir Link ↗</a>`;
+                if (item.pdfBlob) {
+                    botaoAcao = `<button onclick="baixarPdfUnico('${item.id}')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold py-1.5 px-3 rounded-lg text-[11px]">Baixar PDF 📥</button>`;
+                }
+
                 card.innerHTML = `
                     <div class="flex items-center gap-3 w-full sm:w-auto truncate">
-                        <input type="checkbox" value="${item.id}" data-link="${item.linkPdf}" class="check-fds rounded w-4 h-4 accent-cyan-600 cursor-pointer">
+                        <input type="checkbox" value="${item.id}" class="check-fds rounded w-4 h-4 accent-cyan-600 cursor-pointer">
                         <span class="text-lg">📄</span>
                         <div class="truncate">
                             <h4 class="font-black text-slate-900 dark:text-white uppercase truncate">${item.produto}</h4>
-                            <p class="text-[10px] text-slate-500 uppercase font-semibold">Fabricante: ${item.fabricante}</p>
+                            <p class="text-[10px] text-slate-500 uppercase font-semibold">Fabricante: ${item.fabricante} ${item.pdfBlob ? '• (PDF Anexado)' : ''}</p>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-2 w-full sm:w-auto justify-end flex-shrink-0">
-                        <a href="${item.linkPdf}" target="_blank" class="bg-cyan-50 hover:bg-cyan-100 text-cyan-700 font-bold py-1.5 px-3 rounded-lg text-[11px] text-center">Abrir PDF ↗</a>
+                        ${botaoAcao}
                         <button onclick="abrirModalEdicao('${item.id}')" class="text-cyan-600 hover:text-cyan-800 font-bold p-1.5 cursor-pointer" title="Editar">✏️</button>
                         <button onclick="removerFds(${item.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1.5 cursor-pointer" title="Excluir">✕</button>
                     </div>
@@ -403,28 +433,45 @@
             checkboxes.forEach(cb => cb.checked = master.checked);
         }
 
-        // FUNÇÃO DE FILA DE IMPRESSÃO EM LOTE (DISPARA OS PDFs SALVOS EM SEQUÊNCIA)
-        function dispararImpressaoLote() {
+        function baixarPdfUnico(id) {
+            const item = listaFds.find(f => String(f.id) === String(id));
+            if (!item || !item.pdfBlob) return;
+            const link = document.createElement('a');
+            link.href = item.pdfBlob;
+            link.download = item.pdfNome || 'documento.pdf';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // FUNÇÃO DE IMPRESSÃO / DOWNLOAD EM LOTE DOS PDFs ANEXADOS
+        function imprimirLoteAnexos() {
             const selecionados = document.querySelectorAll('.check-fds:checked');
             if (selecionados.length === 0) {
-                alert("Por favor, selecione pelo menos uma FDS na lista para imprimir em lote!");
+                alert("Por favor, selecione pelo menos uma FDS na lista!");
                 return;
             }
 
-            const linksParaAbrir = Array.from(selecionados).map(cb => cb.getAttribute('data-link')).filter(link => link && link !== '#');
+            const idsSelecionados = Array.from(selecionados).map(cb => String(cb.value));
+            const itensParaBaixar = listaFds.filter(item => idsSelecionados.includes(String(item.id)) && item.pdfBlob);
 
-            if (linksParaAbrir.length === 0) {
-                alert("Nenhum dos itens selecionados possui um link de PDF válido cadastrado.");
+            if (itensParaBaixar.length === 0) {
+                alert("Nenhum dos itens selecionados possui um arquivo PDF anexado no sistema. (Itens com apenas link externo devem ser abertos individualmente).");
                 return;
             }
 
-            if (confirm(`Serão abertos ${linksParaAbrir.length} documentos PDF oficiais em sequência para impressão. Deseja continuar?`)) {
-                linksParaAbrir.forEach((link, index) => {
+            if (confirm(`Serão baixados ${itensParaBaixar.length} arquivos PDF anexados em sequência para o seu computador. Deseja continuar?`)) {
+                itensParaBaixar.forEach((item, index) => {
                     setTimeout(() => {
-                        window.open(link, '_blank');
-                    }, index * 800);
+                        const link = document.createElement('a');
+                        link.href = item.pdfBlob;
+                        link.download = item.pdfNome || `FDS_${item.produto}.pdf`;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                    }, index * 600); // Intervalo para o navegador processar os downloads em lote sem bloquear
                 });
-                mostrarAviso(`🖨️ Fila de lote disparada: ${linksParaAbrir.length} documento(s) aberto(s) para impressão!`);
+                mostrarAviso(`📥 Lote disparado: ${itensParaBaixar.length} arquivo(s) PDF enviado(s) para download!`);
             }
         }
 
