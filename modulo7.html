@@ -31,7 +31,7 @@
                         <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300">Módulo 7</span>
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
                     </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Captura direta pela câmera, galeria, arrastar e colar prints</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Captura por link, foto/câmera, galeria e mensagens do Teams</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
@@ -72,11 +72,32 @@
             </div>
         </div>
 
-        <!-- 📸 BOTÕES RÁPIDOS DE CÂMERA E GALERIA PARA CELULAR -->
+        <!-- 🔗 CAIXINHA PARA DIGITAR / COLAR LINK DO PRODUTO -->
+        <div class="bg-blue-50/70 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-900/60 p-4 rounded-2xl shadow-sm space-y-2">
+            <div class="flex justify-between items-center">
+                <label class="block text-xs font-black text-blue-950 dark:text-blue-200 uppercase flex items-center gap-2">
+                    <span>🔗</span>
+                    <span>Colar / Digitar Link do Produto (Mercado Livre, etc.)</span>
+                </label>
+                <button type="button" onclick="colarLinkInput()" class="text-xs text-blue-700 dark:text-blue-300 font-bold hover:underline flex items-center gap-1 cursor-pointer">
+                    📋 Colar
+                </button>
+            </div>
+            
+            <div class="flex flex-col sm:flex-row gap-2">
+                <input type="text" id="inputLinkDireto" placeholder="Cole o link aqui (ex: link do ML ou link + 2x R$ 49,90)..." class="flex-1 text-xs px-3 py-2.5 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-xl outline-none focus:border-blue-600 dark:text-white">
+                <button type="button" onclick="processarLinkDireto()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer flex-shrink-0">
+                    <span>⚡</span>
+                    <span>Reconhecer Link</span>
+                </button>
+            </div>
+            <p id="msgStatusLink" class="text-[11px] font-bold hidden"></p>
+        </div>
+
+        <!-- 📸 BOTÕES RÁPIDOS DE CÂMERA E GALERIA -->
         <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <!-- BOTÃO 1: CÂMERA DIRETA -->
-            <label class="flex items-center justify-center gap-3 bg-purple-600 hover:bg-purple-700 text-white font-black py-4 px-4 rounded-2xl shadow-md cursor-pointer transition active:scale-95 text-sm">
-                <span class="text-2xl">📸</span>
+            <label class="flex items-center justify-center gap-3 bg-purple-600 hover:bg-purple-700 text-white font-black py-3.5 px-4 rounded-2xl shadow-md cursor-pointer transition active:scale-95 text-xs">
+                <span class="text-xl">📸</span>
                 <div class="text-left">
                     <span class="block">TIRAR FOTO AGORA</span>
                     <span class="block text-[10px] font-normal text-purple-200">Abre a câmera do celular direto</span>
@@ -84,30 +105,27 @@
                 <input type="file" id="inputCameraDireta" accept="image/*" capture="environment" class="hidden" onchange="processarArquivos(this.files)">
             </label>
 
-            <!-- BOTÃO 2: ESCOLHER DA GALERIA / PRINTS -->
-            <label class="flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 px-4 rounded-2xl shadow-md cursor-pointer transition active:scale-95 text-sm">
-                <span class="text-2xl">🖼️</span>
+            <label class="flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3.5 px-4 rounded-2xl shadow-md cursor-pointer transition active:scale-95 text-xs">
+                <span class="text-xl">🖼️</span>
                 <div class="text-left">
                     <span class="block">ESCOLHER DA GALERIA</span>
-                    <span class="block text-[10px] font-normal text-indigo-200">Selecione prints do Teams ou notas</span>
+                    <span class="block text-[10px] font-normal text-indigo-200">Selecione prints salvos ou fotos</span>
                 </div>
                 <input type="file" id="inputGaleria" accept="image/*" multiple class="hidden" onchange="processarArquivos(this.files)">
             </label>
         </div>
 
-        <!-- 📦 ÁREA DE ARRASTAR E SOLTAR (DRAG & DROP PARA PC) -->
-        <div id="dropZone" class="border-2 border-dashed border-purple-300 dark:border-purple-700 bg-purple-50/60 dark:bg-purple-950/20 hover:bg-purple-50 dark:hover:bg-purple-950/40 p-5 rounded-2xl text-center transition-all cursor-pointer relative group">
+        <!-- 📦 ÁREA DE ARRASTAR E SOLTAR (DRAG & DROP PARA PC / CTRL+V) -->
+        <div id="dropZone" class="border-2 border-dashed border-purple-300 dark:border-purple-700 bg-purple-50/60 dark:bg-purple-950/20 hover:bg-purple-50 dark:hover:bg-purple-950/40 p-4 rounded-2xl text-center transition-all cursor-pointer relative group">
             <input type="file" id="inputFotoArrasto" accept="image/*" multiple class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="processarArquivos(this.files)">
             
-            <div class="space-y-1.5 pointer-events-none">
-                <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/60 text-purple-600 dark:text-purple-300 rounded-xl mx-auto flex items-center justify-center text-xl font-black shadow-inner group-hover:scale-105 transition">
-                    📂
-                </div>
+            <div class="space-y-1 pointer-events-none">
+                <span class="text-xl">📂</span>
                 <h3 class="text-xs font-black uppercase text-purple-900 dark:text-purple-200">
-                    Ou arraste arquivos para cá (ou dê Ctrl+V)
+                    Ou arraste arquivos para cá (ou use Ctrl+V)
                 </h3>
-                <p class="text-[11px] text-slate-500 dark:text-slate-400 max-w-md mx-auto">
-                    Arraste prints, fotos de telas ou notas fiscais para leitura automática.
+                <p class="text-[10px] text-slate-500 dark:text-slate-400">
+                    Arraste prints de pedidos, carrinhos ou notas fiscais.
                 </p>
                 <div id="statusDrop" class="text-xs font-bold text-purple-600 dark:text-purple-400 hidden pt-1"></div>
             </div>
@@ -118,7 +136,7 @@
             <div class="flex justify-between items-center">
                 <label class="block text-xs font-black text-indigo-950 dark:text-indigo-200 uppercase flex items-center gap-2">
                     <span>💬</span>
-                    <span>Ou Cole o Texto do Teams / WhatsApp</span>
+                    <span>Ou Cole a Mensagem do Teams / WhatsApp</span>
                 </label>
                 <button type="button" onclick="colarTextoTeams()" class="text-xs text-indigo-700 dark:text-indigo-300 font-bold hover:underline flex items-center gap-1 cursor-pointer">
                     📋 Colar Texto
@@ -140,7 +158,7 @@
             <div class="flex justify-between items-center px-1">
                 <h3 class="text-xs font-black uppercase text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5">
                     <span>📦</span>
-                    <span id="tituloItensPendentes">Itens Identificados pela IA (Confira e dê OK)</span>
+                    <span id="tituloItensPendentes">Itens Identificados (Confira e dê OK):</span>
                 </h3>
                 <button type="button" onclick="confirmarTodosOsCards()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-xl shadow-sm transition cursor-pointer">
                     ⚡ Confirmar Todos de uma Vez
@@ -169,6 +187,7 @@
                             <th class="py-2.5 px-3 text-center">Qtd</th>
                             <th class="py-2.5 px-3 text-right">Unitário</th>
                             <th class="py-2.5 px-3 text-right">Total</th>
+                            <th class="py-2.5 px-3 text-center">Link</th>
                             <th class="py-2.5 px-3 text-center">Ações</th>
                         </tr>
                     </thead>
@@ -194,6 +213,113 @@
             const key = document.getElementById('inputApiKey').value.trim();
             localStorage.setItem('gemini_api_key', key);
             alert("Chave API salva com sucesso!");
+        }
+
+        async function colarLinkInput() {
+            try {
+                const texto = await navigator.clipboard.readText();
+                if (texto) {
+                    document.getElementById('inputLinkDireto').value = texto.trim();
+                    processarLinkDireto();
+                }
+            } catch(e) {
+                document.getElementById('inputLinkDireto').focus();
+            }
+        }
+
+        // Extrai o nome do produto decodificando o endereço web do Mercado Livre
+        function extrairNomeDoLinkML(url) {
+            try {
+                const urlLimpa = url.split('?')[0].split('#')[0];
+                const partes = urlLimpa.split('/');
+                for (let p of partes) {
+                    if (p.includes('-') && !p.startsWith('MLB') && !p.startsWith('p') && p.length > 6) {
+                        return decodeURIComponent(p).replace(/-/g, ' ').toUpperCase();
+                    }
+                }
+                const matchMLB = urlLimpa.match(/\/MLB-\d+-(.*?)(?:_JM|\/|$)/i);
+                if (matchMLB && matchMLB[1]) {
+                    return decodeURIComponent(matchMLB[1]).replace(/-/g, ' ').toUpperCase();
+                }
+            } catch(e) {
+                return null;
+            }
+            return null;
+        }
+
+        // 🔗 PROCESSA O LINK DIGITADO OU COLADO
+        function processarLinkDireto() {
+            const entrada = document.getElementById('inputLinkDireto').value.trim();
+            const statusEl = document.getElementById('msgStatusLink');
+
+            if (!entrada) {
+                alert("Por favor, cole um link antes de clicar em Reconhecer!");
+                return;
+            }
+
+            statusEl.classList.remove('hidden');
+
+            let qtd = 1;
+            let unit = 0;
+            let produto = "";
+            let link = "";
+
+            // Acha o link na frase
+            const matchUrl = entrada.match(/(https?:\/\/[^\s]+)/i);
+            if (matchUrl) {
+                link = matchUrl[1];
+                const nomeExtraido = extrairNomeDoLinkML(link);
+                if (nomeExtraido) {
+                    produto = nomeExtraido;
+                }
+            }
+
+            // Acha quantidade (ex: 2x, 3 un)
+            const matchQtd = entrada.match(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/i);
+            if (matchQtd) {
+                qtd = parseInt(matchQtd[1], 10);
+            }
+
+            // Acha preço (ex: R$ 89,90 ou 150.00)
+            const matchPreco = entrada.match(/(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/i);
+            if (matchPreco) {
+                unit = parseFloat(matchPreco[1].replace(',', '.'));
+            }
+
+            // Se não conseguiu extrair do link, pega o texto digitado
+            if (!produto) {
+                let textoSemLink = entrada
+                    .replace(/(https?:\/\/[^\s]+)/gi, '')
+                    .replace(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/gi, ' ')
+                    .replace(/(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/gi, ' ')
+                    .replace(/R\$/gi, ' ')
+                    .trim();
+
+                if (textoSemLink.length > 2) {
+                    produto = textoSemLink.toUpperCase();
+                } else {
+                    produto = "PRODUTO VIA LINK";
+                }
+            }
+
+            const hoje = new Date().toISOString().split('T')[0];
+
+            itensPendentesAprovacao.unshift({
+                tempId: Date.now() + Math.random(),
+                data: hoje,
+                solicitante: "NÃO INFORMADO",
+                produto: produto.toUpperCase(),
+                categoria: adivinharCategoria(produto),
+                qtd: qtd,
+                unit: unit,
+                link: link
+            });
+
+            statusEl.innerText = `✅ Link reconhecido com sucesso: ${produto}`;
+            statusEl.className = "text-[11px] font-bold text-emerald-600 dark:text-emerald-400 block";
+
+            renderizarCardsPendentes();
+            document.getElementById('inputLinkDireto').value = '';
         }
 
         function configurarDragAndDrop() {
@@ -260,7 +386,7 @@
                 return;
             }
 
-            statusEl.innerText = `⏳ IA analisando a foto... Aguarde alguns instantes...`;
+            statusEl.innerText = `⏳ IA analisando a foto... Aguarde...`;
             statusEl.className = "text-xs font-bold text-purple-600 dark:text-purple-400 animate-pulse block pt-1";
 
             for (let i = 0; i < files.length; i++) {
@@ -328,7 +454,8 @@
                         produto: (p.produto || "PRODUTO").toUpperCase(),
                         categoria: p.categoria || "OUTROS",
                         qtd: p.qtd || 1,
-                        unit: p.unit || 0
+                        unit: p.unit || 0,
+                        link: ""
                     });
                 });
             } catch (err) {
@@ -371,6 +498,14 @@
                 let qtd = 1;
                 let unit = 0;
                 let produto = "";
+                let link = "";
+
+                const matchUrl = linha.match(/(https?:\/\/[^\s]+)/i);
+                if (matchUrl) {
+                    link = matchUrl[1];
+                    const nomePeloLink = extrairNomeDoLinkML(link);
+                    if (nomePeloLink) produto = nomePeloLink;
+                }
 
                 const matchQtd = linha.match(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/i);
                 if (matchQtd) qtd = parseInt(matchQtd[1], 10);
@@ -378,15 +513,17 @@
                 const matchPreco = linha.match(/(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/i);
                 if (matchPreco) unit = parseFloat(matchPreco[1].replace(',', '.'));
 
-                let textoLimpo = linha
-                    .replace(/(https?:\/\/[^\s]+)/gi, '')
-                    .replace(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/gi, ' ')
-                    .replace(/(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/gi, ' ')
-                    .replace(/R\$/gi, ' ')
-                    .replace(/(?:solicitante|de|por|para)[:\s-]+[A-Za-zÀ-ÖØ-öø-ÿ\s]+/gi, ' ')
-                    .trim();
+                if (!produto) {
+                    let textoLimpo = linha
+                        .replace(/(https?:\/\/[^\s]+)/gi, '')
+                        .replace(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/gi, ' ')
+                        .replace(/(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/gi, ' ')
+                        .replace(/R\$/gi, ' ')
+                        .replace(/(?:solicitante|de|por|para)[:\s-]+[A-Za-zÀ-ÖØ-öø-ÿ\s]+/gi, ' ')
+                        .trim();
 
-                if (textoLimpo.length > 2) produto = textoLimpo.toUpperCase();
+                    if (textoLimpo.length > 2) produto = textoLimpo.toUpperCase();
+                }
 
                 if (produto || unit > 0) {
                     itensPendentesAprovacao.push({
@@ -396,7 +533,8 @@
                         produto: (produto || "PRODUTO").toUpperCase(),
                         categoria: adivinharCategoria(produto),
                         qtd: qtd || 1,
-                        unit: unit || 0
+                        unit: unit || 0,
+                        link: link || ""
                     });
                 }
             });
@@ -483,6 +621,7 @@
                         </div>
 
                         <div class="md:col-span-4 flex gap-2">
+                            <input type="hidden" id="link-${item.tempId}" value="${item.link || ''}">
                             <button type="button" onclick="confirmarCardIndividual(${item.tempId})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1 cursor-pointer">
                                 <span>✅</span>
                                 <span>OK (Confirmar)</span>
@@ -509,6 +648,7 @@
             const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1;
             const unit = parseFloat(document.getElementById(`unit-${tempId}`).value) || 0;
             const total = qtd * unit;
+            const link = document.getElementById(`link-${tempId}`).value;
 
             compras.unshift({
                 id: Date.now() + Math.random(),
@@ -518,7 +658,8 @@
                 categoria,
                 qtd,
                 unit,
-                total
+                total,
+                link
             });
 
             itensPendentesAprovacao = itensPendentesAprovacao.filter(i => i.tempId !== tempId);
@@ -537,6 +678,7 @@
                 const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1;
                 const unit = parseFloat(document.getElementById(`unit-${tempId}`).value) || 0;
                 const total = qtd * unit;
+                const link = document.getElementById(`link-${tempId}`).value;
 
                 compras.unshift({
                     id: Date.now() + Math.random(),
@@ -546,7 +688,8 @@
                     categoria,
                     qtd,
                     unit,
-                    total
+                    total,
+                    link
                 });
             });
 
@@ -569,7 +712,7 @@
             let solicitantesContador = {};
 
             if (compras.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-400 italic">NENHUMA COMPRA REGISTRADA ATÉ O MOMENTO.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-400 italic">NENHUMA COMPRA REGISTRADA ATÉ O MOMENTO.</td></tr>`;
             } else {
                 compras.forEach(item => {
                     totalGastoGeral += item.total;
@@ -585,6 +728,11 @@
                         <td class="py-2.5 px-3 text-center font-bold text-slate-700 dark:text-slate-300">${item.qtd}</td>
                         <td class="py-2.5 px-3 text-right text-slate-500 whitespace-nowrap">R$ ${item.unit.toFixed(2)}</td>
                         <td class="py-2.5 px-3 text-right font-black text-emerald-600 dark:text-emerald-400 whitespace-nowrap">R$ ${item.total.toFixed(2)}</td>
+                        <td class="py-2.5 px-3 text-center whitespace-nowrap">
+                            ${item.link && item.link.startsWith('http') 
+                                ? `<a href="${item.link}" target="_blank" class="text-blue-600 dark:text-blue-400 font-bold hover:underline normal-case">Ver Link ↗</a>` 
+                                : '<span class="text-slate-400">-</span>'}
+                        </td>
                         <td class="py-2.5 px-3 text-center whitespace-nowrap">
                             <button onclick="removerItem(${item.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1 cursor-pointer" title="Excluir">✕</button>
                         </td>
@@ -641,7 +789,7 @@
             }
 
             let csv = "\uFEFF";
-            csv += "DATA;SOLICITANTE;PRODUTO/SERVIÇO;CATEGORIA;QUANTIDADE;VALOR UNITÁRIO (R$);TOTAL (R$)\n";
+            csv += "DATA;SOLICITANTE;PRODUTO/SERVIÇO;CATEGORIA;QUANTIDADE;VALOR UNITÁRIO (R$);TOTAL (R$);LINK DO PRODUTO\n";
 
             compras.forEach(item => {
                 const linha = [
@@ -651,7 +799,8 @@
                     `"${item.categoria}"`,
                     item.qtd,
                     item.unit.toFixed(2).replace('.', ','),
-                    item.total.toFixed(2).replace('.', ',')
+                    item.total.toFixed(2).replace('.', ','),
+                    `"${(item.link || '').replace(/"/g, '""')}"`
                 ];
                 csv += linha.join(";") + "\n";
             });
