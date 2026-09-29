@@ -13,6 +13,7 @@
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
         .uppercase-input { text-transform: uppercase; }
+        .dropzone-hover { border-color: #9333ea !important; background-color: rgba(243, 232, 255, 0.7) !important; transform: scale(1.01); }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen p-4 sm:p-6 transition-colors duration-200">
@@ -30,7 +31,7 @@
                         <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300">Módulo 7</span>
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
                     </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Leitura de fotos com Inteligência Artificial e controle financeiro</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Arraste imagens, cole prints (Ctrl+V) ou envie mensagens</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
@@ -71,23 +72,44 @@
             </div>
         </div>
 
-        <!-- 🤖 RECONHECIMENTO POR FOTO / PRINT COM IA -->
-        <div class="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/30 dark:to-indigo-950/20 border border-purple-200 dark:border-purple-800/60 p-4 rounded-2xl shadow-sm space-y-3">
+        <!-- 📦 ÁREA DE ARRASTAR E SOLTAR IMAGENS / PRINTS (DRAG & DROP) -->
+        <div id="dropZone" class="border-2 border-dashed border-purple-300 dark:border-purple-700 bg-purple-50/60 dark:bg-purple-950/20 hover:bg-purple-50 dark:hover:bg-purple-950/40 p-6 rounded-2xl text-center transition-all cursor-pointer relative group">
+            <input type="file" id="inputFotoArrasto" accept="image/*" multiple class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="processarArquivos(this.files)">
+            
+            <div class="space-y-2 pointer-events-none">
+                <div class="w-14 h-14 bg-purple-100 dark:bg-purple-900/60 text-purple-600 dark:text-purple-300 rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-inner group-hover:scale-110 transition">
+                    📂
+                </div>
+                <h3 class="text-xs sm:text-sm font-black uppercase text-purple-900 dark:text-purple-200">
+                    Arraste e solte as fotos aqui
+                </h3>
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
+                    Arraste prints do Teams, notas ou carrinhos para dentro desta área.<br>
+                    <span class="font-bold text-purple-700 dark:text-purple-300">Dica:</span> Você também pode apenas clicar ou dar <kbd class="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 font-mono text-[10px]">Ctrl+V</kbd> com o print copiado.
+                </p>
+                <div id="statusDrop" class="text-xs font-bold text-purple-600 dark:text-purple-400 hidden pt-1"></div>
+            </div>
+        </div>
+
+        <!-- 💬 COLAR MENSAGEM DO TEAMS (CASO SEJA EM TEXTO) -->
+        <div class="bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-900/60 p-4 rounded-2xl shadow-sm space-y-3">
             <div class="flex justify-between items-center">
-                <label class="block text-xs font-black text-purple-950 dark:text-purple-200 uppercase flex items-center gap-2">
-                    <span>✨</span>
-                    <span>Analisar Foto ou Print com Inteligência Artificial</span>
+                <label class="block text-xs font-black text-indigo-950 dark:text-indigo-200 uppercase flex items-center gap-2">
+                    <span>💬</span>
+                    <span>Ou Cole o Texto do Teams / WhatsApp</span>
                 </label>
+                <button type="button" onclick="colarTextoTeams()" class="text-xs text-indigo-700 dark:text-indigo-300 font-bold hover:underline flex items-center gap-1 cursor-pointer">
+                    📋 Colar Texto
+                </button>
             </div>
             
-            <div class="flex flex-wrap items-center gap-3">
-                <label class="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl cursor-pointer shadow-sm transition">
-                    <span>📸 Tirar Foto / Selecionar Print</span>
-                    <input type="file" id="inputFotoIa" accept="image/*" class="hidden" onchange="analisarImagemComIA(this)">
-                </label>
-                <span id="statusIa" class="text-[11px] font-bold text-slate-600 dark:text-slate-300">
-                    A IA lê notas fiscais, fotos de telas do Teams ou carrinhos de compra.
-                </span>
+            <textarea id="inputTextoTeams" rows="2" placeholder="Ex: Roberto pediu: 2 Teclados Logitech link:... R$ 89,90 e 1 Mouse Dell R$ 45,00..." class="w-full text-xs p-3 bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800 rounded-xl outline-none focus:border-indigo-600 dark:text-white leading-relaxed"></textarea>
+            
+            <div class="flex justify-end pt-1">
+                <button type="button" onclick="processarTextoBruto(document.getElementById('inputTextoTeams').value)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-md flex items-center gap-1.5 cursor-pointer">
+                    <span>⚡</span>
+                    <span>Reconhecer Texto</span>
+                </button>
             </div>
         </div>
 
@@ -96,9 +118,9 @@
             <div class="flex justify-between items-center px-1">
                 <h3 class="text-xs font-black uppercase text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5">
                     <span>📦</span>
-                    <span id="tituloItensPendentes">Itens Identificados (Apenas confira e clique em OK)</span>
+                    <span id="tituloItensPendentes">Itens Identificados pela IA (Confira e dê OK)</span>
                 </h3>
-                <button type="button" onclick="confirmarTodosOsCards()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-xl shadow-sm transition">
+                <button type="button" onclick="confirmarTodosOsCards()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-xl shadow-sm transition cursor-pointer">
                     ⚡ Confirmar Todos de uma Vez
                 </button>
             </div>
@@ -109,7 +131,7 @@
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">
-                    📋 Histórico de Compras Registradas
+                    📋 Histórico de Compras no Cartão
                 </h3>
                 <span id="labelContador" class="text-[11px] text-slate-400 font-bold">0 ITENS REGISTRADOS</span>
             </div>
@@ -143,12 +165,57 @@
             const savedKey = localStorage.getItem('gemini_api_key') || '';
             document.getElementById('inputApiKey').value = savedKey;
             carregarDoLocalStorage();
+            configurarDragAndDrop();
         });
 
         function salvarApiKey() {
             const key = document.getElementById('inputApiKey').value.trim();
             localStorage.setItem('gemini_api_key', key);
             alert("Chave API salva com sucesso!");
+        }
+
+        // CONFIGURAÇÃO DE ARRASTAR E SOLTAR (DRAG & DROP) + CTRL+V
+        function configurarDragAndDrop() {
+            const dropZone = document.getElementById('dropZone');
+
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropZone.classList.add('dropzone-hover');
+                }, false);
+            });
+
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropZone.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    dropZone.classList.remove('dropzone-hover');
+                }, false);
+            });
+
+            dropZone.addEventListener('drop', (e) => {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                if (files && files.length > 0) {
+                    processarArquivos(files);
+                }
+            }, false);
+
+            // Permite dar Ctrl+V em qualquer lugar da tela para colar print
+            document.addEventListener('paste', (e) => {
+                const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+                const imageFiles = [];
+                for (let index in items) {
+                    const item = items[index];
+                    if (item.kind === 'file' && item.type.startsWith('image/')) {
+                        imageFiles.push(item.getAsFile());
+                    }
+                }
+                if (imageFiles.length > 0) {
+                    processarArquivos(imageFiles);
+                }
+            });
         }
 
         // Converte imagem para Base64
@@ -161,37 +228,50 @@
             });
         }
 
-        // 🤖 ANALISADOR MULTIMODAL COM GEMINI IA
-        async function analisarImagemComIA(input) {
-            if (!input.files || input.files.length === 0) return;
-            const file = input.files[0];
-            const statusEl = document.getElementById('statusIa');
-            const apiKey = localStorage.getItem('gemini_api_key') || document.getElementById('inputApiKey').value.trim();
+        // Processa uma ou mais fotos arrastadas
+        async function processarArquivos(files) {
+            const statusEl = document.getElementById('statusDrop');
+            statusEl.classList.remove('hidden');
 
+            const apiKey = localStorage.getItem('gemini_api_key') || document.getElementById('inputApiKey').value.trim();
             if (!apiKey) {
-                alert("Por favor, informe sua chave API do Gemini no topo da tela para usar o reconhecimento com IA!");
+                alert("Por favor, cole a sua chave API do Gemini no topo da tela para usar o reconhecimento com IA!");
                 document.getElementById('inputApiKey').focus();
+                statusEl.classList.add('hidden');
                 return;
             }
 
-            statusEl.innerText = "⏳ IA analisando a imagem e extraindo produtos... Aguarde...";
-            statusEl.className = "text-[11px] font-bold text-purple-600 dark:text-purple-400 animate-pulse";
+            statusEl.innerText = `⏳ IA analisando ${files.length} imagem(ns)... Aguarde...`;
+            statusEl.className = "text-xs font-bold text-purple-600 dark:text-purple-400 animate-pulse block pt-1";
 
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (!file.type.startsWith('image/')) continue;
+                await chamarIaParaImagem(file, apiKey);
+            }
+
+            statusEl.innerText = `✅ Processamento visual concluído! Confira os cards abaixo.`;
+            statusEl.className = "text-xs font-bold text-emerald-600 dark:text-emerald-400 block pt-1";
+            renderizarCardsPendentes();
+        }
+
+        // 🤖 ANALISADOR MULTIMODAL GEMINI IA
+        async function chamarIaParaImagem(file, apiKey) {
             try {
                 const base64Data = await fileToBase64(file);
 
-                const prompt = `Analise a imagem em anexo (pode ser cupom fiscal, print de tela do Teams, Mercado Livre, etc.) e extraia todos os produtos comprados.
+                const prompt = `Analise a imagem em anexo (pode ser print do Teams, nota fiscal, carrinho do Mercado Livre, etc.) e extraia todas as compras identificadas.
                 Retorne ESTRITAMENTE um JSON com uma lista de objetos contendo os seguintes campos:
                 [
                   {
                     "produto": "nome do item em maiúsculo",
-                    "qtd": número inteiro da quantidade,
+                    "qtd": número inteiro da quantidade (padrão 1 se não achar),
                     "unit": valor unitário decimal (número puro, ex: 15.50),
                     "solicitante": "nome de quem pediu se constar ou 'NÃO INFORMADO'",
                     "categoria": "INFORMÁTICA / TI, ESCRITÓRIO, MANUTENÇÃO, TREINAMENTO, ALIMENTAÇÃO / COPA ou OUTROS"
                   }
                 ]
-                Retorne apenas o array JSON válido, sem formatações Markdown adicionais.`;
+                Retorne apenas o array JSON puro, sem blocos de markdown.`;
 
                 const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
 
@@ -214,37 +294,106 @@
                 });
 
                 const data = await response.json();
-                if (data.error) {
-                    throw new Error(data.error.message);
-                }
+                if (data.error) throw new Error(data.error.message);
 
                 let textoResposta = data.candidates[0].content.parts[0].text.trim();
-                // Limpa blocos de código markdown se houver
                 textoResposta = textoResposta.replace(/```json/gi, '').replace(/```/g, '').trim();
 
                 const produtosExtraidos = JSON.parse(textoResposta);
                 const hoje = new Date().toISOString().split('T')[0];
 
-                itensPendentesAprovacao = produtosExtraidos.map((p, idx) => ({
-                    tempId: Date.now() + idx,
-                    data: hoje,
-                    solicitante: (p.solicitante || "NÃO INFORMADO").toUpperCase(),
-                    produto: (p.produto || "PRODUTO").toUpperCase(),
-                    categoria: p.categoria || "OUTROS",
-                    qtd: p.qtd || 1,
-                    unit: p.unit || 0,
-                    link: ""
-                }));
-
-                statusEl.innerText = `✅ IA identificou ${itensPendentesAprovacao.length} item(ns) com sucesso!`;
-                statusEl.className = "text-[11px] font-bold text-emerald-600 dark:text-emerald-400";
-
-                renderizarCardsPendentes();
+                produtosExtraidos.forEach((p, idx) => {
+                    itensPendentesAprovacao.push({
+                        tempId: Date.now() + Math.random(),
+                        data: hoje,
+                        solicitante: (p.solicitante || "NÃO INFORMADO").toUpperCase(),
+                        produto: (p.produto || "PRODUTO").toUpperCase(),
+                        categoria: p.categoria || "OUTROS",
+                        qtd: p.qtd || 1,
+                        unit: p.unit || 0
+                    });
+                });
             } catch (err) {
-                console.error(err);
-                statusEl.innerText = "⚠️ Erro ao consultar IA: " + err.message;
-                statusEl.className = "text-[11px] font-bold text-rose-500";
+                console.error("Falha ao analisar arquivo:", err);
             }
+        }
+
+        async function colarTextoTeams() {
+            try {
+                const texto = await navigator.clipboard.readText();
+                if (texto) {
+                    document.getElementById('inputTextoTeams').value = texto.trim();
+                    processarTextoBruto(texto);
+                }
+            } catch(e) {
+                document.getElementById('inputTextoTeams').focus();
+            }
+        }
+
+        function processarTextoBruto(textoBruto) {
+            if (!textoBruto || !textoBruto.trim()) {
+                alert("Nenhum texto informado para processar!");
+                return;
+            }
+
+            let solicitanteDetectado = "NÃO INFORMADO";
+            const matchSolicitante = textoBruto.match(/(?:solicitante|de|por|para|quem pediu|pediu|atender|nome)[:\s-]+([A-Za-zÀ-ÖØ-öø-ÿ\s]{2,25})/i);
+            if (matchSolicitante && matchSolicitante[1]) {
+                solicitanteDetectado = matchSolicitante[1].trim().toUpperCase();
+            }
+
+            let linhas = textoBruto.split(/\n|;|\band\b|\be\b/i).map(l => l.trim()).filter(l => l.length > 3);
+            if (linhas.length === 0) linhas = [textoBruto];
+
+            const hoje = new Date().toISOString().split('T')[0];
+
+            linhas.forEach((linha, idx) => {
+                if (linha.toLowerCase().startsWith('solicitante:') || linha.toLowerCase().startsWith('de:')) return;
+
+                let qtd = 1;
+                let unit = 0;
+                let produto = "";
+
+                const matchQtd = linha.match(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/i);
+                if (matchQtd) qtd = parseInt(matchQtd[1], 10);
+
+                const matchPreco = linha.match(/(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/i);
+                if (matchPreco) unit = parseFloat(matchPreco[1].replace(',', '.'));
+
+                let textoLimpo = linha
+                    .replace(/(https?:\/\/[^\s]+)/gi, '')
+                    .replace(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/gi, ' ')
+                    .replace(/(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/gi, ' ')
+                    .replace(/R\$/gi, ' ')
+                    .replace(/(?:solicitante|de|por|para)[:\s-]+[A-Za-zÀ-ÖØ-öø-ÿ\s]+/gi, ' ')
+                    .trim();
+
+                if (textoLimpo.length > 2) produto = textoLimpo.toUpperCase();
+
+                if (produto || unit > 0) {
+                    itensPendentesAprovacao.push({
+                        tempId: Date.now() + Math.random(),
+                        data: hoje,
+                        solicitante: solicitanteDetectado,
+                        produto: (produto || "PRODUTO").toUpperCase(),
+                        categoria: adivinharCategoria(produto),
+                        qtd: qtd || 1,
+                        unit: unit || 0
+                    });
+                }
+            });
+
+            renderizarCardsPendentes();
+        }
+
+        function adivinharCategoria(texto) {
+            const t = (texto || "").toLowerCase();
+            if (t.includes('teclado') || t.includes('mouse') || t.includes('cabo') || t.includes('monitor') || t.includes('hd') || t.includes('ssd') || t.includes('ti')) return "INFORMÁTICA / TI";
+            if (t.includes('papel') || t.includes('caneta') || t.includes('pasta') || t.includes('grampeador')) return "ESCRITÓRIO";
+            if (t.includes('ferramenta') || t.includes('broca') || t.includes('fita') || t.includes('parafuso')) return "MANUTENÇÃO";
+            if (t.includes('curso') || t.includes('treinamento') || t.includes('livro')) return "TREINAMENTO";
+            if (t.includes('cafe') || t.includes('café') || t.includes('copo') || t.includes('açucar')) return "ALIMENTAÇÃO / COPA";
+            return "OUTROS";
         }
 
         function renderizarCardsPendentes() {
@@ -258,7 +407,7 @@
             }
 
             container.classList.remove('hidden');
-            document.getElementById('tituloItensPendentes').innerText = `${itensPendentesAprovacao.length} ITEM(NS) IDENTIFICADOS PELA IA (Confira e dê OK):`;
+            document.getElementById('tituloItensPendentes').innerText = `${itensPendentesAprovacao.length} ITEM(NS) IDENTIFICADOS (Confira e dê OK):`;
 
             itensPendentesAprovacao.forEach((item, index) => {
                 const totalCalculado = (item.qtd * item.unit).toFixed(2);
@@ -269,7 +418,7 @@
                 card.innerHTML = `
                     <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                         <span class="text-xs font-black text-purple-700 dark:text-purple-400 uppercase">Item #${index + 1}</span>
-                        <button type="button" onclick="descartarCardPendente(${item.tempId})" class="text-slate-400 hover:text-rose-500 font-bold text-xs">✕ Descartar</button>
+                        <button type="button" onclick="descartarCardPendente(${item.tempId})" class="text-slate-400 hover:text-rose-500 font-bold text-xs cursor-pointer">✕ Descartar</button>
                     </div>
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-2.5 items-end">
