@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 8 - Procura de FDS com Câmera e IA | Portal Vale</title>
+    <title>Módulo 8 - Procura de FDS com Supabase | Portal Vale</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -51,12 +51,12 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-cyan-100 dark:bg-cyan-900 text-cyan-700 dark:text-cyan-300">Módulo 8</span>
-                        <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Procura de FDS com Câmera e IA</h1>
+                        <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Procura de FDS com Nuvem Supabase</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Análise por Foto & Impressão Direta</p>
-                        <span class="inline-block w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
-                        <span class="text-[10px] font-bold text-cyan-600 dark:text-cyan-400">Módulo Ativo</span>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Sincronização Automática</p>
+                        <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
                 </div>
             </div>
@@ -65,6 +65,9 @@
                 <a href="index.html" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1">
                     ⬅ Menu Principal
                 </a>
+                <button onclick="carregarDoSupabase()" class="bg-cyan-600 hover:bg-cyan-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer">
+                    🔄 Sincronizar
+                </button>
             </div>
         </header>
 
@@ -148,7 +151,7 @@
                         <span>🌐</span> <span>Procurar FDS na Web</span>
                     </button>
                     <button type="button" onclick="salvarFdsSistema()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2.5 px-6 rounded-xl text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer">
-                        <span>💾</span> <span>Salvar FDS no Sistema</span>
+                        <span>💾</span> <span>Salvar FDS na Nuvem</span>
                     </button>
                 </div>
             </div>
@@ -158,7 +161,7 @@
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">
-                    📚 Fichas de Dados de Segurança (FDS) Cadastradas
+                    📚 Fichas de Dados de Segurança (FDS) na Nuvem
                 </h3>
                 <span id="labelContadorFds" class="text-[11px] text-slate-400 font-bold">0 DOCUMENTOS</span>
             </div>
@@ -185,13 +188,11 @@
     <div id="modalImpressao" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full text-slate-900 space-y-4">
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-sm font-black uppercase text-cyan-700">🖨️ Impressão de FDS</h3>
+                <h3 class="text-sm font-black uppercase text-cyan-700">🖨️️ Impressão de FDS</h3>
                 <button onclick="fecharModalImpressao()" class="text-slate-400 hover:text-slate-700 font-black">✕</button>
             </div>
             
-            <div id="conteudoImpressao" class="space-y-4 text-center">
-                <!-- Conteúdo gerado dinamicamente -->
-            </div>
+            <div id="conteudoImpressao" class="space-y-4 text-center"></div>
 
             <div class="flex gap-2 pt-2 border-t">
                 <button type="button" onclick="window.print()" class="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2.5 rounded-xl text-xs">Imprimir Agora</button>
@@ -201,10 +202,22 @@
     </div>
 
     <script>
+        const SUPABASE_URL = "https://gloxtswcksbczinpwtzu.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_0kEiqthWKZZwjM120wQIYw_Hba7qeLc";
+        let supabaseClient = null;
         let listaFds = [];
 
         window.addEventListener('DOMContentLoaded', () => {
             carregarFdsLocal();
+
+            if (window.supabase) {
+                try {
+                    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                    carregarDoSupabase();
+                } catch(e) {
+                    console.warn("Modo local ativo para FDS");
+                }
+            }
         });
 
         function mostrarAviso(msg, tipo = "sucesso") {
@@ -219,15 +232,78 @@
             setTimeout(() => el.classList.add('hidden'), 4000);
         }
 
+        async function carregarDoSupabase() {
+            if (!supabaseClient) return;
+            try {
+                const { data, error } = await supabaseClient
+                    .from('fds_corporativas')
+                    .select('*')
+                    .order('id', { ascending: false });
+
+                if (error) throw error;
+                if (data) {
+                    const localSalvo = JSON.parse(localStorage.getItem('portal_vale_fds_base') || '[]');
+                    const mapLocal = new Map();
+                    localSalvo.forEach(item => mapLocal.set(String(item.id), item));
+
+                    listaFds = data.map(remoto => {
+                        const local = mapLocal.get(String(remoto.id));
+                        return {
+                            id: remoto.id,
+                            produto: remoto.produto,
+                            fabricante: remoto.fabricante || 'NÃO INFORMADO',
+                            link: remoto.link || '',
+                            fotoUrl: (local && local.fotoUrl) ? local.fotoUrl : (remoto.foto_url || ''),
+                            dataRegistro: remoto.data_registro || new Date().toLocaleDateString('pt-BR')
+                        };
+                    });
+
+                    salvarFdsLocal();
+                    renderizarCardsFds();
+                    mostrarAviso("✅ FDS sincronizadas com a nuvem!");
+                }
+            } catch (err) {
+                console.warn("Aviso nuvem FDS:", err.message);
+                carregarFdsLocal();
+            }
+        }
+
+        async function inserirNoSupabase(item) {
+            if (!supabaseClient) return null;
+            try {
+                const payload = {
+                    produto: item.produto,
+                    fabricante: item.fabricante,
+                    link: item.link,
+                    foto_url: item.fotoUrl,
+                    data_registro: item.dataRegistro
+                };
+                let { data, error } = await supabaseClient.from('fds_corporativas').insert([payload]).select();
+                if (!error && data && data[0]) return data[0].id;
+            } catch (err) {
+                console.warn("Aviso Supabase FDS Insert:", err.message);
+            }
+            return null;
+        }
+
+        async function removerDoSupabase(id) {
+            if (!supabaseClient) return;
+            try {
+                await supabaseClient.from('fds_corporativas').delete().eq('id', id);
+            } catch (err) {
+                console.warn("Aviso Supabase FDS Delete:", err.message);
+            }
+        }
+
         async function analisarFotoComIa(file) {
             if (!file) return;
             const apiKey = localStorage.getItem('gemini_api_key');
             if (!apiKey) {
-                alert("⚠️ Chave da IA (Gemini) não configurada! Vá ao Módulo 7 (ou configure no painel) para inserir sua chave de API para leitura de imagens.");
+                alert("⚠️ Chave da IA (Gemini) não configurada! Vá ao Módulo 7 para configurar sua chave de API.");
                 return;
             }
 
-            mostrarAviso("🤖 IA analisando a foto / FDS antiga...", "sucesso");
+            mostrarAviso("🤖 IA analisando a foto...", "sucesso");
 
             try {
                 const base64Data = await new Promise((resolve, reject) => {
@@ -243,7 +319,7 @@
                     body: JSON.stringify({
                         contents: [{
                             parts: [
-                                { text: "Analise esta imagem de um produto químico ou de uma FDS antiga. Retorne APENAS um JSON estrito no formato: {\"produto\": \"NOME\", \"fabricante\": \"FABRICANTE\"}. Se não encontrar algum, deixe em branco." },
+                                { text: "Retorne APENAS um JSON estrito no formato: {\"produto\": \"NOME\", \"fabricante\": \"FABRICANTE\"} com base nesta imagem." },
                                 { inlineData: { mimeType: file.type, data: base64Data } }
                             ]
                         }]
@@ -258,11 +334,10 @@
                 if (resultado.produto) document.getElementById('fdsProduto').value = resultado.produto.toUpperCase();
                 if (resultado.fabricante) document.getElementById('fdsFabricante').value = resultado.fabricante.toUpperCase();
                 
-                // Anexa automaticamente a foto no input de arquivo se possível
                 mostrarAviso("✅ Dados extraídos com sucesso pela IA!");
             } catch (err) {
                 console.error(err);
-                alert("❌ Erro ao processar a imagem com a IA. Preencha os campos manualmente se necessário.");
+                alert("❌ Erro ao processar a imagem com a IA.");
             }
         }
 
@@ -307,12 +382,24 @@
             listaFds.unshift(novoFds);
             salvarFdsLocal();
             renderizarCardsFds();
-            mostrarAviso(`✅ FDS do produto "${produto}" salva com sucesso!`);
+            mostrarAviso(`✅ FDS do produto "${produto}" salva!`);
 
             document.getElementById('fdsProduto').value = '';
             document.getElementById('fdsFabricante').value = '';
             document.getElementById('fdsLink').value = '';
             inputFoto.value = '';
+
+            const supabaseId = await inserirNoSupabase({
+                produto,
+                fabricante: fabricante || "NÃO INFORMADO",
+                link,
+                fotoUrl,
+                dataRegistro: novoFds.dataRegistro
+            });
+            if (supabaseId) {
+                novoFds.id = supabaseId;
+                salvarFdsLocal();
+            }
         }
 
         function renderizarCardsFds() {
@@ -402,7 +489,7 @@
                             <h2 class="text-base font-black uppercase text-slate-900 mt-1">${produto}</h2>
                             <p class="text-xs font-semibold text-slate-600 uppercase">Fabricante: ${fabricante}</p>
                         </div>
-                        ${fotoUrl ? `<img src="${fotoUrl}" class="w-16 h-16 object-cover rounded-xl border border-slate-200 shadow-sm">` : ''}
+                        ${fotoUrl && fotoUrl !== 'null' ? `<img src="${fotoUrl}" class="w-16 h-16 object-cover rounded-xl border border-slate-200 shadow-sm">` : ''}
                     </div>
                     <div class="pt-2 border-t text-[11px] text-slate-500">
                         <p><strong>Link de Acesso:</strong> <a href="${link}" target="_blank" class="text-blue-600 underline">${link || 'Não informado'}</a></p>
@@ -417,12 +504,13 @@
             document.getElementById('modalImpressao').classList.add('hidden');
         }
 
-        function removerFds(id) {
+        async function removerFds(id) {
             if (confirm("Deseja realmente apagar esta FDS do sistema?")) {
-                listaFds = listaFds.filter(f => f.id !== id);
+                listaFds = listaFds.filter(f => String(f.id) !== String(id));
                 salvarFdsLocal();
                 renderizarCardsFds();
                 mostrarAviso("Documento removido com sucesso!");
+                await removerDoSupabase(id);
             }
         }
 
