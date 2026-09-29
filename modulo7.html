@@ -41,7 +41,7 @@
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen p-4 sm:p-6 transition-colors duration-200">
 
-    <div class="max-w-6xl mx-auto space-y-5">
+    <div class="max-w-7xl mx-auto space-y-5">
 
         <!-- CABEÇALHO -->
         <header class="flex flex-wrap justify-between items-center bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 gap-4">
@@ -55,7 +55,7 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Controlo de Entregas</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Botão Salvar Entregas</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
@@ -71,7 +71,7 @@
                     <span>Painel Pessoas</span>
                 </button>
                 <button onclick="carregarDoSupabase()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-sm">
-                    🔄 Sincronizar
+                    🔄 Sincronizar (Puxar)
                 </button>
                 <button onclick="exportarParaCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer">
                     📥 CSV
@@ -149,7 +149,7 @@
             <div id="aba-manual" class="p-4 sm:p-5 space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                     <span class="text-xs font-black text-indigo-900 dark:text-indigo-300 uppercase flex items-center gap-1.5">
-                        <span>✍️</span> Novo Lançamento Manual (Sem link, sem foto)
+                        <span>✍️</span> Novo Lançamento Manual
                     </span>
                     <span class="text-[10px] font-bold text-slate-400">Preencha os campos abaixo</span>
                 </div>
@@ -174,11 +174,14 @@
                     </div>
 
                     <div class="md:col-span-3">
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Local / Fornecedor</label>
+                        <input type="text" id="manualLocal" oninput="this.value = this.value.toUpperCase()" placeholder="EX: MERCADO LIVRE, LOJA FÍSICA..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                    </div>
+
+                    <div class="md:col-span-3">
                         <div class="flex justify-between items-center mb-1">
                             <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Categoria</label>
-                            <button type="button" onclick="adicionarNovaCategoriaPrompt('manualCategoria')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-0.5 rounded-lg text-[10px] font-black transition shadow-sm cursor-pointer" title="Criar nova categoria">
-                                + Nova Categoria
-                            </button>
+                            <button type="button" onclick="adicionarNovaCategoriaPrompt('manualCategoria')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-0.5 rounded-lg text-[10px] font-black transition shadow-sm cursor-pointer">+ Nova</button>
                         </div>
                         <select id="manualCategoria" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-semibold outline-none"></select>
                     </div>
@@ -198,10 +201,10 @@
                         <input type="number" step="0.01" id="manualUnit" placeholder="0,00" oninput="calcularManualPorUnitario()" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                     </div>
 
-                    <div class="md:col-span-5">
+                    <div class="md:col-span-2">
                         <button type="button" onclick="lancarCompraManual()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer">
                             <span>✅</span>
-                            <span>Lançar Compra na Nuvem</span>
+                            <span>Salvar Compra</span>
                         </button>
                     </div>
                 </div>
@@ -212,7 +215,7 @@
                 <div class="flex justify-between items-center">
                     <label class="block text-xs font-black text-blue-950 dark:text-blue-200 uppercase flex items-center gap-2">
                         <span>🔗</span>
-                        <span>Colar / Digitar Link do Produto (Mercado Livre, etc.)</span>
+                        <span>Colar / Digitar Link do Produto</span>
                     </label>
                     <button type="button" onclick="colarLinkInput()" class="text-xs text-blue-700 dark:text-blue-300 font-bold hover:underline flex items-center gap-1 cursor-pointer">
                         📋 Colar
@@ -220,15 +223,15 @@
                 </div>
                 
                 <div class="flex flex-col sm:flex-row gap-2">
-                    <input type="text" id="inputLinkDireto" placeholder="Cole o link aqui (ex: link do ML ou link + 3x total R$ 500)..." class="flex-1 text-xs px-3 py-2.5 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-xl outline-none focus:border-blue-600 dark:text-white">
+                    <input type="text" id="inputLinkDireto" placeholder="Cole o link aqui (ex: link do Mercado Livre, Amazon...)..." class="flex-1 text-xs px-3 py-2.5 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-xl outline-none focus:border-blue-600 dark:text-white">
                     <button type="button" onclick="processarLinkDireto()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer flex-shrink-0">
                         <span>⚡</span>
-                        <span>Reconhecer Link & Abrir Site</span>
+                        <span>Reconhecer Link</span>
                     </button>
                 </div>
             </div>
 
-            <!-- CONTEÚDO 3: FOTO / CÂMERA -->
+            <!-- CONTEÚDO 3: FOTO -->
             <div id="aba-foto" class="p-4 sm:p-5 space-y-3 hidden">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <label class="flex items-center justify-center gap-3 bg-purple-600 hover:bg-purple-700 text-white font-black py-4 px-4 rounded-2xl shadow-md cursor-pointer transition active:scale-95 text-xs">
@@ -263,7 +266,7 @@
                     </button>
                 </div>
                 
-                <textarea id="inputTextoTeams" rows="2" placeholder="Ex: Diogo pediu: 3 Itens total R$ 500,00 ou 2 Teclados R$ 89,90 cada..." class="w-full text-xs p-3 bg-slate-50 dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800 rounded-xl outline-none focus:border-indigo-600 dark:text-white leading-relaxed"></textarea>
+                <textarea id="inputTextoTeams" rows="2" placeholder="Ex: Diogo pediu no Mercado Livre: 3 Itens total R$ 500,00..." class="w-full text-xs p-3 bg-slate-50 dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800 rounded-xl outline-none focus:border-indigo-600 dark:text-white leading-relaxed"></textarea>
                 
                 <div class="flex justify-end pt-1">
                     <button type="button" onclick="processarTextoBruto(document.getElementById('inputTextoTeams').value)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-md flex items-center gap-1.5 cursor-pointer">
@@ -304,6 +307,7 @@
                             <th class="py-2.5 px-3">Data</th>
                             <th class="py-2.5 px-3">Solicitante</th>
                             <th class="py-2.5 px-3">Produto / Serviço</th>
+                            <th class="py-2.5 px-3">Local / Fornecedor</th>
                             <th class="py-2.5 px-3">Categoria</th>
                             <th class="py-2.5 px-3 text-center">Qtd</th>
                             <th class="py-2.5 px-3 text-right">Unitário</th>
@@ -390,7 +394,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE EDIÇÃO (CANETA ✏️ COM CONTROLO DE ENTREGA 📦) -->
+    <!-- MODAL DE EDIÇÃO (CANETA ✏️) -->
     <div id="modalEdicao" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 w-full max-w-xl rounded-2xl p-5 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
@@ -419,6 +423,10 @@
                     <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Produto / Descrição</label>
                     <input type="text" id="editProduto" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
+                <div class="sm:col-span-2">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Local / Fornecedor</label>
+                    <input type="text" id="editLocal" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                </div>
                 <div>
                     <div class="flex justify-between items-center mb-1">
                         <label class="block text-[10px] font-bold text-slate-400 uppercase">Categoria</label>
@@ -441,7 +449,6 @@
                     <input type="number" step="0.01" id="editUnit" oninput="calcularModalPorUnitario()" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
 
-                <!-- CONTROLO DE ENTREGA NA EDIÇÃO -->
                 <div class="sm:col-span-2 bg-slate-100 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
                     <div class="flex items-center justify-between">
                         <label class="flex items-center gap-2 cursor-pointer">
@@ -570,6 +577,7 @@
                 }
                 
                 atualizarTodosOsSelectsCategorias();
+                renderizarCardsPendentes();
 
                 if (selectId) {
                     const sel = document.getElementById(selectId);
@@ -651,6 +659,7 @@
                 return;
             }
 
+            const local = document.getElementById('manualLocal').value.trim().toUpperCase();
             const categoria = document.getElementById('manualCategoria').value;
             const qtd = parseFloat(document.getElementById('manualQtd').value) || 1;
             const total = parseFloat(document.getElementById('manualTotal').value) || 0;
@@ -667,6 +676,7 @@
                 data: data || new Date().toISOString().split('T')[0],
                 solicitante: solicitante,
                 produto: produto,
+                local: local || "NÃO INFORMADO",
                 categoria: categoria || "OUTROS",
                 qtd: qtd,
                 unit: unit,
@@ -685,6 +695,7 @@
             renderizarTabela();
 
             document.getElementById('manualProduto').value = '';
+            document.getElementById('manualLocal').value = '';
             document.getElementById('manualTotal').value = '';
             document.getElementById('manualUnit').value = '';
             document.getElementById('manualQtd').value = '1';
@@ -860,6 +871,7 @@
                     salvarNoLocalStorage();
                     atualizarListaSelectSolicitantes();
                     renderizarTabela();
+                    mostrarAviso("Dados sincronizados com sucesso!");
                 }
             } catch (err) {
                 mostrarAviso("Aviso da Nuvem: " + err.message, "erro");
@@ -876,6 +888,7 @@
                         data: item.data,
                         solicitante: item.solicitante,
                         produto: item.produto,
+                        local: item.local || '',
                         categoria: item.categoria,
                         qtd: item.qtd,
                         unit: item.unit,
@@ -903,6 +916,7 @@
                         data: item.data,
                         solicitante: item.solicitante,
                         produto: item.produto,
+                        local: item.local || '',
                         categoria: item.categoria,
                         qtd: item.qtd,
                         unit: item.unit,
@@ -932,24 +946,44 @@
             }
         }
 
-        // ================= ALTERAÇÃO RÁPIDA DE ENTREGA DIRETO NA TABELA =================
-        async function alternarStatusEntrega(id, checkbox) {
+        // ================= SALVAR ALTERAÇÃO DE ENTREGA DIRETO NA LINHA =================
+        async function salvarAlteracaoEntrega(id) {
             const item = compras.find(c => c.id === id);
             if (!item) return;
 
-            item.entregue = checkbox.checked;
-            if (item.entregue && !item.data_entrega) {
-                item.data_entrega = new Date().toISOString().split('T')[0];
-            } else if (!item.entregue) {
-                item.data_entrega = '';
-            }
+            const chk = document.getElementById(`chk-entregue-${id}`);
+            const inputData = document.getElementById(`data-entrega-${id}`);
+
+            item.entregue = chk.checked;
+            item.data_entrega = item.entregue ? inputData.value : '';
 
             await atualizarNoSupabase(item);
             salvarNoLocalStorage();
             renderizarTabela();
+            mostrarAviso("📦 Status de entrega salvo com sucesso!");
         }
 
-        // ================= PARSER DE LINK & ABERTURA AUTOMÁTICA =================
+        function toggleInputDataEntrega(id, isChecked) {
+            const inputData = document.getElementById(`data-entrega-${id}`);
+            const btnSalvar = document.getElementById(`btn-salvar-${id}`);
+            if (isChecked) {
+                inputData.classList.remove('hidden');
+                if (!inputData.value) {
+                    inputData.value = new Date().toISOString().split('T')[0];
+                }
+            } else {
+                inputData.classList.add('hidden');
+                inputData.value = '';
+            }
+            btnSalvar.classList.remove('hidden');
+        }
+
+        function mostrarBotaoSalvarLinha(id) {
+            const btnSalvar = document.getElementById(`btn-salvar-${id}`);
+            if (btnSalvar) btnSalvar.classList.remove('hidden');
+        }
+
+        // ================= PARSER DE LINK =================
         function extrairNomeDoLinkML(url) {
             try {
                 const urlLimpa = url.split('?')[0].split('#')[0];
@@ -969,6 +1003,16 @@
             return null;
         }
 
+        function identificarLocalPeloLink(url) {
+            const u = (url || "").toLowerCase();
+            if (u.includes('mercadolivre') || u.includes('mercadolv')) return "MERCADO LIVRE";
+            if (u.includes('amazon')) return "AMAZON";
+            if (u.includes('magazineluiza') || u.includes('magalu')) return "MAGAZINE LUIZA";
+            if (u.includes('shopee')) return "SHOPEE";
+            if (u.includes('americanas')) return "AMERICANAS";
+            return "LOJA WEB / INTERNET";
+        }
+
         function processarLinkDireto() {
             const entrada = document.getElementById('inputLinkDireto').value.trim();
             if (!entrada) {
@@ -981,13 +1025,14 @@
             let total = 0;
             let produto = "";
             let link = "";
+            let localDetectado = "MERCADO LIVRE";
 
             const matchUrl = entrada.match(/(https?:\/\/[^\s]+)/i);
             if (matchUrl) {
                 link = matchUrl[1];
                 const nomeExtraido = extrairNomeDoLinkML(link);
                 if (nomeExtraido) produto = nomeExtraido;
-                window.open(link, '_blank');
+                localDetectado = identificarLocalPeloLink(link);
             }
 
             const matchQtd = entrada.match(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/i);
@@ -1014,7 +1059,7 @@
                     .replace(/R\$/gi, ' ')
                     .trim();
 
-                produto = textoSemLink.length > 2 ? textoSemLink.toUpperCase() : "PRODUTO VIA LINK";
+                produto = textoSemLink.length > 2 ? textoSemLink.toUpperCase() : "";
             }
 
             const hoje = new Date().toISOString().split('T')[0];
@@ -1024,6 +1069,7 @@
                 data: hoje,
                 solicitante: "",
                 produto: produto.toUpperCase(),
+                local: localDetectado,
                 categoria: adivinharCategoria(produto),
                 qtd: qtd,
                 unit: unit,
@@ -1086,12 +1132,14 @@
                 let totalDetectado = 0;
                 let produto = "";
                 let link = "";
+                let localDetectado = "MERCADO LIVRE";
 
                 const matchUrl = linha.match(/(https?:\/\/[^\s]+)/i);
                 if (matchUrl) {
                     link = matchUrl[1];
                     const nomePeloLink = extrairNomeDoLinkML(link);
                     if (nomePeloLink) produto = nomePeloLink;
+                    localDetectado = identificarLocalPeloLink(link);
                 }
 
                 const matchQtd = linha.match(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/i);
@@ -1127,7 +1175,8 @@
                         tempId: Date.now() + Math.random(),
                         data: hoje,
                         solicitante: solicitanteDetectado,
-                        produto: (produto || "PRODUTO").toUpperCase(),
+                        produto: (produto || "").toUpperCase(),
+                        local: localDetectado,
                         categoria: adivinharCategoria(produto),
                         qtd: qtd || 1,
                         unit: unit || 0,
@@ -1196,6 +1245,7 @@
                     "unit": valor unitário decimal (número puro, ex: 15.50),
                     "total": valor total decimal se constar ou null,
                     "solicitante": "nome de quem pediu se constar ou ''",
+                    "local": "local ou fornecedor da compra se constar ou 'LOJA FÍSICA'",
                     "categoria": "INFORMÁTICA / TI, ESCRITÓRIO, MANUTENÇÃO, TREINAMENTO, ALIMENTAÇÃO / COPA ou OUTROS"
                   }
                 ]
@@ -1239,7 +1289,8 @@
                         tempId: Date.now() + Math.random(),
                         data: hoje,
                         solicitante: (p.solicitante || "").toUpperCase(),
-                        produto: (p.produto || "PRODUTO").toUpperCase(),
+                        produto: (p.produto || "").toUpperCase(),
+                        local: (p.local || "LOJA FÍSICA").toUpperCase(),
                         categoria: p.categoria || "OUTROS",
                         qtd: q,
                         unit: u,
@@ -1307,7 +1358,12 @@
 
                         <div class="md:col-span-4">
                             <label class="block text-[9px] font-bold text-slate-400 uppercase">Produto / Descrição</label>
-                            <input type="text" id="produto-${item.tempId}" value="${item.produto}" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-white font-bold">
+                            <input type="text" id="produto-${item.tempId}" value="${item.produto}" placeholder="EX: CHUMBADOR, PARAFUSO..." oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold">
+                        </div>
+
+                        <div class="md:col-span-3">
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Local / Fornecedor</label>
+                            <input type="text" id="local-${item.tempId}" value="${item.local || 'MERCADO LIVRE'}" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold">
                         </div>
 
                         <div class="md:col-span-3">
@@ -1335,7 +1391,7 @@
                             <input type="number" step="0.01" id="unit-${item.tempId}" value="${unitCalculado}" oninput="calcularCardPorUnitario(${item.tempId})" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-white font-bold">
                         </div>
 
-                        <div class="md:col-span-5 flex gap-2">
+                        <div class="md:col-span-2 flex gap-2">
                             <input type="hidden" id="link-${item.tempId}" value="${item.link || ''}">
                             <button type="button" onclick="confirmarCardIndividual(${item.tempId})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1 cursor-pointer">
                                 <span>✅</span>
@@ -1374,8 +1430,17 @@
                 return;
             }
 
+            const inputProd = document.getElementById(`produto-${tempId}`);
+            const produto = inputProd.value.trim().toUpperCase();
+
+            if (!produto) {
+                inputProd.focus();
+                alert("⚠️ Por favor, digite o nome do produto!");
+                return;
+            }
+
             const data = document.getElementById(`data-${tempId}`).value;
-            const produto = document.getElementById(`produto-${tempId}`).value.trim().toUpperCase();
+            const local = document.getElementById(`local-${tempId}`).value.trim().toUpperCase();
             const categoria = document.getElementById(`categoria-${tempId}`).value;
             const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1;
             const total = parseFloat(document.getElementById(`total-${tempId}`).value) || 0;
@@ -1387,6 +1452,7 @@
                 data,
                 solicitante,
                 produto,
+                local: local || "MERCADO LIVRE",
                 categoria,
                 qtd,
                 unit,
@@ -1428,6 +1494,7 @@
                 const data = document.getElementById(`data-${tempId}`).value;
                 const solicitante = document.getElementById(`solicitante-${tempId}`).value.trim().toUpperCase();
                 const produto = document.getElementById(`produto-${tempId}`).value.trim().toUpperCase();
+                const local = document.getElementById(`local-${tempId}`).value.trim().toUpperCase();
                 const categoria = document.getElementById(`categoria-${tempId}`).value;
                 const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1;
                 const total = parseFloat(document.getElementById(`total-${tempId}`).value) || 0;
@@ -1438,7 +1505,8 @@
                     id: Date.now() + Math.random(),
                     data,
                     solicitante,
-                    produto,
+                    produto: produto || "PRODUTO",
+                    local: local || "MERCADO LIVRE",
                     categoria,
                     qtd,
                     unit,
@@ -1467,7 +1535,7 @@
             renderizarCardsPendentes();
         }
 
-        // ================= FUNÇÕES DA MODAL DE EDIÇÃO (CANETA ✏️ COM ENTREGA) =================
+        // ================= FUNÇÕES DA MODAL DE EDIÇÃO (CANETA ✏️) =================
         function abrirModalEdicao(index) {
             const item = compras[index];
             if (!item) return;
@@ -1481,6 +1549,7 @@
             validarInputEditSolicitante(editSol);
 
             document.getElementById('editProduto').value = item.produto || '';
+            document.getElementById('editLocal').value = item.local || '';
             
             atualizarTodosOsSelectsCategorias();
             document.getElementById('editCategoria').value = item.categoria || 'OUTROS';
@@ -1490,7 +1559,6 @@
             document.getElementById('editUnit').value = Number(item.unit || 0).toFixed(2);
             document.getElementById('editLink').value = item.link || '';
 
-            // Controlo de Entrega na Modal
             const chkEntregue = document.getElementById('editEntregue');
             chkEntregue.checked = item.entregue || false;
             
@@ -1556,6 +1624,7 @@
             const total = parseFloat(document.getElementById('editTotal').value) || 0;
             const u = parseFloat(document.getElementById('editUnit').value) || (total / q);
             const linkProduto = document.getElementById('editLink').value.trim();
+            const localProduto = document.getElementById('editLocal').value.trim().toUpperCase();
             const entregue = document.getElementById('editEntregue').checked;
             const dataEntrega = document.getElementById('editDataEntrega').value;
 
@@ -1564,6 +1633,7 @@
                 data: document.getElementById('editData').value,
                 solicitante: solicitante,
                 produto: document.getElementById('editProduto').value.trim().toUpperCase(),
+                local: localProduto || "MERCADO LIVRE",
                 categoria: document.getElementById('editCategoria').value,
                 qtd: q,
                 unit: u,
@@ -1600,7 +1670,7 @@
             }
 
             if (listaExibicao.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" class="text-center py-6 text-slate-400 italic">NENHUMA COMPRA ENCONTRADA COM ESSE FILTRO.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="11" class="text-center py-6 text-slate-400 italic">NENHUMA COMPRA ENCONTRADA COM ESSE FILTRO.</td></tr>`;
             } else {
                 listaExibicao.forEach((item) => {
                     const originalIndex = compras.findIndex(c => c.id === item.id);
@@ -1608,7 +1678,8 @@
                     solicitantesContador[item.solicitante] = (solicitantesContador[item.solicitante] || 0) + 1;
 
                     const entregueChecked = item.entregue ? 'checked' : '';
-                    const infoEntrega = item.entregue && item.data_entrega ? `<span class="block text-[9px] text-emerald-600 dark:text-emerald-400 font-bold">Entregue: ${formatarDataBR(item.data_entrega)}</span>` : '<span class="block text-[9px] text-slate-400 italic">Pendente</span>';
+                    const dataEntregaVal = item.data_entrega || '';
+                    const hiddenClass = item.entregue ? '' : 'hidden';
 
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/40 transition uppercase";
@@ -1616,14 +1687,21 @@
                         <td class="py-2.5 px-3 font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap">${formatarDataBR(item.data)}</td>
                         <td class="py-2.5 px-3 font-bold text-slate-800 dark:text-slate-200 whitespace-nowrap">${item.solicitante}</td>
                         <td class="py-2.5 px-3 font-medium text-slate-900 dark:text-white max-w-xs truncate" title="${item.produto}">${item.produto}</td>
+                        <td class="py-2.5 px-3 font-semibold text-indigo-700 dark:text-indigo-300 whitespace-nowrap">${item.local || 'MERCADO LIVRE'}</td>
                         <td class="py-2.5 px-3 whitespace-nowrap"><span class="text-[10px] bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-full font-bold">${item.categoria}</span></td>
                         <td class="py-2.5 px-3 text-center font-bold text-slate-700 dark:text-slate-300">${item.qtd}</td>
                         <td class="py-2.5 px-3 text-right text-slate-500 whitespace-nowrap">R$ ${Number(item.unit || 0).toFixed(2)}</td>
                         <td class="py-2.5 px-3 text-right font-black text-emerald-600 dark:text-emerald-400 whitespace-nowrap">R$ ${Number(item.total || 0).toFixed(2)}</td>
                         <td class="py-2.5 px-3 text-center whitespace-nowrap">
-                            <div class="flex flex-col items-center gap-0.5">
-                                <input type="checkbox" ${entregueChecked} onchange="alternarStatusEntrega(${item.id}, this)" class="w-4 h-4 text-emerald-600 rounded cursor-pointer" title="Marcar como entregue">
-                                ${infoEntrega}
+                            <div class="flex flex-col items-center gap-1">
+                                <label class="flex items-center gap-1 cursor-pointer">
+                                    <input type="checkbox" id="chk-entregue-${item.id}" ${entregueChecked} onchange="toggleInputDataEntrega(${item.id}, this.checked)" class="w-4 h-4 text-emerald-600 rounded cursor-pointer">
+                                    <span class="text-[10px] font-bold">Entregue</span>
+                                </label>
+                                <input type="date" id="data-entrega-${item.id}" value="${dataEntregaVal}" onchange="mostrarBotaoSalvarLinha(${item.id})" class="text-[10px] p-1 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded dark:text-white font-bold ${hiddenClass}">
+                                <button type="button" id="btn-salvar-${item.id}" onclick="salvarAlteracaoEntrega(${item.id})" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-0.5 rounded text-[10px] font-black shadow-sm transition">
+                                    💾 Salvar
+                                </button>
                             </div>
                         </td>
                         <td class="py-2.5 px-3 text-center whitespace-nowrap">
@@ -1709,13 +1787,14 @@
             }
 
             let csv = "\uFEFF";
-            csv += "DATA;SOLICITANTE;PRODUTO/SERVIÇO;CATEGORIA;QUANTIDADE;VALOR UNITÁRIO (R$);TOTAL (R$);ENTREGUE;DATA ENTREGA;LINK DO PRODUTO\n";
+            csv += "DATA;SOLICITANTE;PRODUTO/SERVIÇO;LOCAL/FORNECEDOR;CATEGORIA;QUANTIDADE;VALOR UNITÁRIO (R$);TOTAL (R$);ENTREGUE;DATA ENTREGA;LINK DO PRODUTO\n";
 
             compras.forEach(item => {
                 const linha = [
                     formatarDataBR(item.data),
                     `"${(item.solicitante || '').replace(/"/g, '""')}"`,
                     `"${(item.produto || '').replace(/"/g, '""')}"`,
+                    `"${(item.local || '').replace(/"/g, '""')}"`,
                     `"${item.categoria || ''}"`,
                     item.qtd,
                     Number(item.unit || 0).toFixed(2).replace('.', ','),
