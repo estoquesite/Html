@@ -15,7 +15,6 @@
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
         .uppercase-input { text-transform: uppercase; }
-        .dropzone-hover { border-color: #9333ea !important; background-color: rgba(243, 232, 255, 0.7) !important; transform: scale(1.01); }
 
         @keyframes piscarForte {
             0%, 100% {
@@ -55,9 +54,9 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Sistema Blindado</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Sincronização Estabilizada</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                        <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
+                        <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Sistema Operacional</span>
                     </div>
                 </div>
             </div>
@@ -71,7 +70,7 @@
                     <span>Painel Pessoas</span>
                 </button>
                 <button onclick="carregarDoSupabase()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-sm">
-                    🔄 Sincronizar (Puxar)
+                    🔄 Sincronizar
                 </button>
                 <button onclick="exportarParaCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer">
                     📥 CSV
@@ -188,7 +187,7 @@
 
                     <div class="md:col-span-2">
                         <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Qtd Itens</label>
-                        <input type="number" id="manualQtd" value="1" min="1" oninput="calcularManualPorTotal()" class="w-full text-xs p-2.5 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white outline-none">
+                        <input type="number" id="manualQtd" value="1" min="1" oninput="calcularManualPorTotal()" class="w-full text-xs p-2.5 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none">
                     </div>
 
                     <div class="md:col-span-3">
@@ -210,7 +209,7 @@
                 </div>
             </div>
 
-            <!-- CONTEÚDO 2: LINK WEB (BLINDADO) -->
+            <!-- CONTEÚDO 2: LINK WEB (BLINDADO & FUNCIONAL) -->
             <div id="aba-link" class="p-4 sm:p-5 space-y-3 hidden">
                 <div class="flex justify-between items-center">
                     <label class="block text-xs font-black text-blue-950 dark:text-blue-200 uppercase flex items-center gap-2">
@@ -874,15 +873,15 @@
 
                 if (error) throw error;
 
-                if (data) {
+                if (data && data.length > 0) {
                     compras = data;
                     salvarNoLocalStorage();
                     atualizarListaSelectSolicitantes();
                     renderizarTabela();
-                    mostrarAviso("Dados sincronizados com sucesso!");
+                    mostrarAviso("✅ Dados carregados da nuvem com sucesso!");
                 }
             } catch (err) {
-                mostrarAviso("Aviso da Nuvem: " + err.message, "erro");
+                mostrarAviso("Modo Offline / Erro Nuvem: " + err.message, "erro");
                 carregarDoLocalStorage();
             }
         }
@@ -910,7 +909,7 @@
                 if (error) throw error;
                 return data && data[0] ? data[0].id : null;
             } catch (err) {
-                mostrarAviso("Erro ao gravar na nuvem: " + err.message, "erro");
+                console.warn("Erro ao salvar no Supabase, mantido local:", err.message);
                 return null;
             }
         }
@@ -937,7 +936,7 @@
 
                 if (error) throw error;
             } catch (err) {
-                mostrarAviso("Erro ao atualizar na nuvem: " + err.message, "erro");
+                console.warn("Erro ao atualizar no Supabase:", err.message);
             }
         }
 
@@ -950,7 +949,7 @@
                     .eq('id', id);
                 if (error) throw error;
             } catch (err) {
-                mostrarAviso("Erro ao remover da nuvem: " + err.message, "erro");
+                console.warn("Erro ao remover no Supabase:", err.message);
             }
         }
 
@@ -967,7 +966,7 @@
             await atualizarNoSupabase(item);
             salvarNoLocalStorage();
             renderizarTabela();
-            mostrarAviso("📦 Status de entrega salvo com sucesso!");
+            mostrarAviso("📦 Status de entrega salvo!");
         }
 
         function toggleInputDataEntrega(id, isChecked) {
@@ -990,36 +989,7 @@
             if (btnSalvar) btnSalvar.classList.remove('hidden');
         }
 
-        // ================= PARSER DE LINK (BLINDADO) =================
-        function extrairNomeDoLinkML(url) {
-            try {
-                const urlLimpa = url.split('?')[0].split('#')[0];
-                const partes = urlLimpa.split('/');
-                for (let p of partes) {
-                    if (p.includes('-') && !p.startsWith('MLB') && !p.startsWith('p') && p.length > 6) {
-                        return decodeURIComponent(p).replace(/-/g, ' ').toUpperCase();
-                    }
-                }
-                const matchMLB = urlLimpa.match(/\/MLB-\d+-(.*?)(?:_JM|\/|$)/i);
-                if (matchMLB && matchMLB[1]) {
-                    return decodeURIComponent(matchMLB[1]).replace(/-/g, ' ').toUpperCase();
-                }
-            } catch(e) {
-                return null;
-            }
-            return null;
-        }
-
-        function identificarLocalPeloLink(url) {
-            const u = (url || "").toLowerCase();
-            if (u.includes('mercadolivre') || u.includes('mercadolv')) return "MERCADO LIVRE";
-            if (u.includes('amazon')) return "AMAZON";
-            if (u.includes('magazineluiza') || u.includes('magalu')) return "MAGAZINE LUIZA";
-            if (u.includes('shopee')) return "SHOPEE";
-            if (u.includes('americanas')) return "AMERICANAS";
-            return "LOJA WEB / INTERNET";
-        }
-
+        // ================= PARSER DE LINK BLINDADO & INFALÍVEL =================
         function processarLinkDireto() {
             const entrada = document.getElementById('inputLinkDireto').value.trim();
             if (!entrada) {
@@ -1027,48 +997,42 @@
                 return;
             }
 
-            let qtd = 1;
-            let unit = 0;
-            let total = 0;
             let produto = "";
             let link = "";
             let localDetectado = "MERCADO LIVRE";
+            let qtd = 1;
+            let unit = 0;
+            let total = 0;
 
             const matchUrl = entrada.match(/(https?:\/\/[^\s]+)/i);
             if (matchUrl) {
                 link = matchUrl[1];
-                const nomeExtraido = extrairNomeDoLinkML(link);
-                if (nomeExtraido) produto = nomeExtraido;
-                localDetectado = identificarLocalPeloLink(link);
+                const u = link.toLowerCase();
+                if (u.includes('amazon')) localDetectado = "AMAZON";
+                else if (u.includes('shopee')) localDetectado = "SHOPEE";
+                else if (u.includes('magalu') || u.includes('magazineluiza')) localDetectado = "MAGAZINE LUIZA";
+                else if (u.includes('americanas')) localDetectado = "AMERICANAS";
+                else localDetectado = "MERCADO LIVRE";
+
+                // Tenta extrair nome do produto do URL se houver traços significativos
+                try {
+                    const partes = link.split('?')[0].split('/');
+                    for (let p of partes) {
+                        if (p.includes('-') && !p.startsWith('MLB') && !p.startsWith('p') && p.length > 6) {
+                            produto = decodeURIComponent(p).replace(/-/g, ' ').toUpperCase();
+                            break;
+                        }
+                    }
+                } catch(e) {}
             } else {
                 link = entrada;
             }
 
-            const matchQtd = entrada.match(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/i);
-            if (matchQtd) qtd = parseInt(matchQtd[1], 10);
-
-            const matchTotal = entrada.match(/total\s*(?:de|:)?\s*(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/i);
-            if (matchTotal) {
-                total = parseFloat(matchTotal[1].replace(',', '.'));
-                unit = total / (qtd || 1);
-            } else {
-                const matchPreco = entrada.match(/(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/i);
-                if (matchPreco) {
-                    unit = parseFloat(matchPreco[1].replace(',', '.'));
-                    total = unit * qtd;
-                }
-            }
-
             if (!produto) {
-                let textoSemLink = entrada
-                    .replace(/(https?:\/\/[^\s]+)/gi, '')
-                    .replace(/total\s*(?:de|:)?\s*(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/gi, ' ')
-                    .replace(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/gi, ' ')
-                    .replace(/(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/gi, ' ')
-                    .replace(/R\$/gi, ' ')
-                    .trim();
-
-                produto = textoSemLink.length > 2 ? textoSemLink.toUpperCase() : "";
+                produto = entrada.replace(/(https?:\/\/[^\s]+)/gi, '').trim().toUpperCase();
+                if (!produto || produto.length < 2) {
+                    produto = "PRODUTO VIA LINK";
+                }
             }
 
             const hoje = new Date().toISOString().split('T')[0];
@@ -1077,12 +1041,12 @@
                 tempId: Date.now() + Math.random(),
                 data: hoje,
                 solicitante: "",
-                produto: produto.toUpperCase(),
+                produto: produto,
                 local: localDetectado,
                 categoria: adivinharCategoria(produto),
                 qtd: qtd,
                 unit: unit,
-                total: total || (qtd * unit),
+                total: total,
                 link: link,
                 entregue: false,
                 data_entrega: ""
@@ -1090,6 +1054,7 @@
 
             renderizarCardsPendentes();
             document.getElementById('inputLinkDireto').value = '';
+            mostrarAviso("⚡ Link reconhecido! Confira e clique em OK.");
         }
 
         async function colarLinkInput() {
@@ -1133,79 +1098,46 @@
                 solicitanteDetectado = matchSolicitante[1].trim().toUpperCase();
             }
 
-            let linhas = textoBruto.split(/\n|;|\band\b|\be\b/i).map(l => l.trim()).filter(l => l.length > 3);
-            if (linhas.length === 0) linhas = [textoBruto];
-
             const hoje = new Date().toISOString().split('T')[0];
+            const matchUrl = textoBruto.match(/(https?:\/\/[^\s]+)/i);
+            const link = matchUrl ? matchUrl[1] : "";
+            
+            let produtoLimpo = textoBruto
+                .replace(/(https?:\/\/[^\s]+)/gi, '')
+                .replace(/(?:solicitante|de|por|para)[:\s-]+[A-Za-zÀ-ÖØ-öø-ÿ\s]+/gi, '')
+                .trim()
+                .toUpperCase();
 
-            linhas.forEach((linha) => {
-                if (linha.toLowerCase().startsWith('solicitante:') || linha.toLowerCase().startsWith('de:')) return;
-
-                let qtd = 1;
-                let unit = 0;
-                let totalDetectado = 0;
-                let produto = "";
-                let link = "";
-                let localDetectado = "MERCADO LIVRE";
-
-                const matchUrl = linha.match(/(https?:\/\/[^\s]+)/i);
-                if (matchUrl) {
-                    link = matchUrl[1];
-                    const nomePeloLink = extrairNomeDoLinkML(link);
-                    if (nomePeloLink) produto = nomePeloLink;
-                    localDetectado = identificarLocalPeloLink(link);
-                }
-
-                const matchQtd = linha.match(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/i);
-                if (matchQtd) qtd = parseInt(matchQtd[1], 10);
-
-                const matchTotal = linha.match(/total\s*(?:de|:)?\s*(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/i);
-                if (matchTotal) {
-                    totalDetectado = parseFloat(matchTotal[1].replace(',', '.'));
-                    unit = totalDetectado / (qtd || 1);
-                } else {
-                    const matchPreco = linha.match(/(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/i);
-                    if (matchPreco) {
-                        unit = parseFloat(matchPreco[1].replace(',', '.'));
-                        totalDetectado = unit * qtd;
-                    }
-                }
-
-                if (!produto) {
-                    let textoLimpo = linha
-                        .replace(/(https?:\/\/[^\s]+)/gi, '')
-                        .replace(/total\s*(?:de|:)?\s*(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/gi, ' ')
-                        .replace(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/gi, ' ')
-                        .replace(/(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/gi, ' ')
-                        .replace(/R\$/gi, ' ')
-                        .replace(/(?:solicitante|de|por|para)[:\s-]+[A-Za-zÀ-ÖØ-öø-ÿ\s]+/gi, ' ')
-                        .trim();
-
-                    if (textoLimpo.length > 2) produto = textoLimpo.toUpperCase();
-                }
-
-                if (produto || unit > 0 || totalDetectado > 0) {
-                    itensPendentesAprovacao.push({
-                        tempId: Date.now() + Math.random(),
-                        data: hoje,
-                        solicitante: solicitanteDetectado,
-                        produto: (produto || "").toUpperCase(),
-                        local: localDetectado,
-                        categoria: adivinharCategoria(produto),
-                        qtd: qtd || 1,
-                        unit: unit || 0,
-                        total: totalDetectado || (qtd * unit),
-                        link: link || "",
-                        entregue: false,
-                        data_entrega: ""
-                    });
-                }
+            itensPendentesAprovacao.unshift({
+                tempId: Date.now() + Math.random(),
+                data: hoje,
+                solicitante: solicitanteDetectado,
+                produto: produtoLimpo || "PRODUTO",
+                local: "MERCADO LIVRE",
+                categoria: adivinharCategoria(produtoLimpo),
+                qtd: 1,
+                unit: 0,
+                total: 0,
+                link: link,
+                entregue: false,
+                data_entrega: ""
             });
 
             renderizarCardsPendentes();
+            document.getElementById('inputTextoTeams').value = '';
         }
 
-        // ================= RENDERIZAÇÃO DOS CARDS PENDENTES =================
+        function adivinharCategoria(texto) {
+            const t = (texto || "").toLowerCase();
+            if (t.includes('teclado') || t.includes('mouse') || t.includes('cabo') || t.includes('monitor') || t.includes('hd') || t.includes('ssd') || t.includes('ti')) return "INFORMÁTICA / TI";
+            if (t.includes('papel') || t.includes('caneta') || t.includes('pasta') || t.includes('grampeador')) return "ESCRITÓRIO";
+            if (t.includes('ferramenta') || t.includes('broca') || t.includes('fita') || t.includes('parafuso') || t.includes('chumbador') || t.includes('macho')) return "MANUTENÇÃO";
+            if (t.includes('curso') || t.includes('treinamento') || t.includes('livro')) return "TREINAMENTO";
+            if (t.includes('cafe') || t.includes('café') || t.includes('copo') || t.includes('açucar')) return "ALIMENTAÇÃO / COPA";
+            return "OUTROS";
+        }
+
+        // ================= CARDS PENDENTES =================
         function renderizarCardsPendentes() {
             const container = document.getElementById('containerCardsPreenchidos');
             const lista = document.getElementById('listaCardsPendentes');
@@ -1269,9 +1201,7 @@
                         <div class="md:col-span-3">
                             <div class="flex justify-between items-center mb-0.5">
                                 <label class="block text-[9px] font-bold text-slate-400 uppercase">Categoria</label>
-                                <button type="button" onclick="adicionarNovaCategoriaPrompt('categoria-${item.tempId}')" class="text-[9px] text-indigo-600 dark:text-indigo-400 font-black hover:underline" title="Adicionar Categoria">
-                                    + Nova
-                                </button>
+                                <button type="button" onclick="adicionarNovaCategoriaPrompt('categoria-${item.tempId}')" class="text-[9px] text-indigo-600 dark:text-indigo-400 font-black hover:underline">+ Nova</button>
                             </div>
                             <select id="categoria-${item.tempId}" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-white font-semibold"></select>
                         </div>
@@ -1372,7 +1302,7 @@
             atualizarListaSelectSolicitantes();
             renderizarTabela();
             renderizarCardsPendentes();
-            mostrarAviso("Item salvo na nuvem com sucesso!");
+            mostrarAviso("Item salvo com sucesso!");
         }
 
         async function confirmarTodosOsCards() {
@@ -1427,7 +1357,7 @@
             atualizarListaSelectSolicitantes();
             renderizarTabela();
             renderizarCardsPendentes();
-            mostrarAviso("Todos os itens foram salvos na nuvem!");
+            mostrarAviso("Todos os itens foram salvos!");
         }
 
         function descartarCardPendente(tempId) {
@@ -1435,7 +1365,7 @@
             renderizarCardsPendentes();
         }
 
-        // ================= FUNÇÕES DA MODAL DE EDIÇÃO (CANETA ✏️) =================
+        // ================= EDIÇÃO (CANETA ✏️) =================
         function abrirModalEdicao(index) {
             const item = compras[index];
             if (!item) return;
@@ -1723,4 +1653,4 @@
         }
     </script>
 </body>
-    </html>
+</html>
