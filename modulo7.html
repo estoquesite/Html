@@ -54,7 +54,7 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Datas Inteligentes & Filtros</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Controlo de Entrega na Entrada</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
@@ -85,7 +85,7 @@
         <!-- AVISO DE STATUS -->
         <div id="alertaSistema" class="hidden p-3 rounded-xl text-xs font-bold text-center transition-all"></div>
 
-        <!-- CARTÕES DE RESUMO E CARDS POR PESSOA -->
+        <!-- CARTÕES DE RESUMO -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
                 <span id="labelTotalItens" class="text-[10px] font-bold uppercase text-slate-400">Total de Despesas</span>
@@ -101,10 +101,10 @@
             </div>
         </div>
 
-        <!-- CARDS DINÂMICOS POR PESSOA (RESUMO RÁPIDO) -->
+        <!-- CARDS DINÂMICOS POR PESSOA -->
         <div id="containerCardsPessoas" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
 
-        <!-- 🔍 BARRA DE FILTRO E PESQUISA DE PRODUTOS -->
+        <!-- 🔍 BARRA DE FILTRO E PESQUISA -->
         <div class="bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 p-3.5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="flex items-center gap-2 w-full sm:w-auto">
                 <span class="text-base">🔍</span>
@@ -112,13 +112,11 @@
             </div>
             
             <div class="flex flex-1 flex-col sm:flex-row items-center gap-2 w-full">
-                <!-- PESQUISA DE PRODUTO OU TEXTO -->
                 <div class="relative w-full sm:w-1/2">
                     <input type="text" id="inputPesquisaProduto" oninput="renderizarTabela()" placeholder="Pesquisar produto ou item..." class="uppercase-input w-full text-xs pl-8 pr-7 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-indigo-600 dark:text-white font-bold">
                     <span class="absolute left-2.5 top-2 text-slate-400 text-xs">📦</span>
                 </div>
 
-                <!-- FILTRO POR SOLICITANTE -->
                 <div class="w-full sm:w-1/2">
                     <select id="selectFiltroSolicitante" onchange="aplicarFiltroPorSelect(this.value)" class="w-full text-xs py-2 px-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-indigo-600 dark:text-white font-bold">
                         <option value="">TODOS OS SOLICITANTES (GERAL)</option>
@@ -148,7 +146,7 @@
                 </button>
             </div>
 
-            <!-- CONTEÚDO 1: DIGITAÇÃO MANUAL -->
+            <!-- CONTEÚDO 1: DIGITAÇÃO MANUAL (COM CHECKBOX DE ENTREGA) -->
             <div id="aba-manual" class="p-4 sm:p-5 space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                     <span class="text-xs font-black text-indigo-900 dark:text-indigo-300 uppercase flex items-center gap-1.5">
@@ -160,7 +158,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end">
                     <div class="md:col-span-2">
                         <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Data Compra</label>
-                        <input type="date" id="manualData" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white outline-none font-bold">
+                        <input type="date" id="manualData" onchange="atualizarDataEntregaManualDefault()" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white outline-none font-bold">
                     </div>
 
                     <div class="md:col-span-3">
@@ -173,41 +171,50 @@
 
                     <div class="md:col-span-4">
                         <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Produto / Serviço</label>
-                        <input type="text" id="manualProduto" oninput="this.value = this.value.toUpperCase()" placeholder="EX: CHUMBADOR, JOGO DE MACHO..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                        <input type="text" id="manualProduto" oninput="this.value = this.value.toUpperCase()" placeholder="EX: CHUMBADOR..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                     </div>
 
                     <div class="md:col-span-3">
                         <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Local / Fornecedor</label>
-                        <input type="text" id="manualLocal" oninput="this.value = this.value.toUpperCase()" placeholder="EX: MERCADO LIVRE, LOJA FÍSICA..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                        <input type="text" id="manualLocal" oninput="this.value = this.value.toUpperCase()" placeholder="EX: MERCADO LIVRE..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                     </div>
 
                     <div class="md:col-span-3">
                         <div class="flex justify-between items-center mb-1">
                             <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Categoria</label>
-                            <button type="button" onclick="adicionarNovaCategoriaPrompt('manualCategoria')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-0.5 rounded-lg text-[10px] font-black transition shadow-sm cursor-pointer">+ Nova</button>
+                            <button type="button" onclick="adicionarNovaCategoriaPrompt('manualCategoria')" class="text-[9px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline">+ Nova</button>
                         </div>
                         <select id="manualCategoria" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-semibold outline-none"></select>
                     </div>
 
                     <div class="md:col-span-2">
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Qtd Itens</label>
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Qtd</label>
                         <input type="number" id="manualQtd" value="1" min="1" oninput="calcularManualPorTotal()" class="w-full text-xs p-2.5 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white outline-none">
                     </div>
 
-                    <div class="md:col-span-3">
-                        <label class="block text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase mb-1">Valor Total (R$) 🔄</label>
-                        <input type="number" step="0.01" id="manualTotal" placeholder="0,00" oninput="calcularManualPorTotal()" class="w-full text-xs p-2.5 bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-400 dark:border-emerald-600 rounded-xl font-black text-emerald-600 dark:text-emerald-400 outline-none">
+                    <div class="md:col-span-2">
+                        <label class="block text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase mb-1">Total (R$) 🔄</label>
+                        <input type="number" step="0.01" id="manualTotal" placeholder="0,00" oninput="calcularManualPorTotal()" class="w-full text-xs p-2.5 bg-emerald-50/70 border border-emerald-400 rounded-xl font-black text-emerald-600 outline-none">
                     </div>
 
                     <div class="md:col-span-2">
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Unitário (R$)</label>
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Unitário (R$)</label>
                         <input type="number" step="0.01" id="manualUnit" placeholder="0,00" oninput="calcularManualPorUnitario()" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                     </div>
 
-                    <div class="md:col-span-2">
-                        <button type="button" onclick="lancarCompraManual()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer">
+                    <!-- CHECKBOX DE ENTREGA MANUAL -->
+                    <div class="md:col-span-3 bg-slate-100 dark:bg-slate-900/60 p-2 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <label class="flex items-center gap-1.5 cursor-pointer mb-1">
+                            <input type="checkbox" id="manualEntregue" onchange="toggleManualDataEntrega(this.checked)" class="w-4 h-4 text-emerald-600 rounded">
+                            <span class="text-[10px] font-bold uppercase">📦 Entregue? (+10d)</span>
+                        </label>
+                        <input type="date" id="manualDataEntrega" class="w-full text-[10px] p-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded font-bold hidden">
+                    </div>
+
+                    <div class="md:col-span-12 flex justify-end pt-2">
+                        <button type="button" onclick="lancarCompraManual()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 px-8 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer">
                             <span>✅</span>
-                            <span>Salvar Compra</span>
+                            <span>Salvar Compra na Tabela</span>
                         </button>
                     </div>
                 </div>
@@ -221,7 +228,7 @@
                         <span>Colar / Digitar Link do Produto (Mercado Livre, Amazon, etc.)</span>
                     </label>
                     <div class="flex items-center gap-3">
-                        <button type="button" onclick="limparInputLink()" class="text-xs text-rose-500 font-bold hover:underline flex items-center gap-1 cursor-pointer" title="Limpar campo de link">
+                        <button type="button" onclick="limparInputLink()" class="text-xs text-rose-500 font-bold hover:underline flex items-center gap-1 cursor-pointer">
                             🗑️ Limpar Link
                         </button>
                         <button type="button" onclick="colarLinkInput()" class="text-xs text-blue-700 dark:text-blue-300 font-bold hover:underline flex items-center gap-1 cursor-pointer">
@@ -232,8 +239,8 @@
                 
                 <div class="flex flex-col sm:flex-row gap-2">
                     <div class="relative flex-1">
-                        <input type="text" id="inputLinkDireto" placeholder="Cole o link aqui (ex: link do Mercado Livre, Amazon...)..." class="w-full text-xs px-3 py-2.5 pr-8 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-xl outline-none focus:border-blue-600 dark:text-white">
-                        <button type="button" onclick="limparInputLink()" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-rose-500 font-bold text-xs" title="Apagar">✕</button>
+                        <input type="text" id="inputLinkDireto" placeholder="Cole o link aqui..." class="w-full text-xs px-3 py-2.5 pr-8 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-xl outline-none focus:border-blue-600 dark:text-white">
+                        <button type="button" onclick="limparInputLink()" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-rose-500 font-bold text-xs">✕</button>
                     </div>
                     <button type="button" onclick="processarLinkDireto()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer flex-shrink-0">
                         <span>⚡</span>
@@ -288,7 +295,7 @@
             </div>
         </div>
 
-        <!-- CARDS PRÉ-PREENCHIDOS -->
+        <!-- CARDS PRÉ-PREENCHIDOS (COM OPÇÃO DE ENTREGA) -->
         <div id="containerCardsPreenchidos" class="space-y-3 hidden">
             <div class="flex justify-between items-center px-1">
                 <h3 class="text-xs font-black uppercase text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5">
@@ -515,15 +522,14 @@
             
             const hoje = new Date().toISOString().split('T')[0];
             document.getElementById('manualData').value = hoje;
+            atualizarDataEntregaManualDefault();
             atualizarTodosOsSelectsCategorias();
 
             const solManual = document.getElementById('manualSolicitante');
             solManual.classList.add('piscar-solicitante-forte');
 
-            // 1. CARREGA IMEDIATAMENTE DO ARMAZENAMENTO LOCAL (SEGURO E INSTANTÂNEO)
             carregarDoLocalStorage();
 
-            // 2. SINCRONIZA COM O SUPABASE EM SEGUNDO PLANO
             if (window.supabase) {
                 try {
                     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -657,6 +663,28 @@
             }
         }
 
+        function atualizarDataEntregaManualDefault() {
+            const dataCompraEl = document.getElementById('manualData');
+            const dataEntregaEl = document.getElementById('manualDataEntrega');
+            if (!dataCompraEl || !dataEntregaEl) return;
+            
+            let d = new Date(dataCompraEl.value + 'T00:00:00');
+            d.setDate(d.getDate() + 10);
+            dataEntregaEl.value = d.toISOString().split('T')[0];
+        }
+
+        function toggleManualDataEntrega(isChecked) {
+            const el = document.getElementById('manualDataEntrega');
+            if (!el) return;
+            if (isChecked) {
+                el.classList.remove('hidden');
+                atualizarDataEntregaManualDefault();
+            } else {
+                el.classList.add('hidden');
+                el.value = '';
+            }
+        }
+
         async function lancarCompraManual() {
             const inputSol = document.getElementById('manualSolicitante');
             const solicitante = inputSol.value.trim().toUpperCase();
@@ -682,6 +710,8 @@
             const qtd = parseFloat(document.getElementById('manualQtd').value) || 1;
             const total = parseFloat(document.getElementById('manualTotal').value) || 0;
             const unit = parseFloat(document.getElementById('manualUnit').value) || (total / qtd);
+            const entregue = document.getElementById('manualEntregue').checked;
+            const dataEntrega = entregue ? document.getElementById('manualDataEntrega').value : "";
 
             if (total <= 0 && unit <= 0) {
                 alert("⚠️ Por favor, informe o Valor Total ou o Valor Unitário da compra!");
@@ -700,8 +730,8 @@
                 unit: unit,
                 total: total || (qtd * unit),
                 link: "",
-                entregue: false,
-                data_entrega: ""
+                entregue: entregue,
+                data_entrega: dataEntrega
             };
 
             compras.unshift(novoItem);
@@ -717,6 +747,8 @@
             document.getElementById('manualTotal').value = '';
             document.getElementById('manualUnit').value = '';
             document.getElementById('manualQtd').value = '1';
+            document.getElementById('manualEntregue').checked = false;
+            document.getElementById('manualDataEntrega').classList.add('hidden');
         }
 
         function verificarDigitacaoSolicitante(input, tempId) {
@@ -1000,7 +1032,7 @@
             }
         }
 
-        // ================= CONTROLO DE ENTREGA NA TABELA (+10 DIAS AUTOMÁTICO) =================
+        // ================= CONTROLO DE ENTREGA NA TABELA =================
         async function salvarAlteracaoEntrega(id) {
             const item = compras.find(c => String(c.id) === String(id));
             if (!item) return;
@@ -1014,7 +1046,6 @@
                 if (inputData && inputData.value) {
                     item.data_entrega = inputData.value;
                 } else if (!item.data_entrega) {
-                    // Soma 10 dias automaticamente à data da compra
                     let dCompra = new Date(item.data + 'T00:00:00');
                     dCompra.setDate(dCompra.getDate() + 10);
                     item.data_entrega = dCompra.toISOString().split('T')[0];
@@ -1209,7 +1240,7 @@
             return "OUTROS";
         }
 
-        // ================= CARDS PENDENTES =================
+        // ================= CARDS PENDENTES (COM OPÇÃO DE ENTREGA) =================
         function renderizarCardsPendentes() {
             const container = document.getElementById('containerCardsPreenchidos');
             const lista = document.getElementById('listaCardsPendentes');
@@ -1231,6 +1262,11 @@
                 const classePiscante = estaSemSolicitante ? "piscar-solicitante-forte" : "";
                 const exibirAviso = estaSemSolicitante ? "" : "hidden";
 
+                // Calcula data de entrega padrão (+10 dias)
+                let dEntrega = new Date(item.data + 'T00:00:00');
+                dEntrega.setDate(dEntrega.getDate() + 10);
+                let dataEntregaDefault = dEntrega.toISOString().split('T')[0];
+
                 const card = document.createElement('div');
                 card.className = "bg-white dark:bg-slate-800 border-2 border-purple-400 dark:border-purple-600/80 p-4 rounded-2xl shadow-sm space-y-3";
                 card.id = `card-pendente-${item.tempId}`;
@@ -1243,16 +1279,14 @@
 
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-2.5 items-end">
                         <div class="md:col-span-2">
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Data</label>
-                            <input type="date" id="data-${item.tempId}" value="${item.data}" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white">
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Data Compra</label>
+                            <input type="date" id="data-${item.tempId}" value="${item.data}" onchange="atualizarDataEntregaCard(${item.tempId})" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white">
                         </div>
 
                         <div class="md:col-span-3">
                             <div class="flex justify-between items-center mb-0.5">
                                 <label class="block text-[9px] font-black text-rose-600 uppercase">Solicitante (*)</label>
-                                <span id="avisoSolicitante-${item.tempId}" class="text-[9px] font-black text-rose-600 animate-pulse ${exibirAviso}">
-                                    ⚠️ DIGITE O NOME!
-                                </span>
+                                <span id="avisoSolicitante-${item.tempId}" class="text-[9px] font-black text-rose-600 animate-pulse ${exibirAviso}">⚠️ DIGITE O NOME!</span>
                             </div>
                             <input type="text" id="solicitante-${item.tempId}" value="${item.solicitante || ''}" 
                                 placeholder="QUEM PEDIU?" 
@@ -1262,7 +1296,7 @@
 
                         <div class="md:col-span-4">
                             <label class="block text-[9px] font-bold text-slate-400 uppercase">Produto / Descrição</label>
-                            <input type="text" id="produto-${item.tempId}" value="${item.produto}" placeholder="EX: CHUMBADOR, PARAFUSO..." oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold">
+                            <input type="text" id="produto-${item.tempId}" value="${item.produto}" placeholder="EX: CHUMBADOR..." oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold">
                         </div>
 
                         <div class="md:col-span-3">
@@ -1279,13 +1313,13 @@
                         </div>
 
                         <div class="md:col-span-2">
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Qtd de Itens</label>
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Qtd</label>
                             <input type="number" id="qtd-${item.tempId}" value="${item.qtd}" min="1" oninput="calcularCardPorTotal(${item.tempId})" class="w-full text-xs p-1.5 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white">
                         </div>
 
                         <div class="md:col-span-3">
-                            <label class="block text-[9px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">Valor Total (R$) 🔄</label>
-                            <input type="number" step="0.01" id="total-${item.tempId}" value="${totalCalculado}" oninput="calcularCardPorTotal(${item.tempId})" class="w-full text-xs p-1.5 bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-700 rounded-lg font-black text-emerald-600 dark:text-emerald-400 outline-none">
+                            <label class="block text-[9px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">Total (R$) 🔄</label>
+                            <input type="number" step="0.01" id="total-${item.tempId}" value="${totalCalculado}" oninput="calcularCardPorTotal(${item.tempId})" class="w-full text-xs p-1.5 bg-emerald-50/50 border border-emerald-300 rounded-lg font-black text-emerald-600 outline-none">
                         </div>
 
                         <div class="md:col-span-2">
@@ -1293,7 +1327,16 @@
                             <input type="number" step="0.01" id="unit-${item.tempId}" value="${unitCalculado}" oninput="calcularCardPorUnitario(${item.tempId})" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold">
                         </div>
 
-                        <div class="md:col-span-2 flex gap-2">
+                        <!-- OPÇÃO DE ENTREGA JÁ NO CARD -->
+                        <div class="md:col-span-4 bg-slate-100 dark:bg-slate-900/60 p-2 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <label class="flex items-center gap-1.5 cursor-pointer mb-1">
+                                <input type="checkbox" id="card-entregue-${item.tempId}" onchange="toggleCardDataEntrega('${item.tempId}', this.checked)" class="w-4 h-4 text-emerald-600 rounded">
+                                <span class="text-[9px] font-bold uppercase">📦 Entregue? (+10d)</span>
+                            </label>
+                            <input type="date" id="card-data-entrega-${item.tempId}" value="${dataEntregaDefault}" class="w-full text-[10px] p-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded font-bold hidden">
+                        </div>
+
+                        <div class="md:col-span-3 flex gap-2">
                             <input type="hidden" id="link-${item.tempId}" value="${item.link || ''}">
                             <button type="button" onclick="confirmarCardIndividual('${item.tempId}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1 cursor-pointer">
                                 <span>✅</span>
@@ -1305,6 +1348,27 @@
                 lista.appendChild(card);
                 preencherOpcoesCategoria(card.querySelector(`#categoria-${item.tempId}`), item.categoria || "OUTROS");
             });
+        }
+
+        function atualizarDataEntregaCard(tempId) {
+            const dataCompra = document.getElementById(`data-${tempId}`).value;
+            const dataEntrega = document.getElementById(`card-data-entrega-${tempId}`);
+            if (!dataCompra || !dataEntrega) return;
+            let d = new Date(dataCompra + 'T00:00:00');
+            d.setDate(d.getDate() + 10);
+            dataEntrega.value = d.toISOString().split('T')[0];
+        }
+
+        function toggleCardDataEntrega(tempId, isChecked) {
+            const el = document.getElementById(`card-data-entrega-${tempId}`);
+            if (!el) return;
+            if (isChecked) {
+                el.classList.remove('hidden');
+                atualizarDataEntregaCard(tempId);
+            } else {
+                el.classList.add('hidden');
+                el.value = '';
+            }
         }
 
         function calcularCardPorTotal(tempId) {
@@ -1357,6 +1421,12 @@
             const linkEl = document.getElementById(`link-${tempId}`);
             const link = linkEl ? linkEl.value : "";
 
+            const entregueEl = document.getElementById(`card-entregue-${tempId}`);
+            const entregue = entregueEl ? entregueEl.checked : false;
+
+            const dataEntregaEl = document.getElementById(`card-data-entrega-${tempId}`);
+            const dataEntrega = entregue ? (dataEntregaEl ? dataEntregaEl.value : "") : "";
+
             const novoItem = {
                 id: Date.now(),
                 data,
@@ -1368,8 +1438,8 @@
                 unit,
                 total: total || (qtd * unit),
                 link: link || "",
-                entregue: false,
-                data_entrega: ""
+                entregue: entregue,
+                data_entrega: dataEntrega
             };
 
             compras.unshift(novoItem);
@@ -1410,6 +1480,8 @@
                 const total = parseFloat(document.getElementById(`total-${tempId}`).value) || 0;
                 const unit = parseFloat(document.getElementById(`unit-${tempId}`).value) || (total / qtd);
                 const link = document.getElementById(`link-${tempId}`).value;
+                const entregue = document.getElementById(`card-entregue-${tempId}`).checked;
+                const dataEntrega = entregue ? document.getElementById(`card-data-entrega-${tempId}`).value : "";
 
                 const novoItem = {
                     id: Date.now() + Math.random(),
@@ -1422,8 +1494,8 @@
                     unit,
                     total,
                     link,
-                    entregue: false,
-                    data_entrega: ""
+                    entregue,
+                    data_entrega: dataEntrega
                 };
 
                 compras.unshift(novoItem);
@@ -1488,8 +1560,9 @@
             if (isEntregue) {
                 container.classList.remove('hidden');
                 if (!inputData.value) {
-                    let dCompra = new Date();
-                    inputData.value = dCompra.toISOString().split('T')[0];
+                    let d = new Date(document.getElementById('editData').value || Date.now());
+                    d.setDate(d.getDate() + 10);
+                    inputData.value = d.toISOString().split('T')[0];
                 }
             } else {
                 container.classList.add('hidden');
@@ -1500,9 +1573,9 @@
         function preencherDataHojeModal() {
             document.getElementById('editEntregue').checked = true;
             document.getElementById('containerDataEntrega').classList.remove('hidden');
-            let dCompra = new Date();
-            dCompra.setDate(dCompra.getDate() + 10);
-            document.getElementById('editDataEntrega').value = dCompra.toISOString().split('T')[0];
+            let d = new Date(document.getElementById('editData').value || Date.now());
+            d.setDate(d.getDate() + 10);
+            document.getElementById('editDataEntrega').value = d.toISOString().split('T')[0];
         }
 
         function calcularModalPorTotal() {
@@ -1565,7 +1638,7 @@
             await atualizarNoSupabase(itemAtualizado);
         }
 
-        // ================= TABELA E RENDERIZAÇÃO (ORDENADA POR DATA E STATUS) =================
+        // ================= TABELA E RENDERIZAÇÃO =================
         function renderizarTabela() {
             const tbody = document.getElementById('tabelaComprasCorpo');
             tbody.innerHTML = '';
@@ -1575,7 +1648,6 @@
 
             let listaExibicao = [...compras];
 
-            // Filtro por Solicitante
             if (solicitanteFiltroAtual) {
                 listaExibicao = listaExibicao.filter(i => {
                     const s = (i.solicitante || "").toUpperCase();
@@ -1583,7 +1655,6 @@
                 });
             }
 
-            // Filtro por Pesquisa de Produto / Texto
             const termoPesquisa = document.getElementById('inputPesquisaProduto') ? document.getElementById('inputPesquisaProduto').value.trim().toUpperCase() : "";
             if (termoPesquisa) {
                 listaExibicao = listaExibicao.filter(i => {
@@ -1595,12 +1666,11 @@
                 });
             }
 
-            // Ordem: Pendentes primeiro (do mais recente para o mais antigo), depois os entregues
             listaExibicao.sort((a, b) => {
                 if (a.entregue !== b.entregue) {
-                    return a.entregue ? 1 : -1; // Entregues vão para o fim
+                    return a.entregue ? 1 : -1;
                 }
-                return new Date(b.data) - new Date(a.data); // Mais recentes primeiro
+                return new Date(b.data) - new Date(a.data);
             });
 
             if (listaExibicao.length === 0) {
