@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 8 - Procura de FDS com Supabase | Portal Vale</title>
+    <title>Módulo 8 - Procura e Gestão de FDS | Portal Vale</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -34,7 +34,7 @@
         @media print {
             body * { visibility: hidden; }
             #modalImpressao, #modalImpressao * { visibility: visible; }
-            #modalImpressao { position: absolute; left: 0; top: 0; width: 100%; }
+            #modalImpressao { position: absolute; left: 0; top: 0; width: 100%; box-shadow: none; border: none; }
         }
     </style>
 </head>
@@ -51,10 +51,10 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-cyan-100 dark:bg-cyan-900 text-cyan-700 dark:text-cyan-300">Módulo 8</span>
-                        <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Procura de FDS com Nuvem Supabase</h1>
+                        <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Procura e Gestão de FDS</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Sincronização Automática</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Sincronização e Impressão Lateral</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
@@ -65,7 +65,7 @@
                 <a href="index.html" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1">
                     ⬅ Menu Principal
                 </a>
-                <button onclick="salvarTudoGeralSupabase()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer" title="Forçar salvamento geral na nuvem">
+                <button onclick="salvarTudoGeralSupabase()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer" title="Salvar Geral na Nuvem">
                     💾 Salvar Geral
                 </button>
                 <button onclick="carregarDoSupabase()" class="bg-cyan-600 hover:bg-cyan-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer">
@@ -77,52 +77,52 @@
         <!-- AVISO DE STATUS -->
         <div id="alertaSistema" class="hidden p-3 rounded-xl text-xs font-bold text-center transition-all"></div>
 
-        <!-- BARRAS DE FILTRO SEPARADAS -->
-        <div class="bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 p-3.5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div class="flex items-center gap-2 w-full sm:w-auto">
+        <!-- BARRAS DE PROCURA / FILTRO INTERNO -->
+        <div class="bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl space-y-3">
+            <div class="flex items-center gap-2">
                 <span class="text-base">🔍</span>
-                <span class="text-xs font-black uppercase text-slate-700 dark:text-slate-300 whitespace-nowrap">Filtrar FDS Cadastradas:</span>
+                <span class="text-xs font-black uppercase text-slate-700 dark:text-slate-300">Procurar FDS na Base de Dados:</span>
             </div>
             
-            <div class="flex flex-1 flex-col sm:flex-row items-center gap-2 w-full">
-                <div class="relative w-full sm:w-1/2">
-                    <input type="text" id="inputFiltroProduto" oninput="renderizarCardsFds()" placeholder="Filtrar por nome do produto..." class="uppercase-input w-full text-xs pl-8 pr-7 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-cyan-500 dark:text-white font-bold">
-                    <span class="absolute left-2.5 top-2 text-slate-400 text-xs">📦</span>
-                    <button type="button" onclick="document.getElementById('inputFiltroProduto').value=''; renderizarCardsFds();" class="absolute right-2.5 top-2 text-slate-400 hover:text-rose-500 font-bold text-xs" title="Limpar">✕</button>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="relative">
+                    <input type="text" id="inputFiltroProduto" oninput="renderizarCardsFds()" placeholder="Procurar por nome do produto..." class="uppercase-input w-full text-xs pl-8 pr-7 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-cyan-500 dark:text-white font-bold">
+                    <span class="absolute left-2.5 top-3 text-slate-400 text-xs">📦</span>
+                    <button type="button" onclick="document.getElementById('inputFiltroProduto').value=''; renderizarCardsFds();" class="absolute right-2.5 top-3 text-slate-400 hover:text-rose-500 font-bold text-xs" title="Limpar">✕</button>
                 </div>
 
-                <div class="relative w-full sm:w-1/2">
-                    <input type="text" id="inputFiltroFabricante" oninput="renderizarCardsFds()" placeholder="Filtrar por fabricante..." class="uppercase-input w-full text-xs pl-8 pr-7 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-cyan-500 dark:text-white font-bold">
-                    <span class="absolute left-2.5 top-2 text-slate-400 text-xs">🏭</span>
-                    <button type="button" onclick="document.getElementById('inputFiltroFabricante').value=''; renderizarCardsFds();" class="absolute right-2.5 top-2 text-slate-400 hover:text-rose-500 font-bold text-xs" title="Limpar">✕</button>
+                <div class="relative">
+                    <input type="text" id="inputFiltroFabricante" oninput="renderizarCardsFds()" placeholder="Procurar por fabricante..." class="uppercase-input w-full text-xs pl-8 pr-7 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-cyan-500 dark:text-white font-bold">
+                    <span class="absolute left-2.5 top-3 text-slate-400 text-xs">🏭</span>
+                    <button type="button" onclick="document.getElementById('inputFiltroFabricante').value=''; renderizarCardsFds();" class="absolute right-2.5 top-3 text-slate-400 hover:text-rose-500 font-bold text-xs" title="Limpar">✕</button>
                 </div>
             </div>
         </div>
 
-        <!-- PAINEL DE PROCURA E IA COM CÂMERA -->
+        <!-- PAINEL DE REGISTO / IA COM CÂMERA -->
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                 <span class="text-xs font-black text-cyan-900 dark:text-cyan-300 uppercase flex items-center gap-1.5">
-                    <span>📸</span> Busca por Câmera / IA (Produto ou FDS Antiga)
+                    <span>📸</span> Cadastrar FDS (Manual ou via Câmera/IA)
                 </span>
-                <span class="text-[10px] font-bold text-slate-400">Reconhecimento automático</span>
+                <span class="text-[10px] font-bold text-slate-400">Preencha ou fotografe</span>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <label class="flex items-center justify-center gap-3 bg-purple-600 hover:bg-purple-700 text-white font-black py-4 px-4 rounded-2xl shadow-md cursor-pointer transition active:scale-95 text-xs">
-                    <span class="text-2xl">📸</span>
+                <label class="flex items-center justify-center gap-3 bg-purple-600 hover:bg-purple-700 text-white font-black py-3 px-4 rounded-2xl shadow-md cursor-pointer transition active:scale-95 text-xs">
+                    <span class="text-xl">📸</span>
                     <div class="text-left">
                         <span class="block">TIRAR FOTO DA FDS / PRODUTO</span>
-                        <span class="block text-[10px] font-normal text-purple-200">Abre a câmera para ler o material</span>
+                        <span class="block text-[10px] font-normal text-purple-200">Preenchimento automático por IA</span>
                     </div>
                     <input type="file" id="inputCameraIa" accept="image/*" capture="environment" class="hidden" onchange="analisarFotoComIa(this.files[0])">
                 </label>
 
-                <label class="flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 px-4 rounded-2xl shadow-md cursor-pointer transition active:scale-95 text-xs">
-                    <span class="text-2xl">🖼️</span>
+                <label class="flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3 px-4 rounded-2xl shadow-md cursor-pointer transition active:scale-95 text-xs">
+                    <span class="text-xl">🖼️</span>
                     <div class="text-left">
                         <span class="block">ESCOLHER FOTO DA GALERIA</span>
-                        <span class="block text-[10px] font-normal text-indigo-200">Selecione prints de FDS antigas</span>
+                        <span class="block text-[10px] font-normal text-indigo-200">Selecionar print ou imagem</span>
                     </div>
                     <input type="file" id="inputGaleriaIa" accept="image/*" class="hidden" onchange="analisarFotoComIa(this.files[0])">
                 </label>
@@ -149,22 +149,19 @@
                     <input type="file" id="fdsFoto" accept="image/*" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-semibold">
                 </div>
 
-                <div class="md:col-span-12 flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="pesquisarFdsWeb()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer">
-                        <span>🌐</span> <span>Procurar FDS na Web</span>
-                    </button>
-                    <button type="button" onclick="salvarFdsSistema()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2.5 px-6 rounded-xl text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer">
-                        <span>💾</span> <span>Salvar FDS na Nuvem</span>
+                <div class="md:col-span-12 flex justify-end pt-2">
+                    <button type="button" onclick="salvarFdsSistema()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 px-8 rounded-xl text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer">
+                        <span>💾</span> <span>Salvar FDS e Enviar para Baixo</span>
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- LISTA DE FDS CADASTRADAS -->
+        <!-- LISTA DE FDS ENCONTRADAS -->
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">
-                    📚 Fichas de Dados de Segurança (FDS) na Nuvem
+                    📚 Histórico de Fichas de Dados de Segurança (FDS)
                 </h3>
                 <span id="labelContadorFds" class="text-[11px] text-slate-400 font-bold">0 DOCUMENTOS</span>
             </div>
@@ -187,15 +184,49 @@
         </div>
     </div>
 
-    <!-- MODAL DE IMPRESSÃO RÁPIDA -->
+    <!-- MODAL DE EDIÇÃO (CANETA ✏️) -->
+    <div id="modalEdicao" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 w-full max-w-lg rounded-2xl p-5 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
+                <h3 class="text-xs sm:text-sm font-black text-cyan-600 dark:text-cyan-400 uppercase flex items-center gap-1.5">
+                    <span>✏️</span> Editar Registo de FDS
+                </h3>
+                <button onclick="fecharModalEdicao()" class="text-slate-400 hover:text-slate-600 font-black text-sm">✕</button>
+            </div>
+
+            <input type="hidden" id="editId">
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nome do Produto</label>
+                    <input type="text" id="editProduto" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Fabricante</label>
+                    <input type="text" id="editFabricante" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Link Direto da FDS (PDF)</label>
+                    <input type="text" id="editLink" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none">
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-700">
+                <button type="button" onclick="fecharModalEdicao()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 transition">Cancelar</button>
+                <button type="button" onclick="guardarEdicaoModal()" class="bg-cyan-600 hover:bg-cyan-700 text-white px-5 py-2 rounded-xl text-xs font-black transition shadow-md">Salvar Alterações</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE IMPRESSÃO RÁPIDA (FOTO À ESQUERDA) -->
     <div id="modalImpressao" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full text-slate-900 space-y-4">
+        <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-lg w-full text-slate-900 space-y-4">
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-sm font-black uppercase text-cyan-700">🖨 Impressão de FDS</h3>
+                <h3 class="text-sm font-black uppercase text-cyan-700">🖨 Impressão da Ficha de FDS</h3>
                 <button onclick="fecharModalImpressao()" class="text-slate-400 hover:text-slate-700 font-black">✕</button>
             </div>
             
-            <div id="conteudoImpressao" class="space-y-4 text-center"></div>
+            <div id="conteudoImpressao" class="space-y-4 text-left"></div>
 
             <div class="flex gap-2 pt-2 border-t">
                 <button type="button" onclick="window.print()" class="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2.5 rounded-xl text-xs">Imprimir Agora</button>
@@ -296,19 +327,9 @@
             }
             mostrarAviso("💾 Salvando todos os itens locais na nuvem...", "sucesso");
             for (let item of listaFds) {
-                if (String(item.id).length > 10) { // ID gerado por timestamp local
+                if (String(item.id).length > 10) {
                     const newId = await inserirNoSupabase(item);
                     if (newId) item.id = newId;
-                } else {
-                    try {
-                        await supabaseClient.from('fds_corporativas').update({
-                            produto: item.produto,
-                            fabricante: item.fabricante,
-                            link: item.link,
-                            foto_url: item.fotoUrl,
-                            data_registro: item.dataRegistro
-                        }).eq('id', item.id);
-                    } catch(e) {}
                 }
             }
             salvarFdsLocal();
@@ -371,18 +392,6 @@
             }
         }
 
-        function pesquisarFdsWeb() {
-            const produto = document.getElementById('fdsProduto').value.trim();
-            if (!produto) {
-                alert("Digite o nome do produto para procurar a FDS na internet!");
-                document.getElementById('fdsProduto').focus();
-                return;
-            }
-            const query = encodeURIComponent(`FDS ${produto} pdf`);
-            window.open(`https://www.google.com/search?q=${query}`, '_blank');
-            mostrarAviso(`🌐 Procurando FDS para: ${produto}`);
-        }
-
         async function salvarFdsSistema() {
             const produto = document.getElementById('fdsProduto').value.trim().toUpperCase();
             const fabricante = document.getElementById('fdsFabricante').value.trim().toUpperCase();
@@ -409,10 +418,15 @@
                 dataRegistro: new Date().toLocaleDateString('pt-BR')
             };
 
-            listaFds.unshift(novoFds);
+            // Adiciona no topo ou abre preview e depois salva para baixo
+            if (link && link.startsWith('http')) {
+                window.open(link, '_blank'); // Abre o PDF para visualizar, ao fechar e dar OK ele já está na lista abaixo
+            }
+
+            listaFds.push(novoFds); // Vai para baixo na lista
             salvarFdsLocal();
             renderizarCardsFds();
-            mostrarAviso(`✅ FDS do produto "${produto}" salva!`);
+            mostrarAviso(`✅ FDS do produto "${produto}" salva e enviada para o histórico!`);
 
             document.getElementById('fdsProduto').value = '';
             document.getElementById('fdsFabricante').value = '';
@@ -449,12 +463,12 @@
             }
 
             if (listaExibicao.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-8 text-slate-400 italic text-xs">Nenhum documento encontrado.</div>`;
+                grid.innerHTML = `<div class="col-span-full text-center py-8 text-slate-400 italic text-xs">Nenhum documento encontrado na base.</div>`;
                 document.getElementById('labelContadorFds').innerText = `0 DOCUMENTOS`;
                 return;
             }
 
-            listaExibicao.forEach((item) => {
+            listaExibicao.forEach((item, index) => {
                 const card = document.createElement('div');
                 card.className = "relative bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl shadow-sm space-y-3 flex flex-col justify-between";
                 
@@ -486,8 +500,10 @@
                             : '<span class="text-slate-400 text-[10px]">Sem link</span>'}
                         
                         <button onclick="abrirModalImpressao('${item.produto}', '${item.fabricante}', '${item.link}', '${item.fotoUrl}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 font-bold py-1.5 px-2.5 rounded-xl text-[11px] transition flex items-center gap-1 cursor-pointer" title="Imprimir Ficha com Foto">
-                            <span>🖨️</span> Imprimir
+                            <span>🖨️️</span> Imprimir
                         </button>
+
+                        <button onclick="abrirModalEdicao('${item.id}')" class="text-cyan-600 hover:text-cyan-800 font-bold p-1.5 cursor-pointer" title="Editar">✏️</button>
 
                         <button onclick="removerFds(${item.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1.5 cursor-pointer" title="Excluir">✕</button>
                     </div>
@@ -509,21 +525,60 @@
             document.getElementById('modalFoto').classList.add('hidden');
         }
 
+        // EDIÇÃO
+        function abrirModalEdicao(id) {
+            const item = listaFds.find(f => String(f.id) === String(id));
+            if (!item) return;
+            document.getElementById('editId').value = item.id;
+            document.getElementById('editProduto').value = item.produto;
+            document.getElementById('editFabricante').value = item.fabricante;
+            document.getElementById('editLink').value = item.link;
+            document.getElementById('modalEdicao').classList.remove('hidden');
+        }
+
+        function fecharModalEdicao() {
+            document.getElementById('modalEdicao').classList.add('hidden');
+        }
+
+        async function guardarEdicaoModal() {
+            const id = document.getElementById('editId').value;
+            const produto = document.getElementById('editProduto').value.trim().toUpperCase();
+            const fabricante = document.getElementById('editFabricante').value.trim().toUpperCase();
+            const link = document.getElementById('editLink').value.trim();
+
+            const item = listaFds.find(f => String(f.id) === String(id));
+            if (item) {
+                item.produto = produto;
+                item.fabricante = fabricante;
+                item.link = link;
+                salvarFdsLocal();
+                renderizarCardsFds();
+                fecharModalEdicao();
+                mostrarAviso("Registro atualizado com sucesso!");
+
+                if (supabaseClient) {
+                    try {
+                        await supabaseClient.from('fds_corporativas').update({
+                            produto,
+                            fabricante,
+                            link
+                        }).eq('id', id);
+                    } catch(e) {}
+                }
+            }
+        }
+
+        // IMPRESSÃO COM FOTO À ESQUERDA
         function abrirModalImpressao(produto, fabricante, link, fotoUrl) {
             const container = document.getElementById('conteudoImpressao');
             container.innerHTML = `
-                <div class="border-2 border-slate-300 p-5 rounded-2xl space-y-3 bg-white text-left">
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <span class="text-[9px] font-black bg-cyan-100 text-cyan-800 px-2 py-0.5 rounded">FICHA DE DADOS DE SEGURANÇA (FDS)</span>
-                            <h2 class="text-base font-black uppercase text-slate-900 mt-1">${produto}</h2>
-                            <p class="text-xs font-semibold text-slate-600 uppercase">Fabricante: ${fabricante}</p>
-                        </div>
-                        ${fotoUrl && fotoUrl !== 'null' ? `<img src="${fotoUrl}" class="w-16 h-16 object-cover rounded-xl border border-slate-200 shadow-sm">` : ''}
-                    </div>
-                    <div class="pt-2 border-t text-[11px] text-slate-500">
-                        <p><strong>Link de Acesso:</strong> <a href="${link}" target="_blank" class="text-blue-600 underline">${link || 'Não informado'}</a></p>
-                        <p class="mt-1">Portal Operacional Vale • Documento de Consulta Rápida</p>
+                <div class="border-2 border-slate-300 p-5 rounded-2xl space-y-3 bg-white text-left flex gap-4 items-center">
+                    ${fotoUrl && fotoUrl !== 'null' ? `<img src="${fotoUrl}" class="w-20 h-20 object-cover rounded-xl border border-slate-200 shadow-sm flex-shrink-0">` : ''}
+                    <div class="flex-1">
+                        <span class="text-[9px] font-black bg-cyan-100 text-cyan-800 px-2 py-0.5 rounded">FICHA DE DADOS DE SEGURANÇA (FDS)</span>
+                        <h2 class="text-base font-black uppercase text-slate-900 mt-1">${produto}</h2>
+                        <p class="text-xs font-semibold text-slate-600 uppercase">Fabricante: ${fabricante}</p>
+                        <p class="text-[11px] text-blue-600 underline mt-1 truncate"><strong>Link:</strong> ${link || 'Não informado'}</p>
                     </div>
                 </div>
             `;
