@@ -47,7 +47,7 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Gestão de FDS e Fornecedores</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Gravação Instantânea & Nuvem</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Gravação Local Direta</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Sistema Operacional</span>
                     </div>
@@ -58,9 +58,6 @@
                 <a href="index.html" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1">
                     ⬅ Menu Principal
                 </a>
-                <button onclick="sincronizarTudo()" class="bg-cyan-600 hover:bg-cyan-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer">
-                    🔄 Sincronizar
-                </button>
             </div>
         </header>
 
@@ -98,7 +95,6 @@
                 <span class="absolute left-3 top-5 text-xs text-slate-400">🔍</span>
             </div>
 
-            <!-- LISTA DE FORNECEDORES EM DESTAQUE EM CIMA -->
             <div id="gridFornecedores" class="flex flex-wrap gap-2 pt-2"></div>
         </div>
 
@@ -156,7 +152,7 @@
                             <span>🌐</span> <span>Pesquisar FDS na Web</span>
                         </button>
                         <button type="button" onclick="salvarFdsSistema()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2.5 px-6 rounded-xl text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer">
-                            <span>💾</span> <span>Salvar FDS na Nuvem</span>
+                            <span>💾</span> <span>Salvar FDS no Sistema</span>
                         </button>
                     </div>
                 </div>
@@ -228,20 +224,11 @@
     </div>
 
     <script>
-        const SUPABASE_URL = "https://gloxtswcksbczinpwtzu.supabase.co";
-        const SUPABASE_KEY = "sb_publishable_0kEiqthWKZZwjM120wQIYw_Hba7qeLc";
-        let supabaseClient = null;
         let listaFds = [];
         let listaFornecedores = [];
 
         window.addEventListener('DOMContentLoaded', () => {
             carregarDadosLocais();
-            if (window.supabase) {
-                try {
-                    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                    sincronizarTudo();
-                } catch(e) {}
-            }
         });
 
         function mostrarAviso(msg, tipo = "sucesso") {
@@ -249,18 +236,11 @@
             el.innerText = msg;
             el.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
             el.classList.add(tipo === "sucesso" ? 'bg-emerald-100' : 'bg-rose-100', tipo === "sucesso" ? 'text-emerald-800' : 'text-rose-800');
-            setTimeout(() => el.classList.add('hidden'), 5000);
-        }
-
-        async function sincronizarTudo() {
-            if (!supabaseClient) return;
-            await carregarFornecedoresDoSupabase();
-            await carregarDoSupabase();
-            mostrarAviso("✅ Sincronizado com a nuvem!");
+            setTimeout(() => el.classList.add('hidden'), 4000);
         }
 
         /* --- GESTÃO DE FORNECEDORES --- */
-        async function salvarFornecedorSistema() {
+        function salvarFornecedorSistema() {
             const nome = document.getElementById('inputNomeFornecedor').value.trim().toUpperCase();
             const contato = document.getElementById('inputContatoFornecedor').value.trim().toUpperCase();
 
@@ -284,25 +264,6 @@
             document.getElementById('inputNomeFornecedor').value = '';
             document.getElementById('inputContatoFornecedor').value = '';
             mostrarAviso(`✅ Fornecedor "${nome}" salvo com sucesso!`);
-
-            if (supabaseClient) {
-                try {
-                    await supabaseClient.from('fornecedores_corporativos').insert([{ nome: novoFornecedor.nome, contato: novoFornecedor.contato }]);
-                } catch(e) {}
-            }
-        }
-
-        async function carregarFornecedoresDoSupabase() {
-            if (!supabaseClient) return;
-            try {
-                const { data } = await supabaseClient.from('fornecedores_corporativos').select('*').order('nome', { ascending: true });
-                if (data && data.length > 0) {
-                    listaFornecedores = data.map(f => ({ id: f.id, nome: f.nome.toUpperCase(), contato: f.contato || 'NÃO INFORMADO' }));
-                    salvarDadosLocais();
-                    atualizarSelectsFornecedores();
-                    renderizarListaFornecedores();
-                }
-            } catch(e) {}
         }
 
         function renderizarListaFornecedores() {
@@ -330,13 +291,12 @@
             document.getElementById('labelContadorFornecedores').innerText = `${listaFornecedores.length} FORNECEDORES`;
         }
 
-        async function removerFornecedor(id) {
+        function removerFornecedor(id) {
             if (confirm("Deseja apagar este fornecedor?")) {
                 listaFornecedores = listaFornecedores.filter(f => String(f.id) !== String(id));
                 salvarDadosLocais();
                 atualizarSelectsFornecedores();
                 renderizarListaFornecedores();
-                if (supabaseClient) { try { await supabaseClient.from('fornecedores_corporativos').delete().eq('id', id); } catch(e){} }
             }
         }
 
@@ -358,33 +318,6 @@
         }
 
         /* --- GESTÃO DE FDS E PRODUTOS --- */
-        async function carregarDoSupabase() {
-            if (!supabaseClient) return;
-            try {
-                const { data } = await supabaseClient.from('fds_corporativas').select('*').order('id', { ascending: false });
-                if (data && data.length > 0) {
-                    const localSalvo = JSON.parse(localStorage.getItem('portal_vale_fds_base') || '[]');
-                    const mapLocal = new Map();
-                    localSalvo.forEach(item => mapLocal.set(String(item.id), item));
-
-                    listaFds = data.map(remoto => {
-                        const local = mapLocal.get(String(remoto.id));
-                        return {
-                            id: remoto.id,
-                            produto: remoto.produto,
-                            fabricante: (remoto.fabricante || 'NÃO INFORMADO').toUpperCase(),
-                            linkPdf: remoto.link || '',
-                            pdfBlob: (local && local.pdfBlob) ? local.pdfBlob : (remoto.pdf_blob || ''),
-                            pdfNome: (local && local.pdfNome) ? local.pdfNome : (remoto.pdf_nome || 'documento.pdf'),
-                            dataRegistro: remoto.data_registro || new Date().toLocaleDateString('pt-BR')
-                        };
-                    });
-                    salvarDadosLocais();
-                    renderizarCardsFds();
-                }
-            } catch (err) {}
-        }
-
         async function analisarFotoComIa(file) {
             if (!file) return;
             const apiKey = localStorage.getItem('gemini_api_key');
@@ -493,7 +426,7 @@
                 return;
             }
             if (!fabricante) {
-                alert("Por favor, selecione ou cadastre o fornecedor/fabricante!");
+                alert("Por favor, selecione o fornecedor/fabricante!");
                 document.getElementById('selectFabricante').focus();
                 return;
             }
@@ -531,19 +464,6 @@
             document.getElementById('selectFabricante').value = '';
             document.getElementById('inputLink').value = '';
             inputArquivo.value = '';
-
-            if (supabaseClient) {
-                try {
-                    await supabaseClient.from('fds_corporativas').insert([{
-                        produto: novoItem.produto,
-                        fabricante: novoItem.fabricante,
-                        link: novoItem.linkPdf,
-                        pdf_blob: novoItem.pdfBlob,
-                        pdf_nome: novoItem.pdfNome,
-                        data_registro: novoItem.dataRegistro
-                    }]);
-                } catch(e) {}
-            }
         }
 
         function renderizarCardsFds() {
@@ -713,7 +633,7 @@
         }
         function fecharModalEdicao() { document.getElementById('modalEdicao').classList.add('hidden'); }
 
-        async function guardarEdicaoModal() {
+        function guardarEdicaoModal() {
             const id = document.getElementById('editId').value;
             const produto = document.getElementById('editProduto').value.trim().toUpperCase();
             const fabricante = document.getElementById('editFabricante').value.trim().toUpperCase();
@@ -728,19 +648,15 @@
                 renderizarCardsFds();
                 fecharModalEdicao();
                 mostrarAviso("Registro atualizado com sucesso!");
-                if (supabaseClient) {
-                    try { await supabaseClient.from('fds_corporativas').update({ produto, fabricante, link: linkPdf }).eq('id', id); } catch(e){}
-                }
             }
         }
 
-        async function removerFds(id) {
+        function removerFds(id) {
             if (confirm("Deseja apagar este registro?")) {
                 listaFds = listaFds.filter(f => String(f.id) !== String(id));
                 salvarDadosLocais();
                 renderizarCardsFds();
                 verificarDuplicidadeInput();
-                if (supabaseClient) { try { await supabaseClient.from('fds_corporativas').delete().eq('id', id); } catch(e){} }
             }
         }
 
