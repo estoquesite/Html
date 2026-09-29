@@ -54,9 +54,9 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Salvamento Blindado</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Sincronização e Salvamento Blindados</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                        <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
+                        <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Dados Protegidos</span>
                     </div>
                 </div>
             </div>
@@ -209,12 +209,12 @@
                 </div>
             </div>
 
-            <!-- CONTEÚDO 2: LINK WEB -->
+            <!-- CONTEÚDO 2: LINK WEB (RECONHECEDOR PRECISO) -->
             <div id="aba-link" class="p-4 sm:p-5 space-y-3 hidden">
                 <div class="flex justify-between items-center">
                     <label class="block text-xs font-black text-blue-950 dark:text-blue-200 uppercase flex items-center gap-2">
                         <span>🔗</span>
-                        <span>Colar / Digitar Link do Produto</span>
+                        <span>Colar / Digitar Link do Produto (Mercado Livre, Amazon, etc.)</span>
                     </label>
                     <div class="flex items-center gap-3">
                         <button type="button" onclick="limparInputLink()" class="text-xs text-rose-500 font-bold hover:underline flex items-center gap-1 cursor-pointer" title="Limpar campo de link">
@@ -292,13 +292,13 @@
                     <span id="tituloItensPendentes">Itens Identificados (Confira e dê OK):</span>
                 </h3>
                 <button type="button" onclick="confirmarTodosOsCards()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-xl shadow-sm transition cursor-pointer">
-                    ⚡ Confirmar Todos e Salvar na Nuvem
+                    ⚡ Confirmar Todos e Salvar
                 </button>
             </div>
             <div id="listaCardsPendentes" class="space-y-3"></div>
         </div>
 
-        <!-- TABELA DE COMPRAS REGISTRADAS -->
+        <!-- TABELA DE COMPRAS REGISTRADAS (ORGANIZADA: PENDENTES CIMA, ENTREGUES BAIXO) -->
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">
@@ -516,15 +516,16 @@
             const solManual = document.getElementById('manualSolicitante');
             solManual.classList.add('piscar-solicitante-forte');
 
-            // Carrega primeiro do localStorage para garantir velocidade e segurança imediata
+            // 1. CARREGA IMEDIATAMENTE DO ARMAZENAMENTO LOCAL (SEGURO E INSTANTÂNEO)
             carregarDoLocalStorage();
 
+            // 2. SINCRONIZA COM O SUPABASE EM SEGUNDO PLANO SEM APAGAR O LOCAL
             if (window.supabase) {
                 try {
                     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                    carregarDoSupabase(); // Sincroniza com a nuvem em segundo plano
+                    carregarDoSupabase();
                 } catch(e) {
-                    console.warn("Modo offline ativo");
+                    console.warn("Modo local ativo");
                 }
             }
         });
@@ -598,13 +599,19 @@
         function preencherOpcoesCategoria(selectElement, valorSelecionado = "") {
             if (!selectElement) return;
             selectElement.innerHTML = '';
+            if (!listaCategorias || listaCategorias.length === 0) {
+                listaCategorias = [...CATEGORIAS_PADRAO];
+            }
             listaCategorias.forEach(cat => {
                 const opt = document.createElement('option');
                 opt.value = cat;
                 opt.innerText = cat;
-                if (cat === valorSelecionado) opt.selected = true;
+                if (String(cat).toUpperCase() === String(valorSelecionado).toUpperCase()) opt.selected = true;
                 selectElement.appendChild(opt);
             });
+            if (!selectElement.value && selectElement.options.length > 0) {
+                selectElement.selectedIndex = 0;
+            }
         }
 
         function mostrarAviso(msg, tipo = "sucesso") {
@@ -693,12 +700,13 @@
                 data_entrega: ""
             };
 
+            // Salva de imediato no armazenamento local
             compras.unshift(novoItem);
             salvarNoLocalStorage();
             atualizarListaSelectSolicitantes();
             renderizarTabela();
 
-            // Grava na nuvem em segundo plano
+            // Salva no Supabase em segundo plano
             inserirNoSupabase(novoItem);
 
             document.getElementById('manualProduto').value = '';
@@ -861,7 +869,7 @@
             mostrarAviso("Chave da IA salva com sucesso!");
         }
 
-        // ================= SUPABASE =================
+        // ================= SINCRONIZAÇÃO INTELIGENTE COM O SUPABASE =================
         async function carregarDoSupabase() {
             if (!supabaseClient) return;
 
@@ -873,123 +881,195 @@
 
                 if (error) throw error;
 
-                if (data && data.length > 0) {
-                    // Mescla os dados locais com os da nuvem mantendo o que for mais recente
-                    compras = data;
+                if (data) {
+                    // Pega o cache local atual
+                    const localSalvo = JSON.parse(localStorage.getItem('compras_corporativas_base') || '[]');
+                    const mapLocal = new Map();
+                    localSalvo.forEach(item => mapLocal.set(String(item.id), item));
+
+                    // Mescla os dados do Supabase garantindo que propriedades locais não se percam
+                    const listaMesclada = data.map(remoto => {
+                        const local = mapLocal.get(String(remoto.id));
+                        return {
+                            ...remoto,
+                            entregue: (local && local.entregue !== undefined) ? local.entregue : (remoto.entregue || false),
+                            data_entrega: (local && local.data_entrega !== undefined) ? local.data_entrega : (remoto.data_entrega || ''),
+                            local: (local && local.local) ? local.local : (remoto.local || 'MERCADO LIVRE')
+                        };
+                    });
+
+                    // Preserva itens que foram cadastrados localmente com timestamp e ainda não subiram
+                    localSalvo.forEach(localItem => {
+                        const existeNoRemoto = data.some(r => String(r.id) === String(localItem.id));
+                        if (!existeNoRemoto && String(localItem.id).length >= 10) {
+                            listaMesclada.unshift(localItem);
+                        }
+                    });
+
+                    compras = listaMesclada;
                     salvarNoLocalStorage();
                     atualizarListaSelectSolicitantes();
                     renderizarTabela();
-                    mostrarAviso("✅ Sincronizado com a nuvem!");
+                    mostrarAviso("✅ Sincronizado com sucesso!");
                 }
             } catch (err) {
-                console.warn("Erro ao sincronizar nuvem, usando cache local:", err.message);
+                console.warn("Aviso ao sincronizar nuvem, usando base local:", err.message);
+                carregarDoLocalStorage();
             }
         }
 
         async function inserirNoSupabase(item) {
             if (!supabaseClient) return null;
             try {
-                const { data, error } = await supabaseClient
-                    .from('compras_corporativas')
-                    .insert([{
-                        data: item.data,
-                        solicitante: item.solicitante,
-                        produto: item.produto,
-                        local: item.local || '',
-                        categoria: item.categoria,
-                        qtd: item.qtd,
-                        unit: item.unit,
-                        total: item.total,
-                        link: item.link || '',
-                        entregue: item.entregue || false,
-                        data_entrega: item.data_entrega || ''
-                    }])
-                    .select();
+                // Tenta inserir o payload completo
+                const payload = {
+                    data: item.data,
+                    solicitante: item.solicitante,
+                    produto: item.produto,
+                    local: item.local || '',
+                    categoria: item.categoria,
+                    qtd: item.qtd,
+                    unit: item.unit,
+                    total: item.total,
+                    link: item.link || '',
+                    entregue: !!item.entregue,
+                    data_entrega: item.data_entrega || ''
+                };
 
-                if (error) throw error;
-                return data && data[0] ? data[0].id : null;
+                let { data, error } = await supabaseClient.from('compras_corporativas').insert([payload]).select();
+                if (!error && data && data[0]) return data[0].id;
+
+                // Fallback caso a tabela no Supabase não tenha as novas colunas
+                const payloadBasico = {
+                    data: item.data,
+                    solicitante: item.solicitante,
+                    produto: item.produto,
+                    categoria: item.categoria,
+                    qtd: item.qtd,
+                    unit: item.unit,
+                    total: item.total,
+                    link: item.link || ''
+                };
+                let res2 = await supabaseClient.from('compras_corporativas').insert([payloadBasico]).select();
+                if (!res2.error && res2.data && res2.data[0]) return res2.data[0].id;
             } catch (err) {
-                console.warn("Aviso Supabase Insert:", err.message);
-                return null;
+                console.warn("Aviso inserção Supabase:", err.message);
             }
+            return null;
         }
 
         async function atualizarNoSupabase(item) {
             if (!supabaseClient || !item.id) return;
             try {
-                const { error } = await supabaseClient
-                    .from('compras_corporativas')
-                    .update({
+                const payload = {
+                    data: item.data,
+                    solicitante: item.solicitante,
+                    produto: item.produto,
+                    local: item.local || '',
+                    categoria: item.categoria,
+                    qtd: item.qtd,
+                    unit: item.unit,
+                    total: item.total,
+                    link: item.link || '',
+                    entregue: !!item.entregue,
+                    data_entrega: item.data_entrega || ''
+                };
+
+                let { error } = await supabaseClient.from('compras_corporativas').update(payload).eq('id', item.id);
+                if (error) {
+                    // Fallback para colunas básicas
+                    await supabaseClient.from('compras_corporativas').update({
                         data: item.data,
                         solicitante: item.solicitante,
                         produto: item.produto,
-                        local: item.local || '',
                         categoria: item.categoria,
                         qtd: item.qtd,
                         unit: item.unit,
                         total: item.total,
-                        link: item.link || '',
-                        entregue: item.entregue || false,
-                        data_entrega: item.data_entrega || ''
-                    })
-                    .eq('id', item.id);
-
-                if (error) throw error;
+                        link: item.link || ''
+                    }).eq('id', item.id);
+                }
             } catch (err) {
-                console.warn("Aviso Supabase Update:", err.message);
+                console.warn("Aviso atualização Supabase:", err.message);
             }
         }
 
         async function removerDoSupabase(id) {
             if (!supabaseClient) return;
             try {
-                const { error } = await supabaseClient
-                    .from('compras_corporativas')
-                    .delete()
-                    .eq('id', id);
-                if (error) throw error;
+                await supabaseClient.from('compras_corporativas').delete().eq('id', id);
             } catch (err) {
-                console.warn("Aviso Supabase Delete:", err.message);
+                console.warn("Aviso remoção Supabase:", err.message);
             }
         }
 
+        // ================= CONTROLO DE ENTREGA NA TABELA =================
         async function salvarAlteracaoEntrega(id) {
-            const item = compras.find(c => c.id === id);
+            const item = compras.find(c => String(c.id) === String(id));
             if (!item) return;
 
             const chk = document.getElementById(`chk-entregue-${id}`);
             const inputData = document.getElementById(`data-entrega-${id}`);
 
-            item.entregue = chk.checked;
-            item.data_entrega = item.entregue ? inputData.value : '';
+            item.entregue = chk ? chk.checked : false;
+            item.data_entrega = item.entregue ? (inputData ? inputData.value : '') : '';
 
+            // Salva de imediato no armazenamento local
             salvarNoLocalStorage();
             renderizarTabela();
-            await atualizarNoSupabase(item);
             mostrarAviso("📦 Status de entrega salvo!");
+
+            // Atualiza o Supabase
+            await atualizarNoSupabase(item);
         }
 
         function toggleInputDataEntrega(id, isChecked) {
             const inputData = document.getElementById(`data-entrega-${id}`);
-            const btnSalvar = document.getElementById(`btn-salvar-${id}`);
             if (isChecked) {
-                inputData.classList.remove('hidden');
-                if (!inputData.value) {
-                    inputData.value = new Date().toISOString().split('T')[0];
+                if (inputData) {
+                    inputData.classList.remove('hidden');
+                    if (!inputData.value) {
+                        inputData.value = new Date().toISOString().split('T')[0];
+                    }
                 }
             } else {
-                inputData.classList.add('hidden');
-                inputData.value = '';
+                if (inputData) {
+                    inputData.classList.add('hidden');
+                    inputData.value = '';
+                }
             }
-            btnSalvar.classList.remove('hidden');
-        }
-
-        function mostrarBotaoSalvarLinha(id) {
-            const btnSalvar = document.getElementById(`btn-salvar-${id}`);
-            if (btnSalvar) btnSalvar.classList.remove('hidden');
+            salvarAlteracaoEntrega(id);
         }
 
         // ================= RECONHECEDOR DE LINK INTELIGENTE =================
+        function extrairNomeDoLink(url) {
+            try {
+                let limpa = url.split('?')[0].split('#')[0];
+                let mMLB = limpa.match(/MLB-?\d*-?([a-zA-Z0-9-]+)(?:_JM|\/|$)/i);
+                if (mMLB && mMLB[1] && mMLB[1].length > 4) {
+                    return decodeURIComponent(mMLB[1]).replace(/-/g, ' ').toUpperCase();
+                }
+
+                let partes = limpa.split('/').filter(p => p.length > 0);
+                for (let p of partes) {
+                    if (p.includes('-') && !p.startsWith('MLB') && !p.startsWith('p') && !p.startsWith('up') && p.length > 5 && !p.includes('mercadolivre') && !p.includes('http')) {
+                        return decodeURIComponent(p).replace(/-/g, ' ').toUpperCase();
+                    }
+                }
+            } catch(e) {}
+            return "";
+        }
+
+        function identificarLocalPeloLink(url) {
+            const u = (url || "").toLowerCase();
+            if (u.includes('mercadolivre') || u.includes('mercadolv')) return "MERCADO LIVRE";
+            if (u.includes('amazon')) return "AMAZON";
+            if (u.includes('magazineluiza') || u.includes('magalu')) return "MAGAZINE LUIZA";
+            if (u.includes('shopee')) return "SHOPEE";
+            if (u.includes('americanas')) return "AMERICANAS";
+            return "LOJA WEB / INTERNET";
+        }
+
         function processarLinkDireto() {
             const entrada = document.getElementById('inputLinkDireto').value.trim();
             if (!entrada) {
@@ -1007,32 +1087,15 @@
             const matchUrl = entrada.match(/(https?:\/\/[^\s]+)/i);
             if (matchUrl) {
                 link = matchUrl[1];
-                const u = link.toLowerCase();
-                if (u.includes('amazon')) localDetectado = "AMAZON";
-                else if (u.includes('shopee')) localDetectado = "SHOPEE";
-                else if (u.includes('magalu') || u.includes('magazineluiza')) localDetectado = "MAGAZINE LUIZA";
-                else if (u.includes('americanas')) localDetectado = "AMERICANAS";
-                else localDetectado = "MERCADO LIVRE";
-
-                try {
-                    const partes = link.split('?')[0].split('/');
-                    for (let p of partes) {
-                        if (p.includes('-') && !p.startsWith('MLB') && !p.startsWith('p') && p.length > 6) {
-                            produto = decodeURIComponent(p).replace(/-/g, ' ').toUpperCase();
-                            break;
-                        }
-                    }
-                } catch(e) {}
+                localDetectado = identificarLocalPeloLink(link);
+                produto = extrairNomeDoLink(link);
             } else {
                 link = entrada;
             }
 
             if (!produto) {
-                let textoSemLink = entrada
-                    .replace(/(https?:\/\/[^\s]+)/gi, '')
-                    .trim();
-
-                produto = textoSemLink.length > 2 ? textoSemLink.toUpperCase() : "";
+                let textoSemLink = entrada.replace(/(https?:\/\/[^\s]+)/gi, '').trim();
+                produto = textoSemLink.length > 2 ? textoSemLink.toUpperCase() : "PRODUTO VIA LINK";
             }
 
             const hoje = new Date().toISOString().split('T')[0];
@@ -1223,7 +1286,7 @@
 
                         <div class="md:col-span-2 flex gap-2">
                             <input type="hidden" id="link-${item.tempId}" value="${item.link || ''}">
-                            <button type="button" onclick="confirmarCardIndividual(${item.tempId})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1 cursor-pointer">
+                            <button type="button" onclick="confirmarCardIndividual('${item.tempId}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1 cursor-pointer">
                                 <span>✅</span>
                                 <span>OK (Salvar)</span>
                             </button>
@@ -1251,6 +1314,7 @@
 
         async function confirmarCardIndividual(tempId) {
             const inputSol = document.getElementById(`solicitante-${tempId}`);
+            if (!inputSol) return;
             const solicitante = inputSol.value.trim().toUpperCase();
 
             if (!solicitante || solicitante === "NÃO INFORMADO" || solicitante === "NAO INFORMADO") {
@@ -1261,59 +1325,72 @@
             }
 
             const inputProd = document.getElementById(`produto-${tempId}`);
-            const produto = inputProd.value.trim().toUpperCase();
+            const produto = inputProd ? inputProd.value.trim().toUpperCase() : "PRODUTO";
 
-            if (!produto) {
-                inputProd.focus();
-                alert("⚠️ Por favor, digite o nome do produto!");
-                return;
-            }
+            const dataEl = document.getElementById(`data-${tempId}`);
+            const data = dataEl ? dataEl.value : new Date().toISOString().split('T')[0];
 
-            const data = document.getElementById(`data-${tempId}`).value;
-            const local = document.getElementById(`local-${tempId}`).value.trim().toUpperCase();
-            const categoria = document.getElementById(`categoria-${tempId}`).value;
-            const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1;
-            const total = parseFloat(document.getElementById(`total-${tempId}`).value) || 0;
-            const unit = parseFloat(document.getElementById(`unit-${tempId}`).value) || (total / qtd);
-            const link = document.getElementById(`link-${tempId}`).value;
+            const localEl = document.getElementById(`local-${tempId}`);
+            const local = localEl ? localEl.value.trim().toUpperCase() : "MERCADO LIVRE";
+
+            const catEl = document.getElementById(`categoria-${tempId}`);
+            const categoria = catEl ? catEl.value : "OUTROS";
+
+            const qtdEl = document.getElementById(`qtd-${tempId}`);
+            const qtd = parseFloat(qtdEl ? qtdEl.value : 1) || 1;
+
+            const totalEl = document.getElementById(`total-${tempId}`);
+            const total = parseFloat(totalEl ? totalEl.value : 0) || 0;
+
+            const unitEl = document.getElementById(`unit-${tempId}`);
+            const unit = parseFloat(unitEl ? unitEl.value : (total / qtd)) || (total / qtd);
+
+            const linkEl = document.getElementById(`link-${tempId}`);
+            const link = linkEl ? linkEl.value : "";
 
             const novoItem = {
                 id: Date.now(),
                 data,
                 solicitante,
-                produto,
+                produto: produto || "PRODUTO",
                 local: local || "MERCADO LIVRE",
-                categoria,
+                categoria: categoria || "OUTROS",
                 qtd,
                 unit,
-                total,
-                link,
+                total: total || (qtd * unit),
+                link: link || "",
                 entregue: false,
                 data_entrega: ""
             };
 
+            // 1. SALVAMENTO LOCAL IMEDIATO (GARANTIA TOTAL CONTRA PERDA)
             compras.unshift(novoItem);
-            itensPendentesAprovacao = itensPendentesAprovacao.filter(i => i.tempId !== tempId);
-
+            itensPendentesAprovacao = itensPendentesAprovacao.filter(i => String(i.tempId) !== String(tempId));
             salvarNoLocalStorage();
             atualizarListaSelectSolicitantes();
             renderizarTabela();
             renderizarCardsPendentes();
-            mostrarAviso("✅ Item salvo com sucesso!");
+            mostrarAviso("✅ Item salvo com sucesso no histórico!");
 
-            // Salva na nuvem em segundo plano
-            await inserirNoSupabase(novoItem);
+            // 2. SINCRONIZAÇÃO EM SEGUNDO PLANO COM A NUVEM
+            const supabaseId = await inserirNoSupabase(novoItem);
+            if (supabaseId) {
+                novoItem.id = supabaseId;
+                salvarNoLocalStorage();
+            }
         }
 
         async function confirmarTodosOsCards() {
             for (let item of itensPendentesAprovacao) {
                 const tempId = item.tempId;
                 const inputSol = document.getElementById(`solicitante-${tempId}`);
-                const solicitante = inputSol.value.trim().toUpperCase();
+                const solicitante = inputSol ? inputSol.value.trim().toUpperCase() : "";
 
                 if (!solicitante || solicitante === "NÃO INFORMADO" || solicitante === "NAO INFORMADO") {
-                    inputSol.classList.add('piscar-solicitante-forte');
-                    inputSol.focus();
+                    if (inputSol) {
+                        inputSol.classList.add('piscar-solicitante-forte');
+                        inputSol.focus();
+                    }
                     alert("⚠️ Há itens sem Solicitante preenchido! Digite o nome para continuar.");
                     return;
                 }
@@ -1359,7 +1436,7 @@
         }
 
         function descartarCardPendente(tempId) {
-            itensPendentesAprovacao = itensPendentesAprovacao.filter(i => i.tempId !== tempId);
+            itensPendentesAprovacao = itensPendentesAprovacao.filter(i => String(i.tempId) !== String(tempId));
             renderizarCardsPendentes();
         }
 
@@ -1498,6 +1575,7 @@
                 });
             }
 
+            // Ordena: não entregues no topo, entregues embaixo
             listaExibicao.sort((a, b) => {
                 if (a.entregue === b.entregue) return 0;
                 return a.entregue ? 1 : -1;
@@ -1514,8 +1592,8 @@
                     const entregueChecked = item.entregue ? 'checked' : '';
                     const dataEntregaVal = item.data_entrega || '';
                     
-                    const estiloRiscado = item.entregue ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-white font-medium';
-                    const linhaOpacidade = item.entregue ? 'bg-slate-50/70 dark:bg-slate-800/40 opacity-75' : 'hover:bg-slate-50 dark:hover:bg-slate-700/40';
+                    const estiloRiscado = item.entregue ? 'line-through text-slate-400 dark:text-slate-500 font-normal' : 'text-slate-900 dark:text-white font-medium';
+                    const linhaOpacidade = item.entregue ? 'bg-slate-100/70 dark:bg-slate-800/40 opacity-75' : 'hover:bg-slate-50 dark:hover:bg-slate-700/40';
 
                     const tr = document.createElement('tr');
                     tr.className = `${linhaOpacidade} transition uppercase`;
@@ -1534,10 +1612,7 @@
                                     <input type="checkbox" id="chk-entregue-${item.id}" ${entregueChecked} onchange="toggleInputDataEntrega(${item.id}, this.checked)" class="w-4 h-4 text-emerald-600 rounded cursor-pointer">
                                     <span class="text-[10px] font-bold">Entregue</span>
                                 </label>
-                                <input type="date" id="data-entrega-${item.id}" value="${dataEntregaVal}" onchange="mostrarBotaoSalvarLinha(${item.id})" class="text-[10px] p-1 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded dark:text-white font-bold">
-                                <button type="button" id="btn-salvar-${item.id}" onclick="salvarAlteracaoEntrega(${item.id})" class="hidden bg-emerald-600 hover:bg-emerald-700 text-white px-2 py-0.5 rounded text-[10px] font-black shadow-sm transition">
-                                    💾 Salvar
-                                </button>
+                                <input type="date" id="data-entrega-${item.id}" value="${dataEntregaVal}" onchange="salvarAlteracaoEntrega(${item.id})" class="text-[10px] p-1 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded dark:text-white font-bold ${item.entregue ? '' : 'hidden'}">
                             </div>
                         </td>
                         <td class="py-2.5 px-3 text-center whitespace-nowrap">
@@ -1591,7 +1666,7 @@
 
         async function removerItem(id) {
             if (confirm("Deseja realmente apagar este registro de compra?")) {
-                compras = compras.filter(i => i.id !== id);
+                compras = compras.filter(i => String(i.id) !== String(id));
                 salvarNoLocalStorage();
                 atualizarListaSelectSolicitantes();
                 renderizarTabela();
