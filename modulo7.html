@@ -31,7 +31,7 @@
                         <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300">Módulo 7</span>
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
                     </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Arraste imagens, cole prints (Ctrl+V) ou envie mensagens</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Captura direta pela câmera, galeria, arrastar e colar prints</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
@@ -44,14 +44,14 @@
             </div>
         </header>
 
-        <!-- CONFIGURAÇÃO DA CHAVE DA IA (SALVA NO NAVEGADOR) -->
+        <!-- CONFIGURAÇÃO DA CHAVE DA IA -->
         <div class="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 p-3 rounded-xl flex flex-wrap items-center justify-between gap-2">
             <div class="flex items-center gap-2">
                 <span class="text-base">🔑</span>
                 <span class="text-xs font-bold text-amber-900 dark:text-amber-200">Chave API da IA (Gemini):</span>
                 <input type="password" id="inputApiKey" placeholder="Cole sua chave da API aqui..." class="text-xs px-2.5 py-1 rounded-lg border border-amber-300 dark:border-amber-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none w-52 sm:w-72">
             </div>
-            <button onclick="salvarApiKey()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-1 rounded-lg transition shadow-sm">
+            <button onclick="salvarApiKey()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-1 rounded-lg transition shadow-sm cursor-pointer">
                 Salvar Chave
             </button>
         </div>
@@ -72,26 +72,48 @@
             </div>
         </div>
 
-        <!-- 📦 ÁREA DE ARRASTAR E SOLTAR IMAGENS / PRINTS (DRAG & DROP) -->
-        <div id="dropZone" class="border-2 border-dashed border-purple-300 dark:border-purple-700 bg-purple-50/60 dark:bg-purple-950/20 hover:bg-purple-50 dark:hover:bg-purple-950/40 p-6 rounded-2xl text-center transition-all cursor-pointer relative group">
+        <!-- 📸 BOTÕES RÁPIDOS DE CÂMERA E GALERIA PARA CELULAR -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <!-- BOTÃO 1: CÂMERA DIRETA -->
+            <label class="flex items-center justify-center gap-3 bg-purple-600 hover:bg-purple-700 text-white font-black py-4 px-4 rounded-2xl shadow-md cursor-pointer transition active:scale-95 text-sm">
+                <span class="text-2xl">📸</span>
+                <div class="text-left">
+                    <span class="block">TIRAR FOTO AGORA</span>
+                    <span class="block text-[10px] font-normal text-purple-200">Abre a câmera do celular direto</span>
+                </div>
+                <input type="file" id="inputCameraDireta" accept="image/*" capture="environment" class="hidden" onchange="processarArquivos(this.files)">
+            </label>
+
+            <!-- BOTÃO 2: ESCOLHER DA GALERIA / PRINTS -->
+            <label class="flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 px-4 rounded-2xl shadow-md cursor-pointer transition active:scale-95 text-sm">
+                <span class="text-2xl">🖼️</span>
+                <div class="text-left">
+                    <span class="block">ESCOLHER DA GALERIA</span>
+                    <span class="block text-[10px] font-normal text-indigo-200">Selecione prints do Teams ou notas</span>
+                </div>
+                <input type="file" id="inputGaleria" accept="image/*" multiple class="hidden" onchange="processarArquivos(this.files)">
+            </label>
+        </div>
+
+        <!-- 📦 ÁREA DE ARRASTAR E SOLTAR (DRAG & DROP PARA PC) -->
+        <div id="dropZone" class="border-2 border-dashed border-purple-300 dark:border-purple-700 bg-purple-50/60 dark:bg-purple-950/20 hover:bg-purple-50 dark:hover:bg-purple-950/40 p-5 rounded-2xl text-center transition-all cursor-pointer relative group">
             <input type="file" id="inputFotoArrasto" accept="image/*" multiple class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" onchange="processarArquivos(this.files)">
             
-            <div class="space-y-2 pointer-events-none">
-                <div class="w-14 h-14 bg-purple-100 dark:bg-purple-900/60 text-purple-600 dark:text-purple-300 rounded-2xl mx-auto flex items-center justify-center text-2xl font-black shadow-inner group-hover:scale-110 transition">
+            <div class="space-y-1.5 pointer-events-none">
+                <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/60 text-purple-600 dark:text-purple-300 rounded-xl mx-auto flex items-center justify-center text-xl font-black shadow-inner group-hover:scale-105 transition">
                     📂
                 </div>
-                <h3 class="text-xs sm:text-sm font-black uppercase text-purple-900 dark:text-purple-200">
-                    Arraste e solte as fotos aqui
+                <h3 class="text-xs font-black uppercase text-purple-900 dark:text-purple-200">
+                    Ou arraste arquivos para cá (ou dê Ctrl+V)
                 </h3>
-                <p class="text-[11px] text-slate-500 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
-                    Arraste prints do Teams, notas ou carrinhos para dentro desta área.<br>
-                    <span class="font-bold text-purple-700 dark:text-purple-300">Dica:</span> Você também pode apenas clicar ou dar <kbd class="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-700 font-mono text-[10px]">Ctrl+V</kbd> com o print copiado.
+                <p class="text-[11px] text-slate-500 dark:text-slate-400 max-w-md mx-auto">
+                    Arraste prints, fotos de telas ou notas fiscais para leitura automática.
                 </p>
                 <div id="statusDrop" class="text-xs font-bold text-purple-600 dark:text-purple-400 hidden pt-1"></div>
             </div>
         </div>
 
-        <!-- 💬 COLAR MENSAGEM DO TEAMS (CASO SEJA EM TEXTO) -->
+        <!-- 💬 COLAR MENSAGEM DO TEAMS EM TEXTO -->
         <div class="bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-900/60 p-4 rounded-2xl shadow-sm space-y-3">
             <div class="flex justify-between items-center">
                 <label class="block text-xs font-black text-indigo-950 dark:text-indigo-200 uppercase flex items-center gap-2">
@@ -174,7 +196,6 @@
             alert("Chave API salva com sucesso!");
         }
 
-        // CONFIGURAÇÃO DE ARRASTAR E SOLTAR (DRAG & DROP) + CTRL+V
         function configurarDragAndDrop() {
             const dropZone = document.getElementById('dropZone');
 
@@ -202,7 +223,6 @@
                 }
             }, false);
 
-            // Permite dar Ctrl+V em qualquer lugar da tela para colar print
             document.addEventListener('paste', (e) => {
                 const items = (e.clipboardData || e.originalEvent.clipboardData).items;
                 const imageFiles = [];
@@ -218,7 +238,6 @@
             });
         }
 
-        // Converte imagem para Base64
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -228,20 +247,20 @@
             });
         }
 
-        // Processa uma ou mais fotos arrastadas
         async function processarArquivos(files) {
+            if (!files || files.length === 0) return;
             const statusEl = document.getElementById('statusDrop');
             statusEl.classList.remove('hidden');
 
             const apiKey = localStorage.getItem('gemini_api_key') || document.getElementById('inputApiKey').value.trim();
             if (!apiKey) {
-                alert("Por favor, cole a sua chave API do Gemini no topo da tela para usar o reconhecimento com IA!");
+                alert("Por favor, informe sua chave API do Gemini no topo para ler a imagem!");
                 document.getElementById('inputApiKey').focus();
                 statusEl.classList.add('hidden');
                 return;
             }
 
-            statusEl.innerText = `⏳ IA analisando ${files.length} imagem(ns)... Aguarde...`;
+            statusEl.innerText = `⏳ IA analisando a foto... Aguarde alguns instantes...`;
             statusEl.className = "text-xs font-bold text-purple-600 dark:text-purple-400 animate-pulse block pt-1";
 
             for (let i = 0; i < files.length; i++) {
@@ -250,22 +269,21 @@
                 await chamarIaParaImagem(file, apiKey);
             }
 
-            statusEl.innerText = `✅ Processamento visual concluído! Confira os cards abaixo.`;
+            statusEl.innerText = `✅ Foto processada com sucesso! Confira os dados abaixo.`;
             statusEl.className = "text-xs font-bold text-emerald-600 dark:text-emerald-400 block pt-1";
             renderizarCardsPendentes();
         }
 
-        // 🤖 ANALISADOR MULTIMODAL GEMINI IA
         async function chamarIaParaImagem(file, apiKey) {
             try {
                 const base64Data = await fileToBase64(file);
 
-                const prompt = `Analise a imagem em anexo (pode ser print do Teams, nota fiscal, carrinho do Mercado Livre, etc.) e extraia todas as compras identificadas.
+                const prompt = `Analise a foto em anexo e extraia os produtos comprados, quantidades e valores.
                 Retorne ESTRITAMENTE um JSON com uma lista de objetos contendo os seguintes campos:
                 [
                   {
-                    "produto": "nome do item em maiúsculo",
-                    "qtd": número inteiro da quantidade (padrão 1 se não achar),
+                    "produto": "nome do produto em maiúsculo",
+                    "qtd": número inteiro da quantidade (padrão 1),
                     "unit": valor unitário decimal (número puro, ex: 15.50),
                     "solicitante": "nome de quem pediu se constar ou 'NÃO INFORMADO'",
                     "categoria": "INFORMÁTICA / TI, ESCRITÓRIO, MANUTENÇÃO, TREINAMENTO, ALIMENTAÇÃO / COPA ou OUTROS"
@@ -302,7 +320,7 @@
                 const produtosExtraidos = JSON.parse(textoResposta);
                 const hoje = new Date().toISOString().split('T')[0];
 
-                produtosExtraidos.forEach((p, idx) => {
+                produtosExtraidos.forEach((p) => {
                     itensPendentesAprovacao.push({
                         tempId: Date.now() + Math.random(),
                         data: hoje,
@@ -347,7 +365,7 @@
 
             const hoje = new Date().toISOString().split('T')[0];
 
-            linhas.forEach((linha, idx) => {
+            linhas.forEach((linha) => {
                 if (linha.toLowerCase().startsWith('solicitante:') || linha.toLowerCase().startsWith('de:')) return;
 
                 let qtd = 1;
