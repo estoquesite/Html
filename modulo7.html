@@ -12,6 +12,7 @@
     <style>
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        .uppercase-input { text-transform: uppercase; }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen p-4 sm:p-6 transition-colors duration-200">
@@ -54,7 +55,7 @@
             </div>
             <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
                 <span class="text-[10px] font-bold uppercase text-slate-400">Principal Solicitante</span>
-                <h3 id="cardTopSolicitante" class="text-base font-black text-slate-700 dark:text-slate-200 truncate mt-0.5">Nenhum</h3>
+                <h3 id="cardTopSolicitante" class="text-base font-black text-slate-700 dark:text-slate-200 truncate mt-0.5 uppercase">Nenhum</h3>
             </div>
         </div>
 
@@ -64,28 +65,28 @@
                 📝 Novo Lançamento de Compra
             </h2>
 
-            <!-- CAPTURA POR LIGAÇÃO (COM LEITOR MELHORADO) -->
+            <!-- ÁREA DE CAPTURA RÁPIDA (LINK OU TEXTO COM QTD E VALOR) -->
             <div class="bg-blue-50/70 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/40 p-3.5 rounded-xl space-y-2">
                 <div class="flex justify-between items-center">
                     <label class="block text-[11px] font-bold text-blue-900 dark:text-blue-300 uppercase">
-                        🔗 Capturar Dados da Ligação (Mercado Livre, Amazon, etc.)
+                        🔗 Capturar Link ou Texto (ex: link + 2x R$ 85,00)
                     </label>
                     <button type="button" onclick="colarDoClipboard()" class="text-[10px] text-blue-700 dark:text-blue-400 font-bold hover:underline flex items-center gap-1 cursor-pointer">
-                        📋 Colar Ligação
+                        📋 Colar
                     </button>
                 </div>
                 
                 <div class="flex gap-2">
-                    <input type="url" id="inputUrlProduto" placeholder="Cole a ligação do produto aqui..." class="flex-1 text-xs px-3 py-2 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-xl outline-none focus:border-blue-600 dark:text-white">
-                    <button type="button" id="btnExtrair" onclick="extrairDadosDoLink()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5 cursor-pointer flex-shrink-0">
+                    <input type="text" id="inputUrlProduto" placeholder="Cole o link ou texto (Ex: link do ML 3x R$ 49,90 ou 2 Teclados R$ 120 Roberto)..." class="flex-1 text-xs px-3 py-2 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-xl outline-none focus:border-blue-600 dark:text-white">
+                    <button type="button" id="btnExtrair" onclick="processarEntradaInteligente()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5 cursor-pointer flex-shrink-0">
                         <span>⚡</span>
-                        <span>Extrair Dados</span>
+                        <span>Identificar</span>
                     </button>
                 </div>
                 <p id="msgStatusLink" class="text-[11px] font-medium hidden"></p>
             </div>
 
-            <!-- CAMPOS DO FORMULÁRIO -->
+            <!-- FORMULÁRIO DE PREENCHIMENTO -->
             <form id="formCompra" onsubmit="salvarCompra(event)" class="space-y-4">
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end">
                     
@@ -98,25 +99,25 @@
                     <!-- Solicitante -->
                     <div class="sm:col-span-1 md:col-span-3">
                         <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Solicitante (Quem pediu?)</label>
-                        <input type="text" id="campoSolicitante" required placeholder="Ex: Manutenção / Roberto" class="w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none focus:border-blue-500">
+                        <input type="text" id="campoSolicitante" required placeholder="EX: ROBERTO / MANUTENÇÃO" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none focus:border-blue-500">
                     </div>
 
                     <!-- Descrição do Produto -->
                     <div class="sm:col-span-2 md:col-span-4">
                         <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Descrição do Produto / Serviço</label>
-                        <input type="text" id="campoProduto" required placeholder="Ex: Teclado sem Fio Logitech" class="w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none focus:border-blue-500">
+                        <input type="text" id="campoProduto" required placeholder="EX: TECLADO SEM FIO LOGITECH" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none focus:border-blue-500">
                     </div>
 
                     <!-- Categoria -->
                     <div class="sm:col-span-2 md:col-span-3">
                         <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Categoria</label>
-                        <select id="campoCategoria" class="w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none focus:border-blue-500">
-                            <option value="Informática / TI">💻 Informática / TI</option>
-                            <option value="Escritório">📎 Escritório / Almoxarifado</option>
-                            <option value="Manutenção">🔧 Manutenção</option>
-                            <option value="Treinamento">🎓 Treinamento</option>
-                            <option value="Alimentação / Copa">☕ Alimentação / Copa</option>
-                            <option value="Outros">📦 Outros</option>
+                        <select id="campoCategoria" class="uppercase-input w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none focus:border-blue-500 font-semibold">
+                            <option value="INFORMÁTICA / TI">💻 INFORMÁTICA / TI</option>
+                            <option value="ESCRITÓRIO">📎 ESCRITÓRIO / ALMOXARIFADO</option>
+                            <option value="MANUTENÇÃO">🔧 MANUTENÇÃO</option>
+                            <option value="TREINAMENTO">🎓 TREINAMENTO</option>
+                            <option value="ALIMENTAÇÃO / COPA">☕ ALIMENTAÇÃO / COPA</option>
+                            <option value="OUTROS">📦 OUTROS</option>
                         </select>
                     </div>
 
@@ -138,10 +139,10 @@
                         <input type="text" id="campoValorTotalCalc" readonly value="R$ 0,00" class="w-full text-xs p-2 bg-slate-100 dark:bg-slate-950/60 font-black text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-800 rounded-xl outline-none">
                     </div>
 
-                    <!-- Botão de Submissão -->
+                    <!-- Botão de Guardar -->
                     <div class="sm:col-span-1 md:col-span-4 flex gap-2">
                         <button type="submit" class="flex-1 bg-slate-900 hover:bg-black dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white py-2 px-4 rounded-xl text-xs font-bold transition shadow-sm cursor-pointer">
-                            💾 Registar Compra
+                            💾 REGISTRAR COMPRA
                         </button>
                     </div>
 
@@ -155,7 +156,7 @@
                 <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">
                     📋 Histórico de Lançamentos
                 </h3>
-                <span id="labelContador" class="text-[11px] text-slate-400">0 itens registados</span>
+                <span id="labelContador" class="text-[11px] text-slate-400 font-bold">0 ITENS REGISTRADOS</span>
             </div>
 
             <div class="overflow-x-auto">
@@ -169,11 +170,11 @@
                             <th class="py-2.5 px-3 text-center">Qtd</th>
                             <th class="py-2.5 px-3 text-right">Unitário</th>
                             <th class="py-2.5 px-3 text-right">Total</th>
-                            <th class="py-2.5 px-3 text-center">Comprovativo</th>
+                            <th class="py-2.5 px-3 text-center">Comprovante</th>
                             <th class="py-2.5 px-3 text-center">Ações</th>
                         </tr>
                     </thead>
-                    <tbody id="tabelaComprasCorpo" class="divide-y divide-slate-100 dark:divide-slate-700/60"></tbody>
+                    <tbody id="tabelaComprasCorpo" class="divide-y divide-slate-100 dark:divide-slate-700/60 uppercase"></tbody>
                 </table>
             </div>
         </div>
@@ -182,6 +183,7 @@
 
     <script>
         let compras = [];
+        let urlOrigemGuardada = "";
 
         window.addEventListener('DOMContentLoaded', () => {
             const hoje = new Date().toISOString().split('T')[0];
@@ -194,7 +196,7 @@
                 const texto = await navigator.clipboard.readText();
                 if (texto) {
                     document.getElementById('inputUrlProduto').value = texto.trim();
-                    extrairDadosDoLink();
+                    processarEntradaInteligente();
                 }
             } catch(e) {
                 document.getElementById('inputUrlProduto').focus();
@@ -208,124 +210,107 @@
             document.getElementById('campoValorTotalCalc').value = `R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
         }
 
-        // Extrai o nome do produto diretamente da estrutura do URL do Mercado Livre
-        function extrairTituloPelaUrl(url) {
+        // Extrai o nome do produto decodificando o endereço web do Mercado Livre
+        function extrairNomeDoLinkML(url) {
             try {
-                const urlObj = new URL(url);
-                const pathParts = urlObj.pathname.split('/').filter(Boolean);
-                
-                for (let part of pathParts) {
-                    if (part.includes('-') && !part.startsWith('MLB') && !part.startsWith('p')) {
-                        let nomeFormatado = part.replace(/-/g, ' ');
-                        return nomeFormatado.charAt(0).toUpperCase() + nomeFormatado.slice(1);
+                const urlLimpa = url.split('?')[0].split('#')[0];
+                const partes = urlLimpa.split('/');
+                for (let p of partes) {
+                    if (p.includes('-') && !p.startsWith('MLB') && !p.startsWith('p') && p.length > 6) {
+                        return decodeURIComponent(p).replace(/-/g, ' ').toUpperCase();
                     }
                 }
-
-                const matchMLB = urlObj.pathname.match(/\/MLB-\d+-(.*?)(?:_JM|\/|$)/i);
+                const matchMLB = urlLimpa.match(/\/MLB-\d+-(.*?)(?:_JM|\/|$)/i);
                 if (matchMLB && matchMLB[1]) {
-                    return matchMLB[1].replace(/-/g, ' ');
+                    return decodeURIComponent(matchMLB[1]).replace(/-/g, ' ').toUpperCase();
                 }
-            } catch (e) {
+            } catch(e) {
                 return null;
             }
             return null;
         }
 
-        // Leitura com múltiplos proxies e fallback inteligente
-        async function extrairDadosDoLink() {
-            const url = document.getElementById('inputUrlProduto').value.trim();
+        // RECONHECEDOR INTELIGENTE DE QUANTIDADE, VALOR E PRODUTO
+        async function processarEntradaInteligente() {
+            const textoCompleto = document.getElementById('inputUrlProduto').value.trim();
             const statusEl = document.getElementById('msgStatusLink');
             const btnExtrair = document.getElementById('btnExtrair');
 
-            if (!url) {
-                alert("Por favor, cole uma ligação antes de tentar extrair!");
+            if (!textoCompleto) {
+                alert("Por favor, cole um link ou digite os dados da compra.");
                 return;
             }
 
-            statusEl.innerText = "A carregar dados do anúncio...";
+            statusEl.innerText = "Identificando informações...";
             statusEl.className = "text-[11px] font-medium text-blue-600 dark:text-blue-400 block";
             btnExtrair.disabled = true;
 
-            let extraiuComSucesso = false;
+            let produtoFinal = "";
+            let quantidadeFinal = 1;
+            let precoUnitarioFinal = 0;
+            urlOrigemGuardada = "";
 
-            // 1. Tenta recuperar o nome diretamente pela estrutura da ligação
-            const tituloUrl = extrairTituloPelaUrl(url);
-            if (tituloUrl) {
-                document.getElementById('campoProduto').value = decodeURIComponent(tituloUrl);
-                extraiuComSucesso = true;
+            // 1. RECONHECIMENTO DE QUANTIDADE (Ex: "3x", "2 un", "qtd 4", "5 pecas")
+            const regexQtd = /(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/i;
+            const matchQtd = textoCompleto.match(regexQtd);
+            if (matchQtd) {
+                quantidadeFinal = parseInt(matchQtd[1], 10);
             }
 
-            // 2. Tenta fazer leitura através de proxies
-            const proxies = [
-                `https://api.allorigins.win/get?url=${encodeURIComponent(url)}`,
-                `https://corsproxy.io/?${encodeURIComponent(url)}`
-            ];
+            // 2. RECONHECIMENTO DE VALOR (Ex: "R$ 159,90", "R$89.00", "1450,50")
+            const regexPreco = /(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/i;
+            const matchPreco = textoCompleto.match(regexPreco);
+            if (matchPreco) {
+                precoUnitarioFinal = parseFloat(matchPreco[1].replace(',', '.'));
+            }
 
-            for (let proxyUrl of proxies) {
-                try {
-                    const response = await fetch(proxyUrl, { signal: AbortSignal.timeout(6000) });
-                    if (!response.ok) continue;
+            // 3. RECONHECIMENTO DO PRODUTO (LINK OU NOME)
+            const regexUrl = /(https?:\/\/[^\s]+)/i;
+            const matchUrl = textoCompleto.match(regexUrl);
 
-                    let htmlText = "";
-                    if (proxyUrl.includes('allorigins')) {
-                        const resJson = await response.json();
-                        htmlText = resJson.contents || "";
-                    } else {
-                        htmlText = await response.text();
-                    }
+            if (matchUrl) {
+                urlOrigemGuardada = matchUrl[1];
+                const nomePeloLink = extrairNomeDoLinkML(urlOrigemGuardada);
+                if (nomePeloLink) {
+                    produtoFinal = nomePeloLink;
+                }
+            } else {
+                // Se foi digitado sem link, remove os preços e quantidades para isolar o nome do produto
+                let textoLimpo = textoCompleto
+                    .replace(regexQtd, ' ')
+                    .replace(regexPreco, ' ')
+                    .replace(/R\$/gi, ' ')
+                    .replace(/\s+/g, ' ')
+                    .trim();
 
-                    if (htmlText) {
-                        const parser = new DOMParser();
-                        const doc = parser.parseFromString(htmlText, 'text/html');
-
-                        // Procura título
-                        const ogTitle = doc.querySelector('meta[property="og:title"]');
-                        const h1 = doc.querySelector('h1');
-                        if (ogTitle && ogTitle.content) {
-                            let t = ogTitle.content.replace(/\|.*$/g, '').replace(/- Mercado Livre.*/gi, '').trim();
-                            document.getElementById('campoProduto').value = t;
-                            extraiuComSucesso = true;
-                        } else if (h1 && h1.innerText.trim()) {
-                            document.getElementById('campoProduto').value = h1.innerText.trim();
-                            extraiuComSucesso = true;
-                        }
-
-                        // Procura preço
-                        const priceMeta = doc.querySelector('meta[property="product:price:amount"]') || doc.querySelector('meta[property="og:price:amount"]');
-                        if (priceMeta && priceMeta.content) {
-                            const p = parseFloat(priceMeta.content);
-                            if (!isNaN(p) && p > 0) {
-                                document.getElementById('campoValorUnit').value = p;
-                                calcularTotalLinha();
-                                extraiuComSucesso = true;
-                                break;
-                            }
-                        }
-
-                        const frac = doc.querySelector('.andes-money-amount__fraction');
-                        if (frac) {
-                            let cents = doc.querySelector('.andes-money-amount__cents');
-                            let valorFinal = frac.innerText.replace(/\./g, '');
-                            if (cents) valorFinal += '.' + cents.innerText;
-                            const p = parseFloat(valorFinal);
-                            if (!isNaN(p)) {
-                                document.getElementById('campoValorUnit').value = p;
-                                calcularTotalLinha();
-                                extraiuComSucesso = true;
-                                break;
-                            }
-                        }
-                    }
-                } catch(e) {
-                    // Continua para o próximo proxy
+                if (textoLimpo.length > 2) {
+                    produtoFinal = textoLimpo.toUpperCase();
                 }
             }
 
-            if (extraiuComSucesso) {
-                statusEl.innerText = "✅ Dados identificados! Verifique os valores e complete os campos necessários.";
+            // APLICA OS VALORES IDENTIFICADOS NOS CAMPOS
+            if (produtoFinal) {
+                document.getElementById('campoProduto').value = produtoFinal.toUpperCase();
+            }
+            if (quantidadeFinal > 1) {
+                document.getElementById('campoQtd').value = quantidadeFinal;
+            }
+            if (precoUnitarioFinal > 0) {
+                document.getElementById('campoValorUnit').value = precoUnitarioFinal;
+            }
+
+            calcularTotalLinha();
+
+            // Feedbacks visuais
+            if (produtoFinal && precoUnitarioFinal > 0) {
+                statusEl.innerText = `✅ Identificado: ${quantidadeFinal}x ${produtoFinal} por R$ ${precoUnitarioFinal.toFixed(2)}`;
                 statusEl.className = "text-[11px] font-bold text-emerald-600 dark:text-emerald-400 block";
+            } else if (produtoFinal) {
+                statusEl.innerText = `✅ Nome identificado! Por favor, informe o valor unitário abaixo.`;
+                statusEl.className = "text-[11px] font-bold text-blue-600 dark:text-blue-400 block";
+                document.getElementById('campoValorUnit').focus();
             } else {
-                statusEl.innerText = "ℹ️ O site bloqueou a leitura automática. Por favor, insira o nome e o valor manualmente.";
+                statusEl.innerText = `ℹ️ Digite a descrição e o valor nos campos abaixo.`;
                 statusEl.className = "text-[11px] font-bold text-amber-600 dark:text-amber-400 block";
             }
 
@@ -336,13 +321,13 @@
             e.preventDefault();
 
             const data = document.getElementById('campoData').value;
-            const solicitante = document.getElementById('campoSolicitante').value.trim();
-            const produto = document.getElementById('campoProduto').value.trim();
-            const categoria = document.getElementById('campoCategoria').value;
+            const solicitante = document.getElementById('campoSolicitante').value.trim().toUpperCase();
+            const produto = document.getElementById('campoProduto').value.trim().toUpperCase();
+            const categoria = document.getElementById('campoCategoria').value.toUpperCase();
             const qtd = parseFloat(document.getElementById('campoQtd').value) || 1;
             const unit = parseFloat(document.getElementById('campoValorUnit').value) || 0;
             const total = qtd * unit;
-            const link = document.getElementById('inputUrlProduto').value.trim();
+            const link = urlOrigemGuardada || document.getElementById('inputUrlProduto').value.trim();
 
             compras.unshift({
                 id: Date.now(),
@@ -359,12 +344,13 @@
             salvarNoLocalStorage();
             renderizarTabela();
 
-            // Limpa o formulário mantendo a data atual
+            // Limpeza mantendo a data atual
             document.getElementById('campoProduto').value = '';
             document.getElementById('campoQtd').value = '1';
             document.getElementById('campoValorUnit').value = '';
             document.getElementById('campoValorTotalCalc').value = 'R$ 0,00';
             document.getElementById('inputUrlProduto').value = '';
+            urlOrigemGuardada = "";
             document.getElementById('msgStatusLink').classList.add('hidden');
         }
 
@@ -376,14 +362,14 @@
             let solicitantesContador = {};
 
             if (compras.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-400 italic">Nenhuma compra registada até ao momento.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-400 italic">NENHUMA COMPRA REGISTRADA ATÉ O MOMENTO.</td></tr>`;
             } else {
                 compras.forEach(item => {
                     totalGastoGeral += item.total;
                     solicitantesContador[item.solicitante] = (solicitantesContador[item.solicitante] || 0) + 1;
 
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/40 transition";
+                    tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/40 transition uppercase";
                     tr.innerHTML = `
                         <td class="py-2.5 px-3 font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap">${formatarDataBR(item.data)}</td>
                         <td class="py-2.5 px-3 font-bold text-slate-800 dark:text-slate-200 whitespace-nowrap">${item.solicitante}</td>
@@ -393,10 +379,12 @@
                         <td class="py-2.5 px-3 text-right text-slate-500 whitespace-nowrap">R$ ${item.unit.toFixed(2)}</td>
                         <td class="py-2.5 px-3 text-right font-black text-emerald-600 dark:text-emerald-400 whitespace-nowrap">R$ ${item.total.toFixed(2)}</td>
                         <td class="py-2.5 px-3 text-center whitespace-nowrap">
-                            ${item.link ? `<a href="${item.link}" target="_blank" class="text-blue-600 dark:text-blue-400 font-bold hover:underline">Ver Ligação ↗</a>` : '<span class="text-slate-400">-</span>'}
+                            ${item.link && item.link.startsWith('http') 
+                                ? `<a href="${item.link}" target="_blank" class="text-blue-600 dark:text-blue-400 font-bold hover:underline normal-case">Ver Link ↗</a>` 
+                                : '<span class="text-slate-400">-</span>'}
                         </td>
                         <td class="py-2.5 px-3 text-center whitespace-nowrap">
-                            <button onclick="removerItem(${item.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1 cursor-pointer" title="Eliminar">✕</button>
+                            <button onclick="removerItem(${item.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1 cursor-pointer" title="Excluir">✕</button>
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -404,15 +392,15 @@
             }
 
             document.getElementById('cardTotalItens').innerText = compras.length;
-            document.getElementById('labelContador').innerText = `${compras.length} itens registados`;
+            document.getElementById('labelContador').innerText = `${compras.length} ITENS REGISTRADOS`;
             document.getElementById('cardValorTotal').innerText = `R$ ${totalGastoGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-            let topSolicitante = "Nenhum";
+            let topSolicitante = "NENHUM";
             let maxCount = 0;
             Object.keys(solicitantesContador).forEach(s => {
                 if (solicitantesContador[s] > maxCount) {
                     maxCount = solicitantesContador[s];
-                    topSolicitante = `${s} (${maxCount} compras)`;
+                    topSolicitante = `${s} (${maxCount})`;
                 }
             });
             document.getElementById('cardTopSolicitante').innerText = topSolicitante;
@@ -425,7 +413,7 @@
         }
 
         function removerItem(id) {
-            if (confirm("Deseja eliminar este registo de compra?")) {
+            if (confirm("Deseja realmente apagar este registro de compra?")) {
                 compras = compras.filter(i => i.id !== id);
                 salvarNoLocalStorage();
                 renderizarTabela();
@@ -446,12 +434,12 @@
 
         function exportarParaCSV() {
             if (compras.length === 0) {
-                alert("A lista está vazia! Não existem dados para exportar.");
+                alert("A lista está vazia! Não há dados para exportar.");
                 return;
             }
 
             let csv = "\uFEFF";
-            csv += "Data;Solicitante;Produto/Serviço;Categoria;Quantidade;Valor Unitário (R$);Total (R$);Link do Produto\n";
+            csv += "DATA;SOLICITANTE;PRODUTO/SERVIÇO;CATEGORIA;QUANTIDADE;VALOR UNITÁRIO (R$);TOTAL (R$);LINK DO PRODUTO\n";
 
             compras.forEach(item => {
                 const linha = [
