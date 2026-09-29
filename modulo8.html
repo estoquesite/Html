@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 8 - Gestão e Busca de FDS | Portal Vale</title>
+    <title>Módulo 8 - Procura de FDS | Portal Vale</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -18,12 +18,12 @@
 
         @keyframes neonDelicado {
             0%, 100% {
-                border-color: #38bdf8;
-                box-shadow: 0 0 6px rgba(56, 189, 248, 0.4);
+                border-color: #06b6d4;
+                box-shadow: 0 0 8px rgba(6, 182, 212, 0.5);
             }
             50% {
-                border-color: #818cf8;
-                box-shadow: 0 0 2px rgba(129, 140, 248, 0.2);
+                border-color: #3b82f6;
+                box-shadow: 0 0 3px rgba(59, 130, 246, 0.3);
             }
         }
         .neon-pulsante {
@@ -45,10 +45,10 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-cyan-100 dark:bg-cyan-900 text-cyan-700 dark:text-cyan-300">Módulo 8</span>
-                        <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Gestão e Busca de FDS / FISPQ</h1>
+                        <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Procura e Gestão de FDS</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Links, Fotos e Impressão Rápida</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Procura Instantânea na Web</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
                         <span class="text-[10px] font-bold text-cyan-600 dark:text-cyan-400">Módulo Ativo</span>
                     </div>
@@ -69,7 +69,7 @@
         <div class="bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 p-3.5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="flex items-center gap-2 w-full sm:w-auto">
                 <span class="text-base">🔍</span>
-                <span class="text-xs font-black uppercase text-slate-700 dark:text-slate-300 whitespace-nowrap">Filtrar FDS:</span>
+                <span class="text-xs font-black uppercase text-slate-700 dark:text-slate-300 whitespace-nowrap">Filtrar FDS Cadastradas:</span>
             </div>
             
             <div class="flex flex-1 items-center gap-2 w-full">
@@ -80,13 +80,13 @@
             </div>
         </div>
 
-        <!-- PAINEL DE CADASTRO DE FDS -->
+        <!-- PAINEL DE PROCURA E CADASTRO DE FDS -->
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                 <span class="text-xs font-black text-cyan-900 dark:text-cyan-300 uppercase flex items-center gap-1.5">
-                    <span>➕</span> Adicionar Nova FDS com Foto e Link
+                    <span>🌐</span> Procurar FDS na Internet e Salvar
                 </span>
-                <span class="text-[10px] font-bold text-slate-400">Preencha os dados do material</span>
+                <span class="text-[10px] font-bold text-slate-400">Insira o produto para buscar</span>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end">
@@ -101,8 +101,8 @@
                 </div>
 
                 <div class="md:col-span-3">
-                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Link da FDS / Produto</label>
-                    <input type="text" id="fdsLink" placeholder="https://..." class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Link Direto da FDS (PDF)</label>
+                    <input type="text" id="fdsLink" placeholder="Cole o link da FDS aqui..." class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
 
                 <div class="md:col-span-3">
@@ -111,11 +111,11 @@
                 </div>
 
                 <div class="md:col-span-12 flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="pesquisarFdsWeb()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-4 rounded-xl text-xs transition shadow-md flex items-center gap-1 cursor-pointer">
-                        <span>🌐</span> <span>Pesquisar Web</span>
+                    <button type="button" onclick="pesquisarFdsWeb()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer">
+                        <span>🌐</span> <span>Procurar FDS na Web</span>
                     </button>
-                    <button type="button" onclick="salvarFdsSistema()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2.5 px-6 rounded-xl text-xs transition shadow-md flex items-center gap-1 cursor-pointer">
-                        <span>💾</span> <span>Salvar FDS</span>
+                    <button type="button" onclick="salvarFdsSistema()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2.5 px-6 rounded-xl text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer">
+                        <span>💾</span> <span>Salvar FDS no Sistema</span>
                     </button>
                 </div>
             </div>
@@ -170,13 +170,13 @@
         function pesquisarFdsWeb() {
             const produto = document.getElementById('fdsProduto').value.trim();
             if (!produto) {
-                alert("Digite o nome do produto para pesquisar a FDS na internet!");
+                alert("Digite o nome do produto para procurar a FDS na internet!");
                 document.getElementById('fdsProduto').focus();
                 return;
             }
-            const query = encodeURIComponent(`FDS FISPQ ${produto} pdf`);
+            const query = encodeURIComponent(`FDS ${produto} pdf`);
             window.open(`https://www.google.com/search?q=${query}`, '_blank');
-            mostrarAviso(`🌐 Pesquisa aberta para: ${produto}`);
+            mostrarAviso(`🌐 Procurando FDS para: ${produto}`);
         }
 
         async function salvarFdsSistema() {
@@ -237,9 +237,8 @@
                 const card = document.createElement('div');
                 card.className = "relative bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl shadow-sm space-y-3 flex flex-col justify-between";
                 
-                // MINIATURA NO CANTO SUPERIOR DIREITO (FOTO OU ÍCONE)
                 let miniaturaHTML = `
-                    <div class="absolute right-3 top-3 w-12 h-12 bg-cyan-100 dark:bg-cyan-950 border border-cyan-300 dark:border-cyan-700 rounded-xl flex items-center justify-center shadow-sm overflow-hidden cursor-pointer hover:scale-105 transition" title="Clique para ampliar a foto" onclick="abrirModalFoto('${item.fotoUrl}', '${item.produto}')">
+                    <div class="absolute right-3 top-3 w-12 h-12 bg-cyan-100 dark:bg-cyan-950 border border-cyan-300 dark:border-cyan-700 rounded-xl flex items-center justify-center shadow-sm overflow-hidden cursor-pointer hover:scale-105 transition" title="Sem foto" onclick="mostrarAviso('Nenhuma foto anexada para este item.')">
                         <span class="text-lg">📄</span>
                     </div>
                 `;
@@ -262,8 +261,8 @@
 
                     <div class="flex items-center gap-2 pt-2 border-t border-slate-200 dark:border-slate-700 text-xs">
                         ${item.link && item.link.startsWith('http') 
-                            ? `<a href="${item.link}" target="_blank" class="flex-1 bg-blue-50 hover:bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 font-bold py-1.5 px-2 rounded-xl text-[11px] transition flex items-center justify-center gap-1">🌐 Acessar Link</a>` 
-                            : '<span class="text-slate-400 text-[10px]">Sem link web</span>'}
+                            ? `<a href="${item.link}" target="_blank" class="flex-1 bg-cyan-50 hover:bg-cyan-100 text-cyan-700 dark:bg-cyan-950/60 dark:text-cyan-300 font-bold py-1.5 px-2 rounded-xl text-[11px] transition flex items-center justify-center gap-1">📥 Baixar / Ver FDS</a>` 
+                            : '<span class="text-slate-400 text-[10px]">Sem link de FDS</span>'}
                         
                         <button onclick="removerFds(${item.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1.5 cursor-pointer" title="Excluir">✕</button>
                     </div>
