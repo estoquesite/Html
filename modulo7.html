@@ -55,7 +55,7 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Reconhecedor de Link Definitivo</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Sistema Blindado</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
@@ -210,7 +210,7 @@
                 </div>
             </div>
 
-            <!-- CONTEÚDO 2: LINK WEB (COM RECONHECIMENTO ROBUSTO) -->
+            <!-- CONTEÚDO 2: LINK WEB (BLINDADO) -->
             <div id="aba-link" class="p-4 sm:p-5 space-y-3 hidden">
                 <div class="flex justify-between items-center">
                     <label class="block text-xs font-black text-blue-950 dark:text-blue-200 uppercase flex items-center gap-2">
@@ -990,7 +990,7 @@
             if (btnSalvar) btnSalvar.classList.remove('hidden');
         }
 
-        // ================= PARSER DE LINK (CORRIGIDO E ROBUSTO) =================
+        // ================= PARSER DE LINK (BLINDADO) =================
         function extrairNomeDoLinkML(url) {
             try {
                 const urlLimpa = url.split('?')[0].split('#')[0];
@@ -1723,4 +1723,4 @@
         }
     </script>
 </body>
-</html>
+    </html>
