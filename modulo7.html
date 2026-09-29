@@ -33,47 +33,50 @@
                         <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300">Módulo 7</span>
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
                     </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Sincronizado na Nuvem (Supabase) + Edição Rápida</p>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Nuvem Supabase + Gestão por Solicitante</p>
+                        <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
+                    </div>
                 </div>
             </div>
-            <div class="flex items-center gap-2">
+            
+            <!-- BOTÕES SUPERIORES -->
+            <div class="flex flex-wrap items-center gap-2">
                 <a href="index.html" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1">
-                    ⬅ Voltar ao Menu
+                    ⬅ Menu
                 </a>
-                <button onclick="carregarDoSupabase()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer">
+                <!-- PAINEL DE SOLICITANTES / USUÁRIOS -->
+                <button onclick="abrirModalUsuarios()" class="bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 px-3 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer shadow-sm">
+                    <span>👥</span>
+                    <span>Solicitantes</span>
+                </button>
+                <button onclick="carregarDoSupabase()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-sm">
                     🔄 Sincronizar
                 </button>
-                <button onclick="exportarParaCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5 cursor-pointer">
-                    📥 Exportar (.csv)
+                <button onclick="exportarParaCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer">
+                    📥 CSV
+                </button>
+                <button onclick="abrirModalChaveIa()" class="bg-amber-100 hover:bg-amber-200 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 px-3 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer border border-amber-300 dark:border-amber-700 shadow-sm" title="Configurar Chave IA">
+                    <span>⚙️</span>
+                    <span>Chave IA</span>
                 </button>
             </div>
         </header>
 
-        <!-- PAINEL DE STATUS DA NUVEM & CHAVE GEMINI -->
-        <div class="bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-3.5 rounded-2xl space-y-2.5">
-            <div class="flex justify-between items-center">
-                <span class="text-xs font-black uppercase text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
-                    ☁️ Conexão com Nuvem & IA
-                </span>
-                <span id="badgeSupabase" class="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                    Supabase Conectado
-                </span>
-            </div>
-            
-            <div class="flex flex-col sm:flex-row items-center gap-2">
-                <div class="w-full sm:flex-1 flex items-center gap-2">
-                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap">Chave IA Gemini:</span>
-                    <input type="password" id="geminiKeyInput" placeholder="Cole sua chave da IA (AIzaSy...)" class="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none">
-                </div>
-                <button onclick="salvarChaveGemini()" class="w-full sm:w-auto bg-slate-900 hover:bg-black dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition">
-                    Salvar Chave IA
-                </button>
-            </div>
-        </div>
+        <!-- AVISO DE STATUS -->
+        <div id="alertaSistema" class="hidden p-3 rounded-xl text-xs font-bold text-center transition-all"></div>
 
-        <!-- MENSAGEM DE AVISO / STATUS -->
-        <div id="alertaSistema" class="hidden p-3 rounded-xl text-xs font-bold text-center"></div>
+        <!-- FILTRO ATIVO SELECIONADO -->
+        <div id="boxFiltroAtivo" class="hidden bg-indigo-100 dark:bg-indigo-950/60 border border-indigo-300 dark:border-indigo-800 p-2.5 rounded-xl flex items-center justify-between text-xs">
+            <span class="font-bold text-indigo-900 dark:text-indigo-200 flex items-center gap-2">
+                <span>🔍 Filtrando compras de:</span>
+                <span id="nomeFiltroAtivo" class="font-black underline uppercase"></span>
+            </span>
+            <button onclick="limparFiltroSolicitante()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold">
+                ✕ Limpar Filtro
+            </button>
+        </div>
 
         <!-- CARTÕES DE RESUMO -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -85,8 +88,8 @@
                 <span class="text-[10px] font-bold uppercase text-slate-400">Total Faturado no Cartão</span>
                 <h3 id="cardValorTotal" class="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5">R$ 0,00</h3>
             </div>
-            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
-                <span class="text-[10px] font-bold uppercase text-slate-400">Principal Solicitante</span>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-indigo-400 transition" onclick="abrirModalUsuarios()" title="Clique para ver solicitantes">
+                <span class="text-[10px] font-bold uppercase text-slate-400">Principal Solicitante (Ver Todos 👥)</span>
                 <h3 id="cardTopSolicitante" class="text-base font-black text-slate-700 dark:text-slate-200 truncate mt-0.5 uppercase">Nenhum</h3>
             </div>
         </div>
@@ -104,7 +107,7 @@
             </div>
             
             <div class="flex flex-col sm:flex-row gap-2">
-                <input type="text" id="inputLinkDireto" placeholder="Cole o link aqui (ex: link do ML ou link + 2x R$ 49,90)..." class="flex-1 text-xs px-3 py-2.5 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-xl outline-none focus:border-blue-600 dark:text-white">
+                <input type="text" id="inputLinkDireto" placeholder="Cole o link aqui (ex: link do ML ou link + 3x total R$ 4,50)..." class="flex-1 text-xs px-3 py-2.5 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-xl outline-none focus:border-blue-600 dark:text-white">
                 <button type="button" onclick="processarLinkDireto()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer flex-shrink-0">
                     <span>⚡</span>
                     <span>Reconhecer Link</span>
@@ -118,16 +121,16 @@
                 <span class="text-xl">📸</span>
                 <div class="text-left">
                     <span class="block">TIRAR FOTO AGORA</span>
-                    <span class="block text-[10px] font-normal text-purple-200">Abre a câmara do telemóvel</span>
+                    <span class="block text-[10px] font-normal text-purple-200">Abre a câmera do celular direto</span>
                 </div>
                 <input type="file" id="inputCameraDireta" accept="image/*" capture="environment" class="hidden" onchange="processarArquivos(this.files)">
             </label>
 
             <label class="flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3.5 px-4 rounded-2xl shadow-md cursor-pointer transition active:scale-95 text-xs">
-                <span class="text-xl">🖼️</span>
+                <span class="text-xl">🖼️️</span>
                 <div class="text-left">
                     <span class="block">ESCOLHER DA GALERIA</span>
-                    <span class="block text-[10px] font-normal text-indigo-200">Selecione prints salvos ou fotos</span>
+                    <span class="block text-[10px] font-normal text-indigo-200">Selecione prints salvos ou notas</span>
                 </div>
                 <input type="file" id="inputGaleria" accept="image/*" multiple class="hidden" onchange="processarArquivos(this.files)">
             </label>
@@ -145,7 +148,7 @@
                 </button>
             </div>
             
-            <textarea id="inputTextoTeams" rows="2" placeholder="Ex: Roberto pediu: 2 Teclados Logitech link:... R$ 89,90 e 1 Mouse Dell R$ 45,00..." class="w-full text-xs p-3 bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800 rounded-xl outline-none focus:border-indigo-600 dark:text-white leading-relaxed"></textarea>
+            <textarea id="inputTextoTeams" rows="2" placeholder="Ex: Roberto pediu: 3 Canetas total R$ 4,50 ou 2 Teclados R$ 89,90 cada..." class="w-full text-xs p-3 bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800 rounded-xl outline-none focus:border-indigo-600 dark:text-white leading-relaxed"></textarea>
             
             <div class="flex justify-end pt-1">
                 <button type="button" onclick="processarTextoBruto(document.getElementById('inputTextoTeams').value)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-md flex items-center gap-1.5 cursor-pointer">
@@ -155,7 +158,7 @@
             </div>
         </div>
 
-        <!-- CARDS PRÉ-PREENCHIDOS PARA SÓ DAR OK -->
+        <!-- CARDS PRÉ-PREENCHIDOS PARA SÓ DAR OK (COM DIVISOR E SOMA AUTOMÁTICA) -->
         <div id="containerCardsPreenchidos" class="space-y-3 hidden">
             <div class="flex justify-between items-center px-1">
                 <h3 class="text-xs font-black uppercase text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5">
@@ -200,7 +203,77 @@
 
     </div>
 
-    <!-- MODAL DE EDIÇÃO (CANETA ✏️) -->
+    <!-- MODAL DO PAINEL DE SOLICITANTES / USUÁRIOS (👥) -->
+    <div id="modalUsuarios" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 w-full max-w-2xl rounded-2xl p-5 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-lg">👥</span>
+                    <div>
+                        <h3 class="text-xs sm:text-sm font-black text-indigo-600 dark:text-indigo-400 uppercase">
+                            Painel de Solicitantes
+                        </h3>
+                        <p class="text-[10px] text-slate-500">Resumo de pedidos e gastos por pessoa (Clique para filtrar)</p>
+                    </div>
+                </div>
+                <button onclick="fecharModalUsuarios()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-black text-sm">✕</button>
+            </div>
+
+            <div class="max-h-96 overflow-y-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-200 dark:border-slate-700 text-slate-400 font-bold uppercase text-[10px]">
+                            <th class="py-2 px-3">Solicitante</th>
+                            <th class="py-2 px-3 text-center">Itens Pedidos</th>
+                            <th class="py-2 px-3 text-right">Gasto Total</th>
+                            <th class="py-2 px-3 text-center">Ação</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaUsuariosCorpo" class="divide-y divide-slate-100 dark:divide-slate-700/60 uppercase font-semibold"></tbody>
+                </table>
+            </div>
+
+            <div class="flex justify-between items-center pt-2 border-t border-slate-100 dark:border-slate-700 text-xs">
+                <span id="resumoGeralUsuarios" class="font-bold text-slate-500"></span>
+                <button type="button" onclick="fecharModalUsuarios()" class="bg-slate-900 hover:bg-black dark:bg-slate-700 dark:hover:bg-slate-600 text-white px-4 py-1.5 rounded-xl font-bold transition">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DA CHAVE DA IA (ENGRENAGEM ⚙️) -->
+    <div id="modalChaveIa" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 w-full max-w-md rounded-2xl p-5 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
+                <h3 class="text-xs sm:text-sm font-black text-amber-600 dark:text-amber-400 uppercase flex items-center gap-1.5">
+                    <span>⚙️</span> Chave API da IA (Google Gemini)
+                </h3>
+                <button onclick="fecharModalChaveIa()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-black text-sm">✕</button>
+            </div>
+
+            <div class="space-y-2 text-xs">
+                <p class="text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Cole abaixo a chave de API gerada no Google AI Studio para análise de fotos.
+                </p>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Chave Gemini (AIzaSy...):</label>
+                    <input type="password" id="modalInputGeminiKey" placeholder="Cole aqui sua chave da IA..." class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-mono outline-none focus:border-amber-500">
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-700">
+                <button type="button" onclick="fecharModalChaveIa()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
+                    Fechar
+                </button>
+                <button type="button" onclick="salvarChaveIaModal()" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2 rounded-xl text-xs font-black transition shadow-md flex items-center gap-1.5">
+                    <span>💾</span> Salvar Chave
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE EDIÇÃO (CANETA ✏️ COM DIVISÃO E SOMA) -->
     <div id="modalEdicao" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 w-full max-w-xl rounded-2xl p-5 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
@@ -239,16 +312,21 @@
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Quantidade</label>
-                    <input type="number" id="editQtd" min="1" oninput="atualizarTotalModal()" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                    <input type="number" id="editQtd" min="1" oninput="calcularModalPorUnitario()" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
+
+                <!-- CAMPO UNITÁRIO (MULTIPLICA) -->
                 <div>
                     <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Valor Unitário (R$)</label>
-                    <input type="number" step="0.01" id="editUnit" oninput="atualizarTotalModal()" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                    <input type="number" step="0.01" id="editUnit" oninput="calcularModalPorUnitario()" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
+
+                <!-- CAMPO TOTAL (SE PREENCHER AQUI, DIVIDE O UNITÁRIO) -->
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Total (R$)</label>
-                    <input type="text" id="editTotal" readonly class="w-full p-2 bg-slate-100 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl font-black text-emerald-600 dark:text-emerald-400 outline-none">
+                    <label class="block text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase mb-1">Valor Total (R$) 🔄</label>
+                    <input type="number" step="0.01" id="editTotal" oninput="calcularModalPorTotal()" class="w-full p-2 bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-700 rounded-xl font-black text-emerald-600 dark:text-emerald-400 outline-none">
                 </div>
+
                 <div class="sm:col-span-2">
                     <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Link do Produto (Opcional)</label>
                     <input type="text" id="editLink" placeholder="https://..." class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none">
@@ -273,6 +351,7 @@
         let compras = [];
         let itensPendentesAprovacao = [];
         let supabaseClient = null;
+        let solicitanteFiltroAtual = null;
 
         window.addEventListener('DOMContentLoaded', () => {
             if (window.supabase) {
@@ -280,15 +359,12 @@
                     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
                     carregarDoSupabase();
                 } catch(e) {
-                    mostrarAviso("Erro ao ligar ao Supabase: " + e.message, "erro");
+                    mostrarAviso("Erro ao conectar ao Supabase: " + e.message, "erro");
                     carregarDoLocalStorage();
                 }
             } else {
                 carregarDoLocalStorage();
             }
-
-            const gKey = localStorage.getItem('gemini_api_key') || '';
-            document.getElementById('geminiKeyInput').value = gKey;
         });
 
         function mostrarAviso(msg, tipo = "sucesso") {
@@ -303,12 +379,87 @@
             setTimeout(() => el.classList.add('hidden'), 5000);
         }
 
-        function salvarChaveGemini() {
-            const gKey = document.getElementById('geminiKeyInput').value.trim();
-            localStorage.setItem('gemini_api_key', gKey);
-            mostrarAviso("Chave Gemini guardada com sucesso!");
+        // ================= GESTÃO DE USUÁRIOS / SOLICITANTES (👥) =================
+        function abrirModalUsuarios() {
+            const modal = document.getElementById('modalUsuarios');
+            const tbody = document.getElementById('tabelaUsuariosCorpo');
+            tbody.innerHTML = '';
+
+            let totaisPorPessoa = {};
+
+            compras.forEach(item => {
+                const s = (item.solicitante || "NÃO INFORMADO").toUpperCase();
+                if (!totaisPorPessoa[s]) {
+                    totaisPorPessoa[s] = { count: 0, valor: 0 };
+                }
+                totaisPorPessoa[s].count += Number(item.qtd || 1);
+                totaisPorPessoa[s].valor += Number(item.total || 0);
+            });
+
+            const listaNomes = Object.keys(totaisPorPessoa).sort((a,b) => totaisPorPessoa[b].valor - totaisPorPessoa[a].valor);
+
+            if (listaNomes.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-5 text-slate-400 italic">Nenhum solicitante cadastrado ainda.</td></tr>`;
+            } else {
+                listaNomes.forEach(nome => {
+                    const dados = totaisPorPessoa[nome];
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/40 transition";
+                    tr.innerHTML = `
+                        <td class="py-2.5 px-3 font-bold text-slate-800 dark:text-slate-100">${nome}</td>
+                        <td class="py-2.5 px-3 text-center text-slate-600 dark:text-slate-300">${dados.count} un</td>
+                        <td class="py-2.5 px-3 text-right font-black text-emerald-600 dark:text-emerald-400">R$ ${dados.valor.toFixed(2)}</td>
+                        <td class="py-2.5 px-3 text-center">
+                            <button onclick="filtrarPorSolicitante('${nome}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-2 py-1 rounded-lg text-[10px] font-bold">
+                                🔍 Ver Compras
+                            </button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            document.getElementById('resumoGeralUsuarios').innerText = `Total: ${listaNomes.length} Solicitante(s) Registrado(s)`;
+            modal.classList.remove('hidden');
         }
 
+        function fecharModalUsuarios() {
+            document.getElementById('modalUsuarios').classList.add('hidden');
+        }
+
+        function filtrarPorSolicitante(nome) {
+            solicitanteFiltroAtual = nome;
+            fecharModalUsuarios();
+            document.getElementById('nomeFiltroAtivo').innerText = nome;
+            document.getElementById('boxFiltroAtivo').classList.remove('hidden');
+            renderizarTabela();
+        }
+
+        function limparFiltroSolicitante() {
+            solicitanteFiltroAtual = null;
+            document.getElementById('boxFiltroAtivo').classList.add('hidden');
+            renderizarTabela();
+        }
+
+        // ================= MODAL DA CHAVE DA IA (ENGRENAGEM ⚙️) =================
+        function abrirModalChaveIa() {
+            const savedKey = localStorage.getItem('gemini_api_key') || '';
+            document.getElementById('modalInputGeminiKey').value = savedKey;
+            document.getElementById('modalChaveIa').classList.remove('hidden');
+        }
+
+        function fecharModalChaveIa() {
+            document.getElementById('modalChaveIa').classList.add('hidden');
+        }
+
+        function salvarChaveIaModal() {
+            const key = document.getElementById('modalInputGeminiKey').value.trim();
+            localStorage.setItem('gemini_api_key', key);
+            fecharModalChaveIa();
+            mostrarAviso("Chave da IA salva com sucesso!");
+        }
+
+        // ================= SUPABASE: CRUD =================
         async function carregarDoSupabase() {
             if (!supabaseClient) return;
 
@@ -392,6 +543,7 @@
             }
         }
 
+        // ================= PARSER DE LINK & TEXTO =================
         function extrairNomeDoLinkML(url) {
             try {
                 const urlLimpa = url.split('?')[0].split('#')[0];
@@ -510,6 +662,7 @@
 
                 let qtd = 1;
                 let unit = 0;
+                let totalDetectado = 0;
                 let produto = "";
                 let link = "";
 
@@ -523,12 +676,20 @@
                 const matchQtd = linha.match(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/i);
                 if (matchQtd) qtd = parseInt(matchQtd[1], 10);
 
-                const matchPreco = linha.match(/(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/i);
-                if (matchPreco) unit = parseFloat(matchPreco[1].replace(',', '.'));
+                // Detecta se escreveu "total R$ ..."
+                const matchTotal = linha.match(/total\s*(?:de|:)?\s*(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/i);
+                if (matchTotal) {
+                    totalDetectado = parseFloat(matchTotal[1].replace(',', '.'));
+                    unit = totalDetectado / (qtd || 1);
+                } else {
+                    const matchPreco = linha.match(/(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/i);
+                    if (matchPreco) unit = parseFloat(matchPreco[1].replace(',', '.'));
+                }
 
                 if (!produto) {
                     let textoLimpo = linha
                         .replace(/(https?:\/\/[^\s]+)/gi, '')
+                        .replace(/total\s*(?:de|:)?\s*(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/gi, ' ')
                         .replace(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/gi, ' ')
                         .replace(/(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/gi, ' ')
                         .replace(/R\$/gi, ' ')
@@ -565,6 +726,103 @@
             return "OUTROS";
         }
 
+        // ================= IA E IMAGEM =================
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        async function processarArquivos(files) {
+            if (!files || files.length === 0) return;
+
+            const apiKey = localStorage.getItem('gemini_api_key');
+            if (!apiKey) {
+                abrirModalChaveIa();
+                alert("Por favor, informe a Chave da IA primeiro para ler a imagem!");
+                return;
+            }
+
+            mostrarAviso("⏳ IA visual analisando a imagem... Aguarde...", "sucesso");
+
+            for (let i = 0; i < files.length; i++) {
+                const file = files[i];
+                if (!file.type.startsWith('image/')) continue;
+                await chamarIaParaImagem(file, apiKey);
+            }
+
+            mostrarAviso("✅ Foto processada com sucesso!", "sucesso");
+            renderizarCardsPendentes();
+        }
+
+        async function chamarIaParaImagem(file, apiKey) {
+            try {
+                const base64Data = await fileToBase64(file);
+
+                const prompt = `Analise a foto em anexo e extraia os produtos comprados, quantidades e valores.
+                Retorne ESTRITAMENTE um JSON com uma lista de objetos contendo os seguintes campos:
+                [
+                  {
+                    "produto": "nome do produto em maiúsculo",
+                    "qtd": número inteiro da quantidade (padrão 1),
+                    "unit": valor unitário decimal (número puro, ex: 15.50),
+                    "solicitante": "nome de quem pediu se constar ou 'NÃO INFORMADO'",
+                    "categoria": "INFORMÁTICA / TI, ESCRITÓRIO, MANUTENÇÃO, TREINAMENTO, ALIMENTAÇÃO / COPA ou OUTROS"
+                  }
+                ]
+                Retorne apenas o array JSON puro, sem blocos de markdown.`;
+
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [
+                                { text: prompt },
+                                {
+                                    inline_data: {
+                                        mime_type: file.type || "image/jpeg",
+                                        data: base64Data
+                                    }
+                                }
+                            ]
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                if (data.error) throw new Error(data.error.message);
+
+                let textoResposta = data.candidates[0].content.parts[0].text.trim();
+                textoResposta = textoResposta.replace(/```json/gi, '').replace(/```/g, '').trim();
+
+                const produtosExtraidos = JSON.parse(textoResposta);
+                const hoje = new Date().toISOString().split('T')[0];
+
+                produtosExtraidos.forEach((p) => {
+                    itensPendentesAprovacao.push({
+                        tempId: Date.now() + Math.random(),
+                        data: hoje,
+                        solicitante: (p.solicitante || "NÃO INFORMADO").toUpperCase(),
+                        produto: (p.produto || "PRODUTO").toUpperCase(),
+                        categoria: p.categoria || "OUTROS",
+                        qtd: p.qtd || 1,
+                        unit: p.unit || 0,
+                        link: ""
+                    });
+                });
+            } catch (err) {
+                console.error("Falha ao analisar arquivo:", err);
+                mostrarAviso("Erro na IA: " + err.message, "erro");
+            }
+        }
+
+        // ================= CARDS PRÉ-PREENCHIDOS: DIVISÃO & SOMA =================
         function renderizarCardsPendentes() {
             const container = document.getElementById('containerCardsPreenchidos');
             const lista = document.getElementById('listaCardsPendentes');
@@ -602,7 +860,7 @@
                         </div>
 
                         <div class="md:col-span-4">
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Produto / Serviço</label>
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Produto / Descrição</label>
                             <input type="text" id="produto-${item.tempId}" value="${item.produto}" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-white font-bold">
                         </div>
 
@@ -620,20 +878,22 @@
 
                         <div class="md:col-span-2">
                             <label class="block text-[9px] font-bold text-slate-400 uppercase">Qtd</label>
-                            <input type="number" id="qtd-${item.tempId}" value="${item.qtd}" min="1" oninput="atualizarTotalCard(${item.tempId})" class="w-full text-xs p-1.5 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-white">
+                            <input type="number" id="qtd-${item.tempId}" value="${item.qtd}" min="1" oninput="calcularCardPorUnitario(${item.tempId})" class="w-full text-xs p-1.5 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-white">
                         </div>
 
-                        <div class="md:col-span-3">
+                        <!-- UNITÁRIO (AO DIGITAR MULTIPLICA) -->
+                        <div class="md:col-span-2">
                             <label class="block text-[9px] font-bold text-slate-400 uppercase">Unitário (R$)</label>
-                            <input type="number" step="0.01" id="unit-${item.tempId}" value="${item.unit}" oninput="atualizarTotalCard(${item.tempId})" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-white font-bold">
+                            <input type="number" step="0.01" id="unit-${item.tempId}" value="${item.unit}" oninput="calcularCardPorUnitario(${item.tempId})" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-white font-bold">
                         </div>
 
+                        <!-- TOTAL (AO DIGITAR DIVIDE O UNITÁRIO) -->
                         <div class="md:col-span-3">
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Total (R$)</label>
-                            <input type="text" id="total-${item.tempId}" readonly value="R$ ${totalCalculado}" class="w-full text-xs p-1.5 bg-slate-100 dark:bg-slate-950 font-black text-emerald-600 dark:text-emerald-400 rounded-lg outline-none">
+                            <label class="block text-[9px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">Total (R$) 🔄 Divisor</label>
+                            <input type="number" step="0.01" id="total-${item.tempId}" value="${totalCalculado}" oninput="calcularCardPorTotal(${item.tempId})" class="w-full text-xs p-1.5 bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-700 rounded-lg font-black text-emerald-600 dark:text-emerald-400 outline-none">
                         </div>
 
-                        <div class="md:col-span-4 flex gap-2">
+                        <div class="md:col-span-5 flex gap-2">
                             <input type="hidden" id="link-${item.tempId}" value="${item.link || ''}">
                             <button type="button" onclick="confirmarCardIndividual(${item.tempId})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1 cursor-pointer">
                                 <span>✅</span>
@@ -646,11 +906,20 @@
             });
         }
 
-        function atualizarTotalCard(tempId) {
-            const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 0;
+        // Se o usuário mexer na Quantidade ou no Unitário -> Calcula o Total
+        function calcularCardPorUnitario(tempId) {
+            const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1;
             const unit = parseFloat(document.getElementById(`unit-${tempId}`).value) || 0;
-            const total = qtd * unit;
-            document.getElementById(`total-${tempId}`).value = `R$ ${total.toFixed(2)}`;
+            const total = (qtd * unit).toFixed(2);
+            document.getElementById(`total-${tempId}`).value = total;
+        }
+
+        // Se o usuário colocar o Valor Total (Ex: 3 canetas por R$ 4,50) -> Divide e acha o Unitário (R$ 1,50)
+        function calcularCardPorTotal(tempId) {
+            const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1;
+            const total = parseFloat(document.getElementById(`total-${tempId}`).value) || 0;
+            const unit = (total / qtd).toFixed(2);
+            document.getElementById(`unit-${tempId}`).value = unit;
         }
 
         async function confirmarCardIndividual(tempId) {
@@ -660,7 +929,7 @@
             const categoria = document.getElementById(`categoria-${tempId}`).value;
             const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1;
             const unit = parseFloat(document.getElementById(`unit-${tempId}`).value) || 0;
-            const total = qtd * unit;
+            const total = parseFloat(document.getElementById(`total-${tempId}`).value) || (qtd * unit);
             const link = document.getElementById(`link-${tempId}`).value;
 
             const novoItem = {
@@ -684,7 +953,7 @@
             salvarNoLocalStorage();
             renderizarTabela();
             renderizarCardsPendentes();
-            mostrarAviso("Item guardado com sucesso!");
+            mostrarAviso("Item salvo na nuvem com sucesso!");
         }
 
         async function confirmarTodosOsCards() {
@@ -696,7 +965,7 @@
                 const categoria = document.getElementById(`categoria-${tempId}`).value;
                 const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1;
                 const unit = parseFloat(document.getElementById(`unit-${tempId}`).value) || 0;
-                const total = qtd * unit;
+                const total = parseFloat(document.getElementById(`total-${tempId}`).value) || (qtd * unit);
                 const link = document.getElementById(`link-${tempId}`).value;
 
                 const novoItem = {
@@ -721,7 +990,7 @@
             salvarNoLocalStorage();
             renderizarTabela();
             renderizarCardsPendentes();
-            mostrarAviso("Todos os itens foram guardados!");
+            mostrarAviso("Todos os itens foram salvos na nuvem!");
         }
 
         function descartarCardPendente(tempId) {
@@ -741,10 +1010,10 @@
             document.getElementById('editProduto').value = item.produto || '';
             document.getElementById('editCategoria').value = item.categoria || 'OUTROS';
             document.getElementById('editQtd').value = item.qtd || 1;
-            document.getElementById('editUnit').value = item.unit || 0;
+            document.getElementById('editUnit').value = Number(item.unit || 0).toFixed(2);
+            document.getElementById('editTotal').value = Number(item.total || 0).toFixed(2);
             document.getElementById('editLink').value = item.link || '';
 
-            atualizarTotalModal();
             document.getElementById('modalEdicao').classList.remove('hidden');
         }
 
@@ -752,10 +1021,18 @@
             document.getElementById('modalEdicao').classList.add('hidden');
         }
 
-        function atualizarTotalModal() {
-            const q = parseFloat(document.getElementById('editQtd').value) || 0;
+        // Na modal: Se alterar Unitário -> Calcula Total
+        function calcularModalPorUnitario() {
+            const q = parseFloat(document.getElementById('editQtd').value) || 1;
             const u = parseFloat(document.getElementById('editUnit').value) || 0;
-            document.getElementById('editTotal').value = `R$ ${(q * u).toFixed(2)}`;
+            document.getElementById('editTotal').value = (q * u).toFixed(2);
+        }
+
+        // Na modal: Se alterar Total -> Divide para o Unitário
+        function calcularModalPorTotal() {
+            const q = parseFloat(document.getElementById('editQtd').value) || 1;
+            const tot = parseFloat(document.getElementById('editTotal').value) || 0;
+            document.getElementById('editUnit').value = (tot / q).toFixed(2);
         }
 
         async function guardarEdicaoModal() {
@@ -764,6 +1041,7 @@
 
             const q = parseFloat(document.getElementById('editQtd').value) || 1;
             const u = parseFloat(document.getElementById('editUnit').value) || 0;
+            const total = parseFloat(document.getElementById('editTotal').value) || (q * u);
 
             const itemAtualizado = {
                 ...compras[index],
@@ -773,7 +1051,7 @@
                 categoria: document.getElementById('editCategoria').value,
                 qtd: q,
                 unit: u,
-                total: q * u,
+                total: total,
                 link: document.getElementById('editLink').value.trim()
             };
 
@@ -783,7 +1061,7 @@
             salvarNoLocalStorage();
             renderizarTabela();
             fecharModalEdicao();
-            mostrarAviso("Registo atualizado com sucesso!");
+            mostrarAviso("Registro atualizado com sucesso!");
         }
 
         // ================= TABELA E RENDERIZAÇÃO =================
@@ -794,10 +1072,17 @@
             let totalGastoGeral = 0;
             let solicitantesContador = {};
 
-            if (compras.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-400 italic">NENHUMA COMPRA REGISTRADA ATÉ O MOMENTO.</td></tr>`;
+            // Se tiver filtro de solicitante ativo
+            let listaExibicao = compras;
+            if (solicitanteFiltroAtual) {
+                listaExibicao = compras.filter(i => (i.solicitante || "").toUpperCase() === solicitanteFiltroAtual.toUpperCase());
+            }
+
+            if (listaExibicao.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-400 italic">NENHUMA COMPRA ENCONTRADA.</td></tr>`;
             } else {
-                compras.forEach((item, index) => {
+                listaExibicao.forEach((item) => {
+                    const originalIndex = compras.findIndex(c => c.id === item.id);
                     totalGastoGeral += Number(item.total || 0);
                     solicitantesContador[item.solicitante] = (solicitantesContador[item.solicitante] || 0) + 1;
 
@@ -818,7 +1103,7 @@
                         </td>
                         <td class="py-2.5 px-3 text-center whitespace-nowrap">
                             <div class="flex items-center justify-center gap-1.5">
-                                <button onclick="abrirModalEdicao(${index})" class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 font-bold p-1 cursor-pointer" title="Editar este registo">✏️</button>
+                                <button onclick="abrirModalEdicao(${originalIndex})" class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 font-bold p-1 cursor-pointer" title="Editar com o lápis">✏️</button>
                                 <button onclick="removerItem(${item.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1 cursor-pointer" title="Excluir">✕</button>
                             </div>
                         </td>
@@ -827,8 +1112,8 @@
                 });
             }
 
-            document.getElementById('cardTotalItens').innerText = compras.length;
-            document.getElementById('labelContador').innerText = `${compras.length} ITENS REGISTRADOS`;
+            document.getElementById('cardTotalItens').innerText = listaExibicao.length;
+            document.getElementById('labelContador').innerText = `${listaExibicao.length} ITENS REGISTRADOS`;
             document.getElementById('cardValorTotal').innerText = `R$ ${totalGastoGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
             let topSolicitante = "NENHUM";
