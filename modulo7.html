@@ -17,7 +17,7 @@
         .uppercase-input { text-transform: uppercase; }
         .dropzone-hover { border-color: #9333ea !important; background-color: rgba(243, 232, 255, 0.7) !important; transform: scale(1.01); }
 
-        /* Animação ultra chamativa para o Solicitante na Digitação Manual */
+        /* Animação ultra chamativa para o Solicitante */
         @keyframes piscarForte {
             0%, 100% {
                 background-color: #fef08a;
@@ -148,7 +148,7 @@
                 </button>
             </div>
 
-            <!-- CONTEÚDO 1: ✍️ DIGITAÇÃO MANUAL DIRETA (COM CAIXA PISCANTE FORTE) -->
+            <!-- CONTEÚDO 1: ✍️ DIGITAÇÃO MANUAL DIRETA -->
             <div id="aba-manual" class="p-4 sm:p-5 space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                     <span class="text-xs font-black text-indigo-900 dark:text-indigo-300 uppercase flex items-center gap-1.5">
@@ -164,7 +164,7 @@
                         <input type="date" id="manualData" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white outline-none font-bold">
                     </div>
 
-                    <!-- ⚠️ SOLICITANTE COM CAIXA PISCANTE SUPER CHAMATIVA -->
+                    <!-- ⚠️ SOLICITANTE COM CAIXA PISCANTE -->
                     <div class="md:col-span-3">
                         <div class="flex justify-between items-center mb-1">
                             <label class="block text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase">Solicitante (*)</label>
@@ -196,13 +196,13 @@
                         <input type="number" id="manualQtd" value="1" min="1" oninput="calcularManualPorTotal()" class="w-full text-xs p-2.5 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white outline-none">
                     </div>
 
-                    <!-- VALOR TOTAL (AO DIGITAR DIVIDE PELA QTD) -->
+                    <!-- VALOR TOTAL -->
                     <div class="md:col-span-3">
                         <label class="block text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase mb-1">Valor Total (R$) 🔄</label>
                         <input type="number" step="0.01" id="manualTotal" placeholder="0,00" oninput="calcularManualPorTotal()" class="w-full text-xs p-2.5 bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-400 dark:border-emerald-600 rounded-xl font-black text-emerald-600 dark:text-emerald-400 outline-none">
                     </div>
 
-                    <!-- VALOR UNITÁRIO (AO DIGITAR MULTIPLICA) -->
+                    <!-- VALOR UNITÁRIO -->
                     <div class="md:col-span-2">
                         <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Unitário (R$)</label>
                         <input type="number" step="0.01" id="manualUnit" placeholder="0,00" oninput="calcularManualPorUnitario()" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
@@ -218,7 +218,7 @@
                 </div>
             </div>
 
-            <!-- CONTEÚDO 2: 🔗 LINK DO PRODUTO -->
+            <!-- CONTEÚDO 2: 🔗 LINK DO PRODUTO (ABRE AUTOMÁTICO) -->
             <div id="aba-link" class="p-4 sm:p-5 space-y-3 hidden">
                 <div class="flex justify-between items-center">
                     <label class="block text-xs font-black text-blue-950 dark:text-blue-200 uppercase flex items-center gap-2">
@@ -234,7 +234,7 @@
                     <input type="text" id="inputLinkDireto" placeholder="Cole o link aqui (ex: link do ML ou link + 3x total R$ 500)..." class="flex-1 text-xs px-3 py-2.5 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-xl outline-none focus:border-blue-600 dark:text-white">
                     <button type="button" onclick="processarLinkDireto()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer flex-shrink-0">
                         <span>⚡</span>
-                        <span>Reconhecer Link</span>
+                        <span>Reconhecer Link & Abrir Site</span>
                     </button>
                 </div>
             </div>
@@ -285,7 +285,7 @@
             </div>
         </div>
 
-        <!-- CARDS PRÉ-PREENCHIDOS PARA SÓ DAR OK (QUANDO VEM POR FOTO, LINK OU TEAMS) -->
+        <!-- CARDS PRÉ-PREENCHIDOS PARA SÓ DAR OK -->
         <div id="containerCardsPreenchidos" class="space-y-3 hidden">
             <div class="flex justify-between items-center px-1">
                 <h3 class="text-xs font-black uppercase text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5">
@@ -494,9 +494,8 @@
             
             const hoje = new Date().toISOString().split('T')[0];
             document.getElementById('manualData').value = hoje;
-            preencherOpcoesCategoria(document.getElementById('manualCategoria'));
+            atualizarTodosOsSelectsCategorias();
 
-            // Ativa o destaque inicial na caixa manual
             const solManual = document.getElementById('manualSolicitante');
             solManual.classList.add('piscar-solicitante-forte');
 
@@ -528,7 +527,7 @@
             });
         }
 
-        // ================= GESTÃO DE CATEGORIAS =================
+        // ================= GESTÃO DE CATEGORIAS GLOBAL =================
         function carregarCategorias() {
             const salvas = localStorage.getItem('compras_categorias_lista');
             if (salvas) {
@@ -542,6 +541,16 @@
             localStorage.setItem('compras_categorias_lista', JSON.stringify(listaCategorias));
         }
 
+        function atualizarTodosOsSelectsCategorias() {
+            const selManual = document.getElementById('manualCategoria');
+            const valManual = selManual ? selManual.value : "";
+            preencherOpcoesCategoria(selManual, valManual || "OUTROS");
+
+            const selEdit = document.getElementById('editCategoria');
+            const valEdit = selEdit ? selEdit.value : "";
+            preencherOpcoesCategoria(selEdit, valEdit || "OUTROS");
+        }
+
         function adicionarNovaCategoriaPrompt(selectId = null) {
             const nova = prompt("Digite o nome da NOVA CATEGORIA:");
             if (nova && nova.trim()) {
@@ -551,14 +560,15 @@
                     salvarCategorias();
                 }
                 
-                preencherOpcoesCategoria(document.getElementById('manualCategoria'), categoriaFormatada);
+                atualizarTodosOsSelectsCategorias();
+                renderizarCardsPendentes();
 
                 if (selectId) {
                     const sel = document.getElementById(selectId);
-                    if (sel) preencherOpcoesCategoria(sel, categoriaFormatada);
+                    if (sel) sel.value = categoriaFormatada;
                 }
-                renderizarCardsPendentes();
-                mostrarAviso(`Categoria "${categoriaFormatada}" adicionada com sucesso!`);
+
+                mostrarAviso(`Categoria "${categoriaFormatada}" adicionada e selecionada com sucesso!`);
             }
         }
 
@@ -665,7 +675,6 @@
             atualizarListaSelectSolicitantes();
             renderizarTabela();
 
-            // Reseta campos mantendo solicitante e data
             document.getElementById('manualProduto').value = '';
             document.getElementById('manualTotal').value = '';
             document.getElementById('manualUnit').value = '';
@@ -674,7 +683,7 @@
             mostrarAviso("✅ Compra manual salva com sucesso na nuvem!");
         }
 
-        // ================= CONTROLE DA CAIXA PISCANTE NOS CARDS =================
+        // ================= CONTROLE DE SOLICITANTE NOS CARDS =================
         function verificarDigitacaoSolicitante(input, tempId) {
             input.value = input.value.toUpperCase();
             const val = input.value.trim();
@@ -914,7 +923,7 @@
             }
         }
 
-        // ================= PARSER DE LINK & TEXTO =================
+        // ================= PARSER DE LINK & ABERTURA AUTOMÁTICA =================
         function extrairNomeDoLinkML(url) {
             try {
                 const urlLimpa = url.split('?')[0].split('#')[0];
@@ -952,6 +961,8 @@
                 link = matchUrl[1];
                 const nomeExtraido = extrairNomeDoLinkML(link);
                 if (nomeExtraido) produto = nomeExtraido;
+                
+                window.open(link, '_blank');
             }
 
             const matchQtd = entrada.match(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/i);
@@ -1438,7 +1449,8 @@
 
             document.getElementById('editProduto').value = item.produto || '';
             
-            preencherOpcoesCategoria(document.getElementById('editCategoria'), item.categoria || 'OUTROS');
+            atualizarTodosOsSelectsCategorias();
+            document.getElementById('editCategoria').value = item.categoria || 'OUTROS';
             
             document.getElementById('editQtd').value = item.qtd || 1;
             document.getElementById('editTotal').value = Number(item.total || 0).toFixed(2);
@@ -1481,6 +1493,7 @@
             const q = parseFloat(document.getElementById('editQtd').value) || 1;
             const total = parseFloat(document.getElementById('editTotal').value) || 0;
             const u = parseFloat(document.getElementById('editUnit').value) || (total / q);
+            const linkProduto = document.getElementById('editLink').value.trim();
 
             const itemAtualizado = {
                 ...compras[index],
@@ -1491,7 +1504,7 @@
                 qtd: q,
                 unit: u,
                 total: total,
-                link: document.getElementById('editLink').value.trim()
+                link: linkProduto
             };
 
             compras[index] = itemAtualizado;
@@ -1647,4 +1660,4 @@
         }
     </script>
 </body>
-    </html>
+</html>
