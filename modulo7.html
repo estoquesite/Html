@@ -55,7 +55,7 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Categorias nos Links</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Limpeza de Link</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
@@ -210,20 +210,28 @@
                 </div>
             </div>
 
-            <!-- CONTEÚDO 2: LINK WEB -->
+            <!-- CONTEÚDO 2: LINK WEB (COM BOTÃO DE LIMPAR ✕) -->
             <div id="aba-link" class="p-4 sm:p-5 space-y-3 hidden">
                 <div class="flex justify-between items-center">
                     <label class="block text-xs font-black text-blue-950 dark:text-blue-200 uppercase flex items-center gap-2">
                         <span>🔗</span>
                         <span>Colar / Digitar Link do Produto</span>
                     </label>
-                    <button type="button" onclick="colarLinkInput()" class="text-xs text-blue-700 dark:text-blue-300 font-bold hover:underline flex items-center gap-1 cursor-pointer">
-                        📋 Colar
-                    </button>
+                    <div class="flex items-center gap-3">
+                        <button type="button" onclick="limparInputLink()" class="text-xs text-rose-500 font-bold hover:underline flex items-center gap-1 cursor-pointer" title="Limpar campo de link">
+                            🗑️ Limpar Link
+                        </button>
+                        <button type="button" onclick="colarLinkInput()" class="text-xs text-blue-700 dark:text-blue-300 font-bold hover:underline flex items-center gap-1 cursor-pointer">
+                            📋 Colar
+                        </button>
+                    </div>
                 </div>
                 
                 <div class="flex flex-col sm:flex-row gap-2">
-                    <input type="text" id="inputLinkDireto" placeholder="Cole o link aqui (ex: link do Mercado Livre, Amazon...)..." class="flex-1 text-xs px-3 py-2.5 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-xl outline-none focus:border-blue-600 dark:text-white">
+                    <div class="relative flex-1">
+                        <input type="text" id="inputLinkDireto" placeholder="Cole o link aqui (ex: link do Mercado Livre, Amazon...)..." class="w-full text-xs px-3 py-2.5 pr-8 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-xl outline-none focus:border-blue-600 dark:text-white">
+                        <button type="button" onclick="limparInputLink()" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-rose-500 font-bold text-xs" title="Apagar">✕</button>
+                    </div>
                     <button type="button" onclick="processarLinkDireto()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer flex-shrink-0">
                         <span>⚡</span>
                         <span>Reconhecer Link</span>
@@ -610,6 +618,11 @@
                 el.classList.add('bg-rose-100', 'text-rose-800');
             }
             setTimeout(() => el.classList.add('hidden'), 5000);
+        }
+
+        function limparInputLink() {
+            document.getElementById('inputLinkDireto').value = '';
+            document.getElementById('inputLinkDireto').focus();
         }
 
         function calcularManualPorTotal() {
@@ -1031,7 +1044,7 @@
                 link = matchUrl[1];
                 const nomeExtraido = extrairNomeDoLinkML(link);
                 if (nomeExtraido) produto = nomeExtraido;
-                localDetectId = identificarLocalPeloLink(link);
+                localDetectado = identificarLocalPeloLink(link);
             }
 
             const matchQtd = entrada.match(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/i);
@@ -1190,17 +1203,7 @@
             renderizarCardsPendentes();
         }
 
-        function adivinharCategoria(texto) {
-            const t = (texto || "").toLowerCase();
-            if (t.includes('teclado') || t.includes('mouse') || t.includes('cabo') || t.includes('monitor') || t.includes('hd') || t.includes('ssd') || t.includes('ti')) return "INFORMÁTICA / TI";
-            if (t.includes('papel') || t.includes('caneta') || t.includes('pasta') || t.includes('grampeador')) return "ESCRITÓRIO";
-            if (t.includes('ferramenta') || t.includes('broca') || t.includes('fita') || t.includes('parafuso')) return "MANUTENÇÃO";
-            if (t.includes('curso') || t.includes('treinamento') || t.includes('livro')) return "TREINAMENTO";
-            if (t.includes('cafe') || t.includes('café') || t.includes('copo') || t.includes('açucar')) return "ALIMENTAÇÃO / COPA";
-            return "OUTROS";
-        }
-
-        // ================= CARDS PRÉ-PREENCHIDOS =================
+        // ================= RENDERIZAÇÃO DOS CARDS PENDENTES (COM CATEGORIAS) =================
         function renderizarCardsPendentes() {
             const container = document.getElementById('containerCardsPreenchidos');
             const lista = document.getElementById('listaCardsPendentes');
