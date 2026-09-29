@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 8 - Gestão e Impressão em Lote de FDS | Portal Vale</title>
+    <title>Módulo 8 - Fila de Impressão em Lote | Portal Vale</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -27,13 +27,6 @@
             50% { border-color: #f97316; box-shadow: 0 0 4px rgba(249, 115, 22, 0.5); }
         }
         .neon-duplicado { animation: neonAlertaDuplicado 1s infinite alternate ease-in-out; border-width: 2px !important; }
-
-        @media print {
-            body * { visibility: hidden; }
-            #modalImpressaoLote, #modalImpressaoLote * { visibility: visible; }
-            #modalImpressaoLote { position: absolute; left: 0; top: 0; width: 100%; background: white; }
-            .quebra-pagina { page-break-after: always; break-after: page; }
-        }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen p-4 sm:p-6 transition-colors duration-200">
@@ -49,7 +42,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-cyan-100 dark:bg-cyan-900 text-cyan-700 dark:text-cyan-300">Módulo 8</span>
-                        <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Gestão e Impressão em Lote de FDS</h1>
+                        <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Fila de Impressão em Lote de FDS</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
                         <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Seleção Múltipla & Nuvem Supabase</p>
@@ -76,7 +69,7 @@
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                 <span class="text-xs font-black text-cyan-900 dark:text-cyan-300 uppercase flex items-center gap-1.5">
-                    <span>⚡</span> Reconhecimento por Câmera e Pesquisa de FDS
+                    <span>⚡</span> Reconhecimento por Câmera e Cadastro de FDS
                 </span>
                 <span class="text-[10px] font-bold text-slate-400">Verificação de duplicidade ativa</span>
             </div>
@@ -113,11 +106,10 @@
                     <input type="text" id="inputLink" placeholder="Cole o link oficial do PDF..." class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
 
-                <!-- ANEXO E BOTÕES -->
+                <!-- BOTÕES -->
                 <div class="md:col-span-12 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                        <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase block">2. Anexo Opcional de Documento/Arquivo</span>
-                        <input type="file" id="inputAnexoExtra" class="text-xs mt-1 text-slate-500 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-slate-200 file:text-slate-700 dark:file:bg-slate-700 dark:file:text-slate-200">
+                    <div class="text-[11px] text-slate-500 font-semibold">
+                        💡 Cadastre o link do PDF do fabricante para habilitar a fila em lote.
                     </div>
                     <div class="flex gap-2">
                         <button type="button" onclick="pesquisarWebFds()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer">
@@ -131,7 +123,7 @@
             </div>
         </div>
 
-        <!-- LISTA DE FDS CADASTRADAS COM SELEÇÃO MÚLTIPLA E IMPRESSÃO EM LOTE -->
+        <!-- LISTA DE FDS CADASTRADAS COM SELEÇÃO E FILA EM LOTE -->
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
             <div class="flex flex-wrap justify-between items-center gap-3 border-b pb-3">
                 <div class="flex items-center gap-2">
@@ -141,9 +133,9 @@
                     <span id="labelContadorFds" class="text-[11px] text-slate-400 font-bold">0 DOCUMENTOS</span>
                 </div>
                 
-                <!-- BOTÃO DE IMPRESSÃO EM LOTE -->
-                <button type="button" onclick="abrirImpressaoLote()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-black py-2 px-4 rounded-xl text-xs shadow-md flex items-center gap-1.5 cursor-pointer">
-                    <span>🖨️</span> <span>Imprimir Selecionadas em Lote</span>
+                <!-- BOTÃO DE IMPRESSÃO EM LOTE DIRETA -->
+                <button type="button" onclick="dispararImpressaoLote()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-black py-2.5 px-5 rounded-xl text-xs shadow-md flex items-center gap-1.5 cursor-pointer">
+                    <span>🖨️</span> <span>Imprimir Selecionadas em Lote (Fila)</span>
                 </button>
             </div>
 
@@ -162,20 +154,6 @@
             <div id="gridFds" class="space-y-2"></div>
         </div>
 
-    </div>
-
-    <!-- MODAL DE IMPRESSÃO EM LOTE (OCULTO ATÉ CLICAR EM IMPRIMIR) -->
-    <div id="modalImpressaoLote" class="fixed inset-0 bg-white z-50 p-6 overflow-y-auto hidden">
-        <div class="max-w-3xl mx-auto space-y-6">
-            <div class="flex justify-between items-center border-b pb-4 print:hidden">
-                <h2 class="text-sm font-black uppercase text-cyan-800">🖨️ Pré-visualização de Impressão em Lote</h2>
-                <div class="flex gap-2">
-                    <button onclick="window.print()" class="bg-cyan-600 text-white font-bold px-4 py-2 rounded-xl text-xs">Imprimir Agora</button>
-                    <button onclick="fecharImpressaoLote()" class="bg-slate-200 text-slate-700 font-bold px-4 py-2 rounded-xl text-xs">Fechar</button>
-                </div>
-            </div>
-            <div id="conteudoLoteImpresso" class="space-y-8"></div>
-        </div>
     </div>
 
     <!-- MODAL DE EDIÇÃO -->
@@ -293,7 +271,7 @@
                 }
             } catch (err) {
                 console.error(err);
-                mostrarAviso("ℹ️ Erro na leitura automática. Preencha manualmente.");
+                mostrarAviso("ℹ️️ Erro na leitura automática. Preencha manualmente.");
             }
         }
 
@@ -362,7 +340,6 @@
             document.getElementById('inputProduto').value = '';
             document.getElementById('inputFabricante').value = '';
             document.getElementById('inputLink').value = '';
-            document.getElementById('inputAnexoExtra').value = '';
 
             if (supabaseClient) {
                 try {
@@ -401,7 +378,7 @@
                 
                 card.innerHTML = `
                     <div class="flex items-center gap-3 w-full sm:w-auto truncate">
-                        <input type="checkbox" value="${item.id}" class="check-fds rounded w-4 h-4 accent-cyan-600 cursor-pointer">
+                        <input type="checkbox" value="${item.id}" data-link="${item.linkPdf}" class="check-fds rounded w-4 h-4 accent-cyan-600 cursor-pointer">
                         <span class="text-lg">📄</span>
                         <div class="truncate">
                             <h4 class="font-black text-slate-900 dark:text-white uppercase truncate">${item.produto}</h4>
@@ -426,44 +403,29 @@
             checkboxes.forEach(cb => cb.checked = master.checked);
         }
 
-        function abrirImpressaoLote() {
+        // FUNÇÃO DE FILA DE IMPRESSÃO EM LOTE (DISPARA OS PDFs SALVOS EM SEQUÊNCIA)
+        function dispararImpressaoLote() {
             const selecionados = document.querySelectorAll('.check-fds:checked');
             if (selecionados.length === 0) {
                 alert("Por favor, selecione pelo menos uma FDS na lista para imprimir em lote!");
                 return;
             }
 
-            const idsSelecionados = Array.from(selecionados).map(cb => String(cb.value));
-            const itensParaImprimir = listaFds.filter(item => idsSelecionados.includes(String(item.id)));
+            const linksParaAbrir = Array.from(selecionados).map(cb => cb.getAttribute('data-link')).filter(link => link && link !== '#');
 
-            const container = document.getElementById('conteudoLoteImpresso');
-            container.innerHTML = '';
+            if (linksParaAbrir.length === 0) {
+                alert("Nenhum dos itens selecionados possui um link de PDF válido cadastrado.");
+                return;
+            }
 
-            itensParaImprimir.forEach((item, idx) => {
-                const bloco = document.createElement('div');
-                bloco.className = "border-2 border-slate-300 p-6 rounded-2xl bg-white space-y-4 text-slate-900 quebra-pagina";
-                bloco.innerHTML = `
-                    <div class="flex justify-between items-start border-b pb-3">
-                        <div>
-                            <span class="text-[9px] font-black bg-cyan-100 text-cyan-800 px-2 py-0.5 rounded">FDS - FICHA DE DADOS DE SEGURANÇA</span>
-                            <h2 class="text-base font-black uppercase text-slate-900 mt-2">${item.produto}</h2>
-                            <p class="text-xs font-bold text-slate-600 uppercase mt-1">Fabricante: ${item.fabricante}</p>
-                        </div>
-                        <span class="text-xs font-bold text-slate-400">Item #${idx + 1}</span>
-                    </div>
-                    <div class="space-y-2 text-xs pt-2">
-                        <p><strong>Link de Acesso Oficial ao PDF:</strong> <a href="${item.linkPdf}" target="_blank" class="text-blue-600 underline">${item.linkPdf}</a></p>
-                        <p class="text-[10px] text-slate-500 mt-4">Documento gerado pelo Portal Operacional Vale • Impressão em Lote</p>
-                    </div>
-                `;
-                container.appendChild(bloco);
-            });
-
-            document.getElementById('modalImpressaoLote').classList.remove('hidden');
-        }
-
-        function fecharImpressaoLote() {
-            document.getElementById('modalImpressaoLote').classList.add('hidden');
+            if (confirm(`Serão abertos ${linksParaAbrir.length} documentos PDF oficiais em sequência para impressão. Deseja continuar?`)) {
+                linksParaAbrir.forEach((link, index) => {
+                    setTimeout(() => {
+                        window.open(link, '_blank');
+                    }, index * 800);
+                });
+                mostrarAviso(`🖨️ Fila de lote disparada: ${linksParaAbrir.length} documento(s) aberto(s) para impressão!`);
+            }
         }
 
         function abrirModalEdicao(id) {
