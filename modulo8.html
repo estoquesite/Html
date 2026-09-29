@@ -295,7 +295,7 @@
                 }
             } catch (err) {
                 console.error(err);
-                mostrarAviso("ℹ️️ Erro na leitura automática. Preencha manualmente.");
+                mostrarAviso("ℹ️ Erro na leitura automática. Preencha manualmente.");
             }
         }
 
@@ -474,6 +474,7 @@
             document.getElementById('editProduto').value = item.produto;
             document.getElementById('editFabricante').value = item.fabricante;
             document.getElementById('editLink').value = item.linkPdf;
+            document.getElementById('modalImpressaoUnificada').classList.add('hidden'); // garante fechar outros se houver
             document.getElementById('modalEdicao').classList.remove('hidden');
         }
         function fecharModalEdicao() { document.getElementById('modalEdicao').classList.add('hidden'); }
