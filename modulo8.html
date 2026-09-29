@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 8 - Fusão Real de PDFs em Lote | Portal Vale</title>
+    <title>Módulo 8 - FDS e Fornecedores | Portal Vale</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -44,10 +44,10 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-cyan-100 dark:bg-cyan-900 text-cyan-700 dark:text-cyan-300">Módulo 8</span>
-                        <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Fusão Real de PDFs em Lote</h1>
+                        <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Gestão de FDS e Fornecedores</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Anexo Direto & Motor PDF-Lib</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Fornecedores Dinâmicos & Nuvem Supabase</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
@@ -58,8 +58,8 @@
                 <a href="index.html" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1">
                     ⬅ Menu Principal
                 </a>
-                <button onclick="carregarDoSupabase()" class="bg-cyan-600 hover:bg-cyan-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer">
-                    🔄 Sincronizar
+                <button onclick="sincronizarTudo()" class="bg-cyan-600 hover:bg-cyan-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer">
+                    🔄 Sincronizar Tudo
                 </button>
             </div>
         </header>
@@ -67,11 +67,45 @@
         <!-- AVISO DE STATUS -->
         <div id="alertaSistema" class="hidden p-3 rounded-xl text-xs font-bold text-center transition-all"></div>
 
-        <!-- PAINEL DE CADASTRO -->
+        <!-- PAINEL 1: CADASTRO DE FORNECEDORES -->
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                 <span class="text-xs font-black text-cyan-900 dark:text-cyan-300 uppercase flex items-center gap-1.5">
-                    <span>⚡</span> Reconhecimento por Câmera e Cadastro de FDS
+                    <span>🏢</span> Cadastro de Fornecedores / Fabricantes
+                </span>
+                <span id="labelContadorFornecedores" class="text-[10px] font-bold text-slate-400">0 FORNECEDORES</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-3 items-end">
+                <div class="sm:col-span-5">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Nome do Fornecedor / Fabricante</label>
+                    <input type="text" id="inputNomeFornecedor" placeholder="EX: WEG, VONDER, DEVCON..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                </div>
+                <div class="sm:col-span-5">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Contato / Observação (Opcional)</label>
+                    <input type="text" id="inputContatoFornecedor" placeholder="EX: SUPORTE / TELEFONE / EMAIL..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                </div>
+                <div class="sm:col-span-2">
+                    <button type="button" onclick="salvarFornecedorSistema()" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white font-black py-2.5 px-4 rounded-xl text-xs transition shadow-md cursor-pointer flex items-center justify-center gap-1">
+                        <span>➕</span> <span>Adicionar</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- BUSCA DE FORNECEDORES -->
+            <div class="relative pt-2">
+                <input type="text" id="filtroFornecedor" oninput="renderizarListaFornecedores()" placeholder="🔍 Pesquisar fornecedores cadastrados..." class="uppercase-input w-full text-xs p-2.5 pl-8 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl outline-none font-bold text-slate-800 dark:text-white">
+                <span class="absolute left-3 top-5 text-xs text-slate-400">🔍</span>
+            </div>
+
+            <div id="gridFornecedores" class="flex flex-wrap gap-2 pt-2"></div>
+        </div>
+
+        <!-- PAINEL 2: CADASTRO DE FDS (PRODUTOS) -->
+        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
+                <span class="text-xs font-black text-cyan-900 dark:text-cyan-300 uppercase flex items-center gap-1.5">
+                    <span>⚡</span> Cadastro de Produtos e FDS (com Leitura por Câmera)
                 </span>
                 <span class="text-[10px] font-bold text-slate-400">Verificação de duplicidade ativa</span>
             </div>
@@ -99,8 +133,10 @@
                 </div>
 
                 <div class="md:col-span-4">
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Fabricante</label>
-                    <input type="text" id="inputFabricante" placeholder="EX: VONDER, WEG..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Fornecedor / Fabricante</label>
+                    <select id="selectFabricante" class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none cursor-pointer">
+                        <option value="">SELECIONE O FORNECEDOR...</option>
+                    </select>
                 </div>
 
                 <div class="md:col-span-4">
@@ -108,10 +144,10 @@
                     <input type="text" id="inputLink" placeholder="Cole o link oficial do PDF..." class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
 
-                <!-- CAIXA PARA ANEXAR ARQUIVO PDF E BOTÕES -->
+                <!-- ANEXO E BOTÕES -->
                 <div class="md:col-span-12 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3">
                     <div>
-                        <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase block">2. Ou Anexar Arquivo PDF Oficial do Computador/Celular</span>
+                        <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase block">2. Ou Anexar Arquivo PDF Oficial</span>
                         <input type="file" id="inputArquivoPdf" accept="application/pdf" class="text-xs mt-1 text-slate-500 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700 cursor-pointer">
                     </div>
                     <div class="flex gap-2">
@@ -126,7 +162,7 @@
             </div>
         </div>
 
-        <!-- LISTA DE FDS CADASTRADAS COM SELEÇÃO E FUSÃO REAL DE PDFs -->
+        <!-- LISTA DE FDS CADASTRADAS COM FILTROS E OPÇÕES DE LOTE -->
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
             <div class="flex flex-wrap justify-between items-center gap-3 border-b pb-3">
                 <div class="flex items-center gap-2">
@@ -136,22 +172,33 @@
                     <span id="labelContadorFds" class="text-[11px] text-slate-400 font-bold">0 DOCUMENTOS</span>
                 </div>
                 
-                <!-- BOTÃO DE FUNDIR E BAIXAR PDFs REAIS -->
-                <button type="button" id="btnFundirPdfs" onclick="fundirEBaixarPdfsReais()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-black py-2.5 px-5 rounded-xl text-xs shadow-md flex items-center gap-1.5 cursor-pointer">
-                    <span>📑</span> <span>Juntar PDFs Selecionados em 1 Só Arquivo</span>
-                </button>
+                <div class="flex flex-wrap gap-2">
+                    <button type="button" id="btnFundirPdfs" onclick="fundirEBaixarPdfsReais()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-black py-2.5 px-4 rounded-xl text-xs shadow-md flex items-center gap-1.5 cursor-pointer">
+                        <span>📑</span> <span>Juntar em 1 Só PDF</span>
+                    </button>
+                    <button type="button" onclick="abrirVariosPdfsEmAbas()" class="bg-purple-600 hover:bg-purple-700 text-white font-black py-2.5 px-4 rounded-xl text-xs shadow-md flex items-center gap-1.5 cursor-pointer">
+                        <span>🖨️</span> <span>Abrir Vários para Imprimir</span>
+                    </button>
+                </div>
             </div>
 
-            <!-- BARRA DE BUSCA RÁPIDA E SELECIONAR TODOS -->
-            <div class="flex flex-wrap gap-2 items-center">
-                <div class="relative flex-1">
-                    <input type="text" id="filtroPesquisa" oninput="renderizarCardsFds()" placeholder="🔍 Pesquisar FDS por nome do produto ou fabricante..." class="uppercase-input w-full text-xs p-3 pl-9 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl outline-none font-bold text-slate-800 dark:text-white">
+            <!-- FILTROS DE BUSCA (PRODUTO E FORNECEDOR) -->
+            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
+                <div class="relative sm:col-span-7">
+                    <input type="text" id="filtroPesquisa" oninput="renderizarCardsFds()" placeholder="🔍 Pesquisar FDS por nome do produto..." class="uppercase-input w-full text-xs p-3 pl-9 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl outline-none font-bold text-slate-800 dark:text-white">
                     <span class="absolute left-3 top-3.5 text-xs text-slate-400">🔍</span>
                 </div>
-                <label class="flex items-center gap-1.5 px-3 py-3 bg-slate-100 dark:bg-slate-900 rounded-xl text-xs font-bold cursor-pointer border border-slate-300 dark:border-slate-700">
-                    <input type="checkbox" id="selecionarTodos" onclick="marcarTodos(this)" class="rounded w-4 h-4 accent-cyan-600">
-                    <span>Selecionar Todos</span>
-                </label>
+                <div class="sm:col-span-3">
+                    <select id="filtroFornecedorSelect" onchange="renderizarCardsFds()" class="uppercase-input w-full text-xs p-3 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none cursor-pointer">
+                        <option value="">TODOS OS FORNECEDORES</option>
+                    </select>
+                </div>
+                <div class="sm:col-span-2">
+                    <label class="flex items-center justify-center gap-1.5 px-3 py-3 bg-slate-100 dark:bg-slate-900 rounded-xl text-xs font-bold cursor-pointer border border-slate-300 dark:border-slate-700">
+                        <input type="checkbox" id="selecionarTodos" onclick="marcarTodos(this)" class="rounded w-4 h-4 accent-cyan-600">
+                        <span>Marcar Todos</span>
+                    </label>
+                </div>
             </div>
 
             <div id="gridFds" class="space-y-2"></div>
@@ -159,7 +206,7 @@
 
     </div>
 
-    <!-- MODAL DE EDIÇÃO -->
+    <!-- MODAL DE EDIÇÃO DE FDS -->
     <div id="modalEdicao" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 w-full max-w-lg rounded-2xl p-5 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b pb-3">
@@ -169,7 +216,7 @@
             <input type="hidden" id="editId">
             <div class="space-y-3 text-xs">
                 <input type="text" id="editProduto" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
-                <input type="text" id="editFabricante" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
+                <select id="editFabricante" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold"></select>
                 <input type="text" id="editLink" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl">
             </div>
             <div class="flex justify-end gap-2 pt-2 border-t">
@@ -184,13 +231,14 @@
         const SUPABASE_KEY = "sb_publishable_0kEiqthWKZZwjM120wQIYw_Hba7qeLc";
         let supabaseClient = null;
         let listaFds = [];
+        let listaFornecedores = [];
 
         window.addEventListener('DOMContentLoaded', () => {
-            carregarFdsLocal();
+            carregarDadosLocais();
             if (window.supabase) {
                 try {
                     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                    carregarDoSupabase();
+                    sincronizarTudo();
                 } catch(e) {}
             }
         });
@@ -203,6 +251,116 @@
             setTimeout(() => el.classList.add('hidden'), 5000);
         }
 
+        async function sincronizarTudo() {
+            if (!supabaseClient) return;
+            await carregarFornecedoresDoSupabase();
+            await carregarDoSupabase();
+            mostrarAviso("✅ Dados sincronizados com a nuvem!");
+        }
+
+        /* --- GESTÃO DE FORNECEDORES --- */
+        async function salvarFornecedorSistema() {
+            const nome = document.getElementById('inputNomeFornecedor').value.trim().toUpperCase();
+            const contato = document.getElementById('inputContatoFornecedor').value.trim().toUpperCase();
+
+            if (!nome) {
+                alert("Informe o nome do fornecedor!");
+                document.getElementById('inputNomeFornecedor').focus();
+                return;
+            }
+
+            if (listaFornecedores.some(f => f.nome === nome)) {
+                alert("Este fornecedor já está cadastrado!");
+                return;
+            }
+
+            const novoFornecedor = { id: Date.now(), nome, contato: contato || "NÃO INFORMADO" };
+            listaFornecedores.push(novoFornecedor);
+            salvarDadosLocais();
+            atualizarSelectsFornecedores();
+            renderizarListaFornecedores();
+
+            document.getElementById('inputNomeFornecedor').value = '';
+            document.getElementById('inputContatoFornecedor').value = '';
+            mostrarAviso(`✅ Fornecedor "${nome}" cadastrado com sucesso!`);
+
+            if (supabaseClient) {
+                try {
+                    const { data } = await supabaseClient.from('fornecedores_corporativos').insert([{ nome: novoFornecedor.nome, contato: novoFornecedor.contato }]).select();
+                    if (data && data[0]) {
+                        novoFornecedor.id = data[0].id;
+                        salvarDadosLocais();
+                    }
+                } catch(e) {}
+            }
+        }
+
+        async function carregarFornecedoresDoSupabase() {
+            if (!supabaseClient) return;
+            try {
+                const { data } = await supabaseClient.from('fornecedores_corporativos').select('*').order('nome', { ascending: true });
+                if (data && data.length > 0) {
+                    listaFornecedores = data.map(f => ({ id: f.id, nome: f.nome.toUpperCase(), contato: f.contato || 'NÃO INFORMADO' }));
+                    salvarDadosLocais();
+                    atualizarSelectsFornecedores();
+                    renderizarListaFornecedores();
+                }
+            } catch(e) {}
+        }
+
+        function renderizarListaFornecedores() {
+            const grid = document.getElementById('gridFornecedores');
+            grid.innerHTML = '';
+            const filtro = (document.getElementById('filtroFornecedor')?.value || '').trim().toUpperCase();
+            const filtrados = listaFornecedores.filter(f => f.nome.includes(filtro));
+
+            if (filtrados.length === 0) {
+                grid.innerHTML = `<span class="text-slate-400 italic text-xs">Nenhum fornecedor encontrado.</span>`;
+                document.getElementById('labelContadorFornecedores').innerText = `0 FORNECEDORES`;
+                return;
+            }
+
+            filtrados.forEach(f => {
+                const tag = document.createElement('div');
+                tag.className = "bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 px-3 py-1.5 rounded-xl text-xs font-bold flex items-center gap-2";
+                tag.innerHTML = `
+                    <span>🏢 ${f.nome}</span>
+                    <button onclick="removerFornecedor(${f.id})" class="text-rose-500 hover:text-rose-700 font-black cursor-pointer ml-1">✕</button>
+                `;
+                grid.appendChild(tag);
+            });
+
+            document.getElementById('labelContadorFornecedores').innerText = `${listaFornecedores.length} FORNECEDORES`;
+        }
+
+        async function removerFornecedor(id) {
+            if (confirm("Deseja apagar este fornecedor?")) {
+                listaFornecedores = listaFornecedores.filter(f => String(f.id) !== String(id));
+                salvarDadosLocais();
+                atualizarSelectsFornecedores();
+                renderizarListaFornecedores();
+                if (supabaseClient) { try { await supabaseClient.from('fornecedores_corporativas').delete().eq('id', id); } catch(e){} }
+            }
+        }
+
+        function atualizarSelectsFornecedores() {
+            const selects = ['selectFabricante', 'filtroFornecedorSelect', 'editFabricante'];
+            selects.forEach(idSel => {
+                const sel = document.getElementById(idSel);
+                if (!sel) return;
+                const valorAtual = sel.value;
+                
+                let htmlBase = idSel === 'filtroFornecedorSelect' ? '<option value="">TODOS OS FORNECEDORES</option>' : '<option value="">SELECIONE O FORNECEDOR...</option>';
+                
+                listaFornecedores.forEach(f => {
+                    htmlBase += `<option value="${f.nome}">${f.nome}</option>`;
+                });
+                sel.innerHTML = htmlBase;
+                sel.value = valorAtual;
+            });
+        }
+
+        /* --- GESTÃO DE FDS E PRODUTOS --- */
         async function carregarDoSupabase() {
             if (!supabaseClient) return;
             try {
@@ -217,20 +375,17 @@
                         return {
                             id: remoto.id,
                             produto: remoto.produto,
-                            fabricante: remoto.fabricante || 'NÃO INFORMADO',
+                            fabricante: (remoto.fabricante || 'NÃO INFORMADO').toUpperCase(),
                             linkPdf: remoto.link || '',
                             pdfBlob: (local && local.pdfBlob) ? local.pdfBlob : (remoto.pdf_blob || ''),
                             pdfNome: (local && local.pdfNome) ? local.pdfNome : (remoto.pdf_nome || 'documento.pdf'),
                             dataRegistro: remoto.data_registro || new Date().toLocaleDateString('pt-BR')
                         };
                     });
-                    salvarFdsLocal();
+                    salvarDadosLocais();
                     renderizarCardsFds();
-                    mostrarAviso("✅ FDS sincronizadas com a nuvem!");
                 }
-            } catch (err) {
-                carregarFdsLocal();
-            }
+            } catch (err) {}
         }
 
         async function analisarFotoComIa(file) {
@@ -241,7 +396,7 @@
                 return;
             }
 
-            mostrarAviso("🤖 IA lendo a foto para identificar o produto...", "sucesso");
+            mostrarAviso("🤖 IA lendo a foto para identificar o produto e fornecedor...", "sucesso");
 
             try {
                 const base64Data = await new Promise((resolve, reject) => {
@@ -274,15 +429,21 @@
                         document.getElementById('inputProduto').value = resultado.produto.toUpperCase();
                     }
                     if (resultado.fabricante) {
-                        document.getElementById('inputFabricante').value = resultado.fabricante.toUpperCase();
+                        const fabDetectado = resultado.fabricante.toUpperCase();
+                        // Se o fornecedor detectado não estiver na lista, cadastra automaticamente!
+                        if (!listaFornecedores.some(f => f.nome === fabDetectado)) {
+                            listaFornecedores.push({ id: Date.now(), nome: fabDetectado, contato: 'DETECTADO POR IA' });
+                            atualizarSelectsFornecedores();
+                            renderizarListaFornecedores();
+                        }
+                        document.getElementById('selectFabricante').value = fabDetectado;
                     }
                     verificarDuplicidadeInput();
                     mostrarAviso("✅ Produto reconhecido com sucesso!");
                 } else {
-                    mostrarAviso("ℹ️ Preencha o nome do produto manualmente.");
+                    mostrarAviso("ℹ️ Preencha os campos manualmente.");
                 }
             } catch (err) {
-                console.error(err);
                 mostrarAviso("ℹ️ Erro na leitura automática. Preencha manualmente.");
             }
         }
@@ -313,7 +474,7 @@
 
         function pesquisarWebFds() {
             const produto = document.getElementById('inputProduto').value.trim();
-            const fabricante = document.getElementById('inputFabricante').value.trim();
+            const fabricante = document.getElementById('selectFabricante').value.trim();
             if (!produto) {
                 alert("Digite o nome do produto para pesquisar!");
                 document.getElementById('inputProduto').focus();
@@ -326,13 +487,18 @@
 
         async function salvarFdsSistema() {
             const produto = document.getElementById('inputProduto').value.trim().toUpperCase();
-            const fabricante = document.getElementById('inputFabricante').value.trim().toUpperCase();
+            const fabricante = document.getElementById('selectFabricante').value.trim().toUpperCase();
             const linkPdf = document.getElementById('inputLink').value.trim();
             const inputArquivo = document.getElementById('inputArquivoPdf');
 
             if (!produto) {
                 alert("Por favor, informe o nome do produto!");
                 document.getElementById('inputProduto').focus();
+                return;
+            }
+            if (!fabricante) {
+                alert("Por favor, selecione ou cadastre o fornecedor/fabricante!");
+                document.getElementById('selectFabricante').focus();
                 return;
             }
 
@@ -352,7 +518,7 @@
             const novoItem = {
                 id: Date.now(),
                 produto,
-                fabricante: fabricante || "NÃO INFORMADO",
+                fabricante,
                 linkPdf: linkPdf || "#",
                 pdfBlob,
                 pdfNome,
@@ -360,13 +526,13 @@
             };
 
             listaFds.push(novoItem);
-            salvarFdsLocal();
+            salvarDadosLocais();
             renderizarCardsFds();
             verificarDuplicidadeInput();
             mostrarAviso(`✅ FDS do produto "${produto}" salva com sucesso!`);
 
             document.getElementById('inputProduto').value = '';
-            document.getElementById('inputFabricante').value = '';
+            document.getElementById('selectFabricante').value = '';
             document.getElementById('inputLink').value = '';
             inputArquivo.value = '';
 
@@ -389,9 +555,13 @@
             grid.innerHTML = '';
 
             const termoBusca = (document.getElementById('filtroPesquisa')?.value || '').trim().toUpperCase();
-            const itensFiltrados = listaFds.filter(item => 
-                item.produto.includes(termoBusca) || item.fabricante.includes(termoBusca)
-            );
+            const filtroFornec = (document.getElementById('filtroFornecedorSelect')?.value || '').trim().toUpperCase();
+
+            const itensFiltrados = listaFds.filter(item => {
+                const matchProd = item.produto.includes(termoBusca);
+                const matchFornec = !filtroFornec || item.fabricante === filtroFornec;
+                return matchProd && matchFornec;
+            });
 
             if (itensFiltrados.length === 0) {
                 grid.innerHTML = `<div class="text-center py-6 text-slate-400 italic text-xs">Nenhum documento encontrado.</div>`;
@@ -410,11 +580,11 @@
 
                 card.innerHTML = `
                     <div class="flex items-center gap-3 w-full sm:w-auto truncate">
-                        <input type="checkbox" value="${item.id}" data-link="${item.linkPdf}" class="check-fds rounded w-4 h-4 accent-cyan-600 cursor-pointer">
+                        <input type="checkbox" value="${item.id}" class="check-fds rounded w-4 h-4 accent-cyan-600 cursor-pointer">
                         <span class="text-lg">📄</span>
                         <div class="truncate">
                             <h4 class="font-black text-slate-900 dark:text-white uppercase truncate">${item.produto}</h4>
-                            <p class="text-[10px] text-slate-500 uppercase font-semibold">Fabricante: ${item.fabricante}</p>
+                            <p class="text-[10px] text-slate-500 uppercase font-semibold">Fornecedor: ${item.fabricante}</p>
                         </div>
                     </div>
 
@@ -435,20 +605,20 @@
             checkboxes.forEach(cb => cb.checked = master.checked);
         }
 
-        // FUSÃO REAL DE PDFs (SUPANTA ARQUIVOS ANEXADOS E LINKS DA WEB)
+        // FUSÃO DE PDFs
         async function fundirEBaixarPdfsReais() {
             const selecionados = document.querySelectorAll('.check-fds:checked');
             if (selecionados.length === 0) {
-                alert("Por favor, selecione pelo menos uma FDS na lista para juntar em um único PDF!");
+                alert("Por favor, selecione pelo menos uma FDS na lista!");
                 return;
             }
 
             const btn = document.getElementById('btnFundirPdfs');
             const textoOriginal = btn.innerHTML;
-            btn.innerHTML = "⏳ Processando PDFs oficiais...";
+            btn.innerHTML = "⏳ A juntar PDFs...";
             btn.disabled = true;
 
-            mostrarAviso("⏳ A descarregar e a fundir os PDFs selecionados...", "sucesso");
+            mostrarAviso("⏳ A descarregar e a fundir os PDFs seleccionados...", "sucesso");
 
             try {
                 const pdfsParaUnificar = [];
@@ -458,12 +628,10 @@
                     
                     if (itemObj) {
                         if (itemObj.pdfBlob) {
-                            // Se o PDF foi anexado diretamente do computador
                             const res = await fetch(itemObj.pdfBlob);
                             const buffer = await res.arrayBuffer();
                             pdfsParaUnificar.push(buffer);
                         } else if (itemObj.linkPdf && itemObj.linkPdf !== '#') {
-                            // Se for link web
                             const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(itemObj.linkPdf)}`;
                             try {
                                 const res = await fetch(proxyUrl);
@@ -471,38 +639,31 @@
                                     const buffer = await res.arrayBuffer();
                                     pdfsParaUnificar.push(buffer);
                                 }
-                            } catch (e) {
-                                console.error("Erro ao carregar link:", itemObj.linkPdf);
-                            }
+                            } catch (e) {}
                         }
                     }
                 }
 
                 if (pdfsParaUnificar.length === 0) {
-                    alert("Nenhum arquivo PDF válido foi encontrado nos itens selecionados para fazer a fusão.");
+                    alert("Nenhum arquivo PDF válido foi encontrado nos itens selecionados.");
                     btn.innerHTML = textoOriginal;
                     btn.disabled = false;
                     return;
                 }
 
-                // Junta todos os arquivos em um PDF unificado real via PDF-Lib
                 const pdfDocFinal = await PDFLib.PDFDocument.create();
-
                 for (const pdfBuffer of pdfsParaUnificar) {
                     try {
                         const pdfExterno = await PDFLib.PDFDocument.load(pdfBuffer);
                         const paginasCopiadas = await pdfDocFinal.copyPages(pdfExterno, pdfExterno.getPageIndices());
                         paginasCopiadas.forEach((pagina) => pdfDocFinal.addPage(pagina));
-                    } catch (err) {
-                        console.error("Erro ao fundir páginas:", err);
-                    }
+                    } catch (err) {}
                 }
 
                 const pdfBytesFinal = await pdfDocFinal.save();
                 const blob = new Blob([pdfBytesFinal], { type: 'application/pdf' });
                 const urlBlob = URL.createObjectURL(blob);
 
-                // Baixa o arquivo único unificado pronto para mandar para a impressora
                 const linkDownload = document.createElement('a');
                 linkDownload.href = urlBlob;
                 linkDownload.download = `FDS_Unificadas_Lote_${Date.now()}.pdf`;
@@ -510,13 +671,37 @@
                 linkDownload.click();
                 document.body.removeChild(linkDownload);
 
-                mostrarAviso(`✅ PDF unificado gerado com sucesso! ${pdfsParaUnificar.length} documento(s) juntados em um único arquivo.`);
+                mostrarAviso(`✅ PDF unificado gerado com sucesso!`);
             } catch (err) {
-                console.error(err);
                 alert("Erro ao processar a fusão dos PDFs.");
             } finally {
                 btn.innerHTML = textoOriginal;
                 btn.disabled = false;
+            }
+        }
+
+        function abrirVariosPdfsEmAbas() {
+            const selecionados = document.querySelectorAll('.check-fds:checked');
+            if (selecionados.length === 0) {
+                alert("Por favor, selecione pelo menos uma FDS na lista!");
+                return;
+            }
+
+            const itensEscolhidos = Array.from(selecionados).map(cb => {
+                const idItem = cb.value;
+                return listaFds.find(f => String(f.id) === String(idItem));
+            }).filter(Boolean);
+
+            if (confirm(`Serão abertos ${itensEscolhidos.length} documentos para impressão. Deseja continuar?`)) {
+                itensEscolhidos.forEach((item, index) => {
+                    setTimeout(() => {
+                        const destino = item.pdfBlob ? item.pdfBlob : item.linkPdf;
+                        if (destino && destino !== '#') {
+                            window.open(destino, '_blank');
+                        }
+                    }, index * 600);
+                });
+                mostrarAviso(`🖨️ Fila disparada: ${itensEscolhidos.length} documento(s) aberto(s)!`);
             }
         }
 
@@ -525,8 +710,9 @@
             if (!item) return;
             document.getElementById('editId').value = item.id;
             document.getElementById('editProduto').value = item.produto;
-            document.getElementById('editFabricante').value = item.fabricante;
             document.getElementById('editLink').value = item.linkPdf;
+            atualizarSelectsFornecedores();
+            document.getElementById('editFabricante').value = item.fabricante;
             document.getElementById('modalEdicao').classList.remove('hidden');
         }
         function fecharModalEdicao() { document.getElementById('modalEdicao').classList.add('hidden'); }
@@ -542,7 +728,7 @@
                 item.produto = produto;
                 item.fabricante = fabricante;
                 item.linkPdf = linkPdf;
-                salvarFdsLocal();
+                salvarDadosLocais();
                 renderizarCardsFds();
                 fecharModalEdicao();
                 mostrarAviso("Registro atualizado com sucesso!");
@@ -555,17 +741,36 @@
         async function removerFds(id) {
             if (confirm("Deseja apagar este registro?")) {
                 listaFds = listaFds.filter(f => String(f.id) !== String(id));
-                salvarFdsLocal();
+                salvarDadosLocais();
                 renderizarCardsFds();
                 verificarDuplicidadeInput();
                 if (supabaseClient) { try { await supabaseClient.from('fds_corporativas').delete().eq('id', id); } catch(e){} }
             }
         }
 
-        function salvarFdsLocal() { localStorage.setItem('portal_vale_fds_base', JSON.stringify(listaFds)); }
-        function carregarFdsLocal() {
-            const s = localStorage.getItem('portal_vale_fds_base');
-            if (s) { try { listaFds = JSON.parse(s); } catch(e){ listaFds = []; } }
+        function salvarDadosLocais() {
+            localStorage.setItem('portal_vale_fds_base', JSON.stringify(listaFds));
+            localStorage.setItem('portal_vale_fornecedores_base', JSON.stringify(listaFornecedores));
+        }
+
+        function carregarDadosLocais() {
+            const sFds = localStorage.getItem('portal_vale_fds_base');
+            if (sFds) { try { listaFds = JSON.parse(sFds); } catch(e){ listaFds = []; } }
+
+            const sForn = localStorage.getItem('portal_vale_fornecedores_base');
+            if (sForn) { 
+                try { listaFornecedores = JSON.parse(sForn); } catch(e){ listaFornecedores = []; } 
+            } else {
+                // Fornecedores iniciais padrão caso esteja vazio
+                listaFornecedores = [
+                    { id: 1, nome: "WEG", contato: "PADRÃO" },
+                    { id: 2, nome: "VONDER", contato: "PADRÃO" },
+                    { id: 3, nome: "DEVCON", contato: "PADRÃO" }
+                ];
+            }
+
+            atualizarSelectsFornecedores();
+            renderizarListaFornecedores();
             renderizarCardsFds();
         }
     </script>
