@@ -34,7 +34,7 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Nuvem Supabase + Gestão por Solicitante</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Divisão Automática + Categorias Personalizadas</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
@@ -46,10 +46,9 @@
                 <a href="index.html" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1">
                     ⬅ Menu
                 </a>
-                <!-- PAINEL DE SOLICITANTES / USUÁRIOS -->
                 <button onclick="abrirModalUsuarios()" class="bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 px-3 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer shadow-sm">
                     <span>👥</span>
-                    <span>Solicitantes</span>
+                    <span>Painel Pessoas</span>
                 </button>
                 <button onclick="carregarDoSupabase()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-sm">
                     🔄 Sincronizar
@@ -67,30 +66,45 @@
         <!-- AVISO DE STATUS -->
         <div id="alertaSistema" class="hidden p-3 rounded-xl text-xs font-bold text-center transition-all"></div>
 
-        <!-- FILTRO ATIVO SELECIONADO -->
-        <div id="boxFiltroAtivo" class="hidden bg-indigo-100 dark:bg-indigo-950/60 border border-indigo-300 dark:border-indigo-800 p-2.5 rounded-xl flex items-center justify-between text-xs">
-            <span class="font-bold text-indigo-900 dark:text-indigo-200 flex items-center gap-2">
-                <span>🔍 Filtrando compras de:</span>
-                <span id="nomeFiltroAtivo" class="font-black underline uppercase"></span>
-            </span>
-            <button onclick="limparFiltroSolicitante()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2.5 py-1 rounded-lg text-[10px] font-bold">
-                ✕ Limpar Filtro
-            </button>
-        </div>
-
         <!-- CARTÕES DE RESUMO -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
-                <span class="text-[10px] font-bold uppercase text-slate-400">Total de Despesas</span>
+                <span id="labelTotalItens" class="text-[10px] font-bold uppercase text-slate-400">Total de Despesas</span>
                 <h3 id="cardTotalItens" class="text-xl font-black text-indigo-600 dark:text-indigo-400 mt-0.5">0</h3>
             </div>
             <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
-                <span class="text-[10px] font-bold uppercase text-slate-400">Total Faturado no Cartão</span>
+                <span id="labelValorTotal" class="text-[10px] font-bold uppercase text-slate-400">Total Faturado no Cartão</span>
                 <h3 id="cardValorTotal" class="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5">R$ 0,00</h3>
             </div>
-            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-indigo-400 transition" onclick="abrirModalUsuarios()" title="Clique para ver solicitantes">
-                <span class="text-[10px] font-bold uppercase text-slate-400">Principal Solicitante (Ver Todos 👥)</span>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-indigo-400 transition" onclick="abrirModalUsuarios()" title="Clique para ver lista completa">
+                <span id="labelPessoaCard" class="text-[10px] font-bold uppercase text-slate-400">Principal Solicitante (Ver Todos 👥)</span>
                 <h3 id="cardTopSolicitante" class="text-base font-black text-slate-700 dark:text-slate-200 truncate mt-0.5 uppercase">Nenhum</h3>
+            </div>
+        </div>
+
+        <!-- 🔍 BARRA DE FILTRO E BUSCA POR SOLICITANTE -->
+        <div class="bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 p-3.5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <span class="text-base">👤</span>
+                <span class="text-xs font-black uppercase text-slate-700 dark:text-slate-300 whitespace-nowrap">Filtrar Solicitante:</span>
+            </div>
+            
+            <div class="flex flex-1 flex-col sm:flex-row items-center gap-2 w-full">
+                <div class="relative w-full sm:w-1/2">
+                    <input type="text" id="inputBuscaSolicitante" oninput="aplicarFiltroPorTexto(this.value)" placeholder="Digite o nome (ex: Diogo)..." class="uppercase-input w-full text-xs pl-8 pr-7 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-indigo-600 dark:text-white font-bold">
+                    <span class="absolute left-2.5 top-2 text-slate-400 text-xs">🔍</span>
+                    <button type="button" onclick="limparBuscaSolicitante()" class="absolute right-2.5 top-2 text-slate-400 hover:text-rose-500 font-bold text-xs" title="Limpar">✕</button>
+                </div>
+
+                <div class="w-full sm:w-1/2">
+                    <select id="selectFiltroSolicitante" onchange="aplicarFiltroPorSelect(this.value)" class="w-full text-xs py-2 px-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-indigo-600 dark:text-white font-bold">
+                        <option value="">TODOS OS SOLICITANTES (GERAL)</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="badgeFiltroAtivo" class="hidden text-xs bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 px-3 py-1.5 rounded-xl font-bold border border-indigo-200 dark:border-indigo-800 whitespace-nowrap">
+                Filtro Ativo: <span id="txtFiltroNome" class="font-black"></span>
             </div>
         </div>
 
@@ -107,7 +121,7 @@
             </div>
             
             <div class="flex flex-col sm:flex-row gap-2">
-                <input type="text" id="inputLinkDireto" placeholder="Cole o link aqui (ex: link do ML ou link + 3x total R$ 4,50)..." class="flex-1 text-xs px-3 py-2.5 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-xl outline-none focus:border-blue-600 dark:text-white">
+                <input type="text" id="inputLinkDireto" placeholder="Cole o link aqui (ex: link do ML ou link + 3x total R$ 500)..." class="flex-1 text-xs px-3 py-2.5 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-xl outline-none focus:border-blue-600 dark:text-white">
                 <button type="button" onclick="processarLinkDireto()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer flex-shrink-0">
                     <span>⚡</span>
                     <span>Reconhecer Link</span>
@@ -127,10 +141,10 @@
             </label>
 
             <label class="flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3.5 px-4 rounded-2xl shadow-md cursor-pointer transition active:scale-95 text-xs">
-                <span class="text-xl">🖼️️</span>
+                <span class="text-xl">🖼️</span>
                 <div class="text-left">
                     <span class="block">ESCOLHER DA GALERIA</span>
-                    <span class="block text-[10px] font-normal text-indigo-200">Selecione prints salvos ou notas</span>
+                    <span class="block text-[10px] font-normal text-indigo-200">Selecione prints salvos ou fotos</span>
                 </div>
                 <input type="file" id="inputGaleria" accept="image/*" multiple class="hidden" onchange="processarArquivos(this.files)">
             </label>
@@ -148,7 +162,7 @@
                 </button>
             </div>
             
-            <textarea id="inputTextoTeams" rows="2" placeholder="Ex: Roberto pediu: 3 Canetas total R$ 4,50 ou 2 Teclados R$ 89,90 cada..." class="w-full text-xs p-3 bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800 rounded-xl outline-none focus:border-indigo-600 dark:text-white leading-relaxed"></textarea>
+            <textarea id="inputTextoTeams" rows="2" placeholder="Ex: Diogo pediu: 3 Itens total R$ 500,00 ou 2 Teclados R$ 89,90 cada..." class="w-full text-xs p-3 bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800 rounded-xl outline-none focus:border-indigo-600 dark:text-white leading-relaxed"></textarea>
             
             <div class="flex justify-end pt-1">
                 <button type="button" onclick="processarTextoBruto(document.getElementById('inputTextoTeams').value)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-md flex items-center gap-1.5 cursor-pointer">
@@ -158,7 +172,7 @@
             </div>
         </div>
 
-        <!-- CARDS PRÉ-PREENCHIDOS PARA SÓ DAR OK (COM DIVISOR E SOMA AUTOMÁTICA) -->
+        <!-- CARDS PRÉ-PREENCHIDOS PARA SÓ DAR OK (COM DIVISOR E ADIÇÃO DE CATEGORIA) -->
         <div id="containerCardsPreenchidos" class="space-y-3 hidden">
             <div class="flex justify-between items-center px-1">
                 <h3 class="text-xs font-black uppercase text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5">
@@ -273,7 +287,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE EDIÇÃO (CANETA ✏️ COM DIVISÃO E SOMA) -->
+    <!-- MODAL DE EDIÇÃO (CANETA ✏️ COM DIVISÃO E BOTÃO DE NOVA CATEGORIA) -->
     <div id="modalEdicao" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 w-full max-w-xl rounded-2xl p-5 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
@@ -300,31 +314,29 @@
                     <input type="text" id="editProduto" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Categoria</label>
-                    <select id="editCategoria" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-semibold outline-none">
-                        <option value="INFORMÁTICA / TI">INFORMÁTICA / TI</option>
-                        <option value="ESCRITÓRIO">ESCRITÓRIO</option>
-                        <option value="MANUTENÇÃO">MANUTENÇÃO</option>
-                        <option value="TREINAMENTO">TREINAMENTO</option>
-                        <option value="ALIMENTAÇÃO / COPA">ALIMENTAÇÃO / COPA</option>
-                        <option value="OUTROS">OUTROS</option>
-                    </select>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase">Categoria</label>
+                        <button type="button" onclick="adicionarNovaCategoriaPrompt('editCategoria')" class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline">
+                            + Nova
+                        </button>
+                    </div>
+                    <select id="editCategoria" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-semibold outline-none"></select>
                 </div>
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Quantidade</label>
-                    <input type="number" id="editQtd" min="1" oninput="calcularModalPorUnitario()" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Quantidade de Itens</label>
+                    <input type="number" id="editQtd" min="1" oninput="calcularModalPorTotal()" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
 
-                <!-- CAMPO UNITÁRIO (MULTIPLICA) -->
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Valor Unitário (R$)</label>
-                    <input type="number" step="0.01" id="editUnit" oninput="calcularModalPorUnitario()" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                </div>
-
-                <!-- CAMPO TOTAL (SE PREENCHER AQUI, DIVIDE O UNITÁRIO) -->
+                <!-- VALOR TOTAL (AO DIGITAR, DIVIDE PELA QUANTIDADE) -->
                 <div>
                     <label class="block text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase mb-1">Valor Total (R$) 🔄</label>
                     <input type="number" step="0.01" id="editTotal" oninput="calcularModalPorTotal()" class="w-full p-2 bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-700 rounded-xl font-black text-emerald-600 dark:text-emerald-400 outline-none">
+                </div>
+
+                <!-- VALOR UNITÁRIO (AO DIGITAR, MULTIPLICA PELO TOTAL) -->
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Unitário Calculado (R$)</label>
+                    <input type="number" step="0.01" id="editUnit" oninput="calcularModalPorUnitario()" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
 
                 <div class="sm:col-span-2">
@@ -348,12 +360,25 @@
         const SUPABASE_URL = "https://gloxtswcksbczinpwtzu.supabase.co";
         const SUPABASE_KEY = "sb_publishable_0kEiqthWKZZwjM120wQIYw_Hba7qeLc";
 
+        // Categorias Padrão
+        const CATEGORIAS_PADRAO = [
+            "INFORMÁTICA / TI",
+            "ESCRITÓRIO",
+            "MANUTENÇÃO",
+            "TREINAMENTO",
+            "ALIMENTAÇÃO / COPA",
+            "OUTROS"
+        ];
+
+        let listaCategorias = [];
         let compras = [];
         let itensPendentesAprovacao = [];
         let supabaseClient = null;
-        let solicitanteFiltroAtual = null;
+        let solicitanteFiltroAtual = "";
 
         window.addEventListener('DOMContentLoaded', () => {
+            carregarCategorias();
+
             if (window.supabase) {
                 try {
                     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -367,6 +392,52 @@
             }
         });
 
+        // ================= GESTÃO DE CATEGORIAS =================
+        function carregarCategorias() {
+            const salvas = localStorage.getItem('compras_categorias_lista');
+            if (salvas) {
+                try { listaCategorias = JSON.parse(salvas); } catch(e) { listaCategorias = [...CATEGORIAS_PADRAO]; }
+            } else {
+                listaCategorias = [...CATEGORIAS_PADRAO];
+            }
+        }
+
+        function salvarCategorias() {
+            localStorage.setItem('compras_categorias_lista', JSON.stringify(listaCategorias));
+        }
+
+        function adicionarNovaCategoriaPrompt(selectId = null) {
+            const nova = prompt("Digite o nome da NOVA CATEGORIA:");
+            if (nova && nova.trim()) {
+                const categoriaFormatada = nova.trim().toUpperCase();
+                if (!listaCategorias.includes(categoriaFormatada)) {
+                    listaCategorias.push(categoriaFormatada);
+                    salvarCategorias();
+                }
+                
+                // Atualiza selects abertos
+                if (selectId) {
+                    const sel = document.getElementById(selectId);
+                    if (sel) {
+                        preencherOpcoesCategoria(sel, categoriaFormatada);
+                    }
+                }
+                renderizarCardsPendentes();
+                mostrarAviso(`Categoria "${categoriaFormatada}" adicionada com sucesso!`);
+            }
+        }
+
+        function preencherOpcoesCategoria(selectElement, valorSelecionado = "") {
+            selectElement.innerHTML = '';
+            listaCategorias.forEach(cat => {
+                const opt = document.createElement('option');
+                opt.value = cat;
+                opt.innerText = cat;
+                if (cat === valorSelecionado) opt.selected = true;
+                selectElement.appendChild(opt);
+            });
+        }
+
         function mostrarAviso(msg, tipo = "sucesso") {
             const el = document.getElementById('alertaSistema');
             el.innerText = msg;
@@ -377,6 +448,62 @@
                 el.classList.add('bg-rose-100', 'text-rose-800');
             }
             setTimeout(() => el.classList.add('hidden'), 5000);
+        }
+
+        // ================= FILTRO DINÂMICO POR SOLICITANTE =================
+        function atualizarListaSelectSolicitantes() {
+            const select = document.getElementById('selectFiltroSolicitante');
+            const valorAtual = select.value;
+            
+            const conjuntoNomes = new Set();
+            compras.forEach(c => {
+                if (c.solicitante && c.solicitante.trim()) {
+                    conjuntoNomes.add(c.solicitante.trim().toUpperCase());
+                }
+            });
+
+            select.innerHTML = '<option value="">TODOS OS SOLICITANTES (GERAL)</option>';
+            Array.from(conjuntoNomes).sort().forEach(nome => {
+                const opt = document.createElement('option');
+                opt.value = nome;
+                opt.innerText = nome;
+                select.appendChild(opt);
+            });
+
+            select.value = valorAtual;
+        }
+
+        function aplicarFiltroPorTexto(valor) {
+            solicitanteFiltroAtual = valor.trim().toUpperCase();
+            document.getElementById('selectFiltroSolicitante').value = '';
+            atualizarBadgeFiltro();
+            renderizarTabela();
+        }
+
+        function aplicarFiltroPorSelect(valor) {
+            solicitanteFiltroAtual = valor.trim().toUpperCase();
+            document.getElementById('inputBuscaSolicitante').value = solicitanteFiltroAtual;
+            atualizarBadgeFiltro();
+            renderizarTabela();
+        }
+
+        function limparBuscaSolicitante() {
+            solicitanteFiltroAtual = "";
+            document.getElementById('inputBuscaSolicitante').value = "";
+            document.getElementById('selectFiltroSolicitante').value = "";
+            atualizarBadgeFiltro();
+            renderizarTabela();
+        }
+
+        function atualizarBadgeFiltro() {
+            const badge = document.getElementById('badgeFiltroAtivo');
+            const txt = document.getElementById('txtFiltroNome');
+            if (solicitanteFiltroAtual) {
+                txt.innerText = solicitanteFiltroAtual;
+                badge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+            }
         }
 
         // ================= GESTÃO DE USUÁRIOS / SOLICITANTES (👥) =================
@@ -410,7 +537,7 @@
                         <td class="py-2.5 px-3 text-center text-slate-600 dark:text-slate-300">${dados.count} un</td>
                         <td class="py-2.5 px-3 text-right font-black text-emerald-600 dark:text-emerald-400">R$ ${dados.valor.toFixed(2)}</td>
                         <td class="py-2.5 px-3 text-center">
-                            <button onclick="filtrarPorSolicitante('${nome}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-2 py-1 rounded-lg text-[10px] font-bold">
+                            <button onclick="selecionarPessoaPeloModal('${nome}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-2 py-1 rounded-lg text-[10px] font-bold">
                                 🔍 Ver Compras
                             </button>
                         </td>
@@ -427,18 +554,9 @@
             document.getElementById('modalUsuarios').classList.add('hidden');
         }
 
-        function filtrarPorSolicitante(nome) {
-            solicitanteFiltroAtual = nome;
+        function selecionarPessoaPeloModal(nome) {
             fecharModalUsuarios();
-            document.getElementById('nomeFiltroAtivo').innerText = nome;
-            document.getElementById('boxFiltroAtivo').classList.remove('hidden');
-            renderizarTabela();
-        }
-
-        function limparFiltroSolicitante() {
-            solicitanteFiltroAtual = null;
-            document.getElementById('boxFiltroAtivo').classList.add('hidden');
-            renderizarTabela();
+            aplicarFiltroPorSelect(nome);
         }
 
         // ================= MODAL DA CHAVE DA IA (ENGRENAGEM ⚙️) =================
@@ -474,6 +592,7 @@
                 if (data) {
                     compras = data;
                     salvarNoLocalStorage();
+                    atualizarListaSelectSolicitantes();
                     renderizarTabela();
                 }
             } catch (err) {
@@ -572,6 +691,7 @@
 
             let qtd = 1;
             let unit = 0;
+            let total = 0;
             let produto = "";
             let link = "";
 
@@ -585,12 +705,23 @@
             const matchQtd = entrada.match(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/i);
             if (matchQtd) qtd = parseInt(matchQtd[1], 10);
 
-            const matchPreco = entrada.match(/(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/i);
-            if (matchPreco) unit = parseFloat(matchPreco[1].replace(',', '.'));
+            // Detecta total ou valor unitário
+            const matchTotal = entrada.match(/total\s*(?:de|:)?\s*(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/i);
+            if (matchTotal) {
+                total = parseFloat(matchTotal[1].replace(',', '.'));
+                unit = total / (qtd || 1);
+            } else {
+                const matchPreco = entrada.match(/(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/i);
+                if (matchPreco) {
+                    unit = parseFloat(matchPreco[1].replace(',', '.'));
+                    total = unit * qtd;
+                }
+            }
 
             if (!produto) {
                 let textoSemLink = entrada
                     .replace(/(https?:\/\/[^\s]+)/gi, '')
+                    .replace(/total\s*(?:de|:)?\s*(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/gi, ' ')
                     .replace(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/gi, ' ')
                     .replace(/(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/gi, ' ')
                     .replace(/R\$/gi, ' ')
@@ -609,6 +740,7 @@
                 categoria: adivinharCategoria(produto),
                 qtd: qtd,
                 unit: unit,
+                total: total || (qtd * unit),
                 link: link
             });
 
@@ -676,14 +808,17 @@
                 const matchQtd = linha.match(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/i);
                 if (matchQtd) qtd = parseInt(matchQtd[1], 10);
 
-                // Detecta se escreveu "total R$ ..."
+                // Detecta se escreveu total de valor
                 const matchTotal = linha.match(/total\s*(?:de|:)?\s*(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/i);
                 if (matchTotal) {
                     totalDetectado = parseFloat(matchTotal[1].replace(',', '.'));
                     unit = totalDetectado / (qtd || 1);
                 } else {
                     const matchPreco = linha.match(/(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/i);
-                    if (matchPreco) unit = parseFloat(matchPreco[1].replace(',', '.'));
+                    if (matchPreco) {
+                        unit = parseFloat(matchPreco[1].replace(',', '.'));
+                        totalDetectado = unit * qtd;
+                    }
                 }
 
                 if (!produto) {
@@ -699,7 +834,7 @@
                     if (textoLimpo.length > 2) produto = textoLimpo.toUpperCase();
                 }
 
-                if (produto || unit > 0) {
+                if (produto || unit > 0 || totalDetectado > 0) {
                     itensPendentesAprovacao.push({
                         tempId: Date.now() + Math.random(),
                         data: hoje,
@@ -708,6 +843,7 @@
                         categoria: adivinharCategoria(produto),
                         qtd: qtd || 1,
                         unit: unit || 0,
+                        total: totalDetectado || (qtd * unit),
                         link: link || ""
                     });
                 }
@@ -769,6 +905,7 @@
                     "produto": "nome do produto em maiúsculo",
                     "qtd": número inteiro da quantidade (padrão 1),
                     "unit": valor unitário decimal (número puro, ex: 15.50),
+                    "total": valor total decimal se constar ou null,
                     "solicitante": "nome de quem pediu se constar ou 'NÃO INFORMADO'",
                     "categoria": "INFORMÁTICA / TI, ESCRITÓRIO, MANUTENÇÃO, TREINAMENTO, ALIMENTAÇÃO / COPA ou OUTROS"
                   }
@@ -805,14 +942,19 @@
                 const hoje = new Date().toISOString().split('T')[0];
 
                 produtosExtraidos.forEach((p) => {
+                    const q = p.qtd || 1;
+                    const u = p.unit || 0;
+                    const t = p.total || (q * u);
+
                     itensPendentesAprovacao.push({
                         tempId: Date.now() + Math.random(),
                         data: hoje,
                         solicitante: (p.solicitante || "NÃO INFORMADO").toUpperCase(),
                         produto: (p.produto || "PRODUTO").toUpperCase(),
                         categoria: p.categoria || "OUTROS",
-                        qtd: p.qtd || 1,
-                        unit: p.unit || 0,
+                        qtd: q,
+                        unit: u,
+                        total: t,
                         link: ""
                     });
                 });
@@ -822,7 +964,7 @@
             }
         }
 
-        // ================= CARDS PRÉ-PREENCHIDOS: DIVISÃO & SOMA =================
+        // ================= CARDS PRÉ-PREENCHIDOS (COM DIVISOR E NOVA CATEGORIA) =================
         function renderizarCardsPendentes() {
             const container = document.getElementById('containerCardsPreenchidos');
             const lista = document.getElementById('listaCardsPendentes');
@@ -837,7 +979,9 @@
             document.getElementById('tituloItensPendentes').innerText = `${itensPendentesAprovacao.length} ITEM(NS) IDENTIFICADOS (Confira e dê OK):`;
 
             itensPendentesAprovacao.forEach((item, index) => {
-                const totalCalculado = (item.qtd * item.unit).toFixed(2);
+                const totalCalculado = Number(item.total || (item.qtd * item.unit)).toFixed(2);
+                const unitCalculado = Number(item.unit || (totalCalculado / item.qtd)).toFixed(2);
+
                 const card = document.createElement('div');
                 card.className = "bg-white dark:bg-slate-800 border-2 border-purple-400 dark:border-purple-600/80 p-4 rounded-2xl shadow-sm space-y-3";
                 card.id = `card-pendente-${item.tempId}`;
@@ -865,32 +1009,30 @@
                         </div>
 
                         <div class="md:col-span-3">
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Categoria</label>
-                            <select id="categoria-${item.tempId}" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-white font-semibold">
-                                <option value="INFORMÁTICA / TI" ${item.categoria === 'INFORMÁTICA / TI' ? 'selected' : ''}>INFORMÁTICA / TI</option>
-                                <option value="ESCRITÓRIO" ${item.categoria === 'ESCRITÓRIO' ? 'selected' : ''}>ESCRITÓRIO</option>
-                                <option value="MANUTENÇÃO" ${item.categoria === 'MANUTENÇÃO' ? 'selected' : ''}>MANUTENÇÃO</option>
-                                <option value="TREINAMENTO" ${item.categoria === 'TREINAMENTO' ? 'selected' : ''}>TREINAMENTO</option>
-                                <option value="ALIMENTAÇÃO / COPA" ${item.categoria === 'ALIMENTAÇÃO / COPA' ? 'selected' : ''}>ALIMENTAÇÃO / COPA</option>
-                                <option value="OUTROS" ${item.categoria === 'OUTROS' ? 'selected' : ''}>OUTROS</option>
-                            </select>
+                            <div class="flex justify-between items-center mb-0.5">
+                                <label class="block text-[9px] font-bold text-slate-400 uppercase">Categoria</label>
+                                <button type="button" onclick="adicionarNovaCategoriaPrompt('categoria-${item.tempId}')" class="text-[9px] text-indigo-600 dark:text-indigo-400 font-black hover:underline" title="Adicionar Categoria">
+                                    + Nova
+                                </button>
+                            </div>
+                            <select id="categoria-${item.tempId}" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-white font-semibold"></select>
                         </div>
 
                         <div class="md:col-span-2">
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Qtd</label>
-                            <input type="number" id="qtd-${item.tempId}" value="${item.qtd}" min="1" oninput="calcularCardPorUnitario(${item.tempId})" class="w-full text-xs p-1.5 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-white">
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Qtd de Itens</label>
+                            <input type="number" id="qtd-${item.tempId}" value="${item.qtd}" min="1" oninput="calcularCardPorTotal(${item.tempId})" class="w-full text-xs p-1.5 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-white">
                         </div>
 
-                        <!-- UNITÁRIO (AO DIGITAR MULTIPLICA) -->
+                        <!-- VALOR TOTAL (AO DIGITAR, ELE DIVIDE PELA QUANTIDADE) -->
+                        <div class="md:col-span-3">
+                            <label class="block text-[9px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">Valor Total (R$) 🔄</label>
+                            <input type="number" step="0.01" id="total-${item.tempId}" value="${totalCalculado}" oninput="calcularCardPorTotal(${item.tempId})" class="w-full text-xs p-1.5 bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-700 rounded-lg font-black text-emerald-600 dark:text-emerald-400 outline-none">
+                        </div>
+
+                        <!-- VALOR UNITÁRIO CALCULADO AUTOMATICAMENTE -->
                         <div class="md:col-span-2">
                             <label class="block text-[9px] font-bold text-slate-400 uppercase">Unitário (R$)</label>
-                            <input type="number" step="0.01" id="unit-${item.tempId}" value="${item.unit}" oninput="calcularCardPorUnitario(${item.tempId})" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-white font-bold">
-                        </div>
-
-                        <!-- TOTAL (AO DIGITAR DIVIDE O UNITÁRIO) -->
-                        <div class="md:col-span-3">
-                            <label class="block text-[9px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">Total (R$) 🔄 Divisor</label>
-                            <input type="number" step="0.01" id="total-${item.tempId}" value="${totalCalculado}" oninput="calcularCardPorTotal(${item.tempId})" class="w-full text-xs p-1.5 bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-700 rounded-lg font-black text-emerald-600 dark:text-emerald-400 outline-none">
+                            <input type="number" step="0.01" id="unit-${item.tempId}" value="${unitCalculado}" oninput="calcularCardPorUnitario(${item.tempId})" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-white font-bold">
                         </div>
 
                         <div class="md:col-span-5 flex gap-2">
@@ -903,23 +1045,24 @@
                     </div>
                 `;
                 lista.appendChild(card);
+                preencherOpcoesCategoria(card.querySelector(`#categoria-${item.tempId}`), item.categoria || "OUTROS");
             });
         }
 
-        // Se o usuário mexer na Quantidade ou no Unitário -> Calcula o Total
-        function calcularCardPorUnitario(tempId) {
-            const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1;
-            const unit = parseFloat(document.getElementById(`unit-${tempId}`).value) || 0;
-            const total = (qtd * unit).toFixed(2);
-            document.getElementById(`total-${tempId}`).value = total;
-        }
-
-        // Se o usuário colocar o Valor Total (Ex: 3 canetas por R$ 4,50) -> Divide e acha o Unitário (R$ 1,50)
+        // Se o usuário mexer no TOTAL -> Divide pela Quantidade e acha o UNITÁRIO
         function calcularCardPorTotal(tempId) {
             const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1;
             const total = parseFloat(document.getElementById(`total-${tempId}`).value) || 0;
             const unit = (total / qtd).toFixed(2);
             document.getElementById(`unit-${tempId}`).value = unit;
+        }
+
+        // Se o usuário mexer no UNITÁRIO -> Multiplica pela Quantidade e acha o TOTAL
+        function calcularCardPorUnitario(tempId) {
+            const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1;
+            const unit = parseFloat(document.getElementById(`unit-${tempId}`).value) || 0;
+            const total = (qtd * unit).toFixed(2);
+            document.getElementById(`total-${tempId}`).value = total;
         }
 
         async function confirmarCardIndividual(tempId) {
@@ -928,8 +1071,8 @@
             const produto = document.getElementById(`produto-${tempId}`).value.trim().toUpperCase();
             const categoria = document.getElementById(`categoria-${tempId}`).value;
             const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1;
-            const unit = parseFloat(document.getElementById(`unit-${tempId}`).value) || 0;
-            const total = parseFloat(document.getElementById(`total-${tempId}`).value) || (qtd * unit);
+            const total = parseFloat(document.getElementById(`total-${tempId}`).value) || 0;
+            const unit = parseFloat(document.getElementById(`unit-${tempId}`).value) || (total / qtd);
             const link = document.getElementById(`link-${tempId}`).value;
 
             const novoItem = {
@@ -951,6 +1094,7 @@
             itensPendentesAprovacao = itensPendentesAprovacao.filter(i => i.tempId !== tempId);
 
             salvarNoLocalStorage();
+            atualizarListaSelectSolicitantes();
             renderizarTabela();
             renderizarCardsPendentes();
             mostrarAviso("Item salvo na nuvem com sucesso!");
@@ -964,8 +1108,8 @@
                 const produto = document.getElementById(`produto-${tempId}`).value.trim().toUpperCase();
                 const categoria = document.getElementById(`categoria-${tempId}`).value;
                 const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1;
-                const unit = parseFloat(document.getElementById(`unit-${tempId}`).value) || 0;
-                const total = parseFloat(document.getElementById(`total-${tempId}`).value) || (qtd * unit);
+                const total = parseFloat(document.getElementById(`total-${tempId}`).value) || 0;
+                const unit = parseFloat(document.getElementById(`unit-${tempId}`).value) || (total / qtd);
                 const link = document.getElementById(`link-${tempId}`).value;
 
                 const novoItem = {
@@ -988,6 +1132,7 @@
 
             itensPendentesAprovacao = [];
             salvarNoLocalStorage();
+            atualizarListaSelectSolicitantes();
             renderizarTabela();
             renderizarCardsPendentes();
             mostrarAviso("Todos os itens foram salvos na nuvem!");
@@ -1008,10 +1153,12 @@
             document.getElementById('editData').value = item.data || '';
             document.getElementById('editSolicitante').value = item.solicitante || '';
             document.getElementById('editProduto').value = item.produto || '';
-            document.getElementById('editCategoria').value = item.categoria || 'OUTROS';
+            
+            preencherOpcoesCategoria(document.getElementById('editCategoria'), item.categoria || 'OUTROS');
+            
             document.getElementById('editQtd').value = item.qtd || 1;
-            document.getElementById('editUnit').value = Number(item.unit || 0).toFixed(2);
             document.getElementById('editTotal').value = Number(item.total || 0).toFixed(2);
+            document.getElementById('editUnit').value = Number(item.unit || 0).toFixed(2);
             document.getElementById('editLink').value = item.link || '';
 
             document.getElementById('modalEdicao').classList.remove('hidden');
@@ -1021,18 +1168,16 @@
             document.getElementById('modalEdicao').classList.add('hidden');
         }
 
-        // Na modal: Se alterar Unitário -> Calcula Total
-        function calcularModalPorUnitario() {
-            const q = parseFloat(document.getElementById('editQtd').value) || 1;
-            const u = parseFloat(document.getElementById('editUnit').value) || 0;
-            document.getElementById('editTotal').value = (q * u).toFixed(2);
-        }
-
-        // Na modal: Se alterar Total -> Divide para o Unitário
         function calcularModalPorTotal() {
             const q = parseFloat(document.getElementById('editQtd').value) || 1;
             const tot = parseFloat(document.getElementById('editTotal').value) || 0;
             document.getElementById('editUnit').value = (tot / q).toFixed(2);
+        }
+
+        function calcularModalPorUnitario() {
+            const q = parseFloat(document.getElementById('editQtd').value) || 1;
+            const u = parseFloat(document.getElementById('editUnit').value) || 0;
+            document.getElementById('editTotal').value = (q * u).toFixed(2);
         }
 
         async function guardarEdicaoModal() {
@@ -1040,8 +1185,8 @@
             if (isNaN(index) || !compras[index]) return;
 
             const q = parseFloat(document.getElementById('editQtd').value) || 1;
-            const u = parseFloat(document.getElementById('editUnit').value) || 0;
-            const total = parseFloat(document.getElementById('editTotal').value) || (q * u);
+            const total = parseFloat(document.getElementById('editTotal').value) || 0;
+            const u = parseFloat(document.getElementById('editUnit').value) || (total / q);
 
             const itemAtualizado = {
                 ...compras[index],
@@ -1059,6 +1204,7 @@
 
             await atualizarNoSupabase(itemAtualizado);
             salvarNoLocalStorage();
+            atualizarListaSelectSolicitantes();
             renderizarTabela();
             fecharModalEdicao();
             mostrarAviso("Registro atualizado com sucesso!");
@@ -1072,14 +1218,17 @@
             let totalGastoGeral = 0;
             let solicitantesContador = {};
 
-            // Se tiver filtro de solicitante ativo
+            // Filtro aplicado por texto ou select
             let listaExibicao = compras;
             if (solicitanteFiltroAtual) {
-                listaExibicao = compras.filter(i => (i.solicitante || "").toUpperCase() === solicitanteFiltroAtual.toUpperCase());
+                listaExibicao = compras.filter(i => {
+                    const s = (i.solicitante || "").toUpperCase();
+                    return s.includes(solicitanteFiltroAtual);
+                });
             }
 
             if (listaExibicao.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-400 italic">NENHUMA COMPRA ENCONTRADA.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-400 italic">NENHUMA COMPRA ENCONTRADA COM ESSE FILTRO.</td></tr>`;
             } else {
                 listaExibicao.forEach((item) => {
                     const originalIndex = compras.findIndex(c => c.id === item.id);
@@ -1112,19 +1261,31 @@
                 });
             }
 
+            // Atualiza os cartões superiores
             document.getElementById('cardTotalItens').innerText = listaExibicao.length;
-            document.getElementById('labelContador').innerText = `${listaExibicao.length} ITENS REGISTRADOS`;
+            document.getElementById('labelContador').innerText = `${listaExibicao.length} ITENS EXIBIDOS`;
             document.getElementById('cardValorTotal').innerText = `R$ ${totalGastoGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-            let topSolicitante = "NENHUM";
-            let maxCount = 0;
-            Object.keys(solicitantesContador).forEach(s => {
-                if (solicitantesContador[s] > maxCount) {
-                    maxCount = solicitantesContador[s];
-                    topSolicitante = `${s} (${maxCount})`;
-                }
-            });
-            document.getElementById('cardTopSolicitante').innerText = topSolicitante;
+            if (solicitanteFiltroAtual) {
+                document.getElementById('labelTotalItens').innerText = `Itens Pedidos por ${solicitanteFiltroAtual}`;
+                document.getElementById('labelValorTotal').innerText = `Gasto Total de ${solicitanteFiltroAtual}`;
+                document.getElementById('labelPessoaCard').innerText = `Filtro Selecionado`;
+                document.getElementById('cardTopSolicitante').innerText = solicitanteFiltroAtual;
+            } else {
+                document.getElementById('labelTotalItens').innerText = `Total de Despesas`;
+                document.getElementById('labelValorTotal').innerText = `Total Faturado no Cartão`;
+                document.getElementById('labelPessoaCard').innerText = `Principal Solicitante (Ver Todos 👥)`;
+
+                let topSolicitante = "NENHUM";
+                let maxCount = 0;
+                Object.keys(solicitantesContador).forEach(s => {
+                    if (solicitantesContador[s] > maxCount) {
+                        maxCount = solicitantesContador[s];
+                        topSolicitante = `${s} (${maxCount})`;
+                    }
+                });
+                document.getElementById('cardTopSolicitante').innerText = topSolicitante;
+            }
         }
 
         function formatarDataBR(dataISO) {
@@ -1139,6 +1300,7 @@
                 await removerDoSupabase(id);
                 compras = compras.filter(i => i.id !== id);
                 salvarNoLocalStorage();
+                atualizarListaSelectSolicitantes();
                 renderizarTabela();
             }
         }
@@ -1150,7 +1312,12 @@
         function carregarDoLocalStorage() {
             const salvo = localStorage.getItem('compras_corporativas_base');
             if (salvo) {
-                try { compras = JSON.parse(salvo); } catch(e) { compras = []; }
+                try { 
+                    compras = JSON.parse(salvo); 
+                    atualizarListaSelectSolicitantes();
+                } catch(e) { 
+                    compras = []; 
+                }
             }
             renderizarTabela();
         }
