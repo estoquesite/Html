@@ -1,0 +1,417 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Controle de Compras - Cartão Corporativo</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen p-4 sm:p-6 transition-colors duration-200">
+
+    <div class="max-w-5xl mx-auto space-y-6">
+
+        <!-- CABEÇALHO -->
+        <header class="flex flex-wrap justify-between items-center bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-blue-100 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 rounded-2xl flex items-center justify-center text-2xl font-black shadow-inner">
+                    💳
+                </div>
+                <div>
+                    <h1 class="text-lg sm:text-xl font-black text-slate-900 dark:text-white uppercase tracking-wide">Controle de Compras Corporativas</h1>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">Captura de links, digitação manual e exportação para planilha</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-2">
+                <button onclick="exportarParaCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5 cursor-pointer">
+                    📥 Exportar p/ Excel (.csv)
+                </button>
+                <button onclick="limparTudo()" class="bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/40 dark:text-rose-300 px-3 py-2 rounded-xl text-xs font-bold transition cursor-pointer">
+                    🗑️ Limpar Lista
+                </button>
+            </div>
+        </header>
+
+        <!-- CARTÕES DE RESUMO RÁPIDO -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-1">
+                <span class="text-[10px] font-bold uppercase text-slate-400">Total de Lançamentos</span>
+                <h3 id="cardTotalItens" class="text-2xl font-black text-blue-600 dark:text-blue-400">0</h3>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-1">
+                <span class="text-[10px] font-bold uppercase text-slate-400">Total Gasto no Cartão</span>
+                <h3 id="cardValorTotal" class="text-2xl font-black text-emerald-600 dark:text-emerald-400">R$ 0,00</h3>
+            </div>
+            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-1">
+                <span class="text-[10px] font-bold uppercase text-slate-400">Principal Solicitante</span>
+                <h3 id="cardTopSolicitante" class="text-lg font-black text-slate-700 dark:text-slate-200 truncate">Nenhum</h3>
+            </div>
+        </div>
+
+        <!-- FORMULÁRIO PRINCIPAL DE ENTRADA -->
+        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
+            <h2 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300 tracking-wider border-b border-slate-100 dark:border-slate-700 pb-2">
+                📝 Novo Lançamento de Compra
+            </h2>
+
+            <!-- SESSÃO 1: EXTRATOR AUTOMÁTICO DE LINK -->
+            <div class="bg-blue-50/60 dark:bg-blue-950/20 border border-blue-200/80 dark:border-blue-900/40 p-3.5 rounded-xl space-y-2">
+                <label class="block text-[11px] font-bold text-blue-900 dark:text-blue-300 uppercase">
+                    🔗 Capturar dados do Link (Mercado Livre, Amazon, etc.)
+                </label>
+                <div class="flex gap-2">
+                    <input type="url" id="inputUrlProduto" placeholder="Cole o link do produto aqui..." class="flex-1 text-xs px-3 py-2 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-xl outline-none focus:border-blue-600 dark:text-white">
+                    <button type="button" id="btnExtrair" onclick="extrairDadosDoLink()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5 cursor-pointer">
+                        <span>⚡</span>
+                        <span>Extrair Dados</span>
+                    </button>
+                </div>
+                <p id="msgStatusLink" class="text-[10px] text-blue-600 dark:text-blue-400 hidden"></p>
+            </div>
+
+            <!-- SESSÃO 2: DADOS PARA A BASE / DIGITAÇÃO -->
+            <form id="formCompra" onsubmit="salvarCompra(event)" class="space-y-4">
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end">
+                    
+                    <!-- Data -->
+                    <div class="sm:col-span-1 md:col-span-2">
+                        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Data</label>
+                        <input type="date" id="campoData" required class="w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none focus:border-blue-500">
+                    </div>
+
+                    <!-- Solicitante -->
+                    <div class="sm:col-span-1 md:col-span-3">
+                        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Solicitante (Quem pediu?)</label>
+                        <input type="text" id="campoSolicitante" required placeholder="Ex: Roberto / RH" class="w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none focus:border-blue-500">
+                    </div>
+
+                    <!-- Nome do Produto -->
+                    <div class="sm:col-span-2 md:col-span-4">
+                        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Descrição do Produto / Serviço</label>
+                        <input type="text" id="campoProduto" required placeholder="Ex: Teclado sem Fio Logitech" class="w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none focus:border-blue-500">
+                    </div>
+
+                    <!-- Categoria -->
+                    <div class="sm:col-span-2 md:col-span-3">
+                        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Categoria</label>
+                        <select id="campoCategoria" class="w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none focus:border-blue-500">
+                            <option value="Informática / TI">💻 Informática / TI</option>
+                            <option value="Escritório">📎 Escritório / Almoxarifado</option>
+                            <option value="Manutenção">🔧 Manutenção</option>
+                            <option value="Treinamento">🎓 Treinamento</option>
+                            <option value="Alimentação / Copa">☕ Alimentação / Copa</option>
+                            <option value="Outros">📦 Outros</option>
+                        </select>
+                    </div>
+
+                    <!-- Quantidade -->
+                    <div class="sm:col-span-1 md:col-span-2">
+                        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Qtd</label>
+                        <input type="number" id="campoQtd" min="1" value="1" oninput="calcularTotalLinha()" required class="w-full text-xs p-2 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none focus:border-blue-500">
+                    </div>
+
+                    <!-- Valor Unitário -->
+                    <div class="sm:col-span-1 md:col-span-3">
+                        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Valor Unitário (R$)</label>
+                        <input type="number" id="campoValorUnit" step="0.01" min="0" placeholder="0,00" oninput="calcularTotalLinha()" required class="w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none focus:border-blue-500">
+                    </div>
+
+                    <!-- Valor Total Calculado -->
+                    <div class="sm:col-span-1 md:col-span-3">
+                        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Total (Calculado)</label>
+                        <input type="text" id="campoValorTotalCalc" readonly value="R$ 0,00" class="w-full text-xs p-2 bg-slate-100 dark:bg-slate-950/60 font-black text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-800 rounded-xl outline-none">
+                    </div>
+
+                    <!-- Botão de Salvar -->
+                    <div class="sm:col-span-1 md:col-span-4 flex gap-2">
+                        <button type="submit" class="flex-1 bg-slate-900 hover:bg-black dark:bg-blue-600 dark:hover:bg-blue-700 text-white py-2 px-4 rounded-xl text-xs font-bold transition shadow-sm cursor-pointer">
+                            💾 Registrar na Base
+                        </button>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+
+        <!-- TABELA COM AS COMPRAS REGISTRADAS -->
+        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">
+                    📋 Base de Compras Lançadas
+                </h3>
+                <span id="labelContador" class="text-[11px] text-slate-400">0 itens registrados</span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-100 dark:border-slate-700 text-slate-400 font-bold uppercase text-[10px]">
+                            <th class="py-2.5 px-3">Data</th>
+                            <th class="py-2.5 px-3">Solicitante</th>
+                            <th class="py-2.5 px-3">Produto / Serviço</th>
+                            <th class="py-2.5 px-3">Categoria</th>
+                            <th class="py-2.5 px-3 text-center">Qtd</th>
+                            <th class="py-2.5 px-3 text-right">Unitário</th>
+                            <th class="py-2.5 px-3 text-right">Total</th>
+                            <th class="py-2.5 px-3 text-center">Link / Comprovante</th>
+                            <th class="py-2.5 px-3 text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaComprasCorpo" class="divide-y divide-slate-100 dark:divide-slate-700/60">
+                        <!-- Itens carregados via JS -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        let compras = [];
+
+        // Define a data de hoje por padrão
+        window.addEventListener('DOMContentLoaded', () => {
+            const hoje = new Date().toISOString().split('T')[0];
+            document.getElementById('campoData').value = hoje;
+            carregarDoLocalStorage();
+        });
+
+        function calcularTotalLinha() {
+            const qtd = parseFloat(document.getElementById('campoQtd').value) || 0;
+            const unit = parseFloat(document.getElementById('campoValorUnit').value) || 0;
+            const total = qtd * unit;
+            document.getElementById('campoValorTotalCalc').value = `R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+        }
+
+        // EXTRATOR INTELIGENTE DE ANÚNCIOS (Mercado Livre e Web)
+        async function extrairDadosDoLink() {
+            const url = document.getElementById('inputUrlProduto').value.trim();
+            const statusEl = document.getElementById('msgStatusLink');
+            const btnExtrair = document.getElementById('btnExtrair');
+
+            if (!url) {
+                alert("Por favor, cole um link antes de tentar extrair!");
+                return;
+            }
+
+            statusEl.innerText = "Buscando dados do anúncio...";
+            statusEl.classList.remove('hidden');
+            btnExtrair.disabled = true;
+
+            try {
+                // Usando proxy de CORS gratuito e seguro para ler o HTML da página do anúncio
+                const response = await fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`);
+                const data = await response.json();
+                
+                if (data.contents) {
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(data.contents, 'text/html');
+
+                    // 1. Procura o título do anúncio
+                    let titulo = "";
+                    const ogTitle = doc.querySelector('meta[property="og:title"]');
+                    const pageTitle = doc.querySelector('h1') || doc.querySelector('title');
+
+                    if (ogTitle && ogTitle.content) titulo = ogTitle.content;
+                    else if (pageTitle) titulo = pageTitle.innerText.trim();
+
+                    // Limpa sufixos clássicos do Mercado Livre
+                    titulo = titulo.replace(/\|.*$/g, '').replace(/- Mercado Livre.*/gi, '').trim();
+
+                    // 2. Procura o preço no HTML
+                    let preco = 0;
+                    const metaPrice = doc.querySelector('meta[property="product:price:amount"]') || doc.querySelector('meta[property="og:price:amount"]');
+                    
+                    if (metaPrice && metaPrice.content) {
+                        preco = parseFloat(metaPrice.content);
+                    } else {
+                        // Varredura por frações de preço no Mercado Livre
+                        const priceFraction = doc.querySelector('.andes-money-amount__fraction');
+                        const priceCents = doc.querySelector('.andes-money-amount__cents');
+                        if (priceFraction) {
+                            let valorStr = priceFraction.innerText.replace(/\./g, '');
+                            if (priceCents) valorStr += '.' + priceCents.innerText;
+                            preco = parseFloat(valorStr);
+                        }
+                    }
+
+                    // Preenche os campos automaticamente
+                    if (titulo) document.getElementById('campoProduto').value = titulo;
+                    if (preco && !isNaN(preco)) {
+                        document.getElementById('campoValorUnit').value = preco;
+                        calcularTotalLinha();
+                    }
+
+                    statusEl.innerText = "✅ Dados extraídos com sucesso! Revise e clique em Registrar.";
+                }
+            } catch (err) {
+                statusEl.innerText = "⚠️ Não foi possível ler automaticamente o anúncio. Digite os dados manualmente abaixo.";
+            } finally {
+                btnExtrair.disabled = false;
+            }
+        }
+
+        function salvarCompra(e) {
+            e.preventDefault();
+
+            const data = document.getElementById('campoData').value;
+            const solicitante = document.getElementById('campoSolicitante').value.trim();
+            const produto = document.getElementById('campoProduto').value.trim();
+            const categoria = document.getElementById('campoCategoria').value;
+            const qtd = parseFloat(document.getElementById('campoQtd').value) || 1;
+            const unit = parseFloat(document.getElementById('campoValorUnit').value) || 0;
+            const total = qtd * unit;
+            const link = document.getElementById('inputUrlProduto').value.trim();
+
+            const novoItem = {
+                id: Date.now(),
+                data,
+                solicitante,
+                produto,
+                categoria,
+                qtd,
+                unit,
+                total,
+                link
+            };
+
+            compras.unshift(novoItem);
+            salvarNoLocalStorage();
+            renderizarTabela();
+
+            // Limpa o formulário mantendo a data
+            document.getElementById('campoProduto').value = '';
+            document.getElementById('campoQtd').value = '1';
+            document.getElementById('campoValorUnit').value = '';
+            document.getElementById('campoValorTotalCalc').value = 'R$ 0,00';
+            document.getElementById('inputUrlProduto').value = '';
+            document.getElementById('msgStatusLink').classList.add('hidden');
+        }
+
+        function renderizarTabela() {
+            const tbody = document.getElementById('tabelaComprasCorpo');
+            tbody.innerHTML = '';
+
+            let totalGastoGeral = 0;
+            let solicitantesContador = {};
+
+            if (compras.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-400 italic">Nenhuma compra registrada até o momento. Cole um link ou preencha os dados acima.</td></tr>`;
+            } else {
+                compras.forEach(item => {
+                    totalGastoGeral += item.total;
+                    solicitantesContador[item.solicitante] = (solicitantesContador[item.solicitante] || 0) + 1;
+
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/40 transition";
+                    tr.innerHTML = `
+                        <td class="py-2.5 px-3 font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap">${formatarDataBR(item.data)}</td>
+                        <td class="py-2.5 px-3 font-bold text-slate-800 dark:text-slate-200 whitespace-nowrap">${item.solicitante}</td>
+                        <td class="py-2.5 px-3 font-medium text-slate-900 dark:text-white max-w-xs truncate" title="${item.produto}">${item.produto}</td>
+                        <td class="py-2.5 px-3 whitespace-nowrap"><span class="text-[10px] bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-full font-bold">${item.categoria}</span></td>
+                        <td class="py-2.5 px-3 text-center font-bold text-slate-700 dark:text-slate-300">${item.qtd}</td>
+                        <td class="py-2.5 px-3 text-right text-slate-500 whitespace-nowrap">R$ ${item.unit.toFixed(2)}</td>
+                        <td class="py-2.5 px-3 text-right font-black text-emerald-600 dark:text-emerald-400 whitespace-nowrap">R$ ${item.total.toFixed(2)}</td>
+                        <td class="py-2.5 px-3 text-center whitespace-nowrap">
+                            ${item.link ? `<a href="${item.link}" target="_blank" class="text-blue-600 dark:text-blue-400 font-bold hover:underline">Ver Link ↗</a>` : '<span class="text-slate-400">-</span>'}
+                        </td>
+                        <td class="py-2.5 px-3 text-center whitespace-nowrap">
+                            <button onclick="removerItem(${item.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1" title="Excluir">✕</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            // Atualiza os Cards
+            document.getElementById('cardTotalItens').innerText = compras.length;
+            document.getElementById('labelContador').innerText = `${compras.length} itens registrados`;
+            document.getElementById('cardValorTotal').innerText = `R$ ${totalGastoGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+            let topSolicitante = "Nenhum";
+            let maxCount = 0;
+            Object.keys(solicitantesContador).forEach(s => {
+                if (solicitantesContador[s] > maxCount) {
+                    maxCount = solicitantesContador[s];
+                    topSolicitante = `${s} (${maxCount} compras)`;
+                }
+            });
+            document.getElementById('cardTopSolicitante').innerText = topSolicitante;
+        }
+
+        function formatarDataBR(dataISO) {
+            if (!dataISO) return "";
+            const partes = dataISO.split('-');
+            return `${partes[2]}/${partes[1]}/${partes[0]}`;
+        }
+
+        function removerItem(id) {
+            if (confirm("Deseja realmente apagar este registro de compra?")) {
+                compras = compras.filter(i => i.id !== id);
+                salvarNoLocalStorage();
+                renderizarTabela();
+            }
+        }
+
+        function limparTudo() {
+            if (confirm("Atenção: deseja limpar toda a lista de compras atual?")) {
+                compras = [];
+                salvarNoLocalStorage();
+                renderizarTabela();
+            }
+        }
+
+        function salvarNoLocalStorage() {
+            localStorage.setItem('compras_corporativas_base', JSON.stringify(compras));
+        }
+
+        function carregarDoLocalStorage() {
+            const salvo = localStorage.getItem('compras_corporativas_base');
+            if (salvo) {
+                try { compras = JSON.parse(salvo); } catch(e) { compras = []; }
+            }
+            renderizarTabela();
+        }
+
+        // EXPORTAÇÃO DIRETA PARA EXCEL / GOOGLE SHEETS
+        function exportarParaCSV() {
+            if (compras.length === 0) {
+                alert("A lista está vazia! Não há dados para exportar.");
+                return;
+            }
+
+            let csv = "\uFEFF"; // Garante acentuação perfeita no Excel
+            csv += "Data;Solicitante;Produto/Serviço;Categoria;Quantidade;Valor Unitário (R$);Total (R$);Link do Produto\n";
+
+            compras.forEach(item => {
+                const linha = [
+                    formatarDataBR(item.data),
+                    `"${item.solicitante.replace(/"/g, '""')}"`,
+                    `"${item.produto.replace(/"/g, '""')}"`,
+                    `"${item.categoria}"`,
+                    item.qtd,
+                    item.unit.toFixed(2).replace('.', ','),
+                    item.total.toFixed(2).replace('.', ','),
+                    `"${(item.link || '').replace(/"/g, '""')}"`
+                ];
+                csv += linha.join(";") + "\n";
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Relatorio_Compras_Cartao_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
