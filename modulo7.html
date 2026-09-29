@@ -9,6 +9,8 @@
     <script>
         tailwind.config = { darkMode: 'class' }
     </script>
+    <!-- SDK Oficial do Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
@@ -31,29 +33,43 @@
                         <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300">Módulo 7</span>
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
                     </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Captura por link, foto/câmera, galeria e mensagens do Teams</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Sincronizado na Nuvem (Supabase) + IA Gemini</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
                 <a href="index.html" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1">
                     ⬅ Voltar ao Menu
                 </a>
+                <button onclick="carregarDoSupabase()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer">
+                    🔄 Sincronizar
+                </button>
                 <button onclick="exportarParaCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5 cursor-pointer">
                     📥 Exportar (.csv)
                 </button>
             </div>
         </header>
 
-        <!-- CONFIGURAÇÃO DA CHAVE DA IA -->
-        <div class="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 p-3 rounded-xl flex flex-wrap items-center justify-between gap-2">
-            <div class="flex items-center gap-2">
-                <span class="text-base">🔑</span>
-                <span class="text-xs font-bold text-amber-900 dark:text-amber-200">Chave API da IA (Gemini):</span>
-                <input type="password" id="inputApiKey" placeholder="Cole sua chave da API aqui..." class="text-xs px-2.5 py-1 rounded-lg border border-amber-300 dark:border-amber-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none w-52 sm:w-72">
+        <!-- PAINEL DE STATUS DA NUVEM & CHAVE GEMINI -->
+        <div class="bg-slate-100 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-3.5 rounded-2xl space-y-2.5">
+            <div class="flex justify-between items-center">
+                <span class="text-xs font-black uppercase text-slate-600 dark:text-slate-300 flex items-center gap-1.5">
+                    ☁️ Conexão com Nuvem & IA
+                </span>
+                <span id="badgeSupabase" class="text-[11px] font-bold text-emerald-600 flex items-center gap-1">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    Supabase Conectado
+                </span>
             </div>
-            <button onclick="salvarApiKey()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-1 rounded-lg transition shadow-sm cursor-pointer">
-                Salvar Chave
-            </button>
+            
+            <div class="flex flex-col sm:flex-row items-center gap-2">
+                <div class="w-full sm:flex-1 flex items-center gap-2">
+                    <span class="text-xs font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap">Chave IA Gemini:</span>
+                    <input type="password" id="geminiKeyInput" placeholder="Cole sua chave da IA (AIzaSy...)" class="w-full text-xs px-2.5 py-1.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none">
+                </div>
+                <button onclick="salvarChaveGemini()" class="w-full sm:w-auto bg-slate-900 hover:bg-black dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition">
+                    Salvar Chave IA
+                </button>
+            </div>
         </div>
 
         <!-- CARTÕES DE RESUMO -->
@@ -161,7 +177,7 @@
                     <span id="tituloItensPendentes">Itens Identificados (Confira e dê OK):</span>
                 </h3>
                 <button type="button" onclick="confirmarTodosOsCards()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-xl shadow-sm transition cursor-pointer">
-                    ⚡ Confirmar Todos de uma Vez
+                    ⚡ Confirmar Todos e Salvar na Nuvem
                 </button>
             </div>
             <div id="listaCardsPendentes" class="space-y-3"></div>
@@ -171,7 +187,7 @@
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">
-                    📋 Histórico de Compras no Cartão
+                    📋 Histórico de Compras no Cartão (Sincronizado na Nuvem)
                 </h3>
                 <span id="labelContador" class="text-[11px] text-slate-400 font-bold">0 ITENS REGISTRADOS</span>
             </div>
@@ -199,22 +215,102 @@
     </div>
 
     <script>
+        // ================= CREDENCIAIS PRÉ-CONFIGURADAS =================
+        const SUPABASE_URL = "https://gloxtswcksbczinpwtzu.supabase.co";
+        const SUPABASE_KEY = "sb_publishable_0kEiqthWKZZwjM120wQIYw_Hba7qeLc";
+
         let compras = [];
         let itensPendentesAprovacao = [];
+        let supabaseClient = null;
 
         window.addEventListener('DOMContentLoaded', () => {
-            const savedKey = localStorage.getItem('gemini_api_key') || '';
-            document.getElementById('inputApiKey').value = savedKey;
-            carregarDoLocalStorage();
+            // Inicializa conexão do Supabase com as credenciais fornecidas
+            if (window.supabase) {
+                try {
+                    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+                    carregarDoSupabase();
+                } catch(e) {
+                    console.error("Erro ao inicializar Supabase:", e);
+                    carregarDoLocalStorage();
+                }
+            } else {
+                carregarDoLocalStorage();
+            }
+
+            const gKey = localStorage.getItem('gemini_api_key') || '';
+            document.getElementById('geminiKeyInput').value = gKey;
+
             configurarDragAndDrop();
         });
 
-        function salvarApiKey() {
-            const key = document.getElementById('inputApiKey').value.trim();
-            localStorage.setItem('gemini_api_key', key);
-            alert("Chave API salva com sucesso!");
+        function salvarChaveGemini() {
+            const gKey = document.getElementById('geminiKeyInput').value.trim();
+            localStorage.setItem('gemini_api_key', gKey);
+            alert("Chave Gemini salva com sucesso!");
         }
 
+        // ================= SUPABASE: CRUD =================
+        async function carregarDoSupabase() {
+            if (!supabaseClient) return;
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('compras_corporativas')
+                    .select('*')
+                    .order('id', { ascending: false });
+
+                if (error) throw error;
+
+                if (data) {
+                    compras = data;
+                    salvarNoLocalStorage();
+                    renderizarTabela();
+                }
+            } catch (err) {
+                console.error("Erro ao carregar do Supabase:", err);
+                carregarDoLocalStorage();
+            }
+        }
+
+        async function inserirNoSupabase(item) {
+            if (!supabaseClient) return null;
+            try {
+                const { data, error } = await supabaseClient
+                    .from('compras_corporativas')
+                    .insert([{
+                        data: item.data,
+                        solicitante: item.solicitante,
+                        produto: item.produto,
+                        categoria: item.categoria,
+                        qtd: item.qtd,
+                        unit: item.unit,
+                        total: item.total,
+                        link: item.link || ''
+                    }])
+                    .select();
+
+                if (error) throw error;
+                return data && data[0] ? data[0].id : null;
+            } catch (err) {
+                console.error("Erro ao inserir no Supabase:", err);
+                return null;
+            }
+        }
+
+        async function removerDoSupabase(id) {
+            if (!supabaseClient) return;
+            try {
+                const { error } = await supabaseClient
+                    .from('compras_corporativas')
+                    .delete()
+                    .eq('id', id);
+                if (error) throw error;
+            } catch (err) {
+                console.error("Erro ao deletar do Supabase:", err);
+            }
+        }
+
+        // ================= PARSER DE LINK =================
         async function colarLinkInput() {
             try {
                 const texto = await navigator.clipboard.readText();
@@ -227,7 +323,6 @@
             }
         }
 
-        // Extrai o nome do produto decodificando o endereço web do Mercado Livre
         function extrairNomeDoLinkML(url) {
             try {
                 const urlLimpa = url.split('?')[0].split('#')[0];
@@ -247,7 +342,6 @@
             return null;
         }
 
-        // 🔗 PROCESSA O LINK DIGITADO OU COLADO
         function processarLinkDireto() {
             const entrada = document.getElementById('inputLinkDireto').value.trim();
             const statusEl = document.getElementById('msgStatusLink');
@@ -264,29 +358,19 @@
             let produto = "";
             let link = "";
 
-            // Acha o link na frase
             const matchUrl = entrada.match(/(https?:\/\/[^\s]+)/i);
             if (matchUrl) {
                 link = matchUrl[1];
                 const nomeExtraido = extrairNomeDoLinkML(link);
-                if (nomeExtraido) {
-                    produto = nomeExtraido;
-                }
+                if (nomeExtraido) produto = nomeExtraido;
             }
 
-            // Acha quantidade (ex: 2x, 3 un)
             const matchQtd = entrada.match(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/i);
-            if (matchQtd) {
-                qtd = parseInt(matchQtd[1], 10);
-            }
+            if (matchQtd) qtd = parseInt(matchQtd[1], 10);
 
-            // Acha preço (ex: R$ 89,90 ou 150.00)
             const matchPreco = entrada.match(/(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/i);
-            if (matchPreco) {
-                unit = parseFloat(matchPreco[1].replace(',', '.'));
-            }
+            if (matchPreco) unit = parseFloat(matchPreco[1].replace(',', '.'));
 
-            // Se não conseguiu extrair do link, pega o texto digitado
             if (!produto) {
                 let textoSemLink = entrada
                     .replace(/(https?:\/\/[^\s]+)/gi, '')
@@ -322,6 +406,7 @@
             document.getElementById('inputLinkDireto').value = '';
         }
 
+        // ================= PROCESSAMENTO DE IMAGEM / IA =================
         function configurarDragAndDrop() {
             const dropZone = document.getElementById('dropZone');
 
@@ -344,9 +429,7 @@
             dropZone.addEventListener('drop', (e) => {
                 const dt = e.dataTransfer;
                 const files = dt.files;
-                if (files && files.length > 0) {
-                    processarArquivos(files);
-                }
+                if (files && files.length > 0) processarArquivos(files);
             }, false);
 
             document.addEventListener('paste', (e) => {
@@ -358,9 +441,7 @@
                         imageFiles.push(item.getAsFile());
                     }
                 }
-                if (imageFiles.length > 0) {
-                    processarArquivos(imageFiles);
-                }
+                if (imageFiles.length > 0) processarArquivos(imageFiles);
             });
         }
 
@@ -378,10 +459,10 @@
             const statusEl = document.getElementById('statusDrop');
             statusEl.classList.remove('hidden');
 
-            const apiKey = localStorage.getItem('gemini_api_key') || document.getElementById('inputApiKey').value.trim();
+            const apiKey = localStorage.getItem('gemini_api_key') || document.getElementById('geminiKeyInput').value.trim();
             if (!apiKey) {
-                alert("Por favor, informe sua chave API do Gemini no topo para ler a imagem!");
-                document.getElementById('inputApiKey').focus();
+                alert("Por favor, informe sua chave API do Gemini no topo para ler a foto!");
+                document.getElementById('geminiKeyInput').focus();
                 statusEl.classList.add('hidden');
                 return;
             }
@@ -463,6 +544,7 @@
             }
         }
 
+        // ================= TEXTO DO TEAMS =================
         async function colarTextoTeams() {
             try {
                 const texto = await navigator.clipboard.readText();
@@ -552,6 +634,7 @@
             return "OUTROS";
         }
 
+        // ================= CARDS E APROVAÇÃO =================
         function renderizarCardsPendentes() {
             const container = document.getElementById('containerCardsPreenchidos');
             const lista = document.getElementById('listaCardsPendentes');
@@ -624,7 +707,7 @@
                             <input type="hidden" id="link-${item.tempId}" value="${item.link || ''}">
                             <button type="button" onclick="confirmarCardIndividual(${item.tempId})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1 cursor-pointer">
                                 <span>✅</span>
-                                <span>OK (Confirmar)</span>
+                                <span>OK (Salvar)</span>
                             </button>
                         </div>
                     </div>
@@ -640,7 +723,7 @@
             document.getElementById(`total-${tempId}`).value = `R$ ${total.toFixed(2)}`;
         }
 
-        function confirmarCardIndividual(tempId) {
+        async function confirmarCardIndividual(tempId) {
             const data = document.getElementById(`data-${tempId}`).value;
             const solicitante = document.getElementById(`solicitante-${tempId}`).value.trim().toUpperCase();
             const produto = document.getElementById(`produto-${tempId}`).value.trim().toUpperCase();
@@ -650,8 +733,8 @@
             const total = qtd * unit;
             const link = document.getElementById(`link-${tempId}`).value;
 
-            compras.unshift({
-                id: Date.now() + Math.random(),
+            const novoItem = {
+                id: Date.now(),
                 data,
                 solicitante,
                 produto,
@@ -660,16 +743,21 @@
                 unit,
                 total,
                 link
-            });
+            };
 
+            const supabaseId = await inserirNoSupabase(novoItem);
+            if (supabaseId) novoItem.id = supabaseId;
+
+            compras.unshift(novoItem);
             itensPendentesAprovacao = itensPendentesAprovacao.filter(i => i.tempId !== tempId);
+
             salvarNoLocalStorage();
             renderizarTabela();
             renderizarCardsPendentes();
         }
 
-        function confirmarTodosOsCards() {
-            itensPendentesAprovacao.forEach(item => {
+        async function confirmarTodosOsCards() {
+            for (let item of itensPendentesAprovacao) {
                 const tempId = item.tempId;
                 const data = document.getElementById(`data-${tempId}`).value;
                 const solicitante = document.getElementById(`solicitante-${tempId}`).value.trim().toUpperCase();
@@ -680,7 +768,7 @@
                 const total = qtd * unit;
                 const link = document.getElementById(`link-${tempId}`).value;
 
-                compras.unshift({
+                const novoItem = {
                     id: Date.now() + Math.random(),
                     data,
                     solicitante,
@@ -690,8 +778,13 @@
                     unit,
                     total,
                     link
-                });
-            });
+                };
+
+                const supabaseId = await inserirNoSupabase(novoItem);
+                if (supabaseId) novoItem.id = supabaseId;
+
+                compras.unshift(novoItem);
+            }
 
             itensPendentesAprovacao = [];
             salvarNoLocalStorage();
@@ -704,6 +797,7 @@
             renderizarCardsPendentes();
         }
 
+        // ================= TABELA E RENDERIZAÇÃO =================
         function renderizarTabela() {
             const tbody = document.getElementById('tabelaComprasCorpo');
             tbody.innerHTML = '';
@@ -715,7 +809,7 @@
                 tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-400 italic">NENHUMA COMPRA REGISTRADA ATÉ O MOMENTO.</td></tr>`;
             } else {
                 compras.forEach(item => {
-                    totalGastoGeral += item.total;
+                    totalGastoGeral += Number(item.total || 0);
                     solicitantesContador[item.solicitante] = (solicitantesContador[item.solicitante] || 0) + 1;
 
                     const tr = document.createElement('tr');
@@ -726,8 +820,8 @@
                         <td class="py-2.5 px-3 font-medium text-slate-900 dark:text-white max-w-xs truncate" title="${item.produto}">${item.produto}</td>
                         <td class="py-2.5 px-3 whitespace-nowrap"><span class="text-[10px] bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-full font-bold">${item.categoria}</span></td>
                         <td class="py-2.5 px-3 text-center font-bold text-slate-700 dark:text-slate-300">${item.qtd}</td>
-                        <td class="py-2.5 px-3 text-right text-slate-500 whitespace-nowrap">R$ ${item.unit.toFixed(2)}</td>
-                        <td class="py-2.5 px-3 text-right font-black text-emerald-600 dark:text-emerald-400 whitespace-nowrap">R$ ${item.total.toFixed(2)}</td>
+                        <td class="py-2.5 px-3 text-right text-slate-500 whitespace-nowrap">R$ ${Number(item.unit || 0).toFixed(2)}</td>
+                        <td class="py-2.5 px-3 text-right font-black text-emerald-600 dark:text-emerald-400 whitespace-nowrap">R$ ${Number(item.total || 0).toFixed(2)}</td>
                         <td class="py-2.5 px-3 text-center whitespace-nowrap">
                             ${item.link && item.link.startsWith('http') 
                                 ? `<a href="${item.link}" target="_blank" class="text-blue-600 dark:text-blue-400 font-bold hover:underline normal-case">Ver Link ↗</a>` 
@@ -759,11 +853,13 @@
         function formatarDataBR(dataISO) {
             if (!dataISO) return "";
             const partes = dataISO.split('-');
+            if (partes.length < 3) return dataISO;
             return `${partes[2]}/${partes[1]}/${partes[0]}`;
         }
 
-        function removerItem(id) {
+        async function removerItem(id) {
             if (confirm("Deseja realmente apagar este registro de compra?")) {
+                await removerDoSupabase(id);
                 compras = compras.filter(i => i.id !== id);
                 salvarNoLocalStorage();
                 renderizarTabela();
@@ -794,12 +890,12 @@
             compras.forEach(item => {
                 const linha = [
                     formatarDataBR(item.data),
-                    `"${item.solicitante.replace(/"/g, '""')}"`,
-                    `"${item.produto.replace(/"/g, '""')}"`,
-                    `"${item.categoria}"`,
+                    `"${(item.solicitante || '').replace(/"/g, '""')}"`,
+                    `"${(item.produto || '').replace(/"/g, '""')}"`,
+                    `"${item.categoria || ''}"`,
                     item.qtd,
-                    item.unit.toFixed(2).replace('.', ','),
-                    item.total.toFixed(2).replace('.', ','),
+                    Number(item.unit || 0).toFixed(2).replace('.', ','),
+                    Number(item.total || 0).toFixed(2).replace('.', ','),
                     `"${(item.link || '').replace(/"/g, '""')}"`
                 ];
                 csv += linha.join(";") + "\n";
