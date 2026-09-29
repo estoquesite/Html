@@ -549,6 +549,15 @@
             const selEdit = document.getElementById('editCategoria');
             const valEdit = selEdit ? selEdit.value : "";
             preencherOpcoesCategoria(selEdit, valEdit || "OUTROS");
+
+            // Atualiza também os selects de todos os cards pendentes ativos no ecrã
+            itensPendentesAprovacao.forEach(item => {
+                const selCard = document.getElementById(`categoria-${item.tempId}`);
+                if (selCard) {
+                    const valCard = selCard.value;
+                    preencherOpcoesCategoria(selCard, valCard || item.categoria || "OUTROS");
+                }
+            });
         }
 
         function adicionarNovaCategoriaPrompt(selectId = null) {
@@ -561,14 +570,13 @@
                 }
                 
                 atualizarTodosOsSelectsCategorias();
-                renderizarCardsPendentes();
 
                 if (selectId) {
                     const sel = document.getElementById(selectId);
                     if (sel) sel.value = categoriaFormatada;
                 }
 
-                mostrarAviso(`Categoria "${categoriaFormatada}" adicionada e selecionada com sucesso!`);
+                mostrarAviso(`Categoria "${categoriaFormatada}" adicionada com sucesso!`);
             }
         }
 
