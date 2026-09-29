@@ -63,30 +63,24 @@
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                 <span class="text-xs font-black text-cyan-900 dark:text-cyan-300 uppercase flex items-center gap-1.5">
-                    <span>⚡</span> Reconhecimento por Foto e Pesquisa Inteligente
+                    <span>⚡</span> Reconhecimento por Câmera e Pesquisa de FDS
                 </span>
-                <span class="text-[10px] font-bold text-slate-400">Leitura ágil</span>
+                <span class="text-[10px] font-bold text-slate-400">Processos separados</span>
             </div>
 
-            <!-- BOTÕES DE FOTO / CÂMERA -->
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <label class="flex items-center justify-center gap-3 bg-purple-600 hover:bg-purple-700 text-white font-black py-3 px-4 rounded-2xl shadow-md cursor-pointer transition active:scale-95 text-xs">
-                    <span class="text-xl">📸</span>
-                    <div class="text-left">
-                        <span class="block">TIRAR FOTO PARA RECONHECER PRODUTO</span>
-                        <span class="block text-[10px] font-normal text-purple-200">A IA lê o nome e fabricante na hora</span>
-                    </div>
-                    <input type="file" id="inputCameraIa" accept="image/*" capture="environment" class="hidden" onchange="analisarFotoComIa(this.files[0])">
-                </label>
-
-                <label class="flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3 px-4 rounded-2xl shadow-md cursor-pointer transition active:scale-95 text-xs">
-                    <span class="text-xl">🖼️</span>
-                    <div class="text-left">
-                        <span class="block">ESCOLHER FOTO DA GALERIA</span>
-                        <span class="block text-[10px] font-normal text-indigo-200">Selecionar print ou imagem salva</span>
-                    </div>
-                    <input type="file" id="inputGaleriaIa" accept="image/*" class="hidden" onchange="analisarFotoComIa(this.files[0])">
-                </label>
+            <!-- PROCESSO 1: CÂMERA DE RECONHECIMENTO (IA) -->
+            <div class="bg-purple-50 dark:bg-purple-950/30 p-3 rounded-2xl border border-purple-200 dark:border-purple-900/50 space-y-2">
+                <span class="text-[10px] font-bold text-purple-700 dark:text-purple-300 uppercase block">1. Câmera de Reconhecimento (Identifica Produto e Fabricante)</span>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <label class="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-bold py-2.5 px-4 rounded-xl shadow cursor-pointer transition text-xs">
+                        <span>📸</span> Tirar Foto para Ler Produto
+                        <input type="file" accept="image/*" capture="environment" class="hidden" onchange="analisarFotoComIa(this.files[0])">
+                    </label>
+                    <label class="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl shadow cursor-pointer transition text-xs">
+                        <span>🖼️</span> Escolher Foto da Galeria
+                        <input type="file" accept="image/*" class="hidden" onchange="analisarFotoComIa(this.files[0])">
+                    </label>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end pt-2">
@@ -105,14 +99,20 @@
                     <input type="text" id="inputLink" placeholder="Cole o link oficial do PDF..." class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
 
-                <!-- BOTÕES SEPARADOS ABAIXO -->
-                <div class="md:col-span-12 flex flex-wrap justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-700">
-                    <button type="button" onclick="pesquisarWebFds()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-xl text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer">
-                        <span>🌐</span> <span>Pesquisar FDS na Web</span>
-                    </button>
-                    <button type="button" onclick="salvarFdsSistema()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 px-6 rounded-xl text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer">
-                        <span>💾</span> <span>Salvar FDS na Nuvem</span>
-                    </button>
+                <!-- PROCESSO 2: SEGUNDA CÂMERA / ANEXO SEPARADO (OPCIONAL LÁ EMBAIXO) -->
+                <div class="md:col-span-12 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3">
+                    <div>
+                        <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase block">2. Anexo Opcional de Documento/Arquivo</span>
+                        <input type="file" id="inputAnexoExtra" class="text-xs mt-1 text-slate-500 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-slate-200 file:text-slate-700 dark:file:bg-slate-700 dark:file:text-slate-200">
+                    </div>
+                    <div class="flex gap-2">
+                        <button type="button" onclick="pesquisarWebFds()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer">
+                            <span>🌐</span> <span>Pesquisar FDS na Web</span>
+                        </button>
+                        <button type="button" onclick="salvarFdsSistema()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2.5 px-6 rounded-xl text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer">
+                            <span>💾</span> <span>Salvar FDS na Nuvem</span>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -283,6 +283,7 @@
             document.getElementById('inputProduto').value = '';
             document.getElementById('inputFabricante').value = '';
             document.getElementById('inputLink').value = '';
+            document.getElementById('inputAnexoExtra').value = '';
 
             if (supabaseClient) {
                 try {
