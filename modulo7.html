@@ -18,52 +18,71 @@
 
         @keyframes piscarForte {
             0%, 100% {
-                background-color: #fef08a;
-                border-color: #dc2626;
-                box-shadow: 0 0 15px rgba(220, 38, 38, 0.9);
+                background-color: #fef9c3;
+                border-color: #f59e0b;
+                box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
                 transform: scale(1);
             }
             50% {
-                background-color: #ffedd5;
-                border-color: #ea580c;
-                box-shadow: 0 0 5px rgba(249, 115, 22, 0.4);
-                transform: scale(1.01);
+                background-color: #ffffff;
+                border-color: #d97706;
+                box-shadow: 0 0 3px rgba(217, 119, 6, 0.3);
             }
         }
         .piscar-solicitante-forte {
-            animation: piscarForte 0.8s infinite alternate ease-in-out;
+            animation: piscarForte 1.2s infinite alternate ease-in-out;
             color: #7c2d12 !important;
             font-weight: 900 !important;
-            border-width: 2px !important;
+            border-width: 1.5px !important;
         }
 
-        @keyframes neonPulsante {
+        @keyframes neonDelicado {
             0%, 100% {
-                border-color: #06b6d4;
-                box-shadow: 0 0 12px rgba(6, 182, 212, 0.8);
-                background-color: rgba(236, 254, 255, 0.9);
+                border-color: #38bdf8;
+                box-shadow: 0 0 6px rgba(56, 189, 248, 0.4);
             }
             50% {
-                border-color: #8b5cf6;
-                box-shadow: 0 0 6px rgba(139, 92, 246, 0.5);
-                background-color: #ffffff;
+                border-color: #818cf8;
+                box-shadow: 0 0 2px rgba(129, 140, 248, 0.2);
             }
         }
         .neon-pulsante {
-            animation: neonPulsante 1.5s infinite alternate ease-in-out;
-            border-width: 2px !important;
-            font-weight: bold !important;
+            animation: neonDelicado 2s infinite alternate ease-in-out;
+            border-width: 1.5px !important;
         }
 
-        @keyframes brilhoDuplicado {
-            0%, 100% { background-color: #fef08a; }
-            50% { background-color: #fde047; }
+        @keyframes pulsoSuave {
+            0%, 100% { transform: scale(1); opacity: 0.9; }
+            50% { transform: scale(1.03); opacity: 1; }
         }
-        .alerta-duplicado-brilhante {
-            animation: brilhoDuplicado 0.8s infinite alternate ease-in-out;
-            border: 2px solid #ca8a04 !important;
-            font-weight: 900 !important;
+        .pulso-delicado {
+            animation: pulsoSuave 1.5s infinite ease-in-out;
         }
+
+        @keyframes brilhaFluorescente {
+            0%, 100% {
+                border-color: #22c55e;
+                box-shadow: 0 0 8px rgba(34, 197, 94, 0.7);
+            }
+            50% {
+                border-color: #eab308;
+                box-shadow: 0 0 3px rgba(234, 179, 8, 0.4);
+            }
+        }
+        .alerta-duplicado-fluorescente {
+            animation: brilhaFluorescente 1.2s infinite alternate ease-in-out;
+            border: 2px dashed #22c55e !important;
+            padding: 2px 6px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        /* Cores de Glow (Bordas Fluorescentes) para os Cards de Pessoas */
+        .glow-azul { border: 2px solid #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
+        .glow-roxo { border: 2px solid #c084fc; box-shadow: 0 0 10px rgba(192, 132, 252, 0.5); }
+        .glow-verde { border: 2px solid #4ade80; box-shadow: 0 0 10px rgba(74, 222, 128, 0.5); }
+        .glow-rosa { border: 2px solid #f472b6; box-shadow: 0 0 10px rgba(244, 114, 182, 0.5); }
+        .glow-amarelo { border: 2px solid #facc15; box-shadow: 0 0 10px rgba(250, 204, 21, 0.5); }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen p-4 sm:p-6 transition-colors duration-200">
@@ -82,7 +101,7 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Alerta de Duplicidade Brilhante</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Filtro de Valores & Cards Glow</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
@@ -129,25 +148,34 @@
             </div>
         </div>
 
-        <!-- CARDS DINÂMICOS POR PESSOA -->
+        <!-- CARDS DINÂMICOS POR PESSOA (COM BORDAS GLOW FLUORESCENTES) -->
         <div id="containerCardsPessoas" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
 
-        <!-- 🔍 BARRA DE FILTRO E PESQUISA -->
+        <!-- 🔍 BARRA DE FILTRO, PESQUISA E VALORES -->
         <div class="bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 p-3.5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="flex items-center gap-2 w-full sm:w-auto">
                 <span class="text-base">🔍</span>
-                <span class="text-xs font-black uppercase text-slate-700 dark:text-slate-300 whitespace-nowrap">Pesquisa / Filtro:</span>
+                <span class="text-xs font-black uppercase text-slate-700 dark:text-slate-300 whitespace-nowrap">Filtros:</span>
             </div>
             
             <div class="flex flex-1 flex-col sm:flex-row items-center gap-2 w-full">
-                <div class="relative w-full sm:w-1/2">
-                    <input type="text" id="inputPesquisaProduto" oninput="renderizarTabela()" placeholder="Pesquisar produto ou item..." class="uppercase-input w-full text-xs pl-8 pr-7 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-indigo-600 dark:text-white font-bold">
+                <!-- PESQUISA DE PRODUTO -->
+                <div class="relative w-full sm:w-1/3">
+                    <input type="text" id="inputPesquisaProduto" oninput="renderizarTabela()" placeholder="Pesquisar produto..." class="uppercase-input w-full text-xs pl-8 pr-7 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-indigo-600 dark:text-white font-bold">
                     <span class="absolute left-2.5 top-2 text-slate-400 text-xs">📦</span>
                 </div>
 
-                <div class="w-full sm:w-1/2">
+                <!-- FILTRO POR VALOR -->
+                <div class="relative w-full sm:w-1/3">
+                    <input type="number" step="0.01" id="inputFiltroValor" oninput="renderizarTabela()" placeholder="Filtrar por valor exato (R$)..." class="w-full text-xs pl-8 pr-7 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-indigo-600 dark:text-white font-bold">
+                    <span class="absolute left-2.5 top-2 text-slate-400 text-xs">💲</span>
+                    <button type="button" onclick="document.getElementById('inputFiltroValor').value=''; renderizarTabela();" class="absolute right-2.5 top-2 text-slate-400 hover:text-rose-500 font-bold text-xs" title="Limpar Valor">✕</button>
+                </div>
+
+                <!-- FILTRO POR SOLICITANTE -->
+                <div class="w-full sm:w-1/3">
                     <select id="selectFiltroSolicitante" onchange="aplicarFiltroPorSelect(this.value)" class="w-full text-xs py-2 px-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-indigo-600 dark:text-white font-bold">
-                        <option value="">TODOS OS SOLICITANTES (GERAL)</option>
+                        <option value="">TODOS OS SOLICITANTES</option>
                     </select>
                 </div>
             </div>
@@ -186,7 +214,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end">
                     <div class="md:col-span-2">
                         <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Data Compra</label>
-                        <input type="date" id="manualData" onchange="atualizarDataEntregaManualDefault()" class="neon-pulsante w-full text-xs p-2.5 rounded-xl outline-none">
+                        <input type="date" id="manualData" onchange="atualizarDataEntregaManualDefault()" class="neon-pulsante w-full text-xs p-2.5 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white">
                     </div>
 
                     <div class="md:col-span-3">
@@ -230,13 +258,13 @@
                         <input type="number" step="0.01" id="manualUnit" placeholder="0,00" oninput="calcularManualPorUnitario()" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                     </div>
 
-                    <!-- CHECKBOX DE ENTREGA MANUAL -->
-                    <div class="md:col-span-3 bg-slate-100 dark:bg-slate-900/60 p-2 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <!-- CHECKBOX DE ENTREGA MANUAL COM NEON PULSANTE -->
+                    <div class="md:col-span-3 bg-slate-100 dark:bg-slate-900/60 p-2.5 rounded-xl border border-indigo-200 dark:border-indigo-800">
                         <label class="flex items-center gap-1.5 cursor-pointer mb-1">
-                            <input type="checkbox" id="manualEntregue" onchange="toggleManualDataEntrega(this.checked)" class="w-4 h-4 text-emerald-600 rounded">
-                            <span class="text-[10px] font-bold uppercase">📦 Entregue? (+10d)</span>
+                            <input type="checkbox" id="manualEntregue" onchange="toggleManualDataEntrega(this.checked)" class="pulso-delicado w-4 h-4 text-indigo-600 rounded cursor-pointer">
+                            <span class="text-[10px] font-bold uppercase text-indigo-700 dark:text-indigo-300">📦 Entregue? (+10d)</span>
                         </label>
-                        <input type="date" id="manualDataEntrega" class="w-full text-[10px] p-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded font-bold hidden">
+                        <input type="date" id="manualDataEntrega" class="neon-pulsante w-full text-[10px] p-1.5 rounded font-bold hidden bg-white dark:bg-slate-800 dark:text-white">
                     </div>
 
                     <div class="md:col-span-12 flex justify-end pt-2">
@@ -267,7 +295,7 @@
                 
                 <div class="flex flex-col sm:flex-row gap-2">
                     <div class="relative flex-1">
-                        <input type="text" id="inputLinkDireto" placeholder="Cole o link aqui..." class="neon-pulsante w-full text-xs px-3 py-2.5 pr-8 rounded-xl outline-none">
+                        <input type="text" id="inputLinkDireto" placeholder="Cole o link aqui..." class="neon-pulsante w-full text-xs px-3 py-2.5 pr-8 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white">
                         <button type="button" onclick="limparInputLink()" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-rose-500 font-bold text-xs">✕</button>
                     </div>
                     <button type="button" onclick="processarLinkDireto()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer flex-shrink-0">
@@ -817,7 +845,7 @@
                 }
             });
 
-            select.innerHTML = '<option value="">TODOS OS SOLICITANTES (GERAL)</option>';
+            select.innerHTML = '<option value="">TODOS OS SOLICITANTES</option>';
             Array.from(conjuntoNomes).sort().forEach(nome => {
                 const opt = document.createElement('option');
                 opt.value = nome;
@@ -876,13 +904,17 @@
             });
 
             const nomes = Object.keys(totaisPorPessoa).sort();
-            nomes.forEach(nome => {
+            const classesGlow = ['glow-azul', 'glow-roxo', 'glow-verde', 'glow-rosa', 'glow-amarelo'];
+
+            nomes.forEach((nome, idx) => {
                 const dados = totaisPorPessoa[nome];
+                const glowClass = classesGlow[idx % classesGlow.length];
+
                 const card = document.createElement('div');
-                card.className = "bg-white dark:bg-slate-800 p-3 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-indigo-500 transition";
+                card.className = `bg-white dark:bg-slate-800 p-3 rounded-2xl shadow-sm ${glowClass} cursor-pointer hover:scale-[1.02] transition`;
                 card.onclick = () => aplicarFiltroPorSelect(nome);
                 card.innerHTML = `
-                    <span class="text-[9px] font-bold uppercase text-slate-400 block truncate">👤 ${nome}</span>
+                    <span class="text-[10px] font-black uppercase text-slate-700 dark:text-slate-200 block truncate">👤 ${nome}</span>
                     <div class="flex justify-between items-baseline mt-1">
                         <span class="text-xs font-black text-indigo-600 dark:text-indigo-400">${dados.count} un</span>
                         <span class="text-xs font-black text-emerald-600 dark:text-emerald-400">R$ ${dados.valor.toFixed(2)}</span>
@@ -1307,7 +1339,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-2.5 items-end">
                         <div class="md:col-span-2">
                             <label class="block text-[9px] font-bold text-slate-400 uppercase">Data Compra</label>
-                            <input type="date" id="data-${item.tempId}" value="${item.data}" onchange="atualizarDataEntregaCard('${item.tempId}')" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white">
+                            <input type="date" id="data-${item.tempId}" value="${item.data}" onchange="atualizarDataEntregaCard('${item.tempId}')" class="neon-pulsante w-full text-xs p-1.5 rounded-lg bg-white dark:bg-slate-900 dark:text-white">
                         </div>
 
                         <div class="md:col-span-3">
@@ -1334,7 +1366,7 @@
                         <div class="md:col-span-3">
                             <div class="flex justify-between items-center mb-0.5">
                                 <label class="block text-[9px] font-bold text-slate-400 uppercase">Categoria</label>
-                                <button type="button" onclick="adicionarNovaCategoriaPrompt('categoria-${item.tempId}')" class="text-[9px] text-indigo-600 dark:text-indigo-400 font-black hover:underline">+ Nova</button>
+                                <button type="button" onclick="adicionarNovaCategoriaPrompt('categoria-${item.tempId}')" class="text-[9px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline">+ Nova</button>
                             </div>
                             <select id="categoria-${item.tempId}" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-semibold"></select>
                         </div>
@@ -1354,13 +1386,12 @@
                             <input type="number" step="0.01" id="unit-${item.tempId}" value="${unitCalculado}" oninput="calcularCardPorUnitario(${item.tempId})" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold">
                         </div>
 
-                        <!-- OPÇÃO DE ENTREGA JÁ NO CARD -->
-                        <div class="md:col-span-4 bg-slate-100 dark:bg-slate-900/60 p-2 rounded-xl border border-slate-200 dark:border-slate-700">
+                        <div class="md:col-span-4 bg-slate-100 dark:bg-slate-900/60 p-2.5 rounded-xl border border-indigo-200 dark:border-indigo-800">
                             <label class="flex items-center gap-1.5 cursor-pointer mb-1">
-                                <input type="checkbox" id="card-entregue-${item.tempId}" onchange="toggleCardDataEntrega('${item.tempId}', this.checked)" class="w-4 h-4 text-emerald-600 rounded">
-                                <span class="text-[9px] font-bold uppercase">📦 Entregue? (+10d)</span>
+                                <input type="checkbox" id="card-entregue-${item.tempId}" onchange="toggleCardDataEntrega('${item.tempId}', this.checked)" class="pulso-delicado w-4 h-4 text-indigo-600 rounded cursor-pointer">
+                                <span class="text-[9px] font-bold uppercase text-indigo-700 dark:text-indigo-300">📦 Entregue? (+10d)</span>
                             </label>
-                            <input type="date" id="card-data-entrega-${item.tempId}" value="${dataEntregaDefault}" class="w-full text-[10px] p-1 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded font-bold hidden">
+                            <input type="date" id="card-data-entrega-${item.tempId}" value="${dataEntregaDefault}" class="neon-pulsante w-full text-[10px] p-1.5 rounded font-bold hidden bg-white dark:bg-slate-800 dark:text-white">
                         </div>
 
                         <div class="md:col-span-3 flex gap-2">
@@ -1420,7 +1451,7 @@
             if (!solicitante || solicitante === "NÃO INFORMADO" || solicitante === "NAO INFORMADO") {
                 inputSol.classList.add('piscar-solicitante-forte');
                 inputSol.focus();
-                alert("⚠️ ATENÇÃO: Por favor, preencha quem é o SOLICITANTE desta compra antes de salvar!");
+                alert("⚠️️ ATENÇÃO: Por favor, preencha quem é o SOLICITANTE desta compra antes de salvar!");
                 return;
             }
 
@@ -1693,6 +1724,11 @@
                 });
             }
 
+            const filtroValor = document.getElementById('inputFiltroValor') ? parseFloat(document.getElementById('inputFiltroValor').value) : NaN;
+            if (!isNaN(filtroValor) && filtroValor > 0) {
+                listaExibicao = listaExibicao.filter(i => Number(i.total) === filtroValor || Number(i.unit) === filtroValor);
+            }
+
             listaExibicao.sort((a, b) => {
                 if (a.entregue !== b.entregue) {
                     return a.entregue ? 1 : -1;
@@ -1714,18 +1750,19 @@
                     const estiloRiscado = item.entregue ? 'line-through text-slate-400 dark:text-slate-500 font-normal' : 'text-slate-900 dark:text-white font-medium';
                     const linhaOpacidade = item.entregue ? 'bg-slate-100/70 dark:bg-slate-800/40 opacity-75' : 'hover:bg-slate-50 dark:hover:bg-slate-700/40';
 
-                    // VERIFICA SE HÁ DUPLICIDADE NO PRODUTO / SERVIÇO
                     const produtoAtual = (item.produto || "").trim().toUpperCase();
                     const qtdDuplicados = compras.filter(c => (c.produto || "").trim().toUpperCase() === produtoAtual).length;
-                    const classeDuplicado = qtdDuplicados > 1 ? 'alerta-duplicado-brilhante' : '';
-                    const tooltipDuplicado = qtdDuplicados >  1 ? `⚠️ ATENÇÃO: Este produto "${produtoAtual}" está cadastrado ${qtdDuplicados} vezes!` : '';
+                    const estiloDuplicado = qtdDuplicados > 1 ? 'alerta-duplicado-fluorescente' : '';
+                    const tooltipDuplicado = qtdDuplicados > 1 ? `⚠️️ ATENÇÃO: Este produto "${produtoAtual}" está duplicado (${qtdDuplicados}x)!` : '';
 
                     const tr = document.createElement('tr');
                     tr.className = `${linhaOpacidade} transition uppercase`;
                     tr.innerHTML = `
                         <td class="py-2.5 px-3 font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap">${formatarDataBR(item.data)}</td>
                         <td class="py-2.5 px-3 font-bold text-slate-800 dark:text-slate-200 whitespace-nowrap">${item.solicitante}</td>
-                        <td class="py-2.5 px-3 max-w-xs truncate ${estiloRiscado} ${classeDuplicado}" title="${tooltipDuplicado || item.produto}">${item.produto} ${qtdDuplicados > 1 ? '⚠️(DUPLICADO)' : ''}</td>
+                        <td class="py-2.5 px-3 max-w-xs truncate ${estiloRiscado}" title="${tooltipDuplicado || item.produto}">
+                            <span class="${estiloDuplicado}">${item.produto}</span>
+                        </td>
                         <td class="py-2.5 px-3 font-semibold text-indigo-700 dark:text-indigo-300 whitespace-nowrap">${item.local || 'MERCADO LIVRE'}</td>
                         <td class="py-2.5 px-3 whitespace-nowrap"><span class="text-[10px] bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-full font-bold">${item.categoria}</span></td>
                         <td class="py-2.5 px-3 text-center font-bold text-slate-700 dark:text-slate-300">${item.qtd}</td>
