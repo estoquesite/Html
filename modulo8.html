@@ -47,7 +47,7 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Gestão de FDS e Fornecedores</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Edição Completa de Links e PDFs</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Validação de Documentos Ativa</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Sistema Operacional</span>
                     </div>
@@ -461,7 +461,7 @@
                 id: Date.now(),
                 produto,
                 fabricante,
-                linkPdf: linkPdf || "#",
+                linkPdf: linkPdf || "",
                 pdfBlob,
                 pdfNome,
                 dataRegistro: new Date().toLocaleDateString('pt-BR')
@@ -502,9 +502,11 @@
                 const card = document.createElement('div');
                 card.className = "bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 p-3 rounded-xl shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3 text-xs";
                 
-                let acaoHtml = `<a href="${item.linkPdf}" target="_blank" class="bg-cyan-50 hover:bg-cyan-100 text-cyan-700 font-bold py-1.5 px-3 rounded-lg text-[11px] text-center">Abrir Link ↗</a>`;
+                let acaoHtml = `<span class="text-[10px] text-slate-400 font-bold italic bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded">Sem Documento</span>`;
                 if (item.pdfBlob) {
                     acaoHtml = `<button onclick="abrirPdfAnexado(${item.id})" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold py-1.5 px-3 rounded-lg text-[11px] cursor-pointer shadow-sm">📎 Abrir PDF Anexado ↗</button>`;
+                } else if (item.linkPdf && item.linkPdf !== '#' && item.linkPdf !== '') {
+                    acaoHtml = `<a href="${item.linkPdf}" target="_blank" class="bg-cyan-50 hover:bg-cyan-100 text-cyan-700 font-bold py-1.5 px-3 rounded-lg text-[11px] text-center">Abrir Link ↗</a>`;
                 }
 
                 card.innerHTML = `
@@ -567,7 +569,7 @@
                             const res = await fetch(itemObj.pdfBlob);
                             const buffer = await res.arrayBuffer();
                             pdfsParaUnificar.push(buffer);
-                        } else if (itemObj.linkPdf && itemObj.linkPdf !== '#') {
+                        } else if (itemObj.linkPdf && itemObj.linkPdf !== '#' && itemObj.linkPdf !== '') {
                             const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(itemObj.linkPdf)}`;
                             try {
                                 const res = await fetch(proxyUrl);
@@ -628,20 +630,17 @@
                 return listaFds.find(f => String(f.id) === String(idItem));
             }).filter(Boolean);
 
-            if (confirm(`Serão abertos ${itensEscolhidos.length} documentos para impressão. Deseja continuar?`)) {
+            if (confirm(`Serão abertos ${itensEscolhidos.length} documentos válidos. Deseja continuar?`)) {
                 itensEscolhidos.forEach((item, index) => {
                     setTimeout(() => {
-                        const destino = item.pdfBlob ? item.pdfBlob : item.linkPdf;
-                        if (destino && destino !== '#') {
-                            if (item.pdfBlob) {
-                                abrirPdfAnexado(item.id);
-                            } else {
-                                window.open(destino, '_blank');
-                            }
+                        if (item.pdfBlob) {
+                            abrirPdfAnexado(item.id);
+                        } else if (item.linkPdf && item.linkPdf !== '#' && item.linkPdf !== '') {
+                            window.open(item.linkPdf, '_blank');
                         }
                     }, index * 600);
                 });
-                mostrarAviso(`🖨️ Fila disparada: ${itensEscolhidos.length} documento(s) aberto(s)!`);
+                mostrarAviso(`🖨️ Fila disparada!`);
             }
         }
 
@@ -650,7 +649,7 @@
             if (!item) return;
             document.getElementById('editId').value = item.id;
             document.getElementById('editProduto').value = item.produto;
-            document.getElementById('editLink').value = item.linkPdf;
+            document.getElementById('editLink').value = item.linkPdf || '';
             atualizarSelectsFornecedores();
             document.getElementById('editFabricante').value = item.fabricante;
             document.getElementById('editArquivoPdf').value = '';
@@ -669,7 +668,7 @@
             if (item) {
                 item.produto = produto;
                 item.fabricante = fabricante;
-                item.linkPdf = linkPdf || '#';
+                item.linkPdf = linkPdf;
 
                 if (inputArquivoEdit.files && inputArquivoEdit.files[0]) {
                     const arquivo = inputArquivoEdit.files[0];
