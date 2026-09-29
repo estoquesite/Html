@@ -17,25 +17,26 @@
         .uppercase-input { text-transform: uppercase; }
         .dropzone-hover { border-color: #9333ea !important; background-color: rgba(243, 232, 255, 0.7) !important; transform: scale(1.01); }
 
-        /* Animação piscante para o Solicitante não ser esquecido */
-        @keyframes piscarAlerta {
+        /* Animação ultra chamativa para o Solicitante na Digitação Manual */
+        @keyframes piscarForte {
             0%, 100% {
                 background-color: #fef08a;
-                border-color: #ea580c;
-                box-shadow: 0 0 10px rgba(234, 88, 12, 0.85);
+                border-color: #dc2626;
+                box-shadow: 0 0 15px rgba(220, 38, 38, 0.9);
                 transform: scale(1);
             }
             50% {
                 background-color: #ffedd5;
-                border-color: #f97316;
-                box-shadow: 0 0 4px rgba(249, 115, 22, 0.3);
+                border-color: #ea580c;
+                box-shadow: 0 0 5px rgba(234, 88, 12, 0.4);
                 transform: scale(1.01);
             }
         }
-        .piscar-solicitante {
-            animation: piscarAlerta 1s infinite alternate ease-in-out;
-            color: #9a3412 !important;
+        .piscar-solicitante-forte {
+            animation: piscarForte 0.8s infinite alternate ease-in-out;
+            color: #7c2d12 !important;
             font-weight: 900 !important;
+            border-width: 2px !important;
         }
     </style>
 </head>
@@ -55,7 +56,7 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Digitação Manual + Foto + Link + Teams</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Supabase Nuvem</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
@@ -133,85 +134,85 @@
         <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm overflow-hidden">
             <!-- BOTÕES DAS ABAS -->
             <div class="flex border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 p-1.5 gap-1 overflow-x-auto">
-                <button type="button" onclick="mudarAbaEntrada('manual')" id="tabBtn-manual" class="flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-700">
+                <button type="button" onclick="mudarAbaEntrada('manual')" id="tabBtn-manual" class="flex-1 min-w-[120px] py-2.5 px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-700">
                     <span>✍️</span> <span>Digitar Manual</span>
                 </button>
-                <button type="button" onclick="mudarAbaEntrada('link')" id="tabBtn-link" class="flex-1 min-w-[110px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
+                <button type="button" onclick="mudarAbaEntrada('link')" id="tabBtn-link" class="flex-1 min-w-[110px] py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
                     <span>🔗</span> <span>Link Web</span>
                 </button>
-                <button type="button" onclick="mudarAbaEntrada('foto')" id="tabBtn-foto" class="flex-1 min-w-[110px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
+                <button type="button" onclick="mudarAbaEntrada('foto')" id="tabBtn-foto" class="flex-1 min-w-[110px] py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
                     <span>📸</span> <span>Foto / Câmera</span>
                 </button>
-                <button type="button" onclick="mudarAbaEntrada('texto')" id="tabBtn-texto" class="flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
+                <button type="button" onclick="mudarAbaEntrada('texto')" id="tabBtn-texto" class="flex-1 min-w-[120px] py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
                     <span>💬</span> <span>Colar Teams</span>
                 </button>
             </div>
 
-            <!-- CONTEÚDO 1: ✍️ DIGITAÇÃO MANUAL DIRETA (QUANDO NÃO TEM LINK NEM FOTO) -->
+            <!-- CONTEÚDO 1: ✍️ DIGITAÇÃO MANUAL DIRETA (COM CAIXA PISCANTE FORTE) -->
             <div id="aba-manual" class="p-4 sm:p-5 space-y-4">
-                <div class="flex justify-between items-center">
+                <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                     <span class="text-xs font-black text-indigo-900 dark:text-indigo-300 uppercase flex items-center gap-1.5">
-                        <span>✍️</span> Digitar Compra Manualmente (Sem foto / Sem link)
+                        <span>✍️</span> Novo Lançamento Manual (Sem link, sem foto)
                     </span>
-                    <span class="text-[10px] text-slate-400">Preencha e clique em Lançar Compra</span>
+                    <span class="text-[10px] font-bold text-slate-400">Preencha os campos abaixo</span>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end">
                     <!-- DATA -->
                     <div class="md:col-span-2">
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Data</label>
-                        <input type="date" id="manualData" class="w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none">
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Data</label>
+                        <input type="date" id="manualData" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white outline-none font-bold">
                     </div>
 
-                    <!-- SOLICITANTE COM CAIXA PISCANTE SE VAZIO -->
+                    <!-- ⚠️ SOLICITANTE COM CAIXA PISCANTE SUPER CHAMATIVA -->
                     <div class="md:col-span-3">
                         <div class="flex justify-between items-center mb-1">
-                            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Solicitante</label>
-                            <span id="avisoManualSolicitante" class="text-[9px] font-black text-orange-600 animate-pulse hidden">DIGITE O NOME!</span>
+                            <label class="block text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase">Solicitante (*)</label>
+                            <span id="avisoManualSolicitante" class="text-[9px] font-black text-rose-600 animate-pulse">OBRIGATÓRIO!</span>
                         </div>
-                        <input type="text" id="manualSolicitante" oninput="validarInputManualSolicitante(this)" placeholder="QUEM PEDIU? (OBRIGATÓRIO)" class="uppercase-input w-full text-xs p-2 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none transition-all">
+                        <input type="text" id="manualSolicitante" oninput="validarInputManualSolicitante(this)" placeholder="QUEM PEDIU?" class="uppercase-input w-full text-xs p-2.5 rounded-xl outline-none transition-all piscar-solicitante-forte">
                     </div>
 
                     <!-- PRODUTO -->
                     <div class="md:col-span-4">
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Produto / Serviço</label>
-                        <input type="text" id="manualProduto" oninput="this.value = this.value.toUpperCase()" placeholder="EX: RESMA DE PAPEL A4, TECLADO..." class="uppercase-input w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Produto / Serviço</label>
+                        <input type="text" id="manualProduto" oninput="this.value = this.value.toUpperCase()" placeholder="EX: CHUMBADOR, JOGO DE MACHO..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                     </div>
 
-                    <!-- CATEGORIA -->
+                    <!-- CATEGORIA + BOTÃO DE ADICIONAR NOVA CATEGORIA -->
                     <div class="md:col-span-3">
                         <div class="flex justify-between items-center mb-1">
-                            <label class="block text-[10px] font-bold text-slate-400 uppercase">Categoria</label>
-                            <button type="button" onclick="adicionarNovaCategoriaPrompt('manualCategoria')" class="text-[10px] text-indigo-600 dark:text-indigo-400 font-black hover:underline" title="Adicionar Categoria">
-                                + Nova
+                            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Categoria</label>
+                            <button type="button" onclick="adicionarNovaCategoriaPrompt('manualCategoria')" class="bg-indigo-600 hover:bg-indigo-700 text-white px-2 py-0.5 rounded-lg text-[10px] font-black transition shadow-sm cursor-pointer" title="Criar nova categoria">
+                                + Nova Categoria
                             </button>
                         </div>
-                        <select id="manualCategoria" class="w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-semibold outline-none"></select>
+                        <select id="manualCategoria" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-semibold outline-none"></select>
                     </div>
 
                     <!-- QUANTIDADE -->
                     <div class="md:col-span-2">
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Qtd de Itens</label>
-                        <input type="number" id="manualQtd" value="1" min="1" oninput="calcularManualPorTotal()" class="w-full text-xs p-2 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none">
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Qtd Itens</label>
+                        <input type="number" id="manualQtd" value="1" min="1" oninput="calcularManualPorTotal()" class="w-full text-xs p-2.5 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white outline-none">
                     </div>
 
                     <!-- VALOR TOTAL (AO DIGITAR DIVIDE PELA QTD) -->
                     <div class="md:col-span-3">
-                        <label class="block text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase mb-1">Valor Total (R$) 🔄</label>
-                        <input type="number" step="0.01" id="manualTotal" placeholder="0,00" oninput="calcularManualPorTotal()" class="w-full text-xs p-2 bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-700 rounded-xl font-black text-emerald-600 dark:text-emerald-400 outline-none">
+                        <label class="block text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase mb-1">Valor Total (R$) 🔄</label>
+                        <input type="number" step="0.01" id="manualTotal" placeholder="0,00" oninput="calcularManualPorTotal()" class="w-full text-xs p-2.5 bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-400 dark:border-emerald-600 rounded-xl font-black text-emerald-600 dark:text-emerald-400 outline-none">
                     </div>
 
-                    <!-- VALOR UNITÁRIO (AO DIGITAR MULTIPLICA PELA QTD) -->
+                    <!-- VALOR UNITÁRIO (AO DIGITAR MULTIPLICA) -->
                     <div class="md:col-span-2">
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Unitário (R$)</label>
-                        <input type="number" step="0.01" id="manualUnit" placeholder="0,00" oninput="calcularManualPorUnitario()" class="w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Unitário (R$)</label>
+                        <input type="number" step="0.01" id="manualUnit" placeholder="0,00" oninput="calcularManualPorUnitario()" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                     </div>
 
-                    <!-- BOTÃO LANÇAR COMPRA -->
+                    <!-- BOTÃO LANÇAR -->
                     <div class="md:col-span-5">
-                        <button type="button" onclick="lancarCompraManual()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2.5 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer">
+                        <button type="button" onclick="lancarCompraManual()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer">
                             <span>✅</span>
-                            <span>Lançar Compra no Cartão</span>
+                            <span>Lançar Compra na Nuvem</span>
                         </button>
                     </div>
                 </div>
@@ -230,7 +231,7 @@
                 </div>
                 
                 <div class="flex flex-col sm:flex-row gap-2">
-                    <input type="text" id="inputLinkDireto" placeholder="Cole o link aqui (ex: link do ML ou link + 3x total R$ 500)..." class="flex-1 text-xs px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-xl outline-none focus:border-blue-600 dark:text-white">
+                    <input type="text" id="inputLinkDireto" placeholder="Cole o link aqui (ex: link do ML ou link + 3x total R$ 500)..." class="flex-1 text-xs px-3 py-2.5 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-xl outline-none focus:border-blue-600 dark:text-white">
                     <button type="button" onclick="processarLinkDireto()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer flex-shrink-0">
                         <span>⚡</span>
                         <span>Reconhecer Link</span>
@@ -491,10 +492,13 @@
         window.addEventListener('DOMContentLoaded', () => {
             carregarCategorias();
             
-            // Define data padrão de hoje para digitação manual
             const hoje = new Date().toISOString().split('T')[0];
             document.getElementById('manualData').value = hoje;
             preencherOpcoesCategoria(document.getElementById('manualCategoria'));
+
+            // Ativa o destaque inicial na caixa manual
+            const solManual = document.getElementById('manualSolicitante');
+            solManual.classList.add('piscar-solicitante-forte');
 
             if (window.supabase) {
                 try {
@@ -516,10 +520,10 @@
                 const elBtn = document.getElementById(`tabBtn-${id}`);
                 if (id === aba) {
                     elAba.classList.remove('hidden');
-                    elBtn.className = "flex-1 min-w-[110px] py-2 px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-700";
+                    elBtn.className = "flex-1 min-w-[110px] py-2.5 px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-700";
                 } else {
                     elAba.classList.add('hidden');
-                    elBtn.className = "flex-1 min-w-[110px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200";
+                    elBtn.className = "flex-1 min-w-[110px] py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200";
                 }
             });
         }
@@ -547,7 +551,6 @@
                     salvarCategorias();
                 }
                 
-                // Atualiza o select manual
                 preencherOpcoesCategoria(document.getElementById('manualCategoria'), categoriaFormatada);
 
                 if (selectId) {
@@ -583,7 +586,7 @@
             setTimeout(() => el.classList.add('hidden'), 5000);
         }
 
-        // ================= DIGITAÇÃO MANUAL: CÁLCULOS E LANÇAMENTO =================
+        // ================= DIGITAÇÃO MANUAL =================
         function calcularManualPorTotal() {
             const qtd = parseFloat(document.getElementById('manualQtd').value) || 1;
             const total = parseFloat(document.getElementById('manualTotal').value) || 0;
@@ -603,10 +606,10 @@
             const val = input.value.trim();
             const aviso = document.getElementById('avisoManualSolicitante');
             if (val === "" || val === "NÃO INFORMADO" || val === "NAO INFORMADO") {
-                input.classList.add('piscar-solicitante');
+                input.classList.add('piscar-solicitante-forte');
                 if (aviso) aviso.classList.remove('hidden');
             } else {
-                input.classList.remove('piscar-solicitante');
+                input.classList.remove('piscar-solicitante-forte');
                 if (aviso) aviso.classList.add('hidden');
             }
         }
@@ -616,7 +619,7 @@
             const solicitante = inputSol.value.trim().toUpperCase();
 
             if (!solicitante || solicitante === "NÃO INFORMADO" || solicitante === "NAO INFORMADO") {
-                inputSol.classList.add('piscar-solicitante');
+                inputSol.classList.add('piscar-solicitante-forte');
                 inputSol.focus();
                 alert("⚠️ ATENÇÃO: Por favor, preencha quem é o SOLICITANTE desta compra!");
                 return;
@@ -662,26 +665,26 @@
             atualizarListaSelectSolicitantes();
             renderizarTabela();
 
-            // Limpa o formulário para o próximo lançamento
+            // Reseta campos mantendo solicitante e data
             document.getElementById('manualProduto').value = '';
             document.getElementById('manualTotal').value = '';
             document.getElementById('manualUnit').value = '';
             document.getElementById('manualQtd').value = '1';
 
-            mostrarAviso("✅ Compra manual salva com sucesso no Supabase!");
+            mostrarAviso("✅ Compra manual salva com sucesso na nuvem!");
         }
 
-        // ================= CONTROLE DA CAIXA PISCANTE NO SOLICITANTE =================
+        // ================= CONTROLE DA CAIXA PISCANTE NOS CARDS =================
         function verificarDigitacaoSolicitante(input, tempId) {
             input.value = input.value.toUpperCase();
             const val = input.value.trim();
             const aviso = document.getElementById(`avisoSolicitante-${tempId}`);
 
             if (val === "" || val === "NÃO INFORMADO" || val === "NAO INFORMADO") {
-                input.classList.add('piscar-solicitante');
+                input.classList.add('piscar-solicitante-forte');
                 if (aviso) aviso.classList.remove('hidden');
             } else {
-                input.classList.remove('piscar-solicitante');
+                input.classList.remove('piscar-solicitante-forte');
                 if (aviso) aviso.classList.add('hidden');
             }
         }
@@ -691,10 +694,10 @@
             const val = input.value.trim();
             const aviso = document.getElementById('avisoEditSolicitante');
             if (val === "" || val === "NÃO INFORMADO" || val === "NAO INFORMADO") {
-                input.classList.add('piscar-solicitante');
+                input.classList.add('piscar-solicitante-forte');
                 if (aviso) aviso.classList.remove('hidden');
             } else {
-                input.classList.remove('piscar-solicitante');
+                input.classList.remove('piscar-solicitante-forte');
                 if (aviso) aviso.classList.add('hidden');
             }
         }
@@ -983,7 +986,7 @@
             itensPendentesAprovacao.unshift({
                 tempId: Date.now() + Math.random(),
                 data: hoje,
-                solicitante: "", // Vazio para forçar a piscar
+                solicitante: "",
                 produto: produto.toUpperCase(),
                 categoria: adivinharCategoria(produto),
                 qtd: qtd,
@@ -1211,7 +1214,7 @@
             }
         }
 
-        // ================= CARDS PRÉ-PREENCHIDOS COM CAIXA PISCANTE =================
+        // ================= CARDS PRÉ-PREENCHIDOS =================
         function renderizarCardsPendentes() {
             const container = document.getElementById('containerCardsPreenchidos');
             const lista = document.getElementById('listaCardsPendentes');
@@ -1230,7 +1233,7 @@
                 const unitCalculado = Number(item.unit || (totalCalculado / item.qtd)).toFixed(2);
                 
                 const estaSemSolicitante = !item.solicitante || item.solicitante.trim() === "" || item.solicitante === "NÃO INFORMADO";
-                const classePiscante = estaSemSolicitante ? "piscar-solicitante" : "";
+                const classePiscante = estaSemSolicitante ? "piscar-solicitante-forte" : "";
                 const exibirAviso = estaSemSolicitante ? "" : "hidden";
 
                 const card = document.createElement('div');
@@ -1249,16 +1252,15 @@
                             <input type="date" id="data-${item.tempId}" value="${item.data}" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-white">
                         </div>
 
-                        <!-- ⚠️ CAMPO SOLICITANTE COM CAIXA PISCANTE -->
                         <div class="md:col-span-3">
                             <div class="flex justify-between items-center mb-0.5">
-                                <label class="block text-[9px] font-bold text-slate-500 dark:text-slate-400 uppercase">Solicitante</label>
-                                <span id="avisoSolicitante-${item.tempId}" class="text-[9px] font-black text-orange-600 dark:text-orange-400 animate-pulse ${exibirAviso}">
+                                <label class="block text-[9px] font-black text-rose-600 uppercase">Solicitante (*)</label>
+                                <span id="avisoSolicitante-${item.tempId}" class="text-[9px] font-black text-rose-600 animate-pulse ${exibirAviso}">
                                     ⚠️ DIGITE O NOME!
                                 </span>
                             </div>
                             <input type="text" id="solicitante-${item.tempId}" value="${item.solicitante || ''}" 
-                                placeholder="QUEM PEDIU? (OBRIGATÓRIO)" 
+                                placeholder="QUEM PEDIU?" 
                                 oninput="verificarDigitacaoSolicitante(this, ${item.tempId})" 
                                 class="uppercase-input w-full text-xs p-1.5 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold outline-none transition-all ${classePiscante}">
                         </div>
@@ -1326,7 +1328,7 @@
             const solicitante = inputSol.value.trim().toUpperCase();
 
             if (!solicitante || solicitante === "NÃO INFORMADO" || solicitante === "NAO INFORMADO") {
-                inputSol.classList.add('piscar-solicitante');
+                inputSol.classList.add('piscar-solicitante-forte');
                 inputSol.focus();
                 alert("⚠️ ATENÇÃO: Por favor, preencha quem é o SOLICITANTE desta compra antes de salvar!");
                 return;
@@ -1372,7 +1374,7 @@
                 const solicitante = inputSol.value.trim().toUpperCase();
 
                 if (!solicitante || solicitante === "NÃO INFORMADO" || solicitante === "NAO INFORMADO") {
-                    inputSol.classList.add('piscar-solicitante');
+                    inputSol.classList.add('piscar-solicitante-forte');
                     inputSol.focus();
                     alert("⚠️ Há itens sem Solicitante preenchido! Digite o nome para continuar.");
                     return;
@@ -1467,7 +1469,7 @@
             const solicitante = editSol.value.trim().toUpperCase();
 
             if (!solicitante || solicitante === "NÃO INFORMADO" || solicitante === "NAO INFORMADO") {
-                editSol.classList.add('piscar-solicitante');
+                editSol.classList.add('piscar-solicitante-forte');
                 editSol.focus();
                 alert("⚠️ Por favor, informe o Solicitante para salvar as alterações!");
                 return;
