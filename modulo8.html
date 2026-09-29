@@ -53,7 +53,7 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Impressão Unificada em Lote de FDS</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Salvamento Automático & Nuvem Supabase</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Salvamento Direto & Nuvem Supabase</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
@@ -73,13 +73,13 @@
         <!-- AVISO DE STATUS -->
         <div id="alertaSistema" class="hidden p-3 rounded-xl text-xs font-bold text-center transition-all"></div>
 
-        <!-- PAINEL DE CADASTRO COM SALVAMENTO AUTOMÁTICO -->
+        <!-- PAINEL DE CADASTRO -->
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                 <span class="text-xs font-black text-cyan-900 dark:text-cyan-300 uppercase flex items-center gap-1.5">
                     <span>⚡</span> Reconhecimento por Câmera e Cadastro de FDS
                 </span>
-                <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">💾 Salvamento automático ativo</span>
+                <span class="text-[10px] font-bold text-slate-400">Verificação de duplicidade ativa</span>
             </div>
 
             <!-- CÂMERA DE RECONHECIMENTO (IA) -->
@@ -100,24 +100,24 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end pt-2">
                 <div class="md:col-span-4">
                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Nome do Produto</label>
-                    <input type="text" id="inputProduto" oninput="salvarRascunhoAutomatico(); verificarDuplicidadeInput();" placeholder="EX: DEVCON PLASTIC STEEL..." class="uppercase-input neon-pulsante w-full text-xs p-2.5 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white font-bold">
+                    <input type="text" id="inputProduto" oninput="verificarDuplicidadeInput()" placeholder="EX: DEVCON PLASTIC STEEL..." class="uppercase-input neon-pulsante w-full text-xs p-2.5 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white font-bold">
                     <span id="avisoDuplicadoTexto" class="text-[10px] font-bold text-rose-500 hidden mt-1 block">⚠️ Atenção: Já existe uma FDS igual cadastrada!</span>
                 </div>
 
                 <div class="md:col-span-4">
                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Fabricante</label>
-                    <input type="text" id="inputFabricante" oninput="salvarRascunhoAutomatico()" placeholder="EX: VONDER, WEG..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                    <input type="text" id="inputFabricante" placeholder="EX: VONDER, WEG..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
 
                 <div class="md:col-span-4">
                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Link Direto da FDS (PDF)</label>
-                    <input type="text" id="inputLink" oninput="salvarRascunhoAutomatico()" placeholder="Cole o link oficial do PDF..." class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                    <input type="text" id="inputLink" placeholder="Cole o link oficial do PDF..." class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
 
                 <!-- BOTÕES -->
                 <div class="md:col-span-12 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3">
                     <div class="text-[11px] text-slate-500 font-semibold">
-                        💡 Seus dados são salvos automaticamente ao digitar.
+                        💡 Clique em "Salvar FDS na Nuvem" para registrar o documento na lista.
                     </div>
                     <div class="flex gap-2">
                         <button type="button" onclick="pesquisarWebFds()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer">
@@ -208,7 +208,6 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             carregarFdsLocal();
-            carregarRascunhoAutomatico();
             if (window.supabase) {
                 try {
                     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -223,36 +222,6 @@
             el.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
             el.classList.add(tipo === "sucesso" ? 'bg-emerald-100' : 'bg-rose-100', tipo === "sucesso" ? 'text-emerald-800' : 'text-rose-800');
             setTimeout(() => el.classList.add('hidden'), 4000);
-        }
-
-        function salvarRascunhoAutomatico() {
-            const rascunho = {
-                produto: document.getElementById('inputProduto').value,
-                fabricante: document.getElementById('inputFabricante').value,
-                link: document.getElementById('inputLink').value
-            };
-            localStorage.setItem('portal_vale_fds_rascunho', JSON.stringify(rascunho));
-        }
-
-        function carregarRascunhoAutomatico() {
-            const s = localStorage.getItem('portal_vale_fds_rascunho');
-            if (s) {
-                try {
-                    const rascunho = JSON.parse(s);
-                    if (rascunho.produto) document.getElementById('inputProduto').value = rascunho.produto;
-                    if (rascunho.fabricante) document.getElementById('inputFabricante').value = rascunho.fabricante;
-                    if (rascunho.link) document.getElementById('inputLink').value = rascunho.link;
-                    verificarDuplicidadeInput();
-                } catch(e) {}
-            }
-        }
-
-        function limparRascunhoAutomatico() {
-            localStorage.removeItem('portal_vale_fds_rascunho');
-            document.getElementById('inputProduto').value = '';
-            document.getElementById('inputFabricante').value = '';
-            document.getElementById('inputLink').value = '';
-            verificarDuplicidadeInput();
         }
 
         async function carregarDoSupabase() {
@@ -319,15 +288,14 @@
                     if (resultado.fabricante) {
                         document.getElementById('inputFabricante').value = resultado.fabricante.toUpperCase();
                     }
-                    salvarRascunhoAutomatico();
                     verificarDuplicidadeInput();
                     mostrarAviso("✅ Produto reconhecido com sucesso!");
                 } else {
-                    mostrarAviso("ℹ️️ Preencha o nome do produto manualmente.");
+                    mostrarAviso("ℹ️ Preencha o nome do produto manualmente.");
                 }
             } catch (err) {
                 console.error(err);
-                mostrarAviso("ℹ️ Erro na leitura automática. Preencha manualmente.");
+                mostrarAviso("ℹ️️ Erro na leitura automática. Preencha manualmente.");
             }
         }
 
@@ -389,10 +357,13 @@
 
             listaFds.push(novoItem);
             salvarFdsLocal();
-            limparRascunhoAutomatico();
             renderizarCardsFds();
             verificarDuplicidadeInput();
             mostrarAviso(`✅ FDS do produto "${produto}" salva com sucesso!`);
+
+            document.getElementById('inputProduto').value = '';
+            document.getElementById('inputFabricante').value = '';
+            document.getElementById('inputLink').value = '';
 
             if (supabaseClient) {
                 try {
