@@ -47,7 +47,7 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Gestão de FDS e Fornecedores</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Fornecedores Dinâmicos & Nuvem Supabase</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Fornecedores em Destaque & Nuvem Supabase</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
@@ -98,6 +98,7 @@
                 <span class="absolute left-3 top-5 text-xs text-slate-400">🔍</span>
             </div>
 
+            <!-- LISTA DE FORNECEDORES EM DESTAQUE EM CIMA -->
             <div id="gridFornecedores" class="flex flex-wrap gap-2 pt-2"></div>
         </div>
 
@@ -182,11 +183,11 @@
                 </div>
             </div>
 
-            <!-- FILTROS DE BUSCA (PRODUTO E FORNECEDOR) -->
+            <!-- FILTROS DE BUSCA COM LUPA -->
             <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
                 <div class="relative sm:col-span-7">
-                    <input type="text" id="filtroPesquisa" oninput="renderizarCardsFds()" placeholder="🔍 Pesquisar FDS por nome do produto..." class="uppercase-input w-full text-xs p-3 pl-9 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl outline-none font-bold text-slate-800 dark:text-white">
-                    <span class="absolute left-3 top-3.5 text-xs text-slate-400">🔍</span>
+                    <input type="text" id="filtroPesquisa" oninput="renderizarCardsFds()" placeholder="Pesquisar FDS por nome do produto..." class="uppercase-input w-full text-xs p-3 pl-9 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl outline-none font-bold text-slate-800 dark:text-white">
+                    <span class="absolute left-3 top-3.5 text-xs text-slate-400 pointer-events-none">🔍</span>
                 </div>
                 <div class="sm:col-span-3">
                     <select id="filtroFornecedorSelect" onchange="renderizarCardsFds()" class="uppercase-input w-full text-xs p-3 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none cursor-pointer">
@@ -430,7 +431,6 @@
                     }
                     if (resultado.fabricante) {
                         const fabDetectado = resultado.fabricante.toUpperCase();
-                        // Se o fornecedor detectado não estiver na lista, cadastra automaticamente!
                         if (!listaFornecedores.some(f => f.nome === fabDetectado)) {
                             listaFornecedores.push({ id: Date.now(), nome: fabDetectado, contato: 'DETECTADO POR IA' });
                             atualizarSelectsFornecedores();
@@ -590,7 +590,7 @@
 
                     <div class="flex items-center gap-2 w-full sm:w-auto justify-end flex-shrink-0">
                         ${acaoHtml}
-                        <button onclick="abrirModalEdicao('${item.id}')" class="text-cyan-600 hover:text-cyan-800 font-bold p-1.5 cursor-pointer" title="Editar">✏️</button>
+                        <button onclick="abrirModalEdicao('${item.id}')" class="text-cyan-600 hover:text-cyan-800 font-bold p-1.5 cursor-pointer" title="Editar">✏️️</button>
                         <button onclick="removerFds(${item.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1.5 cursor-pointer" title="Excluir">✕</button>
                     </div>
                 `;
@@ -701,7 +701,7 @@
                         }
                     }, index * 600);
                 });
-                mostrarAviso(`🖨️ Fila disparada: ${itensEscolhidos.length} documento(s) aberto(s)!`);
+                mostrarAviso(`🖨️️ Fila disparada: ${itensEscolhidos.length} documento(s) aberto(s)!`);
             }
         }
 
@@ -761,7 +761,6 @@
             if (sForn) { 
                 try { listaFornecedores = JSON.parse(sForn); } catch(e){ listaFornecedores = []; } 
             } else {
-                // Fornecedores iniciais padrão caso esteja vazio
                 listaFornecedores = [
                     { id: 1, nome: "WEG", contato: "PADRÃO" },
                     { id: 2, nome: "VONDER", contato: "PADRÃO" },
