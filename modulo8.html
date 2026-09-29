@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 8 - Emissão Oficial de FDS | Portal Vale</title>
+    <title>Módulo 8 - Emissão Inteligente de FDS | Portal Vale</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -42,10 +42,10 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-cyan-100 dark:bg-cyan-900 text-cyan-700 dark:text-cyan-300">Módulo 8</span>
-                        <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Busca e Emissão de FDS</h1>
+                        <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Emissão Inteligente de FDS por Foto</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Geração Automática de Ficha Técnica & Foto</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + IA Gemini & Foto no Canto Superior Direito</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
@@ -62,16 +62,37 @@
         <!-- AVISO DE STATUS -->
         <div id="alertaSistema" class="hidden p-3 rounded-xl text-xs font-bold text-center transition-all"></div>
 
-        <!-- PAINEL DE BUSCA DE FDS -->
+        <!-- PAINEL DE BUSCA POR CÂMERA / IA -->
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                 <span class="text-xs font-black text-cyan-900 dark:text-cyan-300 uppercase flex items-center gap-1.5">
-                    <span>🔍</span> Passo 1: Localizar FDS Oficial na Internet e Inserir Foto
+                    <span>📸</span> Passo 1: Tire a foto do produto ou insira os dados
                 </span>
-                <span class="text-[10px] font-bold text-slate-400">Gera o documento pronto para impressão</span>
+                <span class="text-[10px] font-bold text-slate-400">Reconhecimento automático por IA</span>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end">
+            <!-- BOTÃO DA CÂMERA COM IA -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <label class="flex items-center justify-center gap-3 bg-purple-600 hover:bg-purple-700 text-white font-black py-3 px-4 rounded-2xl shadow-md cursor-pointer transition active:scale-95 text-xs">
+                    <span class="text-xl">📸</span>
+                    <div class="text-left">
+                        <span class="block">TIRAR FOTO DO PRODUTO COM A CÂMERA</span>
+                        <span class="block text-[10px] font-normal text-purple-200">A IA identifica o produto automaticamente</span>
+                    </div>
+                    <input type="file" id="inputCameraIa" accept="image/*" capture="environment" class="hidden" onchange="analisarFotoComIa(this.files[0])">
+                </label>
+
+                <label class="flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3 px-4 rounded-2xl shadow-md cursor-pointer transition active:scale-95 text-xs">
+                    <span class="text-xl">🖼️</span>
+                    <div class="text-left">
+                        <span class="block">ESCOLHER FOTO DA GALERIA</span>
+                        <span class="block text-[10px] font-normal text-indigo-200">Selecione imagem salva do produto</span>
+                    </div>
+                    <input type="file" id="inputGaleriaIa" accept="image/*" class="hidden" onchange="analisarFotoComIa(this.files[0])">
+                </label>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end pt-2">
                 <div class="md:col-span-4">
                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Nome do Produto / Material</label>
                     <input type="text" id="buscaProduto" placeholder="EX: DEVCON PLASTIC STEEL..." class="uppercase-input neon-pulsante w-full text-xs p-2.5 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white font-bold">
@@ -83,13 +104,13 @@
                 </div>
 
                 <div class="md:col-span-3">
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Foto do Material / Produto</label>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Foto para o Documento</label>
                     <input type="file" id="buscaFoto" accept="image/*" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-semibold">
                 </div>
 
                 <div class="md:col-span-2">
                     <button type="button" onclick="gerarDocumentoFds()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-2.5 px-4 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1 cursor-pointer">
-                        <span>🌐</span> <span>Buscar FDS</span>
+                        <span>📄</span> <span>Gerar Ficha</span>
                     </button>
                 </div>
             </div>
@@ -228,12 +249,63 @@
             } catch(e) {}
         }
 
+        async function analisarFotoComIa(file) {
+            if (!file) return;
+            const apiKey = localStorage.getItem('gemini_api_key');
+            if (!apiKey) {
+                alert("⚠️ Chave da IA (Gemini) não configurada! Vá ao Módulo 7 para configurar sua chave de API.");
+                return;
+            }
+
+            mostrarAviso("🤖 IA analisando a foto do produto...", "sucesso");
+
+            try {
+                const base64Data = await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onload = () => resolve(reader.result.split(',')[1]);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(file);
+                });
+
+                const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [
+                                { text: "Analise esta foto de um produto químico ou embalagem. Retorne APENAS um JSON estrito no formato: {\"produto\": \"NOME DO PRODUTO\", \"fabricante\": \"FABRICANTE\"}. Se não encontrar, deixe em branco." },
+                                { inlineData: { mimeType: file.type, data: base64Data } }
+                            ]
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                const textoResposta = data.candidates[0].content.parts[0].text;
+                const jsonLimpo = textoResposta.replace(/```json/g, '').replace(/```/g, '').trim();
+                const resultado = JSON.parse(jsonLimpo);
+
+                if (resultado.produto) document.getElementById('buscaProduto').value = resultado.produto.toUpperCase();
+                if (resultado.fabricante) document.getElementById('buscaFabricante').value = resultado.fabricante.toUpperCase();
+                
+                // Anexa automaticamente a foto ao input correspondente
+                const dataTransfer = new DataTransfer();
+                dataTransfer.items.add(file);
+                document.getElementById('buscaFoto').files = dataTransfer.files;
+
+                mostrarAviso("✅ Produto identificado com sucesso pela IA!");
+            } catch (err) {
+                console.error(err);
+                alert("❌ Erro ao processar a imagem com a IA. Preencha os campos manualmente.");
+            }
+        }
+
         function gerarDocumentoFds() {
             const produto = document.getElementById('buscaProduto').value.trim().toUpperCase();
             const fabricante = document.getElementById('buscaFabricante').value.trim().toUpperCase() || "NÃO INFORMADO";
 
             if (!produto) {
-                alert("Por favor, digite o nome do produto/material!");
+                alert("Por favor, digite ou fotografe o nome do produto/material!");
                 document.getElementById('buscaProduto').focus();
                 return;
             }
@@ -255,7 +327,6 @@
                 dataRegistro: new Date().toLocaleDateString('pt-BR')
             };
 
-            // Preenche o documento oficial na tela
             document.getElementById('docNomeProduto').innerText = produto;
             document.getElementById('docFabricante').innerText = `Fabricante: ${fabricante}`;
             document.getElementById('secNomeProd').innerText = produto;
@@ -281,7 +352,7 @@
                 ...dadosItemAtual
             };
 
-            listaFds.push(novoItem); // Vai para baixo na lista
+            listaFds.push(novoItem);
             salvarFdsLocal();
             renderizarCardsFds();
             document.getElementById('painelDocumentoGerado').classList.add('hidden');
