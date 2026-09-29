@@ -66,6 +66,7 @@
         .card-modulo.m1::before, .card-modulo.m2::before { background: #007e7a; }
         .card-modulo.m3::before, .card-modulo.m4::before, .card-modulo.m5::before { background: #db2777; }
         .card-modulo.m6::before { background: #059669; }
+        .card-modulo.m7::before { background: #6366f1; }
         
         .card-modulo:hover { 
             transform: translateY(-5px); 
@@ -86,6 +87,7 @@
         .m1 .card-icone, .m2 .card-icone { background: #e6f4f4; color: #007e7a; }
         .m3 .card-icone, .m4 .card-icone, .m5 .card-icone { background: #fce7f3; color: #db2777; }
         .m6 .card-icone { background: #ecfdf5; color: #059669; }
+        .m7 .card-icone { background: #eef2ff; color: #6366f1; }
         
         .tecla-atalho {
             font-size: 10px;
@@ -160,7 +162,7 @@
             </div>
         </header>
 
-        <!-- GRADE DE MÓDULOS (6 APLICAÇÕES) -->
+        <!-- GRADE COM OS 7 MÓDULOS -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-left">
             
             <!-- MÓDULO 1 -->
@@ -264,22 +266,37 @@
                     <span>Abrir Módulo 6</span><span>➔</span>
                 </div>
             </a>
+
+            <!-- MÓDULO 7 (COMPRAS CARTÃO CORPORATIVO) -->
+            <a href="modulo7.html" class="card-modulo m7" title="Pressione [7] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">💳</div>
+                        <span class="tecla-atalho">Tecla 7</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Compras Cartão Corporativo</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Lançamento e controle de compras no cartão corporativo, extração via links e exportação para planilha.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#6366f1]">
+                    <span>Abrir Módulo 7</span><span>➔</span>
+                </div>
+            </a>
+
         </div>
 
         <!-- RODAPÉ -->
         <footer class="mt-8 text-center text-xs text-slate-400 font-medium space-y-1">
             <p>Sistema Operacional Integrado • Portal Vale Corporativo</p>
-            <p class="text-[10px] text-slate-400/80">Dica: Utilize os números de 1 a 6 no teclado para navegação rápida entre os módulos.</p>
+            <p class="text-[10px] text-slate-400/80">Dica: Utilize os números de 1 a 7 no teclado para navegação rápida entre os módulos.</p>
         </footer>
     </div>
 
-    <!-- ========================================================================= -->
-    <!-- LÓGICA JAVASCRIPT: RELÓGIO, ATALHOS DE TECLADO E SEGURANÇA COM FALLBACK    -->
-    <!-- ========================================================================= -->
+    <!-- SCRIPT DE ATALHOS E SEGURANÇA -->
     <script>
-        const PIN_CORRETO = "1234"; // PIN de contingência padrão corporativo
+        const PIN_CORRETO = "1234";
 
-        // Atualização contínua do relógio institucional
         function atualizarRelogio() {
             const agora = new Date();
             const relogioEl = document.getElementById('relogioTopo');
@@ -290,9 +307,8 @@
         setInterval(atualizarRelogio, 1000);
         atualizarRelogio();
 
-        // Atalhos Numéricos de Teclado (1 a 6) para navegação rápida em desktop
+        // Atalhos de teclado de 1 a 7
         document.addEventListener('keydown', (e) => {
-            // Ignora se estiver digitando em campos de texto
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
             const rotas = {
@@ -301,7 +317,8 @@
                 '3': 'modulo3.html',
                 '4': 'modulo4.html',
                 '5': 'modulo5.html',
-                '6': 'modulo6.html'
+                '6': 'modulo6.html',
+                '7': 'modulo7.html'
             };
 
             if (rotas[e.key]) {
@@ -309,7 +326,6 @@
             }
         });
 
-        // Detecção de Dispositivo Móvel
         function ehDispositivoMovel() {
             return window.innerWidth < 768;
         }
@@ -336,7 +352,6 @@
             }
         }
 
-        // Validação de PIN de Contingência
         function verificarPIN() {
             const input = document.getElementById('pinInput');
             const erroEl = document.getElementById('erro-auth');
@@ -352,12 +367,10 @@
             }
         }
 
-        // Suporte ao Enter no campo de PIN
         document.getElementById('pinInput')?.addEventListener('keyup', (e) => {
             if (e.key === 'Enter') verificarPIN();
         });
 
-        // Validação Biometria Segura (com fallback automático se indisponível)
         async function desbloquearPorBiometria() {
             const erroEl = document.getElementById('erro-auth');
             erroEl.classList.add('hidden');
@@ -413,7 +426,6 @@
             }
         }
 
-        // Auto-lock seguro ao minimizar a aba ou bloquear a tela do celular
         document.addEventListener('visibilitychange', () => {
             if (document.hidden) {
                 bloquearAcesso();
