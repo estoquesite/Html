@@ -65,10 +65,9 @@
                 <span class="text-xs font-black text-cyan-900 dark:text-cyan-300 uppercase flex items-center gap-1.5">
                     <span>⚡</span> Reconhecimento por Foto e Cadastro Direto
                 </span>
-                <span class="text-[10px] font-bold text-slate-400">Sem ocupar espaço com imagens</span>
+                <span class="text-[10px] font-bold text-slate-400">Leitura ágil</span>
             </div>
 
-            <!-- BOTÃO DA CÂMERA PARA LEITURA INTELIGENTE -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <label class="flex items-center justify-center gap-3 bg-purple-600 hover:bg-purple-700 text-white font-black py-3 px-4 rounded-2xl shadow-md cursor-pointer transition active:scale-95 text-xs">
                     <span class="text-xl">📸</span>
@@ -116,7 +115,7 @@
             </div>
         </div>
 
-        <!-- LISTA DE FDS CADASTRADAS -->
+        <!-- LISTA DE FDS CADASTRADAS (COMPACTA) -->
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">
@@ -125,7 +124,7 @@
                 <span id="labelContadorFds" class="text-[11px] text-slate-400 font-bold">0 DOCUMENTOS</span>
             </div>
 
-            <div id="gridFds" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+            <div id="gridFds" class="space-y-2"></div>
         </div>
 
     </div>
@@ -304,27 +303,28 @@
             grid.innerHTML = '';
 
             if (listaFds.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-8 text-slate-400 italic text-xs">Nenhum documento cadastrado.</div>`;
+                grid.innerHTML = `<div class="text-center py-6 text-slate-400 italic text-xs">Nenhum documento cadastrado.</div>`;
                 document.getElementById('labelContadorFds').innerText = `0 DOCUMENTOS`;
                 return;
             }
 
             listaFds.forEach((item) => {
                 const card = document.createElement('div');
-                card.className = "relative bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl shadow-sm space-y-3 flex flex-col justify-between";
+                card.className = "bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 p-3 rounded-xl shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3 text-xs";
                 
                 card.innerHTML = `
-                    <div class="absolute right-3 top-3 w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center text-lg">📄</div>
-                    <div class="pr-14 space-y-1">
-                        <span class="text-[9px] font-bold text-slate-400 uppercase">Registo: ${item.dataRegistro}</span>
-                        <h4 class="text-xs font-black text-slate-900 dark:text-white uppercase truncate">${item.produto}</h4>
-                        <p class="text-[10px] text-slate-500 uppercase font-semibold">Fabricante: ${item.fabricante}</p>
+                    <div class="flex items-center gap-3 w-full sm:w-auto truncate">
+                        <span class="text-lg">📄</span>
+                        <div class="truncate">
+                            <h4 class="font-black text-slate-900 dark:text-white uppercase truncate">${item.produto}</h4>
+                            <p class="text-[10px] text-slate-500 uppercase font-semibold">Fabricante: ${item.fabricante}</p>
+                        </div>
                     </div>
 
-                    <div class="flex items-center gap-2 pt-2 border-t text-xs">
-                        <a href="${item.linkPdf}" target="_blank" class="flex-1 bg-cyan-50 hover:bg-cyan-100 text-cyan-700 font-bold py-1.5 px-2 rounded-xl text-[11px] text-center">Abrir PDF Oficial ↗</a>
-                        <button onclick="abrirModalEdicao('${item.id}')" class="text-cyan-600 font-bold p-1.5 cursor-pointer" title="Editar">✏️</button>
-                        <button onclick="removerFds(${item.id})" class="text-rose-500 font-bold p-1.5 cursor-pointer" title="Excluir">✕</button>
+                    <div class="flex items-center gap-2 w-full sm:w-auto justify-end flex-shrink-0">
+                        <a href="${item.linkPdf}" target="_blank" class="bg-cyan-50 hover:bg-cyan-100 text-cyan-700 font-bold py-1.5 px-3 rounded-lg text-[11px] text-center">Abrir PDF ↗</a>
+                        <button onclick="abrirModalEdicao('${item.id}')" class="text-cyan-600 hover:text-cyan-800 font-bold p-1.5 cursor-pointer" title="Editar">✏️</button>
+                        <button onclick="removerFds(${item.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1.5 cursor-pointer" title="Excluir">✕</button>
                     </div>
                 `;
                 grid.appendChild(card);
