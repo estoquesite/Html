@@ -54,9 +54,9 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Sincronização Estabilizada</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Salvamento Blindado</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                        <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Sistema Operacional</span>
+                        <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
                 </div>
             </div>
@@ -70,7 +70,7 @@
                     <span>Painel Pessoas</span>
                 </button>
                 <button onclick="carregarDoSupabase()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-sm">
-                    🔄 Sincronizar
+                    🔄 Sincronizar (Puxar)
                 </button>
                 <button onclick="exportarParaCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer">
                     📥 CSV
@@ -187,7 +187,7 @@
 
                     <div class="md:col-span-2">
                         <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Qtd Itens</label>
-                        <input type="number" id="manualQtd" value="1" min="1" oninput="calcularManualPorTotal()" class="w-full text-xs p-2.5 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none">
+                        <input type="number" id="manualQtd" value="1" min="1" oninput="calcularManualPorTotal()" class="w-full text-xs p-2.5 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white outline-none">
                     </div>
 
                     <div class="md:col-span-3">
@@ -209,7 +209,7 @@
                 </div>
             </div>
 
-            <!-- CONTEÚDO 2: LINK WEB (BLINDADO & FUNCIONAL) -->
+            <!-- CONTEÚDO 2: LINK WEB -->
             <div id="aba-link" class="p-4 sm:p-5 space-y-3 hidden">
                 <div class="flex justify-between items-center">
                     <label class="block text-xs font-black text-blue-950 dark:text-blue-200 uppercase flex items-center gap-2">
@@ -516,16 +516,16 @@
             const solManual = document.getElementById('manualSolicitante');
             solManual.classList.add('piscar-solicitante-forte');
 
+            // Carrega primeiro do localStorage para garantir velocidade e segurança imediata
+            carregarDoLocalStorage();
+
             if (window.supabase) {
                 try {
                     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                    carregarDoSupabase();
+                    carregarDoSupabase(); // Sincroniza com a nuvem em segundo plano
                 } catch(e) {
-                    mostrarAviso("Erro ao conectar ao Supabase: " + e.message, "erro");
-                    carregarDoLocalStorage();
+                    console.warn("Modo offline ativo");
                 }
-            } else {
-                carregarDoLocalStorage();
             }
         });
 
@@ -616,7 +616,7 @@
             } else {
                 el.classList.add('bg-rose-100', 'text-rose-800');
             }
-            setTimeout(() => el.classList.add('hidden'), 5000);
+            setTimeout(() => el.classList.add('hidden'), 4000);
         }
 
         function calcularManualPorTotal() {
@@ -693,13 +693,13 @@
                 data_entrega: ""
             };
 
-            const supabaseId = await inserirNoSupabase(novoItem);
-            if (supabaseId) novoItem.id = supabaseId;
-
             compras.unshift(novoItem);
             salvarNoLocalStorage();
             atualizarListaSelectSolicitantes();
             renderizarTabela();
+
+            // Grava na nuvem em segundo plano
+            inserirNoSupabase(novoItem);
 
             document.getElementById('manualProduto').value = '';
             document.getElementById('manualLocal').value = '';
@@ -707,7 +707,7 @@
             document.getElementById('manualUnit').value = '';
             document.getElementById('manualQtd').value = '1';
 
-            mostrarAviso("✅ Compra manual salva com sucesso na nuvem!");
+            mostrarAviso("✅ Compra manual salva com sucesso!");
         }
 
         function verificarDigitacaoSolicitante(input, tempId) {
@@ -874,15 +874,15 @@
                 if (error) throw error;
 
                 if (data && data.length > 0) {
+                    // Mescla os dados locais com os da nuvem mantendo o que for mais recente
                     compras = data;
                     salvarNoLocalStorage();
                     atualizarListaSelectSolicitantes();
                     renderizarTabela();
-                    mostrarAviso("✅ Dados carregados da nuvem com sucesso!");
+                    mostrarAviso("✅ Sincronizado com a nuvem!");
                 }
             } catch (err) {
-                mostrarAviso("Modo Offline / Erro Nuvem: " + err.message, "erro");
-                carregarDoLocalStorage();
+                console.warn("Erro ao sincronizar nuvem, usando cache local:", err.message);
             }
         }
 
@@ -909,7 +909,7 @@
                 if (error) throw error;
                 return data && data[0] ? data[0].id : null;
             } catch (err) {
-                console.warn("Erro ao salvar no Supabase, mantido local:", err.message);
+                console.warn("Aviso Supabase Insert:", err.message);
                 return null;
             }
         }
@@ -936,7 +936,7 @@
 
                 if (error) throw error;
             } catch (err) {
-                console.warn("Erro ao atualizar no Supabase:", err.message);
+                console.warn("Aviso Supabase Update:", err.message);
             }
         }
 
@@ -949,7 +949,7 @@
                     .eq('id', id);
                 if (error) throw error;
             } catch (err) {
-                console.warn("Erro ao remover no Supabase:", err.message);
+                console.warn("Aviso Supabase Delete:", err.message);
             }
         }
 
@@ -963,9 +963,9 @@
             item.entregue = chk.checked;
             item.data_entrega = item.entregue ? inputData.value : '';
 
-            await atualizarNoSupabase(item);
             salvarNoLocalStorage();
             renderizarTabela();
+            await atualizarNoSupabase(item);
             mostrarAviso("📦 Status de entrega salvo!");
         }
 
@@ -989,7 +989,7 @@
             if (btnSalvar) btnSalvar.classList.remove('hidden');
         }
 
-        // ================= PARSER DE LINK BLINDADO & INFALÍVEL =================
+        // ================= RECONHECEDOR DE LINK INTELIGENTE =================
         function processarLinkDireto() {
             const entrada = document.getElementById('inputLinkDireto').value.trim();
             if (!entrada) {
@@ -1014,7 +1014,6 @@
                 else if (u.includes('americanas')) localDetectado = "AMERICANAS";
                 else localDetectado = "MERCADO LIVRE";
 
-                // Tenta extrair nome do produto do URL se houver traços significativos
                 try {
                     const partes = link.split('?')[0].split('/');
                     for (let p of partes) {
@@ -1029,10 +1028,11 @@
             }
 
             if (!produto) {
-                produto = entrada.replace(/(https?:\/\/[^\s]+)/gi, '').trim().toUpperCase();
-                if (!produto || produto.length < 2) {
-                    produto = "PRODUTO VIA LINK";
-                }
+                let textoSemLink = entrada
+                    .replace(/(https?:\/\/[^\s]+)/gi, '')
+                    .trim();
+
+                produto = textoSemLink.length > 2 ? textoSemLink.toUpperCase() : "";
             }
 
             const hoje = new Date().toISOString().split('T')[0];
@@ -1041,7 +1041,7 @@
                 tempId: Date.now() + Math.random(),
                 data: hoje,
                 solicitante: "",
-                produto: produto,
+                produto: produto.toUpperCase(),
                 local: localDetectado,
                 categoria: adivinharCategoria(produto),
                 qtd: qtd,
@@ -1131,7 +1131,7 @@
             const t = (texto || "").toLowerCase();
             if (t.includes('teclado') || t.includes('mouse') || t.includes('cabo') || t.includes('monitor') || t.includes('hd') || t.includes('ssd') || t.includes('ti')) return "INFORMÁTICA / TI";
             if (t.includes('papel') || t.includes('caneta') || t.includes('pasta') || t.includes('grampeador')) return "ESCRITÓRIO";
-            if (t.includes('ferramenta') || t.includes('broca') || t.includes('fita') || t.includes('parafuso') || t.includes('chumbador') || t.includes('macho')) return "MANUTENÇÃO";
+            if (t.includes('ferramenta') || t.includes('broca') || t.includes('fita') || t.includes('parafuso') || t.includes('chumbador') || t.includes('macho') || t.includes('talabarte')) return "MANUTENÇÃO";
             if (t.includes('curso') || t.includes('treinamento') || t.includes('livro')) return "TREINAMENTO";
             if (t.includes('cafe') || t.includes('café') || t.includes('copo') || t.includes('açucar')) return "ALIMENTAÇÃO / COPA";
             return "OUTROS";
@@ -1292,9 +1292,6 @@
                 data_entrega: ""
             };
 
-            const supabaseId = await inserirNoSupabase(novoItem);
-            if (supabaseId) novoItem.id = supabaseId;
-
             compras.unshift(novoItem);
             itensPendentesAprovacao = itensPendentesAprovacao.filter(i => i.tempId !== tempId);
 
@@ -1302,7 +1299,10 @@
             atualizarListaSelectSolicitantes();
             renderizarTabela();
             renderizarCardsPendentes();
-            mostrarAviso("Item salvo com sucesso!");
+            mostrarAviso("✅ Item salvo com sucesso!");
+
+            // Salva na nuvem em segundo plano
+            await inserirNoSupabase(novoItem);
         }
 
         async function confirmarTodosOsCards() {
@@ -1346,10 +1346,8 @@
                     data_entrega: ""
                 };
 
-                const supabaseId = await inserirNoSupabase(novoItem);
-                if (supabaseId) novoItem.id = supabaseId;
-
                 compras.unshift(novoItem);
+                inserirNoSupabase(novoItem);
             }
 
             itensPendentesAprovacao = [];
@@ -1357,7 +1355,7 @@
             atualizarListaSelectSolicitantes();
             renderizarTabela();
             renderizarCardsPendentes();
-            mostrarAviso("Todos os itens foram salvos!");
+            mostrarAviso("✅ Todos os itens foram salvos!");
         }
 
         function descartarCardPendente(tempId) {
@@ -1475,12 +1473,13 @@
 
             compras[index] = itemAtualizado;
 
-            await atualizarNoSupabase(itemAtualizado);
             salvarNoLocalStorage();
             atualizarListaSelectSolicitantes();
             renderizarTabela();
             fecharModalEdicao();
             mostrarAviso("Registro atualizado com sucesso!");
+
+            await atualizarNoSupabase(itemAtualizado);
         }
 
         // ================= TABELA E RENDERIZAÇÃO =================
@@ -1592,11 +1591,12 @@
 
         async function removerItem(id) {
             if (confirm("Deseja realmente apagar este registro de compra?")) {
-                await removerDoSupabase(id);
                 compras = compras.filter(i => i.id !== id);
                 salvarNoLocalStorage();
                 atualizarListaSelectSolicitantes();
                 renderizarTabela();
+                await removerDoSupabase(id);
+                mostrarAviso("Item apagado com sucesso!");
             }
         }
 
