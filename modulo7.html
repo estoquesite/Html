@@ -36,6 +36,24 @@
             font-weight: 900 !important;
             border-width: 2px !important;
         }
+
+        @keyframes neonPulsante {
+            0%, 100% {
+                border-color: #06b6d4;
+                box-shadow: 0 0 12px rgba(6, 182, 212, 0.8);
+                background-color: rgba(236, 254, 255, 0.9);
+            }
+            50% {
+                border-color: #8b5cf6;
+                box-shadow: 0 0 6px rgba(139, 92, 246, 0.5);
+                background-color: #ffffff;
+            }
+        }
+        .neon-pulsante {
+            animation: neonPulsante 1.5s infinite alternate ease-in-out;
+            border-width: 2px !important;
+            font-weight: bold !important;
+        }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen p-4 sm:p-6 transition-colors duration-200">
@@ -54,7 +72,7 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Controlo de Entrega na Entrada</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Cores Neon Pulsantes</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
@@ -146,7 +164,7 @@
                 </button>
             </div>
 
-            <!-- CONTEÚDO 1: DIGITAÇÃO MANUAL (COM CHECKBOX DE ENTREGA) -->
+            <!-- CONTEÚDO 1: DIGITAÇÃO MANUAL -->
             <div id="aba-manual" class="p-4 sm:p-5 space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                     <span class="text-xs font-black text-indigo-900 dark:text-indigo-300 uppercase flex items-center gap-1.5">
@@ -158,7 +176,8 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end">
                     <div class="md:col-span-2">
                         <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Data Compra</label>
-                        <input type="date" id="manualData" onchange="atualizarDataEntregaManualDefault()" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white outline-none font-bold">
+                        <!-- CAIXA NEON PULSANTE -->
+                        <input type="date" id="manualData" onchange="atualizarDataEntregaManualDefault()" class="neon-pulsante w-full text-xs p-2.5 rounded-xl outline-none">
                     </div>
 
                     <div class="md:col-span-3">
@@ -198,7 +217,7 @@
                     </div>
 
                     <div class="md:col-span-2">
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Unitário (R$)</label>
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Unitário (R$)</label>
                         <input type="number" step="0.01" id="manualUnit" placeholder="0,00" oninput="calcularManualPorUnitario()" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                     </div>
 
@@ -220,7 +239,7 @@
                 </div>
             </div>
 
-            <!-- CONTEÚDO 2: LINK WEB -->
+            <!-- CONTEÚDO 2: LINK WEB (CAIXA DO LINK NEON PULSANTE) -->
             <div id="aba-link" class="p-4 sm:p-5 space-y-3 hidden">
                 <div class="flex justify-between items-center">
                     <label class="block text-xs font-black text-blue-950 dark:text-blue-200 uppercase flex items-center gap-2">
@@ -239,7 +258,8 @@
                 
                 <div class="flex flex-col sm:flex-row gap-2">
                     <div class="relative flex-1">
-                        <input type="text" id="inputLinkDireto" placeholder="Cole o link aqui..." class="w-full text-xs px-3 py-2.5 pr-8 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-xl outline-none focus:border-blue-600 dark:text-white">
+                        <!-- CAIXA DO LINK COM NEON PULSANTE -->
+                        <input type="text" id="inputLinkDireto" placeholder="Cole o link aqui..." class="neon-pulsante w-full text-xs px-3 py-2.5 pr-8 rounded-xl outline-none">
                         <button type="button" onclick="limparInputLink()" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-rose-500 font-bold text-xs">✕</button>
                     </div>
                     <button type="button" onclick="processarLinkDireto()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer flex-shrink-0">
@@ -295,7 +315,7 @@
             </div>
         </div>
 
-        <!-- CARDS PRÉ-PREENCHIDOS (COM OPÇÃO DE ENTREGA) -->
+        <!-- CARDS PRÉ-PREENCHIDOS -->
         <div id="containerCardsPreenchidos" class="space-y-3 hidden">
             <div class="flex justify-between items-center px-1">
                 <h3 class="text-xs font-black uppercase text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5">
@@ -1134,7 +1154,7 @@
 
             if (!produto) {
                 let textoSemLink = entrada.replace(/(https?:\/\/[^\s]+)/gi, '').trim();
-                produto = textoSemLink.length > 2 ? textoSemLink.toUpperCase() : "PRODUTO VIA LINK";
+                produto = textoSemLink.length > 2 ? textoSemLink.toUpperCase() : "";
             }
 
             const hoje = new Date().toISOString().split('T')[0];
@@ -1240,7 +1260,7 @@
             return "OUTROS";
         }
 
-        // ================= CARDS PENDENTES (COM OPÇÃO DE ENTREGA) =================
+        // ================= CARDS PENDENTES =================
         function renderizarCardsPendentes() {
             const container = document.getElementById('containerCardsPreenchidos');
             const lista = document.getElementById('listaCardsPendentes');
@@ -1262,7 +1282,6 @@
                 const classePiscante = estaSemSolicitante ? "piscar-solicitante-forte" : "";
                 const exibirAviso = estaSemSolicitante ? "" : "hidden";
 
-                // Calcula data de entrega padrão (+10 dias)
                 let dEntrega = new Date(item.data + 'T00:00:00');
                 dEntrega.setDate(dEntrega.getDate() + 10);
                 let dataEntregaDefault = dEntrega.toISOString().split('T')[0];
@@ -1280,7 +1299,7 @@
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-2.5 items-end">
                         <div class="md:col-span-2">
                             <label class="block text-[9px] font-bold text-slate-400 uppercase">Data Compra</label>
-                            <input type="date" id="data-${item.tempId}" value="${item.data}" onchange="atualizarDataEntregaCard(${item.tempId})" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white">
+                            <input type="date" id="data-${item.tempId}" value="${item.data}" onchange="atualizarDataEntregaCard('${item.tempId}')" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white">
                         </div>
 
                         <div class="md:col-span-3">
@@ -1327,7 +1346,6 @@
                             <input type="number" step="0.01" id="unit-${item.tempId}" value="${unitCalculado}" oninput="calcularCardPorUnitario(${item.tempId})" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold">
                         </div>
 
-                        <!-- OPÇÃO DE ENTREGA JÁ NO CARD -->
                         <div class="md:col-span-4 bg-slate-100 dark:bg-slate-900/60 p-2 rounded-xl border border-slate-200 dark:border-slate-700">
                             <label class="flex items-center gap-1.5 cursor-pointer mb-1">
                                 <input type="checkbox" id="card-entregue-${item.tempId}" onchange="toggleCardDataEntrega('${item.tempId}', this.checked)" class="w-4 h-4 text-emerald-600 rounded">
