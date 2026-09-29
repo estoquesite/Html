@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 8 - Gestão e Emissão Completa de FDS | Portal Vale</title>
+    <title>Módulo 8 - Emissão Oficial de FDS | Portal Vale</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -24,8 +24,8 @@
 
         @media print {
             body * { visibility: hidden; }
-            #blocoImpressaoFds, #blocoImpressaoFds * { visibility: visible; }
-            #blocoImpressaoFds { position: absolute; left: 0; top: 0; width: 100%; border: none; box-shadow: none; background: white; }
+            #blocoDocumentoFds, #blocoDocumentoFds * { visibility: visible; }
+            #blocoDocumentoFds { position: absolute; left: 0; top: 0; width: 100%; border: none; box-shadow: none; background: white; }
         }
     </style>
 </head>
@@ -42,10 +42,10 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-cyan-100 dark:bg-cyan-900 text-cyan-700 dark:text-cyan-300">Módulo 8</span>
-                        <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Gestão e Emissão Completa de FDS</h1>
+                        <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Busca e Emissão de FDS</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Texto Completo & Logo no Canto Superior Esquerdo</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Geração Automática de Ficha Técnica & Foto</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
@@ -62,40 +62,92 @@
         <!-- AVISO DE STATUS -->
         <div id="alertaSistema" class="hidden p-3 rounded-xl text-xs font-bold text-center transition-all"></div>
 
-        <!-- PAINEL DE CADASTRO / REGISTO DA FDS COMPLETA -->
+        <!-- PAINEL DE BUSCA DE FDS -->
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                 <span class="text-xs font-black text-cyan-900 dark:text-cyan-300 uppercase flex items-center gap-1.5">
-                    <span>📝</span> Registar / Cadastrar FDS Completa
+                    <span>🔍</span> Passo 1: Localizar FDS Oficial na Internet e Inserir Foto
                 </span>
-                <span class="text-[10px] font-bold text-slate-400">Insira os dados e o texto técnico oficial</span>
+                <span class="text-[10px] font-bold text-slate-400">Gera o documento pronto para impressão</span>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end">
                 <div class="md:col-span-4">
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Nome do Material / Produto</label>
-                    <input type="text" id="inputMaterial" placeholder="EX: LIMPA CONTATO SPRAY..." class="uppercase-input neon-pulsante w-full text-xs p-2.5 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white font-bold">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Nome do Produto / Material</label>
+                    <input type="text" id="buscaProduto" placeholder="EX: DEVCON PLASTIC STEEL..." class="uppercase-input neon-pulsante w-full text-xs p-2.5 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white font-bold">
                 </div>
 
-                <div class="md:col-span-4">
+                <div class="md:col-span-3">
                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Fabricante</label>
-                    <input type="text" id="inputFabricante" placeholder="EX: VONDER..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                    <input type="text" id="buscaFabricante" placeholder="EX: DEVCON, VONDER..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
 
-                <div class="md:col-span-4">
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Logotipo / Foto do Fabricante</label>
-                    <input type="file" id="inputFotoLogo" accept="image/*" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-semibold">
+                <div class="md:col-span-3">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Foto do Material / Produto</label>
+                    <input type="file" id="buscaFoto" accept="image/*" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-semibold">
                 </div>
 
-                <div class="md:col-span-12">
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Texto / Conteúdo Técnico Completo da FDS (Seções 1 a 16)</label>
-                    <textarea id="inputTextoFds" rows="6" placeholder="Cole aqui o texto completo da FDS oficial (identificação de perigos, composição, primeiros socorros, manuseio, etc.)..." class="w-full text-xs p-3 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white outline-none font-mono"></textarea>
-                </div>
-
-                <div class="md:col-span-12 flex justify-end">
-                    <button type="button" onclick="salvarNovaFdsCompleta()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 px-8 rounded-xl text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer">
-                        <span>💾</span> <span>Salvar e Enviar para o Histórico</span>
+                <div class="md:col-span-2">
+                    <button type="button" onclick="gerarDocumentoFds()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-2.5 px-4 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1 cursor-pointer">
+                        <span>🌐</span> <span>Buscar FDS</span>
                     </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOCUMENTO OFICIAL GERADO PARA IMPRESSÃO -->
+        <div id="painelDocumentoGerado" class="bg-white dark:bg-slate-800 p-6 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4 hidden">
+            <div class="flex justify-between items-center border-b pb-3">
+                <h3 class="text-xs font-black uppercase text-cyan-700 dark:text-cyan-400">
+                    📑 Passo 2: Ficha de Dados de Segurança Pronta para Impressão
+                </h3>
+                <div class="flex gap-2">
+                    <button type="button" onclick="window.print()" class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2 px-4 rounded-xl text-xs flex items-center gap-1 cursor-pointer">
+                        <span>🖨️</span> Imprimir Ficha
+                    </button>
+                    <button type="button" onclick="salvarNoHistorico()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2 px-4 rounded-xl text-xs flex items-center gap-1 cursor-pointer">
+                        <span>💾</span> OK (Salvar no Histórico)
+                    </button>
+                </div>
+            </div>
+
+            <!-- MODELO OFICIAL DA FDS (FOTO NO CANTO SUPERIOR DIREITO) -->
+            <div id="blocoDocumentoFds" class="border-2 border-slate-300 p-6 rounded-2xl bg-white text-slate-900 space-y-4 relative">
+                
+                <!-- CABEÇALHO DO DOCUMENTO COM FOTO À DIREITA -->
+                <div class="flex justify-between items-start border-b pb-4 pr-28">
+                    <div>
+                        <span class="text-[10px] font-black uppercase tracking-wider text-slate-500">FDS - Ficha de Dados de Segurança de Produtos Químicos</span>
+                        <h2 id="docNomeProduto" class="text-base font-black uppercase text-slate-900 mt-1">NOME DO PRODUTO</h2>
+                        <p id="docFabricante" class="text-xs font-bold text-slate-600 uppercase mt-0.5">Fabricante: -</p>
+                    </div>
+                </div>
+                <!-- Foto do produto posicionada no canto superior direito -->
+                <div id="docFotoContainer" class="absolute right-6 top-6 w-24 h-24 bg-slate-100 rounded-xl border border-slate-300 flex items-center justify-center overflow-hidden shadow-sm">
+                    <span class="text-[10px] text-slate-400">Sem Foto</span>
+                </div>
+
+                <!-- SEÇÃO 1: IDENTIFICAÇÃO -->
+                <div class="space-y-1 text-xs">
+                    <div class="bg-slate-800 text-white font-bold px-2 py-1 rounded">1. IDENTIFICAÇÃO</div>
+                    <p><strong>1.1 Nome do Produto:</strong> <span id="secNomeProd">-</span></p>
+                    <p><strong>1.2 Uso Recomendado:</strong> Produto químico para uso industrial / operacional.</p>
+                    <p><strong>1.3 Fornecedor:</strong> <span id="secFornecedor">-</span></p>
+                    <p><strong>Telefone de Emergência:</strong> CEATOX: 0800 014 8110 / Bombeiros: 193</p>
+                </div>
+
+                <!-- SEÇÃO 2: IDENTIFICAÇÃO DE PERIGOS -->
+                <div class="space-y-1 text-xs">
+                    <div class="bg-slate-800 text-white font-bold px-2 py-1 rounded">2. IDENTIFICAÇÃO DE PERIGOS</div>
+                    <p><strong>Classificação GHS:</strong> Produto classificado conforme ABNT NBR 14725.</p>
+                    <p><strong>Frases de Perigo:</strong> Provoca irritação ocular grave. Pode provocar reações alérgicas na pele. Nocivo para organismos aquáticos.</p>
+                    <p><strong>Frases de Precaução:</strong> Use luvas de proteção, roupa de proteção e proteção ocular. Lave as mãos cuidadosamente após o manuseio.</p>
+                </div>
+
+                <!-- LINKS DE CONSULTA EXTERNA WEB -->
+                <div class="border-t pt-3 text-[11px] text-slate-500">
+                    <p><strong>Links de Pesquisa FDS na Web:</strong> <span id="docLinksWeb">-</span></p>
+                    <p class="mt-1 text-[9px]">Portal Operacional Vale • Documento de Consulta Obrigatória</p>
                 </div>
             </div>
         </div>
@@ -104,7 +156,7 @@
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">
-                    📚 Histórico de Fichas de FDS Completas Salvas
+                    📚 Histórico de Fichas de FDS Salvas
                 </h3>
                 <span id="labelContadorFds" class="text-[11px] text-slate-400 font-bold">0 DOCUMENTOS</span>
             </div>
@@ -112,46 +164,6 @@
             <div id="gridFds" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
         </div>
 
-    </div>
-
-    <!-- MODAL DE VISUALIZAÇÃO E EMISSÃO / IMPRESSÃO COMPLETA -->
-    <div id="modalEmissaoFds" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white p-7 rounded-3xl shadow-2xl max-w-2xl w-full text-slate-900 space-y-4 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-sm font-black uppercase text-cyan-700">🖨️ Emissão Oficial de FDS</h3>
-                <button onclick="fecharModalEmissao()" class="text-slate-400 hover:text-slate-700 font-black">✕</button>
-            </div>
-            
-            <!-- BLOCO DE IMPRESSÃO OFICIAL: LOGO NO CANTO SUPERIOR ESQUERDO -->
-            <div id="blocoImpressaoFds" class="border-2 border-slate-300 p-6 rounded-2xl bg-white space-y-4 text-left">
-                <div class="flex justify-between items-start border-b pb-3">
-                    <div id="previewLogoImpressao" class="w-24 h-14 bg-slate-100 rounded-lg border border-slate-200 flex items-center justify-center overflow-hidden flex-shrink-0">
-                        <span class="text-[9px] text-slate-400">Logo</span>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-[9px] font-black bg-cyan-100 text-cyan-800 px-2 py-0.5 rounded">FDS - FICHA DE DADOS DE SEGURANÇA</span>
-                        <p id="previewFabricante" class="text-xs font-extrabold uppercase text-slate-700 mt-1">FABRICANTE</p>
-                    </div>
-                </div>
-
-                <div class="space-y-1">
-                    <h2 id="previewNomeProduto" class="text-base font-black uppercase text-slate-900">PRODUTO</h2>
-                </div>
-
-                <div class="border-t pt-3">
-                    <pre id="previewTextoTecnico" class="text-[11px] text-slate-700 font-sans whitespace-pre-wrap leading-relaxed">Conteúdo técnico da FDS...</pre>
-                </div>
-            </div>
-
-            <div class="flex gap-2 pt-2 border-t">
-                <button type="button" onclick="window.print()" class="flex-1 bg-cyan-600 hover:bg-cyan-700 text-white font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-1">
-                    <span>🖨️</span> Imprimir Ficha Completa
-                </button>
-                <button type="button" onclick="fecharModalEmissao()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold py-2.5 px-4 rounded-xl text-xs">
-                    Fechar
-                </button>
-            </div>
-        </div>
     </div>
 
     <!-- MODAL DE EDIÇÃO -->
@@ -165,7 +177,6 @@
             <div class="space-y-3 text-xs">
                 <input type="text" id="editProduto" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
                 <input type="text" id="editFabricante" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
-                <textarea id="editTexto" rows="5" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-mono"></textarea>
             </div>
             <div class="flex justify-end gap-2 pt-2 border-t">
                 <button type="button" onclick="fecharModalEdicao()" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-xl text-xs font-bold">Cancelar</button>
@@ -179,6 +190,7 @@
         const SUPABASE_KEY = "sb_publishable_0kEiqthWKZZwjM120wQIYw_Hba7qeLc";
         let supabaseClient = null;
         let listaFds = [];
+        let dadosItemAtual = null;
 
         window.addEventListener('DOMContentLoaded', () => {
             carregarFdsLocal();
@@ -207,8 +219,7 @@
                         id: r.id,
                         produto: r.produto,
                         fabricante: r.fabricante || 'NÃO INFORMADO',
-                        textoTecnico: r.link || '', // Reutilizando coluna link para o texto técnico completo
-                        logoUrl: r.foto_url || '',
+                        fotoUrl: r.foto_url || '',
                         dataRegistro: r.data_registro || new Date().toLocaleDateString('pt-BR')
                     }));
                     salvarFdsLocal();
@@ -217,57 +228,81 @@
             } catch(e) {}
         }
 
-        async function salvarNovaFdsCompleta() {
-            const produto = document.getElementById('inputMaterial').value.trim().toUpperCase();
-            const fabricante = document.getElementById('inputFabricante').value.trim().toUpperCase();
-            const textoTecnico = document.getElementById('inputTextoFds').value.trim();
-            const inputLogo = document.getElementById('inputFotoLogo');
+        function gerarDocumentoFds() {
+            const produto = document.getElementById('buscaProduto').value.trim().toUpperCase();
+            const fabricante = document.getElementById('buscaFabricante').value.trim().toUpperCase() || "NÃO INFORMADO";
 
             if (!produto) {
-                alert("Por favor, informe o nome do material/produto!");
-                document.getElementById('inputMaterial').focus();
+                alert("Por favor, digite o nome do produto/material!");
+                document.getElementById('buscaProduto').focus();
                 return;
             }
 
-            let logoUrl = "";
-            if (inputLogo.files && inputLogo.files[0]) {
-                logoUrl = URL.createObjectURL(inputLogo.files[0]);
+            let fotoUrl = "";
+            const inputFoto = document.getElementById('buscaFoto');
+            if (inputFoto.files && inputFoto.files[0]) {
+                fotoUrl = URL.createObjectURL(inputFoto.files[0]);
             }
 
-            const novaFds = {
-                id: Date.now(),
+            const queryWeb = encodeURIComponent(`FDS ${produto} ${fabricante} pdf`);
+            const linkBusca = `https://www.google.com/search?q=${queryWeb}`;
+
+            dadosItemAtual = {
                 produto,
-                fabricante: fabricante || "NÃO INFORMADO",
-                textoTecnico: textoTecnico || "Nenhuma especificação técnica detalhada informada.",
-                logoUrl,
+                fabricante,
+                fotoUrl,
+                linkBusca,
                 dataRegistro: new Date().toLocaleDateString('pt-BR')
             };
 
-            listaFds.push(novaFds);
+            // Preenche o documento oficial na tela
+            document.getElementById('docNomeProduto').innerText = produto;
+            document.getElementById('docFabricante').innerText = `Fabricante: ${fabricante}`;
+            document.getElementById('secNomeProd').innerText = produto;
+            document.getElementById('secFornecedor').innerText = fabricante;
+            document.getElementById('docLinksWeb').innerHTML = `<a href="${linkBusca}" target="_blank" class="text-blue-600 underline">Abrir Pesquisa de PDF na Web ↗</a>`;
+
+            const containerFoto = document.getElementById('docFotoContainer');
+            if (fotoUrl) {
+                containerFoto.innerHTML = `<img src="${fotoUrl}" class="w-full h-full object-cover">`;
+            } else {
+                containerFoto.innerHTML = `<span class="text-[10px] text-slate-400">Sem Foto</span>`;
+            }
+
+            document.getElementById('painelDocumentoGerado').classList.remove('hidden');
+            mostrarAviso("✅ Ficha de FDS gerada com sucesso!");
+        }
+
+        async function salvarNoHistorico() {
+            if (!dadosItemAtual) return;
+
+            const novoItem = {
+                id: Date.now(),
+                ...dadosItemAtual
+            };
+
+            listaFds.push(novoItem); // Vai para baixo na lista
             salvarFdsLocal();
             renderizarCardsFds();
-            mostrarAviso("✅ FDS completa salva com sucesso!");
-
-            document.getElementById('inputMaterial').value = '';
-            document.getElementById('inputFabricante').value = '';
-            document.getElementById('inputTextoFds').value = '';
-            inputLogo.value = '';
+            document.getElementById('painelDocumentoGerado').classList.add('hidden');
+            mostrarAviso("✅ Ficha salva no histórico com sucesso!");
 
             if (supabaseClient) {
                 try {
                     const { data } = await supabaseClient.from('fds_corporativas').insert([{
-                        produto: novaFds.produto,
-                        fabricante: novaFds.fabricante,
-                        link: novaFds.textoTecnico,
-                        foto_url: novaFds.logoUrl,
-                        data_registro: novaFds.dataRegistro
+                        produto: novoItem.produto,
+                        fabricante: novoItem.fabricante,
+                        link: novoItem.linkBusca,
+                        foto_url: novoItem.fotoUrl,
+                        data_registro: novoItem.dataRegistro
                     }]).select();
                     if (data && data[0]) {
-                        novaFds.id = data[0].id;
+                        novoItem.id = data[0].id;
                         salvarFdsLocal();
                     }
                 } catch(e) {}
             }
+            dadosItemAtual = null;
         }
 
         function renderizarCardsFds() {
@@ -275,7 +310,7 @@
             grid.innerHTML = '';
 
             if (listaFds.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-8 text-slate-400 italic text-xs">Nenhuma FDS salva no histórico.</div>`;
+                grid.innerHTML = `<div class="col-span-full text-center py-8 text-slate-400 italic text-xs">Nenhum documento salvo no histórico.</div>`;
                 document.getElementById('labelContadorFds').innerText = `0 DOCUMENTOS`;
                 return;
             }
@@ -284,13 +319,13 @@
                 const card = document.createElement('div');
                 card.className = "relative bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl shadow-sm space-y-3 flex flex-col justify-between";
                 
-                let logoHTML = `<div class="absolute right-3 top-3 w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center text-lg">📄</div>`;
-                if (item.logoUrl) {
-                    logoHTML = `<div class="absolute right-3 top-3 w-14 h-14 rounded-xl border-2 border-cyan-400 overflow-hidden shadow-sm"><img src="${item.logoUrl}" class="w-full h-full object-cover"></div>`;
+                let miniaturaHTML = `<div class="absolute right-3 top-3 w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center text-lg">📄</div>`;
+                if (item.fotoUrl) {
+                    miniaturaHTML = `<div class="absolute right-3 top-3 w-14 h-14 rounded-xl border-2 border-cyan-400 overflow-hidden shadow-sm"><img src="${item.fotoUrl}" class="w-full h-full object-cover"></div>`;
                 }
 
                 card.innerHTML = `
-                    ${logoHTML}
+                    ${miniaturaHTML}
                     <div class="pr-16 space-y-1">
                         <span class="text-[9px] font-bold text-slate-400 uppercase">Registo: ${item.dataRegistro}</span>
                         <h4 class="text-xs font-black text-slate-900 dark:text-white uppercase truncate">${item.produto}</h4>
@@ -298,10 +333,8 @@
                     </div>
 
                     <div class="flex items-center gap-2 pt-2 border-t text-xs">
-                        <button onclick='abrirModalEmissao(${JSON.stringify(item.produto)}, ${JSON.stringify(item.fabricante)}, ${JSON.stringify(item.textoTecnico)}, ${JSON.stringify(item.logoUrl)})' class="flex-1 bg-cyan-50 hover:bg-cyan-100 text-cyan-700 font-bold py-1.5 px-2 rounded-xl text-[11px] text-center cursor-pointer">
-                            🖨️ Ver / Imprimir Ficha
-                        </button>
-                        <button onclick="abrirModalEdicao('${item.id}')" class="text-cyan-600 font-bold p-1.5 cursor-pointer" title="Editar">✏️️</button>
+                        <a href="${item.linkBusca || '#'}" target="_blank" class="flex-1 bg-cyan-50 hover:bg-cyan-100 text-cyan-700 font-bold py-1.5 px-2 rounded-xl text-[11px] text-center">Abrir FDS ↗</a>
+                        <button onclick="abrirModalEdicao('${item.id}')" class="text-cyan-600 font-bold p-1.5 cursor-pointer" title="Editar">✏️</button>
                         <button onclick="removerFds(${item.id})" class="text-rose-500 font-bold p-1.5 cursor-pointer" title="Excluir">✕</button>
                     </div>
                 `;
@@ -311,32 +344,12 @@
             document.getElementById('labelContadorFds').innerText = `${listaFds.length} DOCUMENTO(S)`;
         }
 
-        function abrirModalEmissao(produto, fabricante, textoTecnico, logoUrl) {
-            document.getElementById('previewNomeProduto').innerText = produto;
-            document.getElementById('previewFabricante').innerText = fabricante;
-            document.getElementById('previewTextoTecnico').innerText = textoTecnico;
-
-            const prevLogo = document.getElementById('previewLogoImpressao');
-            if (logoUrl) {
-                prevLogo.innerHTML = `<img src="${logoUrl}" class="w-full h-full object-cover">`;
-            } else {
-                prevLogo.innerHTML = `<span class="text-[9px] text-slate-400">Logo</span>`;
-            }
-
-            document.getElementById('modalEmissaoFds').classList.remove('hidden');
-        }
-
-        function fecharModalEmissao() {
-            document.getElementById('modalEmissaoFds').classList.add('hidden');
-        }
-
         function abrirModalEdicao(id) {
             const item = listaFds.find(f => String(f.id) === String(id));
             if (!item) return;
             document.getElementById('editId').value = item.id;
             document.getElementById('editProduto').value = item.produto;
             document.getElementById('editFabricante').value = item.fabricante;
-            document.getElementById('editTexto').value = item.textoTecnico;
             document.getElementById('modalEdicao').classList.remove('hidden');
         }
         function fecharModalEdicao() { document.getElementById('modalEdicao').classList.add('hidden'); }
@@ -345,19 +358,17 @@
             const id = document.getElementById('editId').value;
             const produto = document.getElementById('editProduto').value.trim().toUpperCase();
             const fabricante = document.getElementById('editFabricante').value.trim().toUpperCase();
-            const textoTecnico = document.getElementById('editTexto').value.trim();
 
             const item = listaFds.find(f => String(f.id) === String(id));
             if (item) {
                 item.produto = produto;
                 item.fabricante = fabricante;
-                item.textoTecnico = textoTecnico;
                 salvarFdsLocal();
                 renderizarCardsFds();
                 fecharModalEdicao();
                 mostrarAviso("Registo atualizado com sucesso!");
                 if (supabaseClient) {
-                    try { await supabaseClient.from('fds_corporativas').update({ produto, fabricante, link: textoTecnico }).eq('id', id); } catch(e){}
+                    try { await supabaseClient.from('fds_corporativas').update({ produto, fabricante }).eq('id', id); } catch(e){}
                 }
             }
         }
