@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 8 - Impressão Unificada em Lote | Portal Vale</title>
+    <title>Módulo 8 - Fusão Real de PDFs em Lote | Portal Vale</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -11,6 +11,8 @@
     </script>
     <!-- SDK Oficial do Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Biblioteca PDF-Lib para fundir PDFs reais -->
+    <script src="https://unpkg.com/pdf-lib@1.4.0/dist/pdf-lib.min.js"></script>
     <style>
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
@@ -27,14 +29,6 @@
             50% { border-color: #f97316; box-shadow: 0 0 4px rgba(249, 115, 22, 0.5); }
         }
         .neon-duplicado { animation: neonAlertaDuplicado 1s infinite alternate ease-in-out; border-width: 2px !important; }
-
-        @media print {
-            body * { visibility: hidden; }
-            #modalImpressaoUnificada, #modalImpressaoUnificada * { visibility: visible; }
-            #modalImpressaoUnificada { position: absolute; left: 0; top: 0; width: 100%; background: white; padding: 0; margin: 0; }
-            .sem-impressao { display: none !important; }
-            .bloco-ficha-impressao { page-break-after: always; break-after: page; border: none !important; box-shadow: none !important; margin-bottom: 0 !important; }
-        }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen p-4 sm:p-6 transition-colors duration-200">
@@ -50,10 +44,10 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-cyan-100 dark:bg-cyan-900 text-cyan-700 dark:text-cyan-300">Módulo 8</span>
-                        <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Impressão Unificada em Lote de FDS</h1>
+                        <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Fusão Real de PDFs em Lote</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Salvamento Direto & Nuvem Supabase</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Motor PDF-Lib & Nuvem Supabase</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
@@ -117,7 +111,7 @@
                 <!-- BOTÕES -->
                 <div class="md:col-span-12 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3">
                     <div class="text-[11px] text-slate-500 font-semibold">
-                        💡 Clique em "Salvar FDS na Nuvem" para registrar o documento na lista.
+                        💡 Cadastre o link do PDF para gerar o arquivo unificado em lote.
                     </div>
                     <div class="flex gap-2">
                         <button type="button" onclick="pesquisarWebFds()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer">
@@ -131,7 +125,7 @@
             </div>
         </div>
 
-        <!-- LISTA DE FDS CADASTRADAS COM SELEÇÃO E IMPRESSÃO UNIFICADA -->
+        <!-- LISTA DE FDS CADASTRADAS COM SELEÇÃO E FUSÃO REAL DE PDFs -->
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
             <div class="flex flex-wrap justify-between items-center gap-3 border-b pb-3">
                 <div class="flex items-center gap-2">
@@ -141,9 +135,9 @@
                     <span id="labelContadorFds" class="text-[11px] text-slate-400 font-bold">0 DOCUMENTOS</span>
                 </div>
                 
-                <!-- BOTÃO DE IMPRESSÃO UNIFICADA -->
-                <button type="button" onclick="abrirImpressaoUnificadaLote()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-black py-2.5 px-5 rounded-xl text-xs shadow-md flex items-center gap-1.5 cursor-pointer">
-                    <span>🖨️</span> <span>Imprimir Selecionadas Juntas (Unificado)</span>
+                <!-- BOTÃO DE FUNDIR E BAIXAR PDFs REAIS -->
+                <button type="button" id="btnFundirPdfs" onclick="fundirEBaixarPdfsReais()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-black py-2.5 px-5 rounded-xl text-xs shadow-md flex items-center gap-1.5 cursor-pointer">
+                    <span>📑</span> <span>Juntar PDFs Selecionados em 1 Só Arquivo</span>
                 </button>
             </div>
 
@@ -162,22 +156,6 @@
             <div id="gridFds" class="space-y-2"></div>
         </div>
 
-    </div>
-
-    <!-- MODAL DE PRÉ-VISUALIZAÇÃO DA IMPRESSÃO UNIFICADA -->
-    <div id="modalImpressaoUnificada" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white w-full max-w-2xl rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
-            <div class="flex justify-between items-center border-b pb-3 sem-impressao">
-                <h3 class="text-sm font-black uppercase text-cyan-800">🖨️ Fila Unificada para Impressão</h3>
-                <div class="flex gap-2">
-                    <button onclick="window.print()" class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold px-4 py-2 rounded-xl text-xs">Imprimir Todas Juntas</button>
-                    <button onclick="fecharImpressaoUnificada()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2 rounded-xl text-xs">Fechar</button>
-                </div>
-            </div>
-            
-            <!-- CORPO ONDE OS DOCUMENTOS FICAM UM EMBAIXO DO OUTRO -->
-            <div id="conteudoUnificadoImpresso" class="overflow-y-auto space-y-6 p-2 flex-1"></div>
-        </div>
     </div>
 
     <!-- MODAL DE EDIÇÃO -->
@@ -221,7 +199,7 @@
             el.innerText = msg;
             el.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
             el.classList.add(tipo === "sucesso" ? 'bg-emerald-100' : 'bg-rose-100', tipo === "sucesso" ? 'text-emerald-800' : 'text-rose-800');
-            setTimeout(() => el.classList.add('hidden'), 4000);
+            setTimeout(() => el.classList.add('hidden'), 5000);
         }
 
         async function carregarDoSupabase() {
@@ -359,7 +337,7 @@
             salvarFdsLocal();
             renderizarCardsFds();
             verificarDuplicidadeInput();
-            mostrarAviso(`✅ FDS do produto "${produto}" salva com sucesso!`);
+            mostrarAviso(`✅ FDS do produto "${produto}" salva!`);
 
             document.getElementById('inputProduto').value = '';
             document.getElementById('inputFabricante').value = '';
@@ -402,7 +380,7 @@
                 
                 card.innerHTML = `
                     <div class="flex items-center gap-3 w-full sm:w-auto truncate">
-                        <input type="checkbox" value="${item.id}" class="check-fds rounded w-4 h-4 accent-cyan-600 cursor-pointer">
+                        <input type="checkbox" value="${item.id}" data-link="${item.linkPdf}" class="check-fds rounded w-4 h-4 accent-cyan-600 cursor-pointer">
                         <span class="text-lg">📄</span>
                         <div class="truncate">
                             <h4 class="font-black text-slate-900 dark:text-white uppercase truncate">${item.produto}</h4>
@@ -427,44 +405,81 @@
             checkboxes.forEach(cb => cb.checked = master.checked);
         }
 
-        function abrirImpressaoUnificadaLote() {
+        // MOTOR DE FUSÃO REAL DE PDFs (JUNTA OS PDFs SELECIONADOS EM UM SÓ ARQUIVO)
+        async function fundirEBaixarPdfsReais() {
             const selecionados = document.querySelectorAll('.check-fds:checked');
             if (selecionados.length === 0) {
-                alert("Por favor, selecione pelo menos uma FDS na lista para imprimir juntas!");
+                alert("Por favor, selecione pelo menos uma FDS na lista para juntar em um único PDF!");
                 return;
             }
 
-            const idsSelecionados = Array.from(selecionados).map(cb => String(cb.value));
-            const itensParaImprimir = listaFds.filter(item => idsSelecionados.includes(String(item.id)));
+            const btn = document.getElementById('btnFundirPdfs');
+            const textoOriginal = btn.innerHTML;
+            btn.innerHTML = "⏳ Baixando e unificando PDFs reais...";
+            btn.disabled = true;
 
-            const container = document.getElementById('conteudoUnificadoImpresso');
-            container.innerHTML = '';
+            mostrarAviso("⏳ A descarregar e a fundir os PDFs oficiais selecionados...", "sucesso");
 
-            itensParaImprimir.forEach((item, idx) => {
-                const bloco = document.createElement('div');
-                bloco.className = "bloco-ficha-impressao border-2 border-slate-300 p-6 rounded-2xl bg-white space-y-4 text-slate-900 shadow-sm";
-                bloco.innerHTML = `
-                    <div class="flex justify-between items-start border-b pb-3">
-                        <div>
-                            <span class="text-[9px] font-black bg-cyan-100 text-cyan-800 px-2 py-0.5 rounded">FDS - FICHA DE DADOS DE SEGURANÇA</span>
-                            <h2 class="text-base font-black uppercase text-slate-900 mt-2">${item.produto}</h2>
-                            <p class="text-xs font-bold text-slate-600 uppercase mt-1">Fabricante: ${item.fabricante}</p>
-                        </div>
-                        <span class="text-xs font-bold text-slate-400">Documento #${idx + 1} de ${itensParaImprimir.length}</span>
-                    </div>
-                    <div class="space-y-2 text-xs pt-2">
-                        <p><strong>Link Oficial do PDF:</strong> <a href="${item.linkPdf}" target="_blank" class="text-blue-600 underline">${item.linkPdf}</a></p>
-                        <p class="text-[10px] text-slate-500 mt-4">Portal Operacional Vale • Impressão Unificada em Lote</p>
-                    </div>
-                `;
-                container.appendChild(bloco);
-            });
+            try {
+                const pdfsParaUnificar = [];
+                for (const cb of selecionados) {
+                    const link = cb.getAttribute('data-link');
+                    if (link && link !== '#') {
+                        // Utiliza um serviço CORS seguro para buscar o binário real do PDF do fabricante
+                        const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(link)}`;
+                        try {
+                            const res = await fetch(proxyUrl);
+                            if (res.ok) {
+                                const buffer = await res.arrayBuffer();
+                                pdfsParaUnificar.push(buffer);
+                            }
+                        } catch (e) {
+                            console.error("Erro ao baixar link:", link);
+                        }
+                    }
+                }
 
-            document.getElementById('modalImpressaoUnificada').classList.remove('hidden');
-        }
+                if (pdfsParaUnificar.length === 0) {
+                    alert("Não foi possível transferir os PDFs dos links selecionados (verifique se os links são PDFs diretos válidos).");
+                    btn.innerHTML = textoOriginal;
+                    btn.disabled = false;
+                    return;
+                }
 
-        function fecharImpressaoUnificada() {
-            document.getElementById('modalImpressaoUnificada').classList.add('hidden');
+                // Cria o documento PDF unificado usando PDF-Lib
+                const pdfDocFinal = await PDFLib.PDFDocument.create();
+
+                for (const pdfBuffer of pdfsParaUnificar) {
+                    try {
+                        const pdfExterno = await PDFLib.PDFDocument.load(pdfBuffer);
+                        const paginasCopiadas = await pdfDocFinal.copyPages(pdfExterno, pdfExterno.getPageIndices());
+                        paginasCopiadas.forEach((pagina) => pdfDocFinal.addPage(pagina));
+                    } catch (err) {
+                        console.error("Erro ao processar páginas de um PDF:", err);
+                    }
+                }
+
+                // Gera o arquivo PDF final unificado
+                const pdfBytesFinal = await pdfDocFinal.save();
+                const blob = new Blob([pdfBytesFinal], { type: 'application/pdf' });
+                const urlBlob = URL.createObjectURL(blob);
+
+                // Dispara o download automático do PDF unificado pronto para imprimir
+                const linkDownload = document.createElement('a');
+                linkDownload.href = urlBlob;
+                linkDownload.download = `FDS_Lote_Unificado_${Date.now()}.pdf`;
+                document.body.appendChild(linkDownload);
+                linkDownload.click();
+                document.body.removeChild(linkDownload);
+
+                mostrarAviso(`✅ PDF unificado gerado com sucesso! ${pdfsParaUnificar.length} documento(s) juntados em um único arquivo.`);
+            } catch (err) {
+                console.error(err);
+                alert("Erro ao fundir os arquivos PDF. Verifique os links informados.");
+            } finally {
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+            }
         }
 
         function abrirModalEdicao(id) {
@@ -474,7 +489,6 @@
             document.getElementById('editProduto').value = item.produto;
             document.getElementById('editFabricante').value = item.fabricante;
             document.getElementById('editLink').value = item.linkPdf;
-            document.getElementById('modalImpressaoUnificada').classList.add('hidden'); // garante fechar outros se houver
             document.getElementById('modalEdicao').classList.remove('hidden');
         }
         function fecharModalEdicao() { document.getElementById('modalEdicao').classList.add('hidden'); }
