@@ -47,7 +47,7 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Gestão de FDS e Fornecedores</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Gravação Local Direta</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Visualizador de PDF Ativo</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Sistema Operacional</span>
                     </div>
@@ -491,7 +491,7 @@
                 
                 let acaoHtml = `<a href="${item.linkPdf}" target="_blank" class="bg-cyan-50 hover:bg-cyan-100 text-cyan-700 font-bold py-1.5 px-3 rounded-lg text-[11px] text-center">Abrir Link ↗</a>`;
                 if (item.pdfBlob) {
-                    acaoHtml = `<span class="text-[10px] font-bold text-emerald-600 bg-emerald-50 dark:bg-emerald-950/40 px-2 py-1 rounded">📎 PDF Anexado</span>`;
+                    acaoHtml = `<button onclick="abrirPdfAnexado(${item.id})" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold py-1.5 px-3 rounded-lg text-[11px] cursor-pointer shadow-sm">📎 Abrir PDF Anexado ↗</button>`;
                 }
 
                 card.innerHTML = `
@@ -519,6 +519,13 @@
         function marcarTodos(master) {
             const checkboxes = document.querySelectorAll('.check-fds');
             checkboxes.forEach(cb => cb.checked = master.checked);
+        }
+
+        function abrirPdfAnexado(id) {
+            const item = listaFds.find(f => String(f.id) === String(id));
+            if (!item || !item.pdfBlob) return;
+            const w = window.open('');
+            w.document.write(`<iframe src="${item.pdfBlob}" frameborder="0" style="border:0; top:0; left:0; bottom:0; right:0; width:100%; height:100%;" allowfullscreen></iframe>`);
         }
 
         // FUSÃO DE PDFs
@@ -613,7 +620,11 @@
                     setTimeout(() => {
                         const destino = item.pdfBlob ? item.pdfBlob : item.linkPdf;
                         if (destino && destino !== '#') {
-                            window.open(destino, '_blank');
+                            if (item.pdfBlob) {
+                                abrirPdfAnexado(item.id);
+                            } else {
+                                window.open(destino, '_blank');
+                            }
                         }
                     }, index * 600);
                 });
