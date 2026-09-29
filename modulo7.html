@@ -27,7 +27,7 @@
             50% {
                 background-color: #ffedd5;
                 border-color: #ea580c;
-                box-shadow: 0 0 5px rgba(234, 88, 12, 0.4);
+                box-shadow: 0 0 5px rgba(249, 115, 22, 0.4);
                 transform: scale(1.01);
             }
         }
@@ -55,7 +55,7 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Botão Reconhecer Corrigido</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Reconhecedor de Link Reparado</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
@@ -210,7 +210,7 @@
                 </div>
             </div>
 
-            <!-- CONTEÚDO 2: LINK WEB -->
+            <!-- CONTEÚDO 2: LINK WEB (CORRIGIDO E ROBUSTO) -->
             <div id="aba-link" class="p-4 sm:p-5 space-y-3 hidden">
                 <div class="flex justify-between items-center">
                     <label class="block text-xs font-black text-blue-950 dark:text-blue-200 uppercase flex items-center gap-2">
@@ -990,7 +990,7 @@
             if (btnSalvar) btnSalvar.classList.remove('hidden');
         }
 
-        // ================= PARSER DE LINK =================
+        // ================= PARSER DE LINK (CORRIGIDO E SEGURO) =================
         function extrairNomeDoLinkML(url) {
             try {
                 const urlLimpa = url.split('?')[0].split('#')[0];
@@ -1203,7 +1203,7 @@
             renderizarCardsPendentes();
         }
 
-        // ================= RENDERIZAÇÃO DOS CARDS PENDENTES (COM CATEGORIAS GARANTIDAS) =================
+        // ================= RENDERIZAÇÃO DOS CARDS PENDENTES =================
         function renderizarCardsPendentes() {
             const container = document.getElementById('containerCardsPreenchidos');
             const lista = document.getElementById('listaCardsPendentes');
@@ -1299,7 +1299,7 @@
                     </div>
                 `;
                 lista.appendChild(card);
-                preencherOpcoesCategoria(card.querySelector(`#categoria-${item.tempId}`), item.categoria || adivinharCategoria(item.produto));
+                preencherOpcoesCategoria(card.querySelector(`#categoria-${item.tempId}`), item.categoria || "OUTROS");
             });
         }
 
@@ -1567,6 +1567,12 @@
                 });
             }
 
+            // Organiza: não entregues primeiro, entregues por último (e riscados)
+            listaExibicao.sort((a, b) => {
+                if (a.entregue === b.entregue) return 0;
+                return a.entregue ? 1 : -1;
+            });
+
             if (listaExibicao.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="11" class="text-center py-6 text-slate-400 italic">NENHUMA COMPRA ENCONTRADA COM ESSE FILTRO.</td></tr>`;
             } else {
@@ -1577,13 +1583,16 @@
 
                     const entregueChecked = item.entregue ? 'checked' : '';
                     const dataEntregaVal = item.data_entrega || '';
+                    
+                    const estiloRiscado = item.entregue ? 'line-through text-slate-400 dark:text-slate-500' : 'text-slate-900 dark:text-white font-medium';
+                    const linhaOpacidade = item.entregue ? 'bg-slate-50/70 dark:bg-slate-800/40 opacity-75' : 'hover:bg-slate-50 dark:hover:bg-slate-700/40';
 
                     const tr = document.createElement('tr');
-                    tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/40 transition uppercase";
+                    tr.className = `${linhaOpacidade} transition uppercase`;
                     tr.innerHTML = `
                         <td class="py-2.5 px-3 font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap">${formatarDataBR(item.data)}</td>
                         <td class="py-2.5 px-3 font-bold text-slate-800 dark:text-slate-200 whitespace-nowrap">${item.solicitante}</td>
-                        <td class="py-2.5 px-3 font-medium text-slate-900 dark:text-white max-w-xs truncate" title="${item.produto}">${item.produto}</td>
+                        <td class="py-2.5 px-3 max-w-xs truncate ${estiloRiscado}" title="${item.produto}">${item.produto}</td>
                         <td class="py-2.5 px-3 font-semibold text-indigo-700 dark:text-indigo-300 whitespace-nowrap">${item.local || 'MERCADO LIVRE'}</td>
                         <td class="py-2.5 px-3 whitespace-nowrap"><span class="text-[10px] bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-full font-bold">${item.categoria}</span></td>
                         <td class="py-2.5 px-3 text-center font-bold text-slate-700 dark:text-slate-300">${item.qtd}</td>
