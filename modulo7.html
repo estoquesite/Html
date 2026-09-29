@@ -55,7 +55,7 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Botão Salvar Entregas</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Categorias nos Links</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
@@ -946,7 +946,6 @@
             }
         }
 
-        // ================= SALVAR ALTERAÇÃO DE ENTREGA DIRETO NA LINHA =================
         async function salvarAlteracaoEntrega(id) {
             const item = compras.find(c => c.id === id);
             if (!item) return;
@@ -1032,7 +1031,7 @@
                 link = matchUrl[1];
                 const nomeExtraido = extrairNomeDoLinkML(link);
                 if (nomeExtraido) produto = nomeExtraido;
-                localDetectado = identificarLocalPeloLink(link);
+                localDetectId = identificarLocalPeloLink(link);
             }
 
             const matchQtd = entrada.match(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/i);
@@ -1201,111 +1200,7 @@
             return "OUTROS";
         }
 
-        function fileToBase64(file) {
-            return new Promise((resolve, reject) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = () => resolve(reader.result.split(',')[1]);
-                reader.onerror = error => reject(error);
-            });
-        }
-
-        async function processarArquivos(files) {
-            if (!files || files.length === 0) return;
-
-            const apiKey = localStorage.getItem('gemini_api_key');
-            if (!apiKey) {
-                abrirModalChaveIa();
-                alert("Por favor, informe a Chave da IA primeiro para ler a imagem!");
-                return;
-            }
-
-            mostrarAviso("⏳ IA visual analisando a imagem... Aguarde...", "sucesso");
-
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                if (!file.type.startsWith('image/')) continue;
-                await chamarIaParaImagem(file, apiKey);
-            }
-
-            mostrarAviso("✅ Foto processada com sucesso!", "sucesso");
-            renderizarCardsPendentes();
-        }
-
-        async function chamarIaParaImagem(file, apiKey) {
-            try {
-                const base64Data = await fileToBase64(file);
-
-                const prompt = `Analise a foto em anexo e extraia os produtos comprados, quantidades e valores.
-                Retorne ESTRITAMENTE um JSON com uma lista de objetos contendo os seguintes campos:
-                [
-                  {
-                    "produto": "nome do produto em maiúsculo",
-                    "qtd": número inteiro da quantidade (padrão 1),
-                    "unit": valor unitário decimal (número puro, ex: 15.50),
-                    "total": valor total decimal se constar ou null,
-                    "solicitante": "nome de quem pediu se constar ou ''",
-                    "local": "local ou fornecedor da compra se constar ou 'LOJA FÍSICA'",
-                    "categoria": "INFORMÁTICA / TI, ESCRITÓRIO, MANUTENÇÃO, TREINAMENTO, ALIMENTAÇÃO / COPA ou OUTROS"
-                  }
-                ]
-                Retorne apenas o array JSON puro, sem blocos de markdown.`;
-
-                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
-
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [
-                                { text: prompt },
-                                {
-                                    inline_data: {
-                                        mime_type: file.type || "image/jpeg",
-                                        data: base64Data
-                                    }
-                                }
-                            ]
-                        }]
-                    })
-                });
-
-                const data = await response.json();
-                if (data.error) throw new Error(data.error.message);
-
-                let textoResposta = data.candidates[0].content.parts[0].text.trim();
-                textoResposta = textoResposta.replace(/```json/gi, '').replace(/```/g, '').trim();
-
-                const produtosExtraidos = JSON.parse(textoResposta);
-                const hoje = new Date().toISOString().split('T')[0];
-
-                produtosExtraidos.forEach((p) => {
-                    const q = p.qtd || 1;
-                    const u = p.unit || 0;
-                    const t = p.total || (q * u);
-
-                    itensPendentesAprovacao.push({
-                        tempId: Date.now() + Math.random(),
-                        data: hoje,
-                        solicitante: (p.solicitante || "").toUpperCase(),
-                        produto: (p.produto || "").toUpperCase(),
-                        local: (p.local || "LOJA FÍSICA").toUpperCase(),
-                        categoria: p.categoria || "OUTROS",
-                        qtd: q,
-                        unit: u,
-                        total: t,
-                        link: "",
-                        entregue: false,
-                        data_entrega: ""
-                    });
-                });
-            } catch (err) {
-                console.error("Falha ao analisar arquivo:", err);
-                mostrarAviso("Erro na IA: " + err.message, "erro");
-            }
-        }
-
+        // ================= CARDS PRÉ-PREENCHIDOS =================
         function renderizarCardsPendentes() {
             const container = document.getElementById('containerCardsPreenchidos');
             const lista = document.getElementById('listaCardsPendentes');
@@ -1358,12 +1253,12 @@
 
                         <div class="md:col-span-4">
                             <label class="block text-[9px] font-bold text-slate-400 uppercase">Produto / Descrição</label>
-                            <input type="text" id="produto-${item.tempId}" value="${item.produto}" placeholder="EX: CHUMBADOR, PARAFUSO..." oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold">
+                            <input type="text" id="produto-${item.tempId}" value="${item.produto}" placeholder="EX: CHUMBADOR, PARAFUSO..." oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-white font-bold">
                         </div>
 
                         <div class="md:col-span-3">
                             <label class="block text-[9px] font-bold text-slate-400 uppercase">Local / Fornecedor</label>
-                            <input type="text" id="local-${item.tempId}" value="${item.local || 'MERCADO LIVRE'}" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold">
+                            <input type="text" id="local-${item.tempId}" value="${item.local || 'MERCADO LIVRE'}" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-white font-bold">
                         </div>
 
                         <div class="md:col-span-3">
