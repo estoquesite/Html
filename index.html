@@ -3,307 +3,465 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 8 - Procura de FDS / FISPQ | Portal Vale</title>
+    <title>Portal Operacional - Vale (Menu Mestre)</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = { darkMode: 'class' }
-    </script>
-    <!-- SDK Oficial do Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-        .uppercase-input { text-transform: uppercase; }
-
-        @keyframes neonDelicado {
-            0%, 100% {
-                border-color: #38bdf8;
-                box-shadow: 0 0 6px rgba(56, 189, 248, 0.4);
-            }
-            50% {
-                border-color: #818cf8;
-                box-shadow: 0 0 2px rgba(129, 140, 248, 0.2);
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        vale: {
+                            DEFAULT: '#007e7a',
+                            dark: '#005a57',
+                            light: '#e6f4f4',
+                            amber: '#f59e0b'
+                        }
+                    }
+                }
             }
         }
-        .neon-pulsante {
-            animation: neonDelicado 2s infinite alternate ease-in-out;
-            border-width: 1.5px !important;
+    </script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            background: #f0f4f8; 
+            color: #1e293b; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px 16px; 
+        }
+        .container-menu { max-width: 1100px; width: 100%; }
+        
+        /* CARD DOS MÓDULOS */
+        .card-modulo { 
+            background: #fff; 
+            border-radius: 12px; 
+            border: 1px solid #e2e8f0; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03); 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            text-decoration: none; 
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); 
+            position: relative; 
+            overflow: hidden; 
+            min-height: 180px; 
+        }
+        .card-modulo::before { 
+            content: ''; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            height: 4px; 
+        }
+        
+        .card-modulo.m1::before, .card-modulo.m2::before { background: #007e7a; }
+        .card-modulo.m3::before, .card-modulo.m4::before, .card-modulo.m5::before { background: #db2777; }
+        .card-modulo.m6::before { background: #059669; }
+        .card-modulo.m7::before { background: #6366f1; }
+        .card-modulo.m8::before { background: #0891b2; }
+        
+        .card-modulo:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 14px 25px -4px rgba(0, 0, 0, 0.08); 
+            border-color: #cbd5e1;
+        }
+        
+        .card-icone { 
+            width: 42px; 
+            height: 42px; 
+            border-radius: 10px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 20px; 
+        }
+        
+        .m1 .card-icone, .m2 .card-icone { background: #e6f4f4; color: #007e7a; }
+        .m3 .card-icone, .m4 .card-icone, .m5 .card-icone { background: #fce7f3; color: #db2777; }
+        .m6 .card-icone { background: #ecfdf5; color: #059669; }
+        .m7 .card-icone { background: #eef2ff; color: #6366f1; }
+        .m8 .card-icone { background: #ecfeff; color: #0891b2; }
+        
+        .tecla-atalho {
+            font-size: 10px;
+            font-weight: 800;
+            background: #f1f5f9;
+            color: #64748b;
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
         }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen p-4 sm:p-6 transition-colors duration-200">
+<body class="select-none">
 
-    <div class="max-w-7xl mx-auto space-y-5">
-
-        <!-- CABEÇALHO -->
-        <header class="flex flex-wrap justify-between items-center bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 gap-4">
-            <div class="flex items-center gap-3">
-                <div class="w-12 h-12 bg-cyan-50 dark:bg-cyan-950/60 text-cyan-600 dark:text-cyan-400 rounded-2xl flex items-center justify-center text-2xl font-black shadow-inner">
-                    📄
-                </div>
-                <div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-cyan-100 dark:bg-cyan-900 text-cyan-700 dark:text-cyan-300">Módulo 8</span>
-                        <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Procura e Gestão de FDS / FISPQ</h1>
-                    </div>
-                    <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Procura Instantânea na Web</p>
-                        <span class="inline-block w-1.5 h-1.5 rounded-full bg-cyan-500"></span>
-                        <span class="text-[10px] font-bold text-cyan-600 dark:text-cyan-400">Módulo Ativo</span>
-                    </div>
-                </div>
+    <!-- CAPA DE BLOQUEIO DE SEGURANÇA MOBILE -->
+    <div id="tela-bloqueio-mobile" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 md:hidden">
+        <div class="bg-white p-7 rounded-3xl shadow-2xl max-w-xs w-full text-center space-y-4 border border-slate-100">
+            <div class="w-16 h-16 bg-teal-50 text-teal-700 rounded-3xl mx-auto flex items-center justify-center text-3xl font-black shadow-inner">
+                🔒
             </div>
             
-            <div class="flex flex-wrap items-center gap-2">
-                <a href="index.html" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1">
-                    ⬅ Menu Principal
-                </a>
+            <div>
+                <h2 class="text-base font-black text-slate-900">Portal Vale Operacional</h2>
+                <p class="text-slate-500 mt-1 text-[11px] leading-relaxed">Autentique sua identidade para liberar o acesso móvel.</p>
+            </div>
+
+            <button type="button" id="btnBiometria" onclick="desbloquearPorBiometria()" class="w-full bg-[#007e7a] hover:bg-[#005a57] active:scale-95 text-white font-bold py-3 rounded-2xl transition shadow-md text-xs flex items-center justify-center gap-2 cursor-pointer">
+                <span>👆</span>
+                <span>Validar Digital / Face ID</span>
+            </button>
+
+            <div id="area-pin" class="space-y-2 pt-2 border-t border-slate-100">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase">Ou digite o PIN de Segurança:</label>
+                <div class="flex gap-2 justify-center">
+                    <input type="password" id="pinInput" maxlength="4" placeholder="••••" class="w-28 text-center text-lg font-black tracking-widest py-1.5 border border-slate-300 rounded-xl bg-slate-50 outline-none focus:border-teal-600">
+                    <button type="button" onclick="verificarPIN()" class="bg-slate-800 text-white font-bold px-3 py-1.5 rounded-xl text-xs">Entrar</button>
+                </div>
+            </div>
+
+            <p id="erro-auth" class="text-rose-500 font-bold text-[11px] hidden"></p>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL DO MENU MESTRE -->
+    <div id="conteudo-portal" class="container-menu">
+        
+        <!-- CABEÇALHO CORPORATIVO VALE -->
+        <header class="bg-gradient-to-r from-[#007e7a] to-[#005a57] text-white p-6 sm:p-7 rounded-2xl shadow-lg shadow-teal-900/10 mb-6">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="text-center sm:text-left">
+                    <div class="flex items-center justify-center sm:justify-start gap-3">
+                        <span class="text-2xl font-black tracking-widest text-teal-100">VALE</span>
+                        <div class="h-5 w-px bg-teal-300/40"></div>
+                        <span class="text-lg font-extrabold tracking-wide">Portal Operacional</span>
+                        <span class="bg-amber-500 text-white font-black text-[10px] px-2 py-0.5 rounded shadow-sm">v04</span>
+                    </div>
+                    <p class="text-xs text-teal-100/90 mt-1 font-medium">Suíte integrada de gestão diária, segurança, equipes e FDS</p>
+                </div>
+
+                <div class="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-3.5 py-1.5 rounded-xl text-xs font-semibold border border-white/10">
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="relogioTopo">--:--:--</span>
+                    <span class="text-teal-200">|</span>
+                    <span id="dataTopo">--/--/----</span>
+                </div>
             </div>
         </header>
 
-        <!-- AVISO DE STATUS -->
-        <div id="alertaSistema" class="hidden p-3 rounded-xl text-xs font-bold text-center transition-all"></div>
-
-        <!-- BARRA DE FILTRO E PESQUISA DE FDS -->
-        <div class="bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 p-3.5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div class="flex items-center gap-2 w-full sm:w-auto">
-                <span class="text-base">🔍</span>
-                <span class="text-xs font-black uppercase text-slate-700 dark:text-slate-300 whitespace-nowrap">Filtrar FDS Cadastradas:</span>
-            </div>
+        <!-- GRADE COM OS 8 MÓDULOS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-left">
             
-            <div class="flex flex-1 items-center gap-2 w-full">
-                <div class="relative w-full">
-                    <input type="text" id="inputFiltroFds" oninput="renderizarCardsFds()" placeholder="Pesquisar por nome do produto ou fabricante..." class="uppercase-input w-full text-xs pl-8 pr-7 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-cyan-500 dark:text-white font-bold">
-                    <span class="absolute left-2.5 top-2 text-slate-400 text-xs">📄</span>
+            <!-- MÓDULO 1 -->
+            <a href="modulo1.html" class="card-modulo m1" title="Pressione [1] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">📋</div>
+                        <span class="tecla-atalho">Tecla 1</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">DDS & Emociograma</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Controle semanal com carinhas de emociograma, registro de rubricas e impressão A4 paisagem.
+                    </div>
                 </div>
-            </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#007e7a]">
+                    <span>Abrir Módulo 1</span><span>➔</span>
+                </div>
+            </a>
+
+            <!-- MÓDULO 2 -->
+            <a href="modulo2.html" class="card-modulo m2" title="Pressione [2] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">📅</div>
+                        <span class="tecla-atalho">Tecla 2</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Matriz Anual de DDS</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Grelha anual completa (12 meses) com visibilidade dinâmica por semestre/trimestre e autoajuste.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#007e7a]">
+                    <span>Abrir Módulo 2</span><span>➔</span>
+                </div>
+            </a>
+
+            <!-- MÓDULO 3 -->
+            <a href="modulo3.html" class="card-modulo m3" title="Pressione [3] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">🏖️</div>
+                        <span class="tecla-atalho">Tecla 3</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Cronograma de Férias</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Planejamento anual de início e término das férias da equipe com controle de saldo de dias.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#db2777]">
+                    <span>Abrir Módulo 3</span><span>➔</span>
+                </div>
+            </a>
+
+            <!-- MÓDULO 4 -->
+            <a href="modulo4.html" class="card-modulo m4" title="Pressione [4] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">🎂</div>
+                        <span class="tecla-atalho">Tecla 4</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Aniversariantes do Ano</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Grade bimestral dos 12 meses com distribuição automática e ordenação cronológica por dia.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#db2777]">
+                    <span>Abrir Módulo 4</span><span>➔</span>
+                </div>
+            </a>
+
+            <!-- MÓDULO 5 -->
+            <a href="modulo5.html" class="card-modulo m5" title="Pressione [5] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">📊</div>
+                        <span class="tecla-atalho">Tecla 5</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Absenteísmo & Justificativas</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Registro padronizado de ocorrências (AT, FA, CO, FO) com resumo e lançamento rápido.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#db2777]">
+                    <span>Abrir Módulo 5</span><span>➔</span>
+                </div>
+            </a>
+
+            <!-- MÓDULO 6 -->
+            <a href="modulo6.html" class="card-modulo m6" title="Pressione [6] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">🎓</div>
+                        <span class="tecla-atalho">Tecla 6</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Gestão de Treinamentos</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Capacitações com suporte à turma em lote, sincronização em nuvem e exportação em Excel.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#059669]">
+                    <span>Abrir Módulo 6</span><span>➔</span>
+                </div>
+            </a>
+
+            <!-- MÓDULO 7 -->
+            <a href="modulo7.html" class="card-modulo m7" title="Pressione [7] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">💳</div>
+                        <span class="tecla-atalho">Tecla 7</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Compras Cartão Corporativo</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Lançamento e controle de compras no cartão corporativo, extração via links e exportação para planilha.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#6366f1]">
+                    <span>Abrir Módulo 7</span><span>➔</span>
+                </div>
+            </a>
+
+            <!-- MÓDULO 8 -->
+            <a href="modulo8.html" class="card-modulo m8" title="Pressione [8] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">📄</div>
+                        <span class="tecla-atalho">Tecla 8</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Procura e Gestão de FDS / FISPQ</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Consulta rápida de Fichas de Dados de Segurança com miniaturas visuais, fotos e links diretos.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#0891b2]">
+                    <span>Abrir Módulo 8</span><span>➔</span>
+                </div>
+            </a>
+
         </div>
 
-        <!-- PAINEL DE PROCURA E CADASTRO DE FDS -->
-        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
-                <span class="text-xs font-black text-cyan-900 dark:text-cyan-300 uppercase flex items-center gap-1.5">
-                    <span>🌐</span> Procurar FDS na Internet e Salvar
-                </span>
-                <span class="text-[10px] font-bold text-slate-400">Insira o produto para buscar</span>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end">
-                <div class="md:col-span-3">
-                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Nome do Produto</label>
-                    <input type="text" id="fdsProduto" placeholder="EX: ACETONA..." class="uppercase-input neon-pulsante w-full text-xs p-2.5 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white font-bold">
-                </div>
-
-                <div class="md:col-span-3">
-                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Fabricante</label>
-                    <input type="text" id="fdsFabricante" placeholder="EX: WEG, SHELL..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                </div>
-
-                <div class="md:col-span-3">
-                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Link Direto da FDS (PDF)</label>
-                    <input type="text" id="fdsLink" placeholder="Cole o link da FDS aqui..." class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                </div>
-
-                <div class="md:col-span-3">
-                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Foto / Print do Produto</label>
-                    <input type="file" id="fdsFoto" accept="image/*" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-semibold">
-                </div>
-
-                <div class="md:col-span-12 flex justify-end gap-2 pt-2">
-                    <button type="button" onclick="pesquisarFdsWeb()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer">
-                        <span>🌐</span> <span>Procurar FDS na Web</span>
-                    </button>
-                    <button type="button" onclick="salvarFdsSistema()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2.5 px-6 rounded-xl text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer">
-                        <span>💾</span> <span>Salvar FDS no Sistema</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- LISTA DE FDS CADASTRADAS -->
-        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
-            <div class="flex justify-between items-center">
-                <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">
-                    📚 Fichas de Dados de Segurança (FDS) Cadastradas
-                </h3>
-                <span id="labelContadorFds" class="text-[11px] text-slate-400 font-bold">0 DOCUMENTOS</span>
-            </div>
-
-            <div id="gridFds" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
-        </div>
-
+        <!-- RODAPÉ -->
+        <footer class="mt-8 text-center text-xs text-slate-400 font-medium space-y-1">
+            <p>Sistema Operacional Integrado • Portal Vale Corporativo</p>
+            <p class="text-[10px] text-slate-400/80">Dica: Utilize os números de 1 a 8 no teclado para navegação rápida entre os módulos.</p>
+        </footer>
     </div>
 
-    <!-- MODAL DE VISUALIZAÇÃO DE FOTO -->
-    <div id="modalFoto" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden" onclick="fecharModalFoto()">
-        <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-2xl max-w-lg w-full space-y-3 relative" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
-                <h3 id="modalFotoTitulo" class="text-xs font-black uppercase text-cyan-600 dark:text-cyan-400">Foto do Produto</h3>
-                <button onclick="fecharModalFoto()" class="text-slate-400 hover:text-slate-600 font-black text-sm">✕</button>
-            </div>
-            <div class="flex justify-center bg-slate-100 dark:bg-slate-900 p-2 rounded-xl">
-                <img id="modalFotoImg" src="" alt="Produto" class="max-h-80 object-contain rounded-lg">
-            </div>
-        </div>
-    </div>
-
+    <!-- SCRIPT DE ATALHOS E SEGURANÇA -->
     <script>
-        let listaFds = [];
+        const PIN_CORRETO = "1234";
 
-        window.addEventListener('DOMContentLoaded', () => {
-            carregarFdsLocal();
-        });
-
-        function mostrarAviso(msg, tipo = "sucesso") {
-            const el = document.getElementById('alertaSistema');
-            el.innerText = msg;
-            el.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
-            if (tipo === "sucesso") {
-                el.classList.add('bg-emerald-100', 'text-emerald-800');
-            } else {
-                el.classList.add('bg-rose-100', 'text-rose-800');
-            }
-            setTimeout(() => el.classList.add('hidden'), 4000);
+        function atualizarRelogio() {
+            const agora = new Date();
+            const relogioEl = document.getElementById('relogioTopo');
+            const dataEl = document.getElementById('dataTopo');
+            if (relogioEl) relogioEl.innerText = agora.toLocaleTimeString('pt-BR');
+            if (dataEl) dataEl.innerText = agora.toLocaleDateString('pt-BR');
         }
+        setInterval(atualizarRelogio, 1000);
+        atualizarRelogio();
 
-        function pesquisarFdsWeb() {
-            const produto = document.getElementById('fdsProduto').value.trim();
-            if (!produto) {
-                alert("Digite o nome do produto para procurar a FDS na internet!");
-                document.getElementById('fdsProduto').focus();
-                return;
-            }
-            const query = encodeURIComponent(`FDS FISPQ ${produto} pdf`);
-            window.open(`https://www.google.com/search?q=${query}`, '_blank');
-            mostrarAviso(`🌐 Procurando FDS para: ${produto}`);
-        }
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
 
-        async function salvarFdsSistema() {
-            const produto = document.getElementById('fdsProduto').value.trim().toUpperCase();
-            const fabricante = document.getElementById('fdsFabricante').value.trim().toUpperCase();
-            const link = document.getElementById('fdsLink').value.trim();
-            const inputFoto = document.getElementById('fdsFoto');
-
-            if (!produto) {
-                alert("Por favor, informe o nome do produto!");
-                document.getElementById('fdsProduto').focus();
-                return;
-            }
-
-            let fotoUrl = "";
-            if (inputFoto.files && inputFoto.files[0]) {
-                fotoUrl = URL.createObjectURL(inputFoto.files[0]);
-            }
-
-            const novoFds = {
-                id: Date.now(),
-                produto: produto,
-                fabricante: fabricante || "NÃO INFORMADO",
-                link: link,
-                fotoUrl: fotoUrl,
-                dataRegistro: new Date().toLocaleDateString('pt-BR')
+            const rotas = {
+                '1': 'modulo1.html',
+                '2': 'modulo2.html',
+                '3': 'modulo3.html',
+                '4': 'modulo4.html',
+                '5': 'modulo5.html',
+                '6': 'modulo6.html',
+                '7': 'modulo7.html',
+                '8': 'modulo8.html'
             };
 
-            listaFds.unshift(novoFds);
-            salvarFdsLocal();
-            renderizarCardsFds();
-            mostrarAviso(`✅ FDS do produto "${produto}" salva com sucesso!`);
+            if (rotas[e.key]) {
+                window.location.href = rotas[e.key];
+            }
+        });
 
-            document.getElementById('fdsProduto').value = '';
-            document.getElementById('fdsFabricante').value = '';
-            document.getElementById('fdsLink').value = '';
-            inputFoto.value = '';
+        function ehDispositivoMovel() {
+            return window.innerWidth < 768;
         }
 
-        function renderizarCardsFds() {
-            const grid = document.getElementById('gridFds');
-            grid.innerHTML = '';
-
-            const termo = document.getElementById('inputFiltroFds') ? document.getElementById('inputFiltroFds').value.trim().toUpperCase() : "";
-            let listaExibicao = listaFds;
-
-            if (termo) {
-                listaExibicao = listaFds.filter(f => (f.produto || "").includes(termo) || (f.fabricante || "").includes(termo));
+        function liberarAcesso() {
+            const tela = document.getElementById('tela-bloqueio-mobile');
+            if (tela) {
+                tela.classList.add('transition-opacity', 'duration-300', 'opacity-0');
+                setTimeout(() => {
+                    tela.style.display = 'none';
+                    tela.classList.remove('opacity-0');
+                }, 300);
             }
+        }
 
-            if (listaExibicao.length === 0) {
-                grid.innerHTML = `<div class="col-span-full text-center py-8 text-slate-400 italic text-xs">Nenhum documento encontrado.</div>`;
-                document.getElementById('labelContadorFds').innerText = `0 DOCUMENTOS`;
+        function bloquearAcesso() {
+            if (!ehDispositivoMovel()) return;
+            sessionStorage.removeItem('vale_sessao_biometria');
+            const tela = document.getElementById('tela-bloqueio-mobile');
+            if (tela) {
+                document.getElementById('erro-auth').classList.add('hidden');
+                document.getElementById('pinInput').value = '';
+                tela.style.display = 'flex';
+            }
+        }
+
+        function verificarPIN() {
+            const input = document.getElementById('pinInput');
+            const erroEl = document.getElementById('erro-auth');
+
+            if (input.value === PIN_CORRETO) {
+                sessionStorage.setItem('vale_sessao_biometria', 'true');
+                liberarAcesso();
+            } else {
+                erroEl.innerText = "PIN incorreto. Tente novamente.";
+                erroEl.classList.remove('hidden');
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        document.getElementById('pinInput')?.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') verificarPIN();
+        });
+
+        async function desbloquearPorBiometria() {
+            const erroEl = document.getElementById('erro-auth');
+            erroEl.classList.add('hidden');
+
+            if (!window.isSecureContext || !window.PublicKeyCredential) {
+                erroEl.innerText = "Biometria indisponível. Utilize o PIN de segurança.";
+                erroEl.classList.remove('hidden');
+                document.getElementById('pinInput').focus();
                 return;
             }
 
-            listaExibicao.forEach((item) => {
-                const card = document.createElement('div');
-                card.className = "relative bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 p-4 rounded-2xl shadow-sm space-y-3 flex flex-col justify-between";
-                
-                let miniaturaHTML = `
-                    <div class="absolute right-3 top-3 w-12 h-12 bg-cyan-100 dark:bg-cyan-950 border border-cyan-300 dark:border-cyan-700 rounded-xl flex items-center justify-center shadow-sm overflow-hidden cursor-pointer hover:scale-105 transition" title="Sem foto" onclick="mostrarAviso('Nenhuma foto anexada para este item.')">
-                        <span class="text-lg">📄</span>
-                    </div>
-                `;
-
-                if (item.fotoUrl) {
-                    miniaturaHTML = `
-                        <div class="absolute right-3 top-3 w-14 h-14 bg-white dark:bg-slate-800 border-2 border-cyan-400 rounded-xl flex items-center justify-center shadow-md overflow-hidden cursor-pointer hover:scale-105 transition" title="Clique para ampliar a foto" onclick="abrirModalFoto('${item.fotoUrl}', '${item.produto}')">
-                            <img src="${item.fotoUrl}" alt="Foto" class="w-full h-full object-cover">
-                        </div>
-                    `;
+            try {
+                const disponivel = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+                if (!disponivel) {
+                    erroEl.innerText = "Nenhuma biometria ativa no aparelho. Utilize o PIN.";
+                    erroEl.classList.remove('hidden');
+                    document.getElementById('pinInput').focus();
+                    return;
                 }
 
-                card.innerHTML = `
-                    ${miniaturaHTML}
-                    <div class="pr-16 space-y-1">
-                        <span class="text-[9px] font-bold text-slate-400 uppercase">Registo: ${item.dataRegistro}</span>
-                        <h4 class="text-xs font-black text-slate-900 dark:text-white uppercase truncate" title="${item.produto}">${item.produto}</h4>
-                        <p class="text-[10px] text-slate-500 dark:text-slate-400 uppercase font-semibold">Fabricante: ${item.fabricante}</p>
-                    </div>
+                const challenge = new Uint8Array(32);
+                window.crypto.getRandomValues(challenge);
 
-                    <div class="flex items-center gap-2 pt-2 border-t border-slate-200 dark:border-slate-700 text-xs">
-                        ${item.link && item.link.startsWith('http') 
-                            ? `<a href="${item.link}" target="_blank" class="flex-1 bg-cyan-50 hover:bg-cyan-100 text-cyan-700 dark:bg-cyan-950/60 dark:text-cyan-300 font-bold py-1.5 px-2 rounded-xl text-[11px] transition flex items-center justify-center gap-1">📥 Baixar / Ver FDS</a>` 
-                            : '<span class="text-slate-400 text-[10px]">Sem link de FDS</span>'}
-                        
-                        <button onclick="removerFds(${item.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1.5 cursor-pointer" title="Excluir">✕</button>
-                    </div>
-                `;
-                grid.appendChild(card);
-            });
+                const options = {
+                    publicKey: {
+                        challenge: challenge,
+                        rp: { name: "Portal Vale" },
+                        user: {
+                            id: new Uint8Array([1, 2, 3, 4]),
+                            name: "operacional@vale",
+                            displayName: "Operador Vale"
+                        },
+                        pubKeyCredParams: [{ type: "public-key", alg: -7 }],
+                        authenticatorSelection: {
+                            authenticatorAttachment: "platform",
+                            userVerification: "required"
+                        },
+                        timeout: 30000
+                    }
+                };
 
-            document.getElementById('labelContadorFds').innerText = `${listaExibicao.length} DOCUMENTO(S)`;
-        }
-
-        function abrirModalFoto(fotoUrl, produto) {
-            if (!fotoUrl) return;
-            document.getElementById('modalFotoTitulo').innerText = produto;
-            document.getElementById('modalFotoImg').src = fotoUrl;
-            document.getElementById('modalFoto').classList.remove('hidden');
-        }
-
-        function fecharModalFoto() {
-            document.getElementById('modalFoto').classList.add('hidden');
-        }
-
-        function removerFds(id) {
-            if (confirm("Deseja realmente apagar esta FDS do sistema?")) {
-                listaFds = listaFds.filter(f => f.id !== id);
-                salvarFdsLocal();
-                renderizarCardsFds();
-                mostrarAviso("Documento removido com sucesso!");
+                const cred = await navigator.credentials.create(options);
+                if (cred) {
+                    sessionStorage.setItem('vale_sessao_biometria', 'true');
+                    liberarAcesso();
+                }
+            } catch (err) {
+                if (err.name !== "NotAllowedError") {
+                    erroEl.innerText = "Validação não concluída. Digite o PIN de 4 dígitos.";
+                    erroEl.classList.remove('hidden');
+                    document.getElementById('pinInput').focus();
+                }
             }
         }
 
-        function salvarFdsLocal() {
-            localStorage.setItem('portal_vale_fds_base', JSON.stringify(listaFds));
-        }
-
-        function carregarFdsLocal() {
-            const salvo = localStorage.getItem('portal_vale_fds_base');
-            if (salvo) {
-                try { listaFds = JSON.parse(salvo); } catch(e) { listaFds = []; }
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                bloquearAcesso();
+            } else if (ehDispositivoMovel() && sessionStorage.getItem('vale_sessao_biometria') !== 'true') {
+                setTimeout(desbloquearPorBiometria, 350);
             }
-            renderizarCardsFds();
-        }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!ehDispositivoMovel()) {
+                sessionStorage.setItem('vale_sessao_biometria', 'true');
+                const tela = document.getElementById('tela-bloqueio-mobile');
+                if (tela) tela.style.display = 'none';
+                return;
+            }
+
+            if (sessionStorage.getItem('vale_sessao_biometria') === 'true') {
+                liberarAcesso();
+            } else {
+                bloquearAcesso();
+                setTimeout(desbloquearPorBiometria, 400);
+            }
+        });
     </script>
 </body>
 </html>
