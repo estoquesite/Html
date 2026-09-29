@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 8 - Gestão e Impressão em Lote de FDS | Portal Vale</title>
+    <title>Módulo 8 - Impressão Unificada em Lote | Portal Vale</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -27,6 +27,14 @@
             50% { border-color: #f97316; box-shadow: 0 0 4px rgba(249, 115, 22, 0.5); }
         }
         .neon-duplicado { animation: neonAlertaDuplicado 1s infinite alternate ease-in-out; border-width: 2px !important; }
+
+        @media print {
+            body * { visibility: hidden; }
+            #modalImpressaoUnificada, #modalImpressaoUnificada * { visibility: visible; }
+            #modalImpressaoUnificada { position: absolute; left: 0; top: 0; width: 100%; background: white; padding: 0; margin: 0; }
+            .sem-impressao { display: none !important; }
+            .bloco-ficha-impressao { page-break-after: always; break-after: page; border: none !important; box-shadow: none !important; margin-bottom: 0 !important; }
+        }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen p-4 sm:p-6 transition-colors duration-200">
@@ -42,10 +50,10 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-cyan-100 dark:bg-cyan-900 text-cyan-700 dark:text-cyan-300">Módulo 8</span>
-                        <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Gestão e Impressão em Lote de FDS</h1>
+                        <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Impressão Unificada em Lote de FDS</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Fila Inteligente & Nuvem Supabase</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Salvamento Automático & Nuvem Supabase</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
@@ -65,13 +73,13 @@
         <!-- AVISO DE STATUS -->
         <div id="alertaSistema" class="hidden p-3 rounded-xl text-xs font-bold text-center transition-all"></div>
 
-        <!-- PAINEL DE CADASTRO OTIMIZADO -->
+        <!-- PAINEL DE CADASTRO COM SALVAMENTO AUTOMÁTICO -->
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                 <span class="text-xs font-black text-cyan-900 dark:text-cyan-300 uppercase flex items-center gap-1.5">
                     <span>⚡</span> Reconhecimento por Câmera e Cadastro de FDS
                 </span>
-                <span class="text-[10px] font-bold text-slate-400">Verificação de duplicidade ativa</span>
+                <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">💾 Salvamento automático ativo</span>
             </div>
 
             <!-- CÂMERA DE RECONHECIMENTO (IA) -->
@@ -92,25 +100,24 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end pt-2">
                 <div class="md:col-span-4">
                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Nome do Produto</label>
-                    <input type="text" id="inputProduto" oninput="verificarDuplicidadeInput()" placeholder="EX: DEVCON PLASTIC STEEL..." class="uppercase-input neon-pulsante w-full text-xs p-2.5 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white font-bold">
+                    <input type="text" id="inputProduto" oninput="salvarRascunhoAutomatico(); verificarDuplicidadeInput();" placeholder="EX: DEVCON PLASTIC STEEL..." class="uppercase-input neon-pulsante w-full text-xs p-2.5 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white font-bold">
                     <span id="avisoDuplicadoTexto" class="text-[10px] font-bold text-rose-500 hidden mt-1 block">⚠️ Atenção: Já existe uma FDS igual cadastrada!</span>
                 </div>
 
                 <div class="md:col-span-4">
                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Fabricante</label>
-                    <input type="text" id="inputFabricante" placeholder="EX: VONDER, WEG..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                    <input type="text" id="inputFabricante" oninput="salvarRascunhoAutomatico()" placeholder="EX: VONDER, WEG..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
 
                 <div class="md:col-span-4">
-                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Link Web do PDF (Opcional)</label>
-                    <input type="text" id="inputLink" placeholder="Cole o link oficial do PDF..." class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Link Direto da FDS (PDF)</label>
+                    <input type="text" id="inputLink" oninput="salvarRascunhoAutomatico()" placeholder="Cole o link oficial do PDF..." class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
 
-                <!-- ANEXO DIRETO DO PDF E BOTÕES -->
+                <!-- BOTÕES -->
                 <div class="md:col-span-12 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3">
-                    <div>
-                        <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase block">2. Ou Anexar Arquivo PDF do Computador/Celular</span>
-                        <input type="file" id="inputArquivoPdf" accept="application/pdf" class="text-xs mt-1 text-slate-500 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-cyan-600 file:text-white hover:file:bg-cyan-700 cursor-pointer">
+                    <div class="text-[11px] text-slate-500 font-semibold">
+                        💡 Seus dados são salvos automaticamente ao digitar.
                     </div>
                     <div class="flex gap-2">
                         <button type="button" onclick="pesquisarWebFds()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer">
@@ -124,7 +131,7 @@
             </div>
         </div>
 
-        <!-- LISTA DE FDS CADASTRADAS COM SELEÇÃO E IMPRESSÃO EM LOTE -->
+        <!-- LISTA DE FDS CADASTRADAS COM SELEÇÃO E IMPRESSÃO UNIFICADA -->
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
             <div class="flex flex-wrap justify-between items-center gap-3 border-b pb-3">
                 <div class="flex items-center gap-2">
@@ -134,9 +141,9 @@
                     <span id="labelContadorFds" class="text-[11px] text-slate-400 font-bold">0 DOCUMENTOS</span>
                 </div>
                 
-                <!-- BOTÃO DE IMPRESSÃO EM LOTE INTELIGENTE -->
-                <button type="button" onclick="executarImpressaoLoteGeral()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-black py-2.5 px-5 rounded-xl text-xs shadow-md flex items-center gap-1.5 cursor-pointer">
-                    <span>🖨️</span> <span>Imprimir / Baixar Selecionadas em Lote</span>
+                <!-- BOTÃO DE IMPRESSÃO UNIFICADA -->
+                <button type="button" onclick="abrirImpressaoUnificadaLote()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-black py-2.5 px-5 rounded-xl text-xs shadow-md flex items-center gap-1.5 cursor-pointer">
+                    <span>🖨️</span> <span>Imprimir Selecionadas Juntas (Unificado)</span>
                 </button>
             </div>
 
@@ -155,6 +162,22 @@
             <div id="gridFds" class="space-y-2"></div>
         </div>
 
+    </div>
+
+    <!-- MODAL DE PRÉ-VISUALIZAÇÃO DA IMPRESSÃO UNIFICADA -->
+    <div id="modalImpressaoUnificada" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white w-full max-w-2xl rounded-3xl p-6 shadow-2xl space-y-4 max-h-[90vh] flex flex-col">
+            <div class="flex justify-between items-center border-b pb-3 sem-impressao">
+                <h3 class="text-sm font-black uppercase text-cyan-800">🖨️ Fila Unificada para Impressão</h3>
+                <div class="flex gap-2">
+                    <button onclick="window.print()" class="bg-cyan-600 hover:bg-cyan-700 text-white font-bold px-4 py-2 rounded-xl text-xs">Imprimir Todas Juntas</button>
+                    <button onclick="fecharImpressaoUnificada()" class="bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold px-4 py-2 rounded-xl text-xs">Fechar</button>
+                </div>
+            </div>
+            
+            <!-- CORPO ONDE OS DOCUMENTOS FICAM UM EMBAIXO DO OUTRO -->
+            <div id="conteudoUnificadoImpresso" class="overflow-y-auto space-y-6 p-2 flex-1"></div>
+        </div>
     </div>
 
     <!-- MODAL DE EDIÇÃO -->
@@ -185,6 +208,7 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             carregarFdsLocal();
+            carregarRascunhoAutomatico();
             if (window.supabase) {
                 try {
                     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -201,27 +225,48 @@
             setTimeout(() => el.classList.add('hidden'), 4000);
         }
 
+        function salvarRascunhoAutomatico() {
+            const rascunho = {
+                produto: document.getElementById('inputProduto').value,
+                fabricante: document.getElementById('inputFabricante').value,
+                link: document.getElementById('inputLink').value
+            };
+            localStorage.setItem('portal_vale_fds_rascunho', JSON.stringify(rascunho));
+        }
+
+        function carregarRascunhoAutomatico() {
+            const s = localStorage.getItem('portal_vale_fds_rascunho');
+            if (s) {
+                try {
+                    const rascunho = JSON.parse(s);
+                    if (rascunho.produto) document.getElementById('inputProduto').value = rascunho.produto;
+                    if (rascunho.fabricante) document.getElementById('inputFabricante').value = rascunho.fabricante;
+                    if (rascunho.link) document.getElementById('inputLink').value = rascunho.link;
+                    verificarDuplicidadeInput();
+                } catch(e) {}
+            }
+        }
+
+        function limparRascunhoAutomatico() {
+            localStorage.removeItem('portal_vale_fds_rascunho');
+            document.getElementById('inputProduto').value = '';
+            document.getElementById('inputFabricante').value = '';
+            document.getElementById('inputLink').value = '';
+            verificarDuplicidadeInput();
+        }
+
         async function carregarDoSupabase() {
             if (!supabaseClient) return;
             try {
                 const { data } = await supabaseClient.from('fds_corporativas').select('*').order('id', { ascending: false });
                 if (data) {
-                    const localSalvo = JSON.parse(localStorage.getItem('portal_vale_fds_base') || '[]');
-                    const mapLocal = new Map();
-                    localSalvo.forEach(item => mapLocal.set(String(item.id), item));
-
-                    listaFds = data.map(remoto => {
-                        const local = mapLocal.get(String(remoto.id));
-                        return {
-                            id: remoto.id,
-                            produto: remoto.produto,
-                            fabricante: remoto.fabricante || 'NÃO INFORMADO',
-                            linkPdf: remoto.link || '',
-                            pdfBlob: (local && local.pdfBlob) ? local.pdfBlob : (remoto.pdf_blob || ''),
-                            pdfNome: (local && local.pdfNome) ? local.pdfNome : (remoto.pdf_nome || 'documento.pdf'),
-                            dataRegistro: remoto.data_registro || new Date().toLocaleDateString('pt-BR')
-                        };
-                    });
+                    listaFds = data.map(remoto => ({
+                        id: remoto.id,
+                        produto: remoto.produto,
+                        fabricante: remoto.fabricante || 'NÃO INFORMADO',
+                        linkPdf: remoto.link || '',
+                        dataRegistro: remoto.data_registro || new Date().toLocaleDateString('pt-BR')
+                    }));
                     salvarFdsLocal();
                     renderizarCardsFds();
                     mostrarAviso("✅ FDS sincronizadas com a nuvem!");
@@ -274,10 +319,11 @@
                     if (resultado.fabricante) {
                         document.getElementById('inputFabricante').value = resultado.fabricante.toUpperCase();
                     }
+                    salvarRascunhoAutomatico();
                     verificarDuplicidadeInput();
                     mostrarAviso("✅ Produto reconhecido com sucesso!");
                 } else {
-                    mostrarAviso("ℹ️ Preencha o nome do produto manualmente.");
+                    mostrarAviso("ℹ️️ Preencha o nome do produto manualmente.");
                 }
             } catch (err) {
                 console.error(err);
@@ -326,7 +372,6 @@
             const produto = document.getElementById('inputProduto').value.trim().toUpperCase();
             const fabricante = document.getElementById('inputFabricante').value.trim().toUpperCase();
             const linkPdf = document.getElementById('inputLink').value.trim();
-            const inputArquivo = document.getElementById('inputArquivoPdf');
 
             if (!produto) {
                 alert("Por favor, informe o nome do produto!");
@@ -334,50 +379,33 @@
                 return;
             }
 
-            let pdfBlob = "";
-            let pdfNome = "";
-
-            if (inputArquivo.files && inputArquivo.files[0]) {
-                const arquivo = inputArquivo.files[0];
-                pdfNome = arquivo.name;
-                pdfBlob = await new Promise((resolve) => {
-                    const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
-                    reader.readAsDataURL(arquivo);
-                });
-            }
-
             const novoItem = {
                 id: Date.now(),
                 produto,
                 fabricante: fabricante || "NÃO INFORMADO",
                 linkPdf: linkPdf || "#",
-                pdfBlob,
-                pdfNome,
                 dataRegistro: new Date().toLocaleDateString('pt-BR')
             };
 
             listaFds.push(novoItem);
             salvarFdsLocal();
+            limparRascunhoAutomatico();
             renderizarCardsFds();
             verificarDuplicidadeInput();
             mostrarAviso(`✅ FDS do produto "${produto}" salva com sucesso!`);
 
-            document.getElementById('inputProduto').value = '';
-            document.getElementById('inputFabricante').value = '';
-            document.getElementById('inputLink').value = '';
-            inputArquivo.value = '';
-
             if (supabaseClient) {
                 try {
-                    await supabaseClient.from('fds_corporativas').insert([{
+                    const { data } = await supabaseClient.from('fds_corporativas').insert([{
                         produto: novoItem.produto,
                         fabricante: novoItem.fabricante,
                         link: novoItem.linkPdf,
-                        pdf_blob: novoItem.pdfBlob,
-                        pdf_nome: novoItem.pdfNome,
                         data_registro: novoItem.dataRegistro
-                    }]);
+                    }]).select();
+                    if (data && data[0]) {
+                        novoItem.id = data[0].id;
+                        salvarFdsLocal();
+                    }
                 } catch(e) {}
             }
         }
@@ -401,23 +429,18 @@
                 const card = document.createElement('div');
                 card.className = "bg-slate-50 dark:bg-slate-900/60 border border-slate-200 dark:border-slate-700 p-3 rounded-xl shadow-sm flex flex-col sm:flex-row items-center justify-between gap-3 text-xs";
                 
-                let botaoAcao = `<a href="${item.linkPdf}" target="_blank" class="bg-cyan-50 hover:bg-cyan-100 text-cyan-700 font-bold py-1.5 px-3 rounded-lg text-[11px] text-center">Abrir Link ↗</a>`;
-                if (item.pdfBlob) {
-                    botaoAcao = `<button onclick="baixarPdfUnico('${item.id}')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold py-1.5 px-3 rounded-lg text-[11px]">Baixar PDF 📥</button>`;
-                }
-
                 card.innerHTML = `
                     <div class="flex items-center gap-3 w-full sm:w-auto truncate">
                         <input type="checkbox" value="${item.id}" class="check-fds rounded w-4 h-4 accent-cyan-600 cursor-pointer">
                         <span class="text-lg">📄</span>
                         <div class="truncate">
                             <h4 class="font-black text-slate-900 dark:text-white uppercase truncate">${item.produto}</h4>
-                            <p class="text-[10px] text-slate-500 uppercase font-semibold">Fabricante: ${item.fabricante} ${item.pdfBlob ? '• (PDF Anexado)' : ''}</p>
+                            <p class="text-[10px] text-slate-500 uppercase font-semibold">Fabricante: ${item.fabricante}</p>
                         </div>
                     </div>
 
                     <div class="flex items-center gap-2 w-full sm:w-auto justify-end flex-shrink-0">
-                        ${botaoAcao}
+                        <a href="${item.linkPdf}" target="_blank" class="bg-cyan-50 hover:bg-cyan-100 text-cyan-700 font-bold py-1.5 px-3 rounded-lg text-[11px] text-center">Abrir PDF ↗</a>
                         <button onclick="abrirModalEdicao('${item.id}')" class="text-cyan-600 hover:text-cyan-800 font-bold p-1.5 cursor-pointer" title="Editar">✏️</button>
                         <button onclick="removerFds(${item.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1.5 cursor-pointer" title="Excluir">✕</button>
                     </div>
@@ -433,49 +456,44 @@
             checkboxes.forEach(cb => cb.checked = master.checked);
         }
 
-        function baixarPdfUnico(id) {
-            const item = listaFds.find(f => String(f.id) === String(id));
-            if (!item || !item.pdfBlob) return;
-            const link = document.createElement('a');
-            link.href = item.pdfBlob;
-            link.download = item.pdfNome || 'documento.pdf';
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }
-
-        // FUNÇÃO INTELIGENTE DE LOTE (SUPORTA TANTO PDF ANEXADO QUANTO LINKS DA WEB)
-        function executarImpressaoLoteGeral() {
+        function abrirImpressaoUnificadaLote() {
             const selecionados = document.querySelectorAll('.check-fds:checked');
             if (selecionados.length === 0) {
-                alert("Por favor, selecione pelo menos uma FDS na lista!");
+                alert("Por favor, selecione pelo menos uma FDS na lista para imprimir juntas!");
                 return;
             }
 
             const idsSelecionados = Array.from(selecionados).map(cb => String(cb.value));
-            const itensEscolhidos = listaFds.filter(item => idsSelecionados.includes(String(item.id)));
+            const itensParaImprimir = listaFds.filter(item => idsSelecionados.includes(String(item.id)));
 
-            if (confirm(`Deseja processar ${itensEscolhidos.length} documento(s) selecionado(s) em lote?`)) {
-                let contador = 0;
-                itensEscolhidos.forEach((item, index) => {
-                    setTimeout(() => {
-                        if (item.pdfBlob) {
-                            // Se tem PDF anexado, baixa o arquivo
-                            const link = document.createElement('a');
-                            link.href = item.pdfBlob;
-                            link.download = item.pdfNome || `FDS_${item.produto}.pdf`;
-                            document.body.appendChild(link);
-                            link.click();
-                            document.body.removeChild(link);
-                        } else if (item.linkPdf && item.linkPdf !== '#') {
-                            // Se tem link da web, abre a aba correspondente
-                            window.open(item.linkPdf, '_blank');
-                        }
-                    }, index * 500);
-                    contador++;
-                });
-                mostrarAviso(`🚀 Lote disparado com sucesso: ${contador} arquivo(s) processado(s)!`);
-            }
+            const container = document.getElementById('conteudoUnificadoImpresso');
+            container.innerHTML = '';
+
+            itensParaImprimir.forEach((item, idx) => {
+                const bloco = document.createElement('div');
+                bloco.className = "bloco-ficha-impressao border-2 border-slate-300 p-6 rounded-2xl bg-white space-y-4 text-slate-900 shadow-sm";
+                bloco.innerHTML = `
+                    <div class="flex justify-between items-start border-b pb-3">
+                        <div>
+                            <span class="text-[9px] font-black bg-cyan-100 text-cyan-800 px-2 py-0.5 rounded">FDS - FICHA DE DADOS DE SEGURANÇA</span>
+                            <h2 class="text-base font-black uppercase text-slate-900 mt-2">${item.produto}</h2>
+                            <p class="text-xs font-bold text-slate-600 uppercase mt-1">Fabricante: ${item.fabricante}</p>
+                        </div>
+                        <span class="text-xs font-bold text-slate-400">Documento #${idx + 1} de ${itensParaImprimir.length}</span>
+                    </div>
+                    <div class="space-y-2 text-xs pt-2">
+                        <p><strong>Link Oficial do PDF:</strong> <a href="${item.linkPdf}" target="_blank" class="text-blue-600 underline">${item.linkPdf}</a></p>
+                        <p class="text-[10px] text-slate-500 mt-4">Portal Operacional Vale • Impressão Unificada em Lote</p>
+                    </div>
+                `;
+                container.appendChild(bloco);
+            });
+
+            document.getElementById('modalImpressaoUnificada').classList.remove('hidden');
+        }
+
+        function fecharImpressaoUnificada() {
+            document.getElementById('modalImpressaoUnificada').classList.add('hidden');
         }
 
         function abrirModalEdicao(id) {
@@ -503,7 +521,7 @@
                 salvarFdsLocal();
                 renderizarCardsFds();
                 fecharModalEdicao();
-                mostrarAviso("Registo atualizado com sucesso!");
+                mostrarAviso("Registro atualizado com sucesso!");
                 if (supabaseClient) {
                     try { await supabaseClient.from('fds_corporativas').update({ produto, fabricante, link: linkPdf }).eq('id', id); } catch(e){}
                 }
