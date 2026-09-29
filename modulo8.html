@@ -77,7 +77,7 @@
                         <input type="file" accept="image/*" capture="environment" class="hidden" onchange="analisarFotoComIa(this.files[0])">
                     </label>
                     <label class="flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 px-4 rounded-xl shadow cursor-pointer transition text-xs">
-                        <span>🖼️</span> Escolher Foto da Galeria
+                        <span>🖼️️</span> Escolher Foto da Galeria
                         <input type="file" accept="image/*" class="hidden" onchange="analisarFotoComIa(this.files[0])">
                     </label>
                 </div>
@@ -99,7 +99,7 @@
                     <input type="text" id="inputLink" placeholder="Cole o link oficial do PDF..." class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
 
-                <!-- PROCESSO 2: SEGUNDA CÂMERA / ANEXO SEPARADO -->
+                <!-- PROCESSO 2: ANEXO SEPARADO E BOTÕES -->
                 <div class="md:col-span-12 bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-200 dark:border-slate-700 flex flex-wrap items-center justify-between gap-3">
                     <div>
                         <span class="text-[10px] font-bold text-slate-600 dark:text-slate-400 uppercase block">2. Anexo Opcional de Documento/Arquivo</span>
@@ -226,7 +226,7 @@
                     body: JSON.stringify({
                         contents: [{
                             parts: [
-                                { text: "Analise esta foto de um produto químico ou embalagem. Retorne APENAS um JSON estrito no formato: {\"produto\": \"NOME\", \"fabricante\": \"FABRICANTE\"}. Se não encontrar, deixe em branco." },
+                                { text: "Analise esta foto de um produto químico ou embalagem. Extraia o nome do produto e o fabricante. Retorne APENAS um objeto JSON estrito com exatamente estas duas chaves em maiúsculas: {\"PRODUTO\": \"NOME\", \"FABRICANTE\": \"FABRICANTE\"}. Sem markdown, sem crases, apenas o JSON puro." },
                                 { inlineData: { mimeType: file.type, data: base64Data } }
                             ]
                         }]
@@ -235,17 +235,23 @@
 
                 const data = await response.json();
                 if (data.candidates && data.candidates[0].content.parts[0].text) {
-                    const textoResposta = data.candidates[0].content.parts[0].text;
-                    const jsonLimpo = textoResposta.replace(/```json/g, '').replace(/```/g, '').trim();
-                    const resultado = JSON.parse(jsonLimpo);
+                    let textoResposta = data.candidates[0].content.parts[0].text.trim();
+                    textoResposta = textoResposta.replace(/```json/g, '').replace(/```/g, '').trim();
+                    const resultado = JSON.parse(textoResposta);
 
-                    if (resultado.produto) document.getElementById('inputProduto').value = resultado.produto.toUpperCase();
-                    if (resultado.fabricante) document.getElementById('inputFabricante').value = resultado.fabricante.toUpperCase();
+                    if (resultado.PRODUTO || resultado.produto) {
+                        document.getElementById('inputProduto').value = (resultado.PRODUTO || resultado.produto).toUpperCase();
+                    }
+                    if (resultado.FABRICANTE || resultado.fabricante) {
+                        document.getElementById('inputFabricante').value = (resultado.FABRICANTE || resultado.fabricante).toUpperCase();
+                    }
+                    mostrarAviso("✅ Produto reconhecido com sucesso!");
+                } else {
+                    mostrarAviso("ℹ️ Não foi possível extrair automaticamente. Preencha manualmente.");
                 }
-
-                mostrarAviso("✅ Produto reconhecido com sucesso!");
             } catch (err) {
-                mostrarAviso("ℹ️ Preencha o nome do produto manualmente.");
+                console.error(err);
+                mostrarAviso("ℹ️ Erro na leitura. Preencha os campos manualmente.");
             }
         }
 
