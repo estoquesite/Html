@@ -54,6 +54,16 @@
             border-width: 2px !important;
             font-weight: bold !important;
         }
+
+        @keyframes brilhoDuplicado {
+            0%, 100% { background-color: #fef08a; }
+            50% { background-color: #fde047; }
+        }
+        .alerta-duplicado-brilhante {
+            animation: brilhoDuplicado 0.8s infinite alternate ease-in-out;
+            border: 2px solid #ca8a04 !important;
+            font-weight: 900 !important;
+        }
     </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen p-4 sm:p-6 transition-colors duration-200">
@@ -72,7 +82,7 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Cores Neon Pulsantes</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Alerta de Duplicidade Brilhante</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
@@ -176,7 +186,6 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end">
                     <div class="md:col-span-2">
                         <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Data Compra</label>
-                        <!-- CAIXA NEON PULSANTE -->
                         <input type="date" id="manualData" onchange="atualizarDataEntregaManualDefault()" class="neon-pulsante w-full text-xs p-2.5 rounded-xl outline-none">
                     </div>
 
@@ -239,7 +248,7 @@
                 </div>
             </div>
 
-            <!-- CONTEÚDO 2: LINK WEB (CAIXA DO LINK NEON PULSANTE) -->
+            <!-- CONTEÚDO 2: LINK WEB -->
             <div id="aba-link" class="p-4 sm:p-5 space-y-3 hidden">
                 <div class="flex justify-between items-center">
                     <label class="block text-xs font-black text-blue-950 dark:text-blue-200 uppercase flex items-center gap-2">
@@ -258,7 +267,6 @@
                 
                 <div class="flex flex-col sm:flex-row gap-2">
                     <div class="relative flex-1">
-                        <!-- CAIXA DO LINK COM NEON PULSANTE -->
                         <input type="text" id="inputLinkDireto" placeholder="Cole o link aqui..." class="neon-pulsante w-full text-xs px-3 py-2.5 pr-8 rounded-xl outline-none">
                         <button type="button" onclick="limparInputLink()" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-rose-500 font-bold text-xs">✕</button>
                     </div>
@@ -1346,6 +1354,7 @@
                             <input type="number" step="0.01" id="unit-${item.tempId}" value="${unitCalculado}" oninput="calcularCardPorUnitario(${item.tempId})" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold">
                         </div>
 
+                        <!-- OPÇÃO DE ENTREGA JÁ NO CARD -->
                         <div class="md:col-span-4 bg-slate-100 dark:bg-slate-900/60 p-2 rounded-xl border border-slate-200 dark:border-slate-700">
                             <label class="flex items-center gap-1.5 cursor-pointer mb-1">
                                 <input type="checkbox" id="card-entregue-${item.tempId}" onchange="toggleCardDataEntrega('${item.tempId}', this.checked)" class="w-4 h-4 text-emerald-600 rounded">
@@ -1705,12 +1714,18 @@
                     const estiloRiscado = item.entregue ? 'line-through text-slate-400 dark:text-slate-500 font-normal' : 'text-slate-900 dark:text-white font-medium';
                     const linhaOpacidade = item.entregue ? 'bg-slate-100/70 dark:bg-slate-800/40 opacity-75' : 'hover:bg-slate-50 dark:hover:bg-slate-700/40';
 
+                    // VERIFICA SE HÁ DUPLICIDADE NO PRODUTO / SERVIÇO
+                    const produtoAtual = (item.produto || "").trim().toUpperCase();
+                    const qtdDuplicados = compras.filter(c => (c.produto || "").trim().toUpperCase() === produtoAtual).length;
+                    const classeDuplicado = qtdDuplicados > 1 ? 'alerta-duplicado-brilhante' : '';
+                    const tooltipDuplicado = qtdDuplicados >  1 ? `⚠️ ATENÇÃO: Este produto "${produtoAtual}" está cadastrado ${qtdDuplicados} vezes!` : '';
+
                     const tr = document.createElement('tr');
                     tr.className = `${linhaOpacidade} transition uppercase`;
                     tr.innerHTML = `
                         <td class="py-2.5 px-3 font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap">${formatarDataBR(item.data)}</td>
                         <td class="py-2.5 px-3 font-bold text-slate-800 dark:text-slate-200 whitespace-nowrap">${item.solicitante}</td>
-                        <td class="py-2.5 px-3 max-w-xs truncate ${estiloRiscado}" title="${item.produto}">${item.produto}</td>
+                        <td class="py-2.5 px-3 max-w-xs truncate ${estiloRiscado} ${classeDuplicado}" title="${tooltipDuplicado || item.produto}">${item.produto} ${qtdDuplicados > 1 ? '⚠️(DUPLICADO)' : ''}</td>
                         <td class="py-2.5 px-3 font-semibold text-indigo-700 dark:text-indigo-300 whitespace-nowrap">${item.local || 'MERCADO LIVRE'}</td>
                         <td class="py-2.5 px-3 whitespace-nowrap"><span class="text-[10px] bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-full font-bold">${item.categoria}</span></td>
                         <td class="py-2.5 px-3 text-center font-bold text-slate-700 dark:text-slate-300">${item.qtd}</td>
