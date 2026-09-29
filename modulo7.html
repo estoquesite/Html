@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="pt-PT">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -30,7 +30,7 @@
                         <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300">Módulo 7</span>
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
                     </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Gestão de despesas, extração inteligente e exportação de dados</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Captura automática de pedidos do Teams, extração e exportação</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
@@ -59,102 +59,50 @@
             </div>
         </div>
 
-        <!-- FORMULÁRIO DE LANÇAMENTO -->
-        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-4">
-            <h2 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300 tracking-wider border-b border-slate-100 dark:border-slate-700 pb-2">
-                📝 Novo Lançamento de Compra
-            </h2>
-
-            <!-- ÁREA DE CAPTURA RÁPIDA (LINK OU TEXTO COM QTD E VALOR) -->
-            <div class="bg-blue-50/70 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-900/40 p-3.5 rounded-xl space-y-2">
-                <div class="flex justify-between items-center">
-                    <label class="block text-[11px] font-bold text-blue-900 dark:text-blue-300 uppercase">
-                        🔗 Capturar Link ou Texto (ex: link + 2x R$ 85,00)
-                    </label>
-                    <button type="button" onclick="colarDoClipboard()" class="text-[10px] text-blue-700 dark:text-blue-400 font-bold hover:underline flex items-center gap-1 cursor-pointer">
-                        📋 Colar
-                    </button>
-                </div>
-                
-                <div class="flex gap-2">
-                    <input type="text" id="inputUrlProduto" placeholder="Cole o link ou texto (Ex: link do ML 3x R$ 49,90 ou 2 Teclados R$ 120 Roberto)..." class="flex-1 text-xs px-3 py-2 bg-white dark:bg-slate-900 border border-blue-200 dark:border-blue-800 rounded-xl outline-none focus:border-blue-600 dark:text-white">
-                    <button type="button" id="btnExtrair" onclick="processarEntradaInteligente()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-sm flex items-center gap-1.5 cursor-pointer flex-shrink-0">
-                        <span>⚡</span>
-                        <span>Identificar</span>
-                    </button>
-                </div>
-                <p id="msgStatusLink" class="text-[11px] font-medium hidden"></p>
+        <!-- NOVO BLOCO INTELIGENTE: COLAR MENSAGEM DO TEAMS -->
+        <div class="bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-900/60 p-4 rounded-2xl shadow-sm space-y-3">
+            <div class="flex justify-between items-center">
+                <label class="block text-xs font-black text-indigo-950 dark:text-indigo-200 uppercase flex items-center gap-2">
+                    <span>💬</span>
+                    <span>Colar Mensagem Direto do Teams / WhatsApp</span>
+                </label>
+                <button type="button" onclick="colarTextoTeams()" class="text-xs text-indigo-700 dark:text-indigo-300 font-bold hover:underline flex items-center gap-1 cursor-pointer">
+                    📋 Colar do Clipboard
+                </button>
             </div>
-
-            <!-- FORMULÁRIO DE PREENCHIMENTO -->
-            <form id="formCompra" onsubmit="salvarCompra(event)" class="space-y-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end">
-                    
-                    <!-- Data -->
-                    <div class="sm:col-span-1 md:col-span-2">
-                        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Data</label>
-                        <input type="date" id="campoData" required class="w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none focus:border-blue-500">
-                    </div>
-
-                    <!-- Solicitante -->
-                    <div class="sm:col-span-1 md:col-span-3">
-                        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Solicitante (Quem pediu?)</label>
-                        <input type="text" id="campoSolicitante" required placeholder="EX: ROBERTO / MANUTENÇÃO" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none focus:border-blue-500">
-                    </div>
-
-                    <!-- Descrição do Produto -->
-                    <div class="sm:col-span-2 md:col-span-4">
-                        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Descrição do Produto / Serviço</label>
-                        <input type="text" id="campoProduto" required placeholder="EX: TECLADO SEM FIO LOGITECH" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none focus:border-blue-500">
-                    </div>
-
-                    <!-- Categoria -->
-                    <div class="sm:col-span-2 md:col-span-3">
-                        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Categoria</label>
-                        <select id="campoCategoria" class="uppercase-input w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none focus:border-blue-500 font-semibold">
-                            <option value="INFORMÁTICA / TI">💻 INFORMÁTICA / TI</option>
-                            <option value="ESCRITÓRIO">📎 ESCRITÓRIO / ALMOXARIFADO</option>
-                            <option value="MANUTENÇÃO">🔧 MANUTENÇÃO</option>
-                            <option value="TREINAMENTO">🎓 TREINAMENTO</option>
-                            <option value="ALIMENTAÇÃO / COPA">☕ ALIMENTAÇÃO / COPA</option>
-                            <option value="OUTROS">📦 OUTROS</option>
-                        </select>
-                    </div>
-
-                    <!-- Quantidade -->
-                    <div class="sm:col-span-1 md:col-span-2">
-                        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Qtd</label>
-                        <input type="number" id="campoQtd" min="1" value="1" oninput="calcularTotalLinha()" required class="w-full text-xs p-2 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none focus:border-blue-500">
-                    </div>
-
-                    <!-- Valor Unitário -->
-                    <div class="sm:col-span-1 md:col-span-3">
-                        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Valor Unitário (R$)</label>
-                        <input type="number" id="campoValorUnit" step="0.01" min="0" placeholder="0,00" oninput="calcularTotalLinha()" required class="w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none focus:border-blue-500">
-                    </div>
-
-                    <!-- Total Calculado -->
-                    <div class="sm:col-span-1 md:col-span-3">
-                        <label class="block text-[10px] font-bold uppercase text-slate-400 mb-1">Total (Calculado)</label>
-                        <input type="text" id="campoValorTotalCalc" readonly value="R$ 0,00" class="w-full text-xs p-2 bg-slate-100 dark:bg-slate-950/60 font-black text-emerald-600 dark:text-emerald-400 border border-slate-200 dark:border-slate-800 rounded-xl outline-none">
-                    </div>
-
-                    <!-- Botão de Guardar -->
-                    <div class="sm:col-span-1 md:col-span-4 flex gap-2">
-                        <button type="submit" class="flex-1 bg-slate-900 hover:bg-black dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white py-2 px-4 rounded-xl text-xs font-bold transition shadow-sm cursor-pointer">
-                            💾 REGISTRAR COMPRA
-                        </button>
-                    </div>
-
-                </div>
-            </form>
+            
+            <textarea id="inputTextoTeams" rows="3" placeholder="Cole aqui a mensagem do Teams com o pedido (ex: Roberto pediu: 2 Teclados Logitech link:... R$ 89,90 e 1 Mouse Dell R$ 45,00)..." class="w-full text-xs p-3 bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800 rounded-xl outline-none focus:border-indigo-600 dark:text-white leading-relaxed"></textarea>
+            
+            <div class="flex justify-between items-center pt-1">
+                <span class="text-[11px] text-slate-500 dark:text-slate-400">
+                    O sistema separa múltiplos produtos, links, quantidades e solicitante automaticamente.
+                </span>
+                <button type="button" onclick="processarMensagemTeams()" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-md flex items-center gap-1.5 cursor-pointer">
+                    <span>⚡</span>
+                    <span>Reconhecer e Gerar Cards</span>
+                </button>
+            </div>
         </div>
 
-        <!-- TABELA DE COMPRAS -->
+        <!-- ÁREA ONDE SURGEM AS CAIXAS PRÉ-PREENCHIDAS PARA VOCÊ SÓ APERTAR OK -->
+        <div id="containerCardsPreenchidos" class="space-y-3 hidden">
+            <div class="flex justify-between items-center px-1">
+                <h3 class="text-xs font-black uppercase text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5">
+                    <span>📦</span>
+                    <span id="tituloItensPendentes">Itens Identificados (Apenas confira e aperte OK)</span>
+                </h3>
+                <button type="button" onclick="confirmarTodosOsCards()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-xl shadow-sm transition">
+                    ⚡ Confirmar Todos de uma Vez
+                </button>
+            </div>
+            <div id="listaCardsPendentes" class="space-y-3"></div>
+        </div>
+
+        <!-- TABELA DE COMPRAS FINAL -->
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">
-                    📋 Histórico de Lançamentos
+                    📋 Histórico de Lançamentos Registrados
                 </h3>
                 <span id="labelContador" class="text-[11px] text-slate-400 font-bold">0 ITENS REGISTRADOS</span>
             </div>
@@ -183,34 +131,25 @@
 
     <script>
         let compras = [];
-        let urlOrigemGuardada = "";
+        let itensPendentesAprovacao = [];
 
         window.addEventListener('DOMContentLoaded', () => {
-            const hoje = new Date().toISOString().split('T')[0];
-            document.getElementById('campoData').value = hoje;
             carregarDoLocalStorage();
         });
 
-        async function colarDoClipboard() {
+        async function colarTextoTeams() {
             try {
                 const texto = await navigator.clipboard.readText();
                 if (texto) {
-                    document.getElementById('inputUrlProduto').value = texto.trim();
-                    processarEntradaInteligente();
+                    document.getElementById('inputTextoTeams').value = texto.trim();
+                    processarMensagemTeams();
                 }
             } catch(e) {
-                document.getElementById('inputUrlProduto').focus();
+                document.getElementById('inputTextoTeams').focus();
             }
         }
 
-        function calcularTotalLinha() {
-            const qtd = parseFloat(document.getElementById('campoQtd').value) || 0;
-            const unit = parseFloat(document.getElementById('campoValorUnit').value) || 0;
-            const total = qtd * unit;
-            document.getElementById('campoValorTotalCalc').value = `R$ ${total.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-        }
-
-        // Extrai o nome do produto decodificando o endereço web do Mercado Livre
+        // Extrai o nome do produto caso venha em link do Mercado Livre
         function extrairNomeDoLinkML(url) {
             try {
                 const urlLimpa = url.split('?')[0].split('#')[0];
@@ -230,107 +169,206 @@
             return null;
         }
 
-        // RECONHECEDOR INTELIGENTE DE QUANTIDADE, VALOR E PRODUTO
-        async function processarEntradaInteligente() {
-            const textoCompleto = document.getElementById('inputUrlProduto').value.trim();
-            const statusEl = document.getElementById('msgStatusLink');
-            const btnExtrair = document.getElementById('btnExtrair');
-
-            if (!textoCompleto) {
-                alert("Por favor, cole um link ou digite os dados da compra.");
+        // PARSER INTELIGENTE DO TEAMS / WHATSAPP
+        function processarMensagemTeams() {
+            const textoBruto = document.getElementById('inputTextoTeams').value.trim();
+            if (!textoBruto) {
+                alert("Por favor, cole o texto do Teams antes de processar!");
                 return;
             }
 
-            statusEl.innerText = "Identificando informações...";
-            statusEl.className = "text-[11px] font-medium text-blue-600 dark:text-blue-400 block";
-            btnExtrair.disabled = true;
-
-            let produtoFinal = "";
-            let quantidadeFinal = 1;
-            let precoUnitarioFinal = 0;
-            urlOrigemGuardada = "";
-
-            // 1. RECONHECIMENTO DE QUANTIDADE (Ex: "3x", "2 un", "qtd 4", "5 pecas")
-            const regexQtd = /(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/i;
-            const matchQtd = textoCompleto.match(regexQtd);
-            if (matchQtd) {
-                quantidadeFinal = parseInt(matchQtd[1], 10);
+            // 1. Tenta identificar o solicitante no texto inteiro
+            let solicitanteDetectado = "SOLICITANTE NÃO INFORMADO";
+            const matchSolicitante = textoBruto.match(/(?:solicitante|de|por|para|quem pediu|pediu|atender|nome)[:\s-]+([A-Za-zÀ-ÖØ-öø-ÿ\s]{2,25})/i);
+            if (matchSolicitante && matchSolicitante[1]) {
+                solicitanteDetectado = matchSolicitante[1].trim().toUpperCase();
             }
 
-            // 2. RECONHECIMENTO DE VALOR (Ex: "R$ 159,90", "R$89.00", "1450,50")
-            const regexPreco = /(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/i;
-            const matchPreco = textoCompleto.match(regexPreco);
-            if (matchPreco) {
-                precoUnitarioFinal = parseFloat(matchPreco[1].replace(',', '.'));
-            }
+            // 2. Divide em blocos/linhas caso haja múltiplos itens
+            let linhas = textoBruto.split(/\n|;|\band\b|\be\b/i).map(l => l.trim()).filter(l => l.length > 3);
+            if (linhas.length === 0) linhas = [textoBruto];
 
-            // 3. RECONHECIMENTO DO PRODUTO (LINK OU NOME)
-            const regexUrl = /(https?:\/\/[^\s]+)/i;
-            const matchUrl = textoCompleto.match(regexUrl);
+            itensPendentesAprovacao = [];
+            const hoje = new Date().toISOString().split('T')[0];
 
-            if (matchUrl) {
-                urlOrigemGuardada = matchUrl[1];
-                const nomePeloLink = extrairNomeDoLinkML(urlOrigemGuardada);
-                if (nomePeloLink) {
-                    produtoFinal = nomePeloLink;
+            linhas.forEach((linha, idx) => {
+                // Se a linha for só o nome da pessoa ou cabeçalho sem produto, ignora
+                if (linha.toLowerCase().startsWith('solicitante:') || linha.toLowerCase().startsWith('de:')) return;
+
+                let qtd = 1;
+                let unit = 0;
+                let link = "";
+                let produto = "";
+
+                // Acha Link
+                const matchUrl = linha.match(/(https?:\/\/[^\s]+)/i);
+                if (matchUrl) {
+                    link = matchUrl[1];
+                    const nomePeloLink = extrairNomeDoLinkML(link);
+                    if (nomePeloLink) produto = nomePeloLink;
                 }
-            } else {
-                // Se foi digitado sem link, remove os preços e quantidades para isolar o nome do produto
-                let textoLimpo = textoCompleto
-                    .replace(regexQtd, ' ')
-                    .replace(regexPreco, ' ')
-                    .replace(/R\$/gi, ' ')
-                    .replace(/\s+/g, ' ')
-                    .trim();
 
-                if (textoLimpo.length > 2) {
-                    produtoFinal = textoLimpo.toUpperCase();
+                // Acha Quantidade (ex: 2x, 3 un, 4 peças)
+                const matchQtd = linha.match(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/i);
+                if (matchQtd) {
+                    qtd = parseInt(matchQtd[1], 10);
                 }
+
+                // Acha Valor Unitário (ex: R$ 89,90 ou 150.00)
+                const matchPreco = linha.match(/(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/i);
+                if (matchPreco) {
+                    unit = parseFloat(matchPreco[1].replace(',', '.'));
+                }
+
+                // Isola o nome do produto se não foi achado pelo link
+                if (!produto) {
+                    let textoLimpo = linha
+                        .replace(/(https?:\/\/[^\s]+)/gi, '')
+                        .replace(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/gi, ' ')
+                        .replace(/(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/gi, ' ')
+                        .replace(/R\$/gi, ' ')
+                        .replace(/(?:solicitante|de|por|para)[:\s-]+[A-Za-zÀ-ÖØ-öø-ÿ\s]+/gi, ' ')
+                        .trim();
+
+                    if (textoLimpo.length > 2) {
+                        produto = textoLimpo.toUpperCase();
+                    }
+                }
+
+                if (produto || link || unit > 0) {
+                    itensPendentesAprovacao.push({
+                        tempId: Date.now() + idx,
+                        data: hoje,
+                        solicitante: solicitanteDetectado,
+                        produto: (produto || "PRODUTO SEM DESCRIÇÃO").toUpperCase(),
+                        categoria: adivinharCategoria(produto),
+                        qtd: qtd || 1,
+                        unit: unit || 0,
+                        link: link || ""
+                    });
+                }
+            });
+
+            if (itensPendentesAprovacao.length === 0) {
+                alert("Não foi possível identificar produtos na mensagem. Tente colar novamente.");
+                return;
             }
 
-            // APLICA OS VALORES IDENTIFICADOS NOS CAMPOS
-            if (produtoFinal) {
-                document.getElementById('campoProduto').value = produtoFinal.toUpperCase();
-            }
-            if (quantidadeFinal > 1) {
-                document.getElementById('campoQtd').value = quantidadeFinal;
-            }
-            if (precoUnitarioFinal > 0) {
-                document.getElementById('campoValorUnit').value = precoUnitarioFinal;
-            }
-
-            calcularTotalLinha();
-
-            // Feedbacks visuais
-            if (produtoFinal && precoUnitarioFinal > 0) {
-                statusEl.innerText = `✅ Identificado: ${quantidadeFinal}x ${produtoFinal} por R$ ${precoUnitarioFinal.toFixed(2)}`;
-                statusEl.className = "text-[11px] font-bold text-emerald-600 dark:text-emerald-400 block";
-            } else if (produtoFinal) {
-                statusEl.innerText = `✅ Nome identificado! Por favor, informe o valor unitário abaixo.`;
-                statusEl.className = "text-[11px] font-bold text-blue-600 dark:text-blue-400 block";
-                document.getElementById('campoValorUnit').focus();
-            } else {
-                statusEl.innerText = `ℹ️ Digite a descrição e o valor nos campos abaixo.`;
-                statusEl.className = "text-[11px] font-bold text-amber-600 dark:text-amber-400 block";
-            }
-
-            btnExtrair.disabled = false;
+            renderizarCardsPendentes();
         }
 
-        function salvarCompra(e) {
-            e.preventDefault();
+        // Sugestão de Categoria Automática
+        function adivinharCategoria(texto) {
+            const t = (texto || "").toLowerCase();
+            if (t.includes('teclado') || t.includes('mouse') || t.includes('cabo') || t.includes('monitor') || t.includes('hd') || t.includes('ssd') || t.includes('ti')) return "INFORMÁTICA / TI";
+            if (t.includes('papel') || t.includes('caneta') || t.includes('pasta') || t.includes('grampeador')) return "ESCRITÓRIO";
+            if (t.includes('ferramenta') || t.includes('broca') || t.includes('fita') || t.includes('parafuso')) return "MANUTENÇÃO";
+            if (t.includes('curso') || t.includes('treinamento') || t.includes('livro')) return "TREINAMENTO";
+            if (t.includes('cafe') || t.includes('café') || t.includes('copo') || t.includes('açucar')) return "ALIMENTAÇÃO / COPA";
+            return "OUTROS";
+        }
 
-            const data = document.getElementById('campoData').value;
-            const solicitante = document.getElementById('campoSolicitante').value.trim().toUpperCase();
-            const produto = document.getElementById('campoProduto').value.trim().toUpperCase();
-            const categoria = document.getElementById('campoCategoria').value.toUpperCase();
-            const qtd = parseFloat(document.getElementById('campoQtd').value) || 1;
-            const unit = parseFloat(document.getElementById('campoValorUnit').value) || 0;
+        // Renderiza cada card com inputs editáveis prontos para dar OK
+        function renderizarCardsPendentes() {
+            const container = document.getElementById('containerCardsPreenchidos');
+            const lista = document.getElementById('listaCardsPendentes');
+            lista.innerHTML = '';
+
+            if (itensPendentesAprovacao.length === 0) {
+                container.classList.add('hidden');
+                return;
+            }
+
+            container.classList.remove('hidden');
+            document.getElementById('tituloItensPendentes').innerText = `${itensPendentesAprovacao.length} ITEM(NS) PRONTO(S) PARA CONFIRMAÇÃO:`;
+
+            itensPendentesAprovacao.forEach((item, index) => {
+                const totalCalculado = (item.qtd * item.unit).toFixed(2);
+                const card = document.createElement('div');
+                card.className = "bg-white dark:bg-slate-800 border-2 border-indigo-300 dark:border-indigo-700/80 p-4 rounded-2xl shadow-sm space-y-3";
+                card.id = `card-pendente-${item.tempId}`;
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
+                        <span class="text-xs font-black text-indigo-600 dark:text-indigo-400 uppercase">Item #${index + 1} Identificado</span>
+                        <button type="button" onclick="descartarCardPendente(${item.tempId})" class="text-slate-400 hover:text-rose-500 font-bold text-xs">✕ Descartar</button>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-2.5 items-end">
+                        <div class="md:col-span-2">
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Data</label>
+                            <input type="date" id="data-${item.tempId}" value="${item.data}" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-white">
+                        </div>
+
+                        <div class="md:col-span-3">
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Solicitante</label>
+                            <input type="text" id="solicitante-${item.tempId}" value="${item.solicitante}" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-white font-bold">
+                        </div>
+
+                        <div class="md:col-span-4">
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Produto / Serviço</label>
+                            <input type="text" id="produto-${item.tempId}" value="${item.produto}" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-white font-bold">
+                        </div>
+
+                        <div class="md:col-span-3">
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Categoria</label>
+                            <select id="categoria-${item.tempId}" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-white font-semibold">
+                                <option value="INFORMÁTICA / TI" ${item.categoria === 'INFORMÁTICA / TI' ? 'selected' : ''}>INFORMÁTICA / TI</option>
+                                <option value="ESCRITÓRIO" ${item.categoria === 'ESCRITÓRIO' ? 'selected' : ''}>ESCRITÓRIO</option>
+                                <option value="MANUTENÇÃO" ${item.categoria === 'MANUTENÇÃO' ? 'selected' : ''}>MANUTENÇÃO</option>
+                                <option value="TREINAMENTO" ${item.categoria === 'TREINAMENTO' ? 'selected' : ''}>TREINAMENTO</option>
+                                <option value="ALIMENTAÇÃO / COPA" ${item.categoria === 'ALIMENTAÇÃO / COPA' ? 'selected' : ''}>ALIMENTAÇÃO / COPA</option>
+                                <option value="OUTROS" ${item.categoria === 'OUTROS' ? 'selected' : ''}>OUTROS</option>
+                            </select>
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Qtd</label>
+                            <input type="number" id="qtd-${item.tempId}" value="${item.qtd}" min="1" oninput="atualizarTotalCard(${item.tempId})" class="w-full text-xs p-1.5 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-white">
+                        </div>
+
+                        <div class="md:col-span-3">
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Unitário (R$)</label>
+                            <input type="number" step="0.01" id="unit-${item.tempId}" value="${item.unit}" oninput="atualizarTotalCard(${item.tempId})" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg dark:text-white font-bold">
+                        </div>
+
+                        <div class="md:col-span-3">
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Total (R$)</label>
+                            <input type="text" id="total-${item.tempId}" readonly value="R$ ${totalCalculado}" class="w-full text-xs p-1.5 bg-slate-100 dark:bg-slate-950 font-black text-emerald-600 dark:text-emerald-400 rounded-lg outline-none">
+                        </div>
+
+                        <div class="md:col-span-4 flex gap-2">
+                            <input type="hidden" id="link-${item.tempId}" value="${item.link}">
+                            <button type="button" onclick="confirmarCardIndividual(${item.tempId})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1 cursor-pointer">
+                                <span>✅</span>
+                                <span>OK (Confirmar)</span>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                lista.appendChild(card);
+            });
+        }
+
+        function atualizarTotalCard(tempId) {
+            const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 0;
+            const unit = parseFloat(document.getElementById(`unit-${tempId}`).value) || 0;
             const total = qtd * unit;
-            const link = urlOrigemGuardada || document.getElementById('inputUrlProduto').value.trim();
+            document.getElementById(`total-${tempId}`).value = `R$ ${total.toFixed(2)}`;
+        }
+
+        function confirmarCardIndividual(tempId) {
+            const data = document.getElementById(`data-${tempId}`).value;
+            const solicitante = document.getElementById(`solicitante-${tempId}`).value.trim().toUpperCase();
+            const produto = document.getElementById(`produto-${tempId}`).value.trim().toUpperCase();
+            const categoria = document.getElementById(`categoria-${tempId}`).value;
+            const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1;
+            const unit = parseFloat(document.getElementById(`unit-${tempId}`).value) || 0;
+            const total = qtd * unit;
+            const link = document.getElementById(`link-${tempId}`).value;
 
             compras.unshift({
-                id: Date.now(),
+                id: Date.now() + Math.random(),
                 data,
                 solicitante,
                 produto,
@@ -341,19 +379,50 @@
                 link
             });
 
+            itensPendentesAprovacao = itensPendentesAprovacao.filter(i => i.tempId !== tempId);
             salvarNoLocalStorage();
             renderizarTabela();
-
-            // Limpeza mantendo a data atual
-            document.getElementById('campoProduto').value = '';
-            document.getElementById('campoQtd').value = '1';
-            document.getElementById('campoValorUnit').value = '';
-            document.getElementById('campoValorTotalCalc').value = 'R$ 0,00';
-            document.getElementById('inputUrlProduto').value = '';
-            urlOrigemGuardada = "";
-            document.getElementById('msgStatusLink').classList.add('hidden');
+            renderizarCardsPendentes();
         }
 
+        function confirmarTodosOsCards() {
+            itensPendentesAprovacao.forEach(item => {
+                const tempId = item.tempId;
+                const data = document.getElementById(`data-${tempId}`).value;
+                const solicitante = document.getElementById(`solicitante-${tempId}`).value.trim().toUpperCase();
+                const produto = document.getElementById(`produto-${tempId}`).value.trim().toUpperCase();
+                const categoria = document.getElementById(`categoria-${tempId}`).value;
+                const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1;
+                const unit = parseFloat(document.getElementById(`unit-${tempId}`).value) || 0;
+                const total = qtd * unit;
+                const link = document.getElementById(`link-${tempId}`).value;
+
+                compras.unshift({
+                    id: Date.now() + Math.random(),
+                    data,
+                    solicitante,
+                    produto,
+                    categoria,
+                    qtd,
+                    unit,
+                    total,
+                    link
+                });
+            });
+
+            itensPendentesAprovacao = [];
+            salvarNoLocalStorage();
+            renderizarTabela();
+            renderizarCardsPendentes();
+            document.getElementById('inputTextoTeams').value = '';
+        }
+
+        function descartarCardPendente(tempId) {
+            itensPendentesAprovacao = itensPendentesAprovacao.filter(i => i.tempId !== tempId);
+            renderizarCardsPendentes();
+        }
+
+        // TABELA FINAL
         function renderizarTabela() {
             const tbody = document.getElementById('tabelaComprasCorpo');
             tbody.innerHTML = '';
