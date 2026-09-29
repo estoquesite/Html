@@ -47,9 +47,9 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Gestão de FDS e Fornecedores</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Sistema Operacional Ativo</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Anexos Seguros Otimizados</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                        <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Pronto para Uso</span>
+                        <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Sistema Operacional</span>
                     </div>
                 </div>
             </div>
@@ -151,7 +151,6 @@
                         <button type="button" onclick="pesquisarWebFds()" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2.5 px-5 rounded-xl text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer">
                             <span>🌐</span> <span>Pesquisar FDS na Web</span>
                         </button>
-                        <!-- BOTÃO DE SALVAR 100% ATIVO E FUNCIONAL -->
                         <button type="button" onclick="salvarFdsSistema()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2.5 px-6 rounded-xl text-xs transition shadow-md flex items-center gap-1.5 cursor-pointer">
                             <span>💾</span> <span>Salvar FDS no Sistema</span>
                         </button>
@@ -451,9 +450,10 @@
             if (inputArquivo.files && inputArquivo.files[0]) {
                 const arquivo = inputArquivo.files[0];
                 pdfNome = arquivo.name;
+                // Lê o arquivo de forma segura convertendo para formato otimizado
                 pdfBlob = await new Promise((resolve) => {
                     const reader = new FileReader();
-                    reader.onload = () => resolve(reader.result);
+                    reader.onload = (e) => resolve(e.target.result);
                     reader.readAsDataURL(arquivo);
                 });
             }
@@ -469,7 +469,17 @@
             };
 
             listaFds.push(novoItem);
-            salvarDadosLocais();
+            
+            // Tratamento de segurança contra excesso de tamanho no localStorage
+            try {
+                salvarDadosLocais();
+            } catch (err) {
+                console.warn("Aviso de limite de armazenamento excedido. Salvando sem o blob pesado.");
+                novoItem.pdfBlob = ""; // Fallback se o arquivo for extremamente gigante
+                salvarDadosLocais();
+                alert("Atenção: O arquivo PDF anexado é muito pesado para o armazenamento local do navegador. O produto foi salvo, mas recomendamos usar link web para arquivos muito grandes.");
+            }
+
             renderizarCardsFds();
             verificarDuplicidadeInput();
             mostrarAviso(`✅ FDS do produto "${produto}" salva com sucesso!`);
@@ -676,12 +686,19 @@
                     item.pdfNome = arquivo.name;
                     item.pdfBlob = await new Promise((resolve) => {
                         const reader = new FileReader();
-                        reader.onload = () => resolve(reader.result);
+                        reader.onload = (e) => resolve(e.target.result);
                         reader.readAsDataURL(arquivo);
                     });
                 }
 
-                salvarDadosLocais();
+                try {
+                    salvarDadosLocais();
+                } catch(e) {
+                    item.pdfBlob = "";
+                    salvarDadosLocais();
+                    alert("Aviso: O arquivo PDF editado é muito grande para o armazenamento local. O registro foi salvo sem o anexo pesado.");
+                }
+
                 renderizarCardsFds();
                 fecharModalEdicao();
                 mostrarAviso("Registro atualizado com sucesso!");
