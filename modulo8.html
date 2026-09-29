@@ -47,7 +47,7 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Gestão de FDS e Fornecedores</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Visualizador de PDF Ativo</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Edição Completa de Links e PDFs</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Sistema Operacional</span>
                     </div>
@@ -203,22 +203,35 @@
 
     </div>
 
-    <!-- MODAL DE EDIÇÃO DE FDS -->
+    <!-- MODAL DE EDIÇÃO DE FDS COMPLETO (LINK E PDF) -->
     <div id="modalEdicao" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 w-full max-w-lg rounded-2xl p-5 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-xs font-black uppercase text-cyan-600">✏️ Editar FDS</h3>
+                <h3 class="text-xs font-black uppercase text-cyan-600">✏️ Editar FDS (Produto, Fornecedor, Link e PDF)</h3>
                 <button onclick="fecharModalEdicao()" class="text-slate-400 font-black">✕</button>
             </div>
             <input type="hidden" id="editId">
             <div class="space-y-3 text-xs">
-                <input type="text" id="editProduto" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold">
-                <select id="editFabricante" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl font-bold"></select>
-                <input type="text" id="editLink" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border rounded-xl">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Nome do Produto</label>
+                    <input type="text" id="editProduto" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Fornecedor / Fabricante</label>
+                    <select id="editFabricante" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold cursor-pointer"></select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Link Web do PDF</label>
+                    <input type="text" id="editLink" placeholder="Cole o link do PDF..." class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Substituir / Anexar Novo Arquivo PDF (Opcional)</label>
+                    <input type="file" id="editArquivoPdf" accept="application/pdf" class="text-xs text-slate-500 file:mr-4 file:py-1 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-bold file:bg-cyan-600 file:text-white cursor-pointer">
+                </div>
             </div>
             <div class="flex justify-end gap-2 pt-2 border-t">
-                <button type="button" onclick="fecharModalEdicao()" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-xl text-xs font-bold">Cancelar</button>
-                <button type="button" onclick="guardarEdicaoModal()" class="px-5 py-2 bg-cyan-600 text-white rounded-xl text-xs font-black">Salvar Alterações</button>
+                <button type="button" onclick="fecharModalEdicao()" class="px-4 py-2 bg-slate-200 text-slate-700 rounded-xl text-xs font-bold cursor-pointer">Cancelar</button>
+                <button type="button" onclick="guardarEdicaoModal()" class="px-5 py-2 bg-cyan-600 text-white rounded-xl text-xs font-black cursor-pointer">Salvar Alterações</button>
             </div>
         </div>
     </div>
@@ -640,21 +653,34 @@
             document.getElementById('editLink').value = item.linkPdf;
             atualizarSelectsFornecedores();
             document.getElementById('editFabricante').value = item.fabricante;
+            document.getElementById('editArquivoPdf').value = '';
             document.getElementById('modalEdicao').classList.remove('hidden');
         }
         function fecharModalEdicao() { document.getElementById('modalEdicao').classList.add('hidden'); }
 
-        function guardarEdicaoModal() {
+        async function guardarEdicaoModal() {
             const id = document.getElementById('editId').value;
             const produto = document.getElementById('editProduto').value.trim().toUpperCase();
             const fabricante = document.getElementById('editFabricante').value.trim().toUpperCase();
             const linkPdf = document.getElementById('editLink').value.trim();
+            const inputArquivoEdit = document.getElementById('editArquivoPdf');
 
             const item = listaFds.find(f => String(f.id) === String(id));
             if (item) {
                 item.produto = produto;
                 item.fabricante = fabricante;
-                item.linkPdf = linkPdf;
+                item.linkPdf = linkPdf || '#';
+
+                if (inputArquivoEdit.files && inputArquivoEdit.files[0]) {
+                    const arquivo = inputArquivoEdit.files[0];
+                    item.pdfNome = arquivo.name;
+                    item.pdfBlob = await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onload = () => resolve(reader.result);
+                        reader.readAsDataURL(arquivo);
+                    });
+                }
+
                 salvarDadosLocais();
                 renderizarCardsFds();
                 fecharModalEdicao();
