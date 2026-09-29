@@ -9,8 +9,6 @@
     <script>
         tailwind.config = { darkMode: 'class' }
     </script>
-    <!-- Tesseract OCR para leitura de imagem/foto no navegador -->
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@4/dist/tesseract.min.js"></script>
     <style>
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
@@ -32,7 +30,7 @@
                         <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300">Módulo 7</span>
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
                     </div>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Captura por foto/print, mensagens do Teams e links</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Leitura de fotos com Inteligência Artificial e controle financeiro</p>
                 </div>
             </div>
             <div class="flex items-center gap-2">
@@ -44,6 +42,18 @@
                 </button>
             </div>
         </header>
+
+        <!-- CONFIGURAÇÃO DA CHAVE DA IA (SALVA NO NAVEGADOR) -->
+        <div class="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 p-3 rounded-xl flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+                <span class="text-base">🔑</span>
+                <span class="text-xs font-bold text-amber-900 dark:text-amber-200">Chave API da IA (Gemini):</span>
+                <input type="password" id="inputApiKey" placeholder="Cole sua chave da API aqui..." class="text-xs px-2.5 py-1 rounded-lg border border-amber-300 dark:border-amber-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-white outline-none w-52 sm:w-72">
+            </div>
+            <button onclick="salvarApiKey()" class="bg-amber-600 hover:bg-amber-700 text-white text-xs font-bold px-3 py-1 rounded-lg transition shadow-sm">
+                Salvar Chave
+            </button>
+        </div>
 
         <!-- CARTÕES DE RESUMO -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
@@ -61,45 +71,23 @@
             </div>
         </div>
 
-        <!-- 📸 RECONHECIMENTO POR FOTO / PRINT / IMAGEM -->
-        <div class="bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/20 border border-emerald-200 dark:border-emerald-800/60 p-4 rounded-2xl shadow-sm space-y-3">
+        <!-- 🤖 RECONHECIMENTO POR FOTO / PRINT COM IA -->
+        <div class="bg-gradient-to-r from-purple-50 to-indigo-50 dark:from-purple-950/30 dark:to-indigo-950/20 border border-purple-200 dark:border-purple-800/60 p-4 rounded-2xl shadow-sm space-y-3">
             <div class="flex justify-between items-center">
-                <label class="block text-xs font-black text-emerald-900 dark:text-emerald-200 uppercase flex items-center gap-2">
-                    <span>📷</span>
-                    <span>Reconhecer por Imagem (Foto de Nota, Print do Carrinho ou Teams)</span>
+                <label class="block text-xs font-black text-purple-950 dark:text-purple-200 uppercase flex items-center gap-2">
+                    <span>✨</span>
+                    <span>Analisar Foto ou Print com Inteligência Artificial</span>
                 </label>
             </div>
             
             <div class="flex flex-wrap items-center gap-3">
-                <label class="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl cursor-pointer shadow-sm transition">
-                    <span>📸 Tirar Foto / Selecionar Imagem</span>
-                    <input type="file" id="inputFoto" accept="image/*" class="hidden" onchange="processarFoto(this)">
+                <label class="flex items-center gap-2 bg-purple-600 hover:bg-purple-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl cursor-pointer shadow-sm transition">
+                    <span>📸 Tirar Foto / Selecionar Print</span>
+                    <input type="file" id="inputFotoIa" accept="image/*" class="hidden" onchange="analisarImagemComIA(this)">
                 </label>
-                <span id="statusOcr" class="text-[11px] font-bold text-slate-600 dark:text-slate-300">
-                    Selecione uma imagem ou tire uma foto para extrair os dados na hora.
+                <span id="statusIa" class="text-[11px] font-bold text-slate-600 dark:text-slate-300">
+                    A IA lê notas fiscais, fotos de telas do Teams ou carrinhos de compra.
                 </span>
-            </div>
-        </div>
-
-        <!-- 💬 COLAR MENSAGEM DO TEAMS -->
-        <div class="bg-indigo-50/70 dark:bg-indigo-950/30 border border-indigo-200 dark:border-indigo-900/60 p-4 rounded-2xl shadow-sm space-y-3">
-            <div class="flex justify-between items-center">
-                <label class="block text-xs font-black text-indigo-950 dark:text-indigo-200 uppercase flex items-center gap-2">
-                    <span>💬</span>
-                    <span>Ou Cole a Mensagem do Teams / WhatsApp</span>
-                </label>
-                <button type="button" onclick="colarTextoTeams()" class="text-xs text-indigo-700 dark:text-indigo-300 font-bold hover:underline flex items-center gap-1 cursor-pointer">
-                    📋 Colar
-                </button>
-            </div>
-            
-            <textarea id="inputTextoTeams" rows="2" placeholder="Ex: Roberto pediu: 2 Teclados Logitech link:... R$ 89,90 e 1 Mouse Dell R$ 45,00..." class="w-full text-xs p-3 bg-white dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800 rounded-xl outline-none focus:border-indigo-600 dark:text-white leading-relaxed"></textarea>
-            
-            <div class="flex justify-end pt-1">
-                <button type="button" onclick="processarTextoBruto(document.getElementById('inputTextoTeams').value)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-md flex items-center gap-1.5 cursor-pointer">
-                    <span>⚡</span>
-                    <span>Reconhecer Texto</span>
-                </button>
             </div>
         </div>
 
@@ -121,7 +109,7 @@
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">
-                    📋 Histórico de Compras no Cartão
+                    📋 Histórico de Compras Registradas
                 </h3>
                 <span id="labelContador" class="text-[11px] text-slate-400 font-bold">0 ITENS REGISTRADOS</span>
             </div>
@@ -137,7 +125,6 @@
                             <th class="py-2.5 px-3 text-center">Qtd</th>
                             <th class="py-2.5 px-3 text-right">Unitário</th>
                             <th class="py-2.5 px-3 text-right">Total</th>
-                            <th class="py-2.5 px-3 text-center">Comprovante</th>
                             <th class="py-2.5 px-3 text-center">Ações</th>
                         </tr>
                     </thead>
@@ -153,163 +140,111 @@
         let itensPendentesAprovacao = [];
 
         window.addEventListener('DOMContentLoaded', () => {
+            const savedKey = localStorage.getItem('gemini_api_key') || '';
+            document.getElementById('inputApiKey').value = savedKey;
             carregarDoLocalStorage();
         });
 
-        // 📸 LEITURA DA FOTO VIA TESSERACT OCR
-        async function processarFoto(input) {
-            if (!input.files || input.files.length === 0) return;
-            const arquivo = input.files[0];
-            const statusEl = document.getElementById('statusOcr');
+        function salvarApiKey() {
+            const key = document.getElementById('inputApiKey').value.trim();
+            localStorage.setItem('gemini_api_key', key);
+            alert("Chave API salva com sucesso!");
+        }
 
-            statusEl.innerText = "⏳ Lendo imagem com inteligência visual... Aguarde...";
-            statusEl.className = "text-[11px] font-bold text-indigo-600 dark:text-indigo-400 animate-pulse";
+        // Converte imagem para Base64
+        function fileToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result.split(',')[1]);
+                reader.onerror = error => reject(error);
+            });
+        }
+
+        // 🤖 ANALISADOR MULTIMODAL COM GEMINI IA
+        async function analisarImagemComIA(input) {
+            if (!input.files || input.files.length === 0) return;
+            const file = input.files[0];
+            const statusEl = document.getElementById('statusIa');
+            const apiKey = localStorage.getItem('gemini_api_key') || document.getElementById('inputApiKey').value.trim();
+
+            if (!apiKey) {
+                alert("Por favor, informe sua chave API do Gemini no topo da tela para usar o reconhecimento com IA!");
+                document.getElementById('inputApiKey').focus();
+                return;
+            }
+
+            statusEl.innerText = "⏳ IA analisando a imagem e extraindo produtos... Aguarde...";
+            statusEl.className = "text-[11px] font-bold text-purple-600 dark:text-purple-400 animate-pulse";
 
             try {
-                const resultado = await Tesseract.recognize(
-                    arquivo,
-                    'por', // Português
-                    { logger: m => {
-                        if (m.status === 'recognizing text') {
-                            statusEl.innerText = `Processando imagem: ${Math.round(m.progress * 100)}%`;
-                        }
-                    }}
-                );
+                const base64Data = await fileToBase64(file);
 
-                const textoExtraido = resultado.data.text;
-                statusEl.innerText = "✅ Texto da imagem lido com sucesso!";
+                const prompt = `Analise a imagem em anexo (pode ser cupom fiscal, print de tela do Teams, Mercado Livre, etc.) e extraia todos os produtos comprados.
+                Retorne ESTRITAMENTE um JSON com uma lista de objetos contendo os seguintes campos:
+                [
+                  {
+                    "produto": "nome do item em maiúsculo",
+                    "qtd": número inteiro da quantidade,
+                    "unit": valor unitário decimal (número puro, ex: 15.50),
+                    "solicitante": "nome de quem pediu se constar ou 'NÃO INFORMADO'",
+                    "categoria": "INFORMÁTICA / TI, ESCRITÓRIO, MANUTENÇÃO, TREINAMENTO, ALIMENTAÇÃO / COPA ou OUTROS"
+                  }
+                ]
+                Retorne apenas o array JSON válido, sem formatações Markdown adicionais.`;
+
+                const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`;
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [
+                                { text: prompt },
+                                {
+                                    inline_data: {
+                                        mime_type: file.type || "image/jpeg",
+                                        data: base64Data
+                                    }
+                                }
+                            ]
+                        }]
+                    })
+                });
+
+                const data = await response.json();
+                if (data.error) {
+                    throw new Error(data.error.message);
+                }
+
+                let textoResposta = data.candidates[0].content.parts[0].text.trim();
+                // Limpa blocos de código markdown se houver
+                textoResposta = textoResposta.replace(/```json/gi, '').replace(/```/g, '').trim();
+
+                const produtosExtraidos = JSON.parse(textoResposta);
+                const hoje = new Date().toISOString().split('T')[0];
+
+                itensPendentesAprovacao = produtosExtraidos.map((p, idx) => ({
+                    tempId: Date.now() + idx,
+                    data: hoje,
+                    solicitante: (p.solicitante || "NÃO INFORMADO").toUpperCase(),
+                    produto: (p.produto || "PRODUTO").toUpperCase(),
+                    categoria: p.categoria || "OUTROS",
+                    qtd: p.qtd || 1,
+                    unit: p.unit || 0,
+                    link: ""
+                }));
+
+                statusEl.innerText = `✅ IA identificou ${itensPendentesAprovacao.length} item(ns) com sucesso!`;
                 statusEl.className = "text-[11px] font-bold text-emerald-600 dark:text-emerald-400";
-                
-                // Manda o texto lido da foto para o mesmo parser inteligente
-                processarTextoBruto(textoExtraido);
+
+                renderizarCardsPendentes();
             } catch (err) {
-                statusEl.innerText = "⚠️ Falha ao ler imagem. Tente uma foto mais nítida ou cole o texto.";
+                console.error(err);
+                statusEl.innerText = "⚠️ Erro ao consultar IA: " + err.message;
                 statusEl.className = "text-[11px] font-bold text-rose-500";
             }
-        }
-
-        async function colarTextoTeams() {
-            try {
-                const texto = await navigator.clipboard.readText();
-                if (texto) {
-                    document.getElementById('inputTextoTeams').value = texto.trim();
-                    processarTextoBruto(texto);
-                }
-            } catch(e) {
-                document.getElementById('inputTextoTeams').focus();
-            }
-        }
-
-        function extrairNomeDoLinkML(url) {
-            try {
-                const urlLimpa = url.split('?')[0].split('#')[0];
-                const partes = urlLimpa.split('/');
-                for (let p of partes) {
-                    if (p.includes('-') && !p.startsWith('MLB') && !p.startsWith('p') && p.length > 6) {
-                        return decodeURIComponent(p).replace(/-/g, ' ').toUpperCase();
-                    }
-                }
-                const matchMLB = urlLimpa.match(/\/MLB-\d+-(.*?)(?:_JM|\/|$)/i);
-                if (matchMLB && matchMLB[1]) {
-                    return decodeURIComponent(matchMLB[1]).replace(/-/g, ' ').toUpperCase();
-                }
-            } catch(e) {
-                return null;
-            }
-            return null;
-        }
-
-        // PARSER UNIVERSAL (PARA FOTO OU TEXTO DO TEAMS)
-        function processarTextoBruto(textoBruto) {
-            if (!textoBruto || !textoBruto.trim()) {
-                alert("Nenhum texto identificado para processar!");
-                return;
-            }
-
-            let solicitanteDetectado = "SOLICITANTE NÃO INFORMADO";
-            const matchSolicitante = textoBruto.match(/(?:solicitante|de|por|para|quem pediu|pediu|atender|nome)[:\s-]+([A-Za-zÀ-ÖØ-öø-ÿ\s]{2,25})/i);
-            if (matchSolicitante && matchSolicitante[1]) {
-                solicitanteDetectado = matchSolicitante[1].trim().toUpperCase();
-            }
-
-            let linhas = textoBruto.split(/\n|;|\band\b|\be\b/i).map(l => l.trim()).filter(l => l.length > 3);
-            if (linhas.length === 0) linhas = [textoBruto];
-
-            itensPendentesAprovacao = [];
-            const hoje = new Date().toISOString().split('T')[0];
-
-            linhas.forEach((linha, idx) => {
-                if (linha.toLowerCase().startsWith('solicitante:') || linha.toLowerCase().startsWith('de:')) return;
-
-                let qtd = 1;
-                let unit = 0;
-                let link = "";
-                let produto = "";
-
-                // Link
-                const matchUrl = linha.match(/(https?:\/\/[^\s]+)/i);
-                if (matchUrl) {
-                    link = matchUrl[1];
-                    const nomePeloLink = extrairNomeDoLinkML(link);
-                    if (nomePeloLink) produto = nomePeloLink;
-                }
-
-                // Quantidade
-                const matchQtd = linha.match(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/i);
-                if (matchQtd) {
-                    qtd = parseInt(matchQtd[1], 10);
-                }
-
-                // Preço
-                const matchPreco = linha.match(/(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/i);
-                if (matchPreco) {
-                    unit = parseFloat(matchPreco[1].replace(',', '.'));
-                }
-
-                if (!produto) {
-                    let textoLimpo = linha
-                        .replace(/(https?:\/\/[^\s]+)/gi, '')
-                        .replace(/(?:^|\s)(\d+)\s*(?:x|unidades?|unids?|un|peças?|pecas?|itens?)(?:\s|$)/gi, ' ')
-                        .replace(/(?:r\$\s*|\$\s*)?(\d{1,5}(?:[.,]\d{2}))/gi, ' ')
-                        .replace(/R\$/gi, ' ')
-                        .replace(/(?:solicitante|de|por|para)[:\s-]+[A-Za-zÀ-ÖØ-öø-ÿ\s]+/gi, ' ')
-                        .trim();
-
-                    if (textoLimpo.length > 2) {
-                        produto = textoLimpo.toUpperCase();
-                    }
-                }
-
-                if (produto || link || unit > 0) {
-                    itensPendentesAprovacao.push({
-                        tempId: Date.now() + idx,
-                        data: hoje,
-                        solicitante: solicitanteDetectado,
-                        produto: (produto || "PRODUTO").toUpperCase(),
-                        categoria: adivinharCategoria(produto),
-                        qtd: qtd || 1,
-                        unit: unit || 0,
-                        link: link || ""
-                    });
-                }
-            });
-
-            if (itensPendentesAprovacao.length === 0) {
-                alert("Não conseguimos separar os produtos automaticamente. Verifique o texto ou a imagem.");
-                return;
-            }
-
-            renderizarCardsPendentes();
-        }
-
-        function adivinharCategoria(texto) {
-            const t = (texto || "").toLowerCase();
-            if (t.includes('teclado') || t.includes('mouse') || t.includes('cabo') || t.includes('monitor') || t.includes('hd') || t.includes('ssd') || t.includes('ti')) return "INFORMÁTICA / TI";
-            if (t.includes('papel') || t.includes('caneta') || t.includes('pasta') || t.includes('grampeador')) return "ESCRITÓRIO";
-            if (t.includes('ferramenta') || t.includes('broca') || t.includes('fita') || t.includes('parafuso')) return "MANUTENÇÃO";
-            if (t.includes('curso') || t.includes('treinamento') || t.includes('livro')) return "TREINAMENTO";
-            if (t.includes('cafe') || t.includes('café') || t.includes('copo') || t.includes('açucar')) return "ALIMENTAÇÃO / COPA";
-            return "OUTROS";
         }
 
         function renderizarCardsPendentes() {
@@ -323,17 +258,17 @@
             }
 
             container.classList.remove('hidden');
-            document.getElementById('tituloItensPendentes').innerText = `${itensPendentesAprovacao.length} ITEM(NS) PRONTO(S) PARA CONFIRMAÇÃO:`;
+            document.getElementById('tituloItensPendentes').innerText = `${itensPendentesAprovacao.length} ITEM(NS) IDENTIFICADOS PELA IA (Confira e dê OK):`;
 
             itensPendentesAprovacao.forEach((item, index) => {
                 const totalCalculado = (item.qtd * item.unit).toFixed(2);
                 const card = document.createElement('div');
-                card.className = "bg-white dark:bg-slate-800 border-2 border-emerald-400 dark:border-emerald-600/80 p-4 rounded-2xl shadow-sm space-y-3";
+                card.className = "bg-white dark:bg-slate-800 border-2 border-purple-400 dark:border-purple-600/80 p-4 rounded-2xl shadow-sm space-y-3";
                 card.id = `card-pendente-${item.tempId}`;
 
                 card.innerHTML = `
                     <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
-                        <span class="text-xs font-black text-emerald-700 dark:text-emerald-400 uppercase">Item #${index + 1} Reconhecido</span>
+                        <span class="text-xs font-black text-purple-700 dark:text-purple-400 uppercase">Item #${index + 1}</span>
                         <button type="button" onclick="descartarCardPendente(${item.tempId})" class="text-slate-400 hover:text-rose-500 font-bold text-xs">✕ Descartar</button>
                     </div>
 
@@ -381,7 +316,6 @@
                         </div>
 
                         <div class="md:col-span-4 flex gap-2">
-                            <input type="hidden" id="link-${item.tempId}" value="${item.link}">
                             <button type="button" onclick="confirmarCardIndividual(${item.tempId})" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1 cursor-pointer">
                                 <span>✅</span>
                                 <span>OK (Confirmar)</span>
@@ -408,7 +342,6 @@
             const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1;
             const unit = parseFloat(document.getElementById(`unit-${tempId}`).value) || 0;
             const total = qtd * unit;
-            const link = document.getElementById(`link-${tempId}`).value;
 
             compras.unshift({
                 id: Date.now() + Math.random(),
@@ -418,8 +351,7 @@
                 categoria,
                 qtd,
                 unit,
-                total,
-                link
+                total
             });
 
             itensPendentesAprovacao = itensPendentesAprovacao.filter(i => i.tempId !== tempId);
@@ -438,7 +370,6 @@
                 const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1;
                 const unit = parseFloat(document.getElementById(`unit-${tempId}`).value) || 0;
                 const total = qtd * unit;
-                const link = document.getElementById(`link-${tempId}`).value;
 
                 compras.unshift({
                     id: Date.now() + Math.random(),
@@ -448,8 +379,7 @@
                     categoria,
                     qtd,
                     unit,
-                    total,
-                    link
+                    total
                 });
             });
 
@@ -457,8 +387,6 @@
             salvarNoLocalStorage();
             renderizarTabela();
             renderizarCardsPendentes();
-            document.getElementById('inputTextoTeams').value = '';
-            document.getElementById('inputFoto').value = '';
         }
 
         function descartarCardPendente(tempId) {
@@ -474,7 +402,7 @@
             let solicitantesContador = {};
 
             if (compras.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-400 italic">NENHUMA COMPRA REGISTRADA ATÉ O MOMENTO.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-400 italic">NENHUMA COMPRA REGISTRADA ATÉ O MOMENTO.</td></tr>`;
             } else {
                 compras.forEach(item => {
                     totalGastoGeral += item.total;
@@ -490,11 +418,6 @@
                         <td class="py-2.5 px-3 text-center font-bold text-slate-700 dark:text-slate-300">${item.qtd}</td>
                         <td class="py-2.5 px-3 text-right text-slate-500 whitespace-nowrap">R$ ${item.unit.toFixed(2)}</td>
                         <td class="py-2.5 px-3 text-right font-black text-emerald-600 dark:text-emerald-400 whitespace-nowrap">R$ ${item.total.toFixed(2)}</td>
-                        <td class="py-2.5 px-3 text-center whitespace-nowrap">
-                            ${item.link && item.link.startsWith('http') 
-                                ? `<a href="${item.link}" target="_blank" class="text-blue-600 dark:text-blue-400 font-bold hover:underline normal-case">Ver Link ↗</a>` 
-                                : '<span class="text-slate-400">-</span>'}
-                        </td>
                         <td class="py-2.5 px-3 text-center whitespace-nowrap">
                             <button onclick="removerItem(${item.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1 cursor-pointer" title="Excluir">✕</button>
                         </td>
@@ -551,7 +474,7 @@
             }
 
             let csv = "\uFEFF";
-            csv += "DATA;SOLICITANTE;PRODUTO/SERVIÇO;CATEGORIA;QUANTIDADE;VALOR UNITÁRIO (R$);TOTAL (R$);LINK DO PRODUTO\n";
+            csv += "DATA;SOLICITANTE;PRODUTO/SERVIÇO;CATEGORIA;QUANTIDADE;VALOR UNITÁRIO (R$);TOTAL (R$)\n";
 
             compras.forEach(item => {
                 const linha = [
@@ -561,8 +484,7 @@
                     `"${item.categoria}"`,
                     item.qtd,
                     item.unit.toFixed(2).replace('.', ','),
-                    item.total.toFixed(2).replace('.', ','),
-                    `"${(item.link || '').replace(/"/g, '""')}"`
+                    item.total.toFixed(2).replace('.', ',')
                 ];
                 csv += linha.join(";") + "\n";
             });
