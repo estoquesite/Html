@@ -17,7 +17,6 @@
         .uppercase-input { text-transform: uppercase; }
         .dropzone-hover { border-color: #9333ea !important; background-color: rgba(243, 232, 255, 0.7) !important; transform: scale(1.01); }
 
-        /* Animação ultra chamativa para o Solicitante */
         @keyframes piscarForte {
             0%, 100% {
                 background-color: #fef08a;
@@ -42,7 +41,7 @@
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen p-4 sm:p-6 transition-colors duration-200">
 
-    <div class="max-w-5xl mx-auto space-y-5">
+    <div class="max-w-6xl mx-auto space-y-5">
 
         <!-- CABEÇALHO -->
         <header class="flex flex-wrap justify-between items-center bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 gap-4">
@@ -56,14 +55,13 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Supabase Nuvem</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Controlo de Entregas</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
                 </div>
             </div>
             
-            <!-- BOTÕES SUPERIORES -->
             <div class="flex flex-wrap items-center gap-2">
                 <a href="index.html" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1">
                     ⬅ Menu
@@ -132,7 +130,6 @@
 
         <!-- ================= ABAS PARA ENTRADA DE DADOS ================= -->
         <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm overflow-hidden">
-            <!-- BOTÕES DAS ABAS -->
             <div class="flex border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 p-1.5 gap-1 overflow-x-auto">
                 <button type="button" onclick="mudarAbaEntrada('manual')" id="tabBtn-manual" class="flex-1 min-w-[120px] py-2.5 px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-700">
                     <span>✍️</span> <span>Digitar Manual</span>
@@ -148,7 +145,7 @@
                 </button>
             </div>
 
-            <!-- CONTEÚDO 1: ✍️ DIGITAÇÃO MANUAL DIRETA -->
+            <!-- CONTEÚDO 1: DIGITAÇÃO MANUAL -->
             <div id="aba-manual" class="p-4 sm:p-5 space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                     <span class="text-xs font-black text-indigo-900 dark:text-indigo-300 uppercase flex items-center gap-1.5">
@@ -158,13 +155,11 @@
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end">
-                    <!-- DATA -->
                     <div class="md:col-span-2">
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Data</label>
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Data Compra</label>
                         <input type="date" id="manualData" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white outline-none font-bold">
                     </div>
 
-                    <!-- ⚠️ SOLICITANTE COM CAIXA PISCANTE -->
                     <div class="md:col-span-3">
                         <div class="flex justify-between items-center mb-1">
                             <label class="block text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase">Solicitante (*)</label>
@@ -173,13 +168,11 @@
                         <input type="text" id="manualSolicitante" oninput="validarInputManualSolicitante(this)" placeholder="QUEM PEDIU?" class="uppercase-input w-full text-xs p-2.5 rounded-xl outline-none transition-all piscar-solicitante-forte">
                     </div>
 
-                    <!-- PRODUTO -->
                     <div class="md:col-span-4">
                         <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Produto / Serviço</label>
                         <input type="text" id="manualProduto" oninput="this.value = this.value.toUpperCase()" placeholder="EX: CHUMBADOR, JOGO DE MACHO..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                     </div>
 
-                    <!-- CATEGORIA + BOTÃO DE ADICIONAR NOVA CATEGORIA -->
                     <div class="md:col-span-3">
                         <div class="flex justify-between items-center mb-1">
                             <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Categoria</label>
@@ -190,25 +183,21 @@
                         <select id="manualCategoria" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-semibold outline-none"></select>
                     </div>
 
-                    <!-- QUANTIDADE -->
                     <div class="md:col-span-2">
                         <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Qtd Itens</label>
                         <input type="number" id="manualQtd" value="1" min="1" oninput="calcularManualPorTotal()" class="w-full text-xs p-2.5 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white outline-none">
                     </div>
 
-                    <!-- VALOR TOTAL -->
                     <div class="md:col-span-3">
                         <label class="block text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase mb-1">Valor Total (R$) 🔄</label>
                         <input type="number" step="0.01" id="manualTotal" placeholder="0,00" oninput="calcularManualPorTotal()" class="w-full text-xs p-2.5 bg-emerald-50/70 dark:bg-emerald-950/30 border border-emerald-400 dark:border-emerald-600 rounded-xl font-black text-emerald-600 dark:text-emerald-400 outline-none">
                     </div>
 
-                    <!-- VALOR UNITÁRIO -->
                     <div class="md:col-span-2">
                         <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Unitário (R$)</label>
                         <input type="number" step="0.01" id="manualUnit" placeholder="0,00" oninput="calcularManualPorUnitario()" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                     </div>
 
-                    <!-- BOTÃO LANÇAR -->
                     <div class="md:col-span-5">
                         <button type="button" onclick="lancarCompraManual()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer">
                             <span>✅</span>
@@ -218,7 +207,7 @@
                 </div>
             </div>
 
-            <!-- CONTEÚDO 2: 🔗 LINK DO PRODUTO (ABRE AUTOMÁTICO) -->
+            <!-- CONTEÚDO 2: LINK WEB -->
             <div id="aba-link" class="p-4 sm:p-5 space-y-3 hidden">
                 <div class="flex justify-between items-center">
                     <label class="block text-xs font-black text-blue-950 dark:text-blue-200 uppercase flex items-center gap-2">
@@ -239,7 +228,7 @@
                 </div>
             </div>
 
-            <!-- CONTEÚDO 3: 📸 FOTO / CÂMERA -->
+            <!-- CONTEÚDO 3: FOTO / CÂMERA -->
             <div id="aba-foto" class="p-4 sm:p-5 space-y-3 hidden">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <label class="flex items-center justify-center gap-3 bg-purple-600 hover:bg-purple-700 text-white font-black py-4 px-4 rounded-2xl shadow-md cursor-pointer transition active:scale-95 text-xs">
@@ -262,7 +251,7 @@
                 </div>
             </div>
 
-            <!-- CONTEÚDO 4: 💬 TEXTO DO TEAMS -->
+            <!-- CONTEÚDO 4: TEAMS -->
             <div id="aba-texto" class="p-4 sm:p-5 space-y-3 hidden">
                 <div class="flex justify-between items-center">
                     <label class="block text-xs font-black text-indigo-950 dark:text-indigo-200 uppercase flex items-center gap-2">
@@ -285,7 +274,7 @@
             </div>
         </div>
 
-        <!-- CARDS PRÉ-PREENCHIDOS PARA SÓ DAR OK -->
+        <!-- CARDS PRÉ-PREENCHIDOS -->
         <div id="containerCardsPreenchidos" class="space-y-3 hidden">
             <div class="flex justify-between items-center px-1">
                 <h3 class="text-xs font-black uppercase text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5">
@@ -319,6 +308,7 @@
                             <th class="py-2.5 px-3 text-center">Qtd</th>
                             <th class="py-2.5 px-3 text-right">Unitário</th>
                             <th class="py-2.5 px-3 text-right">Total</th>
+                            <th class="py-2.5 px-3 text-center">Entrega 📦</th>
                             <th class="py-2.5 px-3 text-center">Link</th>
                             <th class="py-2.5 px-3 text-center">Ações</th>
                         </tr>
@@ -330,7 +320,7 @@
 
     </div>
 
-    <!-- MODAL DO PAINEL DE SOLICITANTES / USUÁRIOS (👥) -->
+    <!-- MODAL DO PAINEL DE SOLICITANTES (👥) -->
     <div id="modalUsuarios" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 w-full max-w-2xl rounded-2xl p-5 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
@@ -400,12 +390,12 @@
         </div>
     </div>
 
-    <!-- MODAL DE EDIÇÃO (CANETA ✏️) -->
+    <!-- MODAL DE EDIÇÃO (CANETA ✏️ COM CONTROLO DE ENTREGA 📦) -->
     <div id="modalEdicao" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 w-full max-w-xl rounded-2xl p-5 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
                 <h3 class="text-xs sm:text-sm font-black text-indigo-600 dark:text-indigo-400 uppercase flex items-center gap-1.5">
-                    <span>✏️</span> Editar Registo de Compra
+                    <span>✏️</span> Editar Registo de Compra & Entregas
                 </h3>
                 <button onclick="fecharModalEdicao()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-black text-sm">✕</button>
             </div>
@@ -415,7 +405,7 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Data</label>
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Data da Compra</label>
                     <input type="date" id="editData" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none">
                 </div>
                 <div>
@@ -432,9 +422,7 @@
                 <div>
                     <div class="flex justify-between items-center mb-1">
                         <label class="block text-[10px] font-bold text-slate-400 uppercase">Categoria</label>
-                        <button type="button" onclick="adicionarNovaCategoriaPrompt('editCategoria')" class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline">
-                            + Nova
-                        </button>
+                        <button type="button" onclick="adicionarNovaCategoriaPrompt('editCategoria')" class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline">+ Nova</button>
                     </div>
                     <select id="editCategoria" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-semibold outline-none"></select>
                 </div>
@@ -451,6 +439,21 @@
                 <div>
                     <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Unitário Calculado (R$)</label>
                     <input type="number" step="0.01" id="editUnit" oninput="calcularModalPorUnitario()" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                </div>
+
+                <!-- CONTROLO DE ENTREGA NA EDIÇÃO -->
+                <div class="sm:col-span-2 bg-slate-100 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
+                    <div class="flex items-center justify-between">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                            <input type="checkbox" id="editEntregue" onchange="toggleDataEntregaModal(this.checked)" class="w-4 h-4 text-indigo-600 rounded">
+                            <span class="font-bold text-slate-800 dark:text-slate-200 uppercase">📦 Produto Entregue?</span>
+                        </label>
+                        <button type="button" onclick="preencherDataHojeModal()" class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline">📆 Marcar Hoje</button>
+                    </div>
+                    <div id="containerDataEntrega" class="hidden pt-1">
+                        <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Dia da Entrega:</label>
+                        <input type="date" id="editDataEntrega" class="w-full p-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg dark:text-white font-bold">
+                    </div>
                 </div>
 
                 <div class="sm:col-span-2">
@@ -512,7 +515,6 @@
             }
         });
 
-        // ================= CONTROLE DE ABAS =================
         function mudarAbaEntrada(aba) {
             ['manual', 'link', 'foto', 'texto'].forEach(id => {
                 const elAba = document.getElementById(`aba-${id}`);
@@ -527,7 +529,6 @@
             });
         }
 
-        // ================= GESTÃO DE CATEGORIAS GLOBAL =================
         function carregarCategorias() {
             const salvas = localStorage.getItem('compras_categorias_lista');
             if (salvas) {
@@ -550,7 +551,6 @@
             const valEdit = selEdit ? selEdit.value : "";
             preencherOpcoesCategoria(selEdit, valEdit || "OUTROS");
 
-            // Atualiza também os selects de todos os cards pendentes ativos no ecrã
             itensPendentesAprovacao.forEach(item => {
                 const selCard = document.getElementById(`categoria-${item.tempId}`);
                 if (selCard) {
@@ -604,7 +604,6 @@
             setTimeout(() => el.classList.add('hidden'), 5000);
         }
 
-        // ================= DIGITAÇÃO MANUAL =================
         function calcularManualPorTotal() {
             const qtd = parseFloat(document.getElementById('manualQtd').value) || 1;
             const total = parseFloat(document.getElementById('manualTotal').value) || 0;
@@ -672,7 +671,9 @@
                 qtd: qtd,
                 unit: unit,
                 total: total || (qtd * unit),
-                link: ""
+                link: "",
+                entregue: false,
+                data_entrega: ""
             };
 
             const supabaseId = await inserirNoSupabase(novoItem);
@@ -691,7 +692,6 @@
             mostrarAviso("✅ Compra manual salva com sucesso na nuvem!");
         }
 
-        // ================= CONTROLE DE SOLICITANTE NOS CARDS =================
         function verificarDigitacaoSolicitante(input, tempId) {
             input.value = input.value.toUpperCase();
             const val = input.value.trim();
@@ -719,7 +719,6 @@
             }
         }
 
-        // ================= FILTRO DINÂMICO POR SOLICITANTE =================
         function atualizarListaSelectSolicitantes() {
             const select = document.getElementById('selectFiltroSolicitante');
             const valorAtual = select.value;
@@ -775,7 +774,6 @@
             }
         }
 
-        // ================= PAINEL DE SOLICITANTES (👥) =================
         function abrirModalUsuarios() {
             const modal = document.getElementById('modalUsuarios');
             const tbody = document.getElementById('tabelaUsuariosCorpo');
@@ -828,7 +826,6 @@
             aplicarFiltroPorSelect(nome);
         }
 
-        // ================= MODAL CHAVE IA =================
         function abrirModalChaveIa() {
             const savedKey = localStorage.getItem('gemini_api_key') || '';
             document.getElementById('modalInputGeminiKey').value = savedKey;
@@ -883,7 +880,9 @@
                         qtd: item.qtd,
                         unit: item.unit,
                         total: item.total,
-                        link: item.link || ''
+                        link: item.link || '',
+                        entregue: item.entregue || false,
+                        data_entrega: item.data_entrega || ''
                     }])
                     .select();
 
@@ -908,7 +907,9 @@
                         qtd: item.qtd,
                         unit: item.unit,
                         total: item.total,
-                        link: item.link || ''
+                        link: item.link || '',
+                        entregue: item.entregue || false,
+                        data_entrega: item.data_entrega || ''
                     })
                     .eq('id', item.id);
 
@@ -929,6 +930,23 @@
             } catch (err) {
                 mostrarAviso("Erro ao remover da nuvem: " + err.message, "erro");
             }
+        }
+
+        // ================= ALTERAÇÃO RÁPIDA DE ENTREGA DIRETO NA TABELA =================
+        async function alternarStatusEntrega(id, checkbox) {
+            const item = compras.find(c => c.id === id);
+            if (!item) return;
+
+            item.entregue = checkbox.checked;
+            if (item.entregue && !item.data_entrega) {
+                item.data_entrega = new Date().toISOString().split('T')[0];
+            } else if (!item.entregue) {
+                item.data_entrega = '';
+            }
+
+            await atualizarNoSupabase(item);
+            salvarNoLocalStorage();
+            renderizarTabela();
         }
 
         // ================= PARSER DE LINK & ABERTURA AUTOMÁTICA =================
@@ -969,7 +987,6 @@
                 link = matchUrl[1];
                 const nomeExtraido = extrairNomeDoLinkML(link);
                 if (nomeExtraido) produto = nomeExtraido;
-                
                 window.open(link, '_blank');
             }
 
@@ -1011,7 +1028,9 @@
                 qtd: qtd,
                 unit: unit,
                 total: total || (qtd * unit),
-                link: link
+                link: link,
+                entregue: false,
+                data_entrega: ""
             });
 
             renderizarCardsPendentes();
@@ -1113,7 +1132,9 @@
                         qtd: qtd || 1,
                         unit: unit || 0,
                         total: totalDetectado || (qtd * unit),
-                        link: link || ""
+                        link: link || "",
+                        entregue: false,
+                        data_entrega: ""
                     });
                 }
             });
@@ -1131,7 +1152,6 @@
             return "OUTROS";
         }
 
-        // ================= IA E IMAGEM =================
         function fileToBase64(file) {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -1224,7 +1244,9 @@
                         qtd: q,
                         unit: u,
                         total: t,
-                        link: ""
+                        link: "",
+                        entregue: false,
+                        data_entrega: ""
                     });
                 });
             } catch (err) {
@@ -1233,7 +1255,6 @@
             }
         }
 
-        // ================= CARDS PRÉ-PREENCHIDOS =================
         function renderizarCardsPendentes() {
             const container = document.getElementById('containerCardsPreenchidos');
             const lista = document.getElementById('listaCardsPendentes');
@@ -1370,7 +1391,9 @@
                 qtd,
                 unit,
                 total,
-                link
+                link,
+                entregue: false,
+                data_entrega: ""
             };
 
             const supabaseId = await inserirNoSupabase(novoItem);
@@ -1420,7 +1443,9 @@
                     qtd,
                     unit,
                     total,
-                    link
+                    link,
+                    entregue: false,
+                    data_entrega: ""
                 };
 
                 const supabaseId = await inserirNoSupabase(novoItem);
@@ -1442,7 +1467,7 @@
             renderizarCardsPendentes();
         }
 
-        // ================= FUNÇÕES DA MODAL DE EDIÇÃO (CANETA ✏️) =================
+        // ================= FUNÇÕES DA MODAL DE EDIÇÃO (CANETA ✏️ COM ENTREGA) =================
         function abrirModalEdicao(index) {
             const item = compras[index];
             if (!item) return;
@@ -1465,11 +1490,40 @@
             document.getElementById('editUnit').value = Number(item.unit || 0).toFixed(2);
             document.getElementById('editLink').value = item.link || '';
 
+            // Controlo de Entrega na Modal
+            const chkEntregue = document.getElementById('editEntregue');
+            chkEntregue.checked = item.entregue || false;
+            
+            const inputDataEntrega = document.getElementById('editDataEntrega');
+            inputDataEntrega.value = item.data_entrega || '';
+            
+            toggleDataEntregaModal(chkEntregue.checked);
+
             document.getElementById('modalEdicao').classList.remove('hidden');
         }
 
         function fecharModalEdicao() {
             document.getElementById('modalEdicao').classList.add('hidden');
+        }
+
+        function toggleDataEntregaModal(isEntregue) {
+            const container = document.getElementById('containerDataEntrega');
+            const inputData = document.getElementById('editDataEntrega');
+            if (isEntregue) {
+                container.classList.remove('hidden');
+                if (!inputData.value) {
+                    inputData.value = new Date().toISOString().split('T')[0];
+                }
+            } else {
+                container.classList.add('hidden');
+                inputData.value = '';
+            }
+        }
+
+        function preencherDataHojeModal() {
+            document.getElementById('editEntregue').checked = true;
+            document.getElementById('containerDataEntrega').classList.remove('hidden');
+            document.getElementById('editDataEntrega').value = new Date().toISOString().split('T')[0];
         }
 
         function calcularModalPorTotal() {
@@ -1502,6 +1556,8 @@
             const total = parseFloat(document.getElementById('editTotal').value) || 0;
             const u = parseFloat(document.getElementById('editUnit').value) || (total / q);
             const linkProduto = document.getElementById('editLink').value.trim();
+            const entregue = document.getElementById('editEntregue').checked;
+            const dataEntrega = document.getElementById('editDataEntrega').value;
 
             const itemAtualizado = {
                 ...compras[index],
@@ -1512,7 +1568,9 @@
                 qtd: q,
                 unit: u,
                 total: total,
-                link: linkProduto
+                link: linkProduto,
+                entregue: entregue,
+                data_entrega: entregue ? dataEntrega : ''
             };
 
             compras[index] = itemAtualizado;
@@ -1542,12 +1600,15 @@
             }
 
             if (listaExibicao.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-400 italic">NENHUMA COMPRA ENCONTRADA COM ESSE FILTRO.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" class="text-center py-6 text-slate-400 italic">NENHUMA COMPRA ENCONTRADA COM ESSE FILTRO.</td></tr>`;
             } else {
                 listaExibicao.forEach((item) => {
                     const originalIndex = compras.findIndex(c => c.id === item.id);
                     totalGastoGeral += Number(item.total || 0);
                     solicitantesContador[item.solicitante] = (solicitantesContador[item.solicitante] || 0) + 1;
+
+                    const entregueChecked = item.entregue ? 'checked' : '';
+                    const infoEntrega = item.entregue && item.data_entrega ? `<span class="block text-[9px] text-emerald-600 dark:text-emerald-400 font-bold">Entregue: ${formatarDataBR(item.data_entrega)}</span>` : '<span class="block text-[9px] text-slate-400 italic">Pendente</span>';
 
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/40 transition uppercase";
@@ -1559,6 +1620,12 @@
                         <td class="py-2.5 px-3 text-center font-bold text-slate-700 dark:text-slate-300">${item.qtd}</td>
                         <td class="py-2.5 px-3 text-right text-slate-500 whitespace-nowrap">R$ ${Number(item.unit || 0).toFixed(2)}</td>
                         <td class="py-2.5 px-3 text-right font-black text-emerald-600 dark:text-emerald-400 whitespace-nowrap">R$ ${Number(item.total || 0).toFixed(2)}</td>
+                        <td class="py-2.5 px-3 text-center whitespace-nowrap">
+                            <div class="flex flex-col items-center gap-0.5">
+                                <input type="checkbox" ${entregueChecked} onchange="alternarStatusEntrega(${item.id}, this)" class="w-4 h-4 text-emerald-600 rounded cursor-pointer" title="Marcar como entregue">
+                                ${infoEntrega}
+                            </div>
+                        </td>
                         <td class="py-2.5 px-3 text-center whitespace-nowrap">
                             ${item.link && item.link.startsWith('http') 
                                 ? `<a href="${item.link}" target="_blank" class="text-blue-600 dark:text-blue-400 font-bold hover:underline normal-case">Ver Link ↗</a>` 
@@ -1642,7 +1709,7 @@
             }
 
             let csv = "\uFEFF";
-            csv += "DATA;SOLICITANTE;PRODUTO/SERVIÇO;CATEGORIA;QUANTIDADE;VALOR UNITÁRIO (R$);TOTAL (R$);LINK DO PRODUTO\n";
+            csv += "DATA;SOLICITANTE;PRODUTO/SERVIÇO;CATEGORIA;QUANTIDADE;VALOR UNITÁRIO (R$);TOTAL (R$);ENTREGUE;DATA ENTREGA;LINK DO PRODUTO\n";
 
             compras.forEach(item => {
                 const linha = [
@@ -1653,6 +1720,8 @@
                     item.qtd,
                     Number(item.unit || 0).toFixed(2).replace('.', ','),
                     Number(item.total || 0).toFixed(2).replace('.', ','),
+                    item.entregue ? "SIM" : "NÃO",
+                    formatarDataBR(item.data_entrega || ''),
                     `"${(item.link || '').replace(/"/g, '""')}"`
                 ];
                 csv += linha.join(";") + "\n";
