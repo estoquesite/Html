@@ -47,9 +47,9 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Gestão de FDS e Fornecedores</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Fornecedores em Destaque & Nuvem Supabase</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Gravação Instantânea & Nuvem</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                        <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
+                        <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Sistema Operacional</span>
                     </div>
                 </div>
             </div>
@@ -59,7 +59,7 @@
                     ⬅ Menu Principal
                 </a>
                 <button onclick="sincronizarTudo()" class="bg-cyan-600 hover:bg-cyan-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer">
-                    🔄 Sincronizar Tudo
+                    🔄 Sincronizar
                 </button>
             </div>
         </header>
@@ -256,7 +256,7 @@
             if (!supabaseClient) return;
             await carregarFornecedoresDoSupabase();
             await carregarDoSupabase();
-            mostrarAviso("✅ Dados sincronizados com a nuvem!");
+            mostrarAviso("✅ Sincronizado com a nuvem!");
         }
 
         /* --- GESTÃO DE FORNECEDORES --- */
@@ -283,15 +283,11 @@
 
             document.getElementById('inputNomeFornecedor').value = '';
             document.getElementById('inputContatoFornecedor').value = '';
-            mostrarAviso(`✅ Fornecedor "${nome}" cadastrado com sucesso!`);
+            mostrarAviso(`✅ Fornecedor "${nome}" salvo com sucesso!`);
 
             if (supabaseClient) {
                 try {
-                    const { data } = await supabaseClient.from('fornecedores_corporativos').insert([{ nome: novoFornecedor.nome, contato: novoFornecedor.contato }]).select();
-                    if (data && data[0]) {
-                        novoFornecedor.id = data[0].id;
-                        salvarDadosLocais();
-                    }
+                    await supabaseClient.from('fornecedores_corporativos').insert([{ nome: novoFornecedor.nome, contato: novoFornecedor.contato }]);
                 } catch(e) {}
             }
         }
@@ -340,7 +336,7 @@
                 salvarDadosLocais();
                 atualizarSelectsFornecedores();
                 renderizarListaFornecedores();
-                if (supabaseClient) { try { await supabaseClient.from('fornecedores_corporativas').delete().eq('id', id); } catch(e){} }
+                if (supabaseClient) { try { await supabaseClient.from('fornecedores_corporativos').delete().eq('id', id); } catch(e){} }
             }
         }
 
@@ -366,7 +362,7 @@
             if (!supabaseClient) return;
             try {
                 const { data } = await supabaseClient.from('fds_corporativas').select('*').order('id', { ascending: false });
-                if (data) {
+                if (data && data.length > 0) {
                     const localSalvo = JSON.parse(localStorage.getItem('portal_vale_fds_base') || '[]');
                     const mapLocal = new Map();
                     localSalvo.forEach(item => mapLocal.set(String(item.id), item));
@@ -590,7 +586,7 @@
 
                     <div class="flex items-center gap-2 w-full sm:w-auto justify-end flex-shrink-0">
                         ${acaoHtml}
-                        <button onclick="abrirModalEdicao('${item.id}')" class="text-cyan-600 hover:text-cyan-800 font-bold p-1.5 cursor-pointer" title="Editar">✏️️</button>
+                        <button onclick="abrirModalEdicao('${item.id}')" class="text-cyan-600 hover:text-cyan-800 font-bold p-1.5 cursor-pointer" title="Editar">✏️</button>
                         <button onclick="removerFds(${item.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1.5 cursor-pointer" title="Excluir">✕</button>
                     </div>
                 `;
@@ -701,7 +697,7 @@
                         }
                     }, index * 600);
                 });
-                mostrarAviso(`🖨️️ Fila disparada: ${itensEscolhidos.length} documento(s) aberto(s)!`);
+                mostrarAviso(`🖨️ Fila disparada: ${itensEscolhidos.length} documento(s) aberto(s)!`);
             }
         }
 
