@@ -65,6 +65,9 @@
                 <a href="index.html" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1">
                     ⬅ Menu Principal
                 </a>
+                <button onclick="salvarTudoGeralSupabase()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer" title="Forçar salvamento geral na nuvem">
+                    💾 Salvar Geral
+                </button>
                 <button onclick="carregarDoSupabase()" class="bg-cyan-600 hover:bg-cyan-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer">
                     🔄 Sincronizar
                 </button>
@@ -188,7 +191,7 @@
     <div id="modalImpressao" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white p-8 rounded-3xl shadow-2xl max-w-md w-full text-slate-900 space-y-4">
             <div class="flex justify-between items-center border-b pb-3">
-                <h3 class="text-sm font-black uppercase text-cyan-700">🖨️️ Impressão de FDS</h3>
+                <h3 class="text-sm font-black uppercase text-cyan-700">🖨 Impressão de FDS</h3>
                 <button onclick="fecharModalImpressao()" class="text-slate-400 hover:text-slate-700 font-black">✕</button>
             </div>
             
@@ -284,6 +287,33 @@
                 console.warn("Aviso Supabase FDS Insert:", err.message);
             }
             return null;
+        }
+
+        async function salvarTudoGeralSupabase() {
+            if (!supabaseClient) {
+                alert("Supabase não conectado!");
+                return;
+            }
+            mostrarAviso("💾 Salvando todos os itens locais na nuvem...", "sucesso");
+            for (let item of listaFds) {
+                if (String(item.id).length > 10) { // ID gerado por timestamp local
+                    const newId = await inserirNoSupabase(item);
+                    if (newId) item.id = newId;
+                } else {
+                    try {
+                        await supabaseClient.from('fds_corporativas').update({
+                            produto: item.produto,
+                            fabricante: item.fabricante,
+                            link: item.link,
+                            foto_url: item.fotoUrl,
+                            data_registro: item.dataRegistro
+                        }).eq('id', item.id);
+                    } catch(e) {}
+                }
+            }
+            salvarFdsLocal();
+            renderizarCardsFds();
+            mostrarAviso("✅ Sincronização geral concluída!");
         }
 
         async function removerDoSupabase(id) {
