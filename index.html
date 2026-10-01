@@ -1,837 +1,507 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Módulo 4 - Aniversariantes da Equipe | Portal Vale v07</title>
-<style>
-:root {
-    --primary: #db2777;
-    --primary-dark: #be185d;
-    --primary-light: #fce7f3;
-    --primary-border: #f472b6;
-    --primary-bg: #fff5f8;
-    --accent: #f59e0b;
-    --danger: #ef4444;
-    --success: #10b981;
-    --slate-900: #0f172a;
-    --slate-700: #334155;
-    --slate-600: #475569;
-    --slate-300: #cbd5e1;
-    --slate-200: #e2e8f0;
-    --slate-100: #f1f5f9;
-    --slate-50: #f8fafc;
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { 
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
-    background: #fff5f8; 
-    color: var(--slate-900); 
-    min-height: 100vh; 
-    padding: 8px; 
-}
-
-/* NOTIFICAÇÃO TOAST */
-#toastNotificacao {
-    position: fixed; 
-    bottom: 24px; 
-    right: 24px; 
-    background: var(--slate-900); 
-    color: #fff;
-    padding: 10px 18px; 
-    border-radius: 6px; 
-    font-size: 12px; 
-    font-weight: 700;
-    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.25); 
-    opacity: 0; 
-    pointer-events: none;
-    transition: opacity 0.25s ease, transform 0.25s ease; 
-    transform: translateY(12px); 
-    z-index: 9999;
-}
-#toastNotificacao.ativo { opacity: 1; transform: translateY(0); }
-
-/* PAINEL DE CONTROLE */
-.painel-controle { 
-    background: #ffffff; 
-    padding: 12px 16px; 
-    margin: 0 auto 10px auto; 
-    border-radius: 12px; 
-    box-shadow: 0 10px 25px -5px rgba(219, 39, 119, 0.08); 
-    border: 1px solid #fbcfe8; 
-    max-width: 980px; 
-}
-.topo-modulo-info { 
-    display: flex; 
-    align-items: center; 
-    justify-content: space-between; 
-    margin-bottom: 8px; 
-    border-bottom: 2px solid var(--primary); 
-    padding-bottom: 6px; 
-}
-.badge-modulo { 
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
-    color: #fff; 
-    font-size: 11px; 
-    font-weight: 800; 
-    padding: 4px 10px; 
-    border-radius: 6px; 
-    text-transform: uppercase; 
-    letter-spacing: 0.8px; 
-}
-.tag-v07 { 
-    background-color: var(--accent); 
-    color: #fff; 
-    font-weight: 800; 
-    font-size: 9px; 
-    padding: 2px 6px; 
-    border-radius: 4px; 
-    margin-left: 6px; 
-}
-
-.campos-painel { 
-    display: grid; 
-    gap: 8px; 
-    margin-bottom: 6px; 
-    grid-template-columns: 130px 1.5fr; 
-}
-.campo-grupo label { 
-    display: flex;
-    justify-content: space-between;
-    font-weight: 700; 
-    margin-bottom: 2px; 
-    font-size: 10px; 
-    color: #9d174d; 
-    text-transform: uppercase; 
-}
-.painel-controle input[type="text"] { 
-    width: 100%; 
-    font-family: inherit; 
-    font-size: 11px; 
-    padding: 6px 8px; 
-    border: 1px solid var(--primary-border); 
-    border-radius: 6px; 
-    background: var(--primary-bg); 
-    outline: none; 
-}
-.painel-controle input[type="text"]:focus, .painel-controle textarea:focus { 
-    border-color: var(--primary); 
-    background: #fff; 
-}
-.painel-controle textarea { 
-    width: 100%; 
-    height: 45px; 
-    font-family: inherit; 
-    font-size: 11px; 
-    padding: 6px 8px; 
-    border: 1px solid var(--primary-border); 
-    border-radius: 6px; 
-    resize: vertical; 
-    text-transform: uppercase; 
-    background: var(--primary-bg); 
-    outline: none; 
-}
-
-.barra-metricas {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 6px;
-    flex-wrap: wrap;
-}
-.card-metrica {
-    background: var(--primary-bg);
-    border: 1px solid #fbcfe8;
-    padding: 3px 8px;
-    border-radius: 6px;
-    font-size: 10.5px;
-    font-weight: 700;
-    color: #9d174d;
-}
-
-.botoes-painel { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 4px; }
-.btn { 
-    cursor: pointer; 
-    padding: 6px 10px; 
-    font-size: 10.5px; 
-    font-weight: 700; 
-    border: none; 
-    border-radius: 6px; 
-    color: #fff; 
-    display: inline-flex; 
-    align-items: center; 
-    gap: 4px; 
-    transition: filter 0.15s ease, transform 0.05s ease;
-}
-.btn:hover { filter: brightness(1.08); }
-.btn:active { transform: translateY(1px); }
-
-.btn-pink { background-color: var(--primary); } 
-.btn-ordenar { background-color: #ea580c; }
-.btn-salvar { background-color: #2563eb; } 
-.btn-carregar { background-color: #0284c7; } 
-.btn-exportar { background-color: #4f46e5; }
-.btn-limpar { background-color: var(--slate-100); color: var(--slate-600); border: 1px solid var(--slate-300); } 
-.btn-voltar { background-color: var(--slate-600); text-decoration: none; } 
-.btn-imprimir { background-color: var(--slate-900); margin-left: auto; }
-
-/* FOLHA A4 RETRATO RIGOROSA EM 1 PÁGINA */
-.folha-a4 { 
-    width: 100%; 
-    max-width: 980px; 
-    background: #fff; 
-    padding: 8px 12px; 
-    margin: 0 auto 10px auto; 
-    box-shadow: 0 10px 30px rgba(219, 39, 119, 0.08); 
-    border-radius: 10px; 
-    border: 1.5px solid var(--primary-border); 
-    position: relative; 
-}
-
-/* CABEÇALHO PADRÃO VALE */
-.cabecalho-container, .info-aniver-bar { 
-    width: 100%; 
-    border-collapse: collapse; 
-    border: 1.2px solid var(--slate-900); 
-    margin-bottom: 2px; 
-    table-layout: fixed; 
-}
-.cabecalho-container td, .info-aniver-bar td { 
-    border: 1px solid var(--slate-700); 
-    padding: 2px 5px; 
-    vertical-align: middle; 
-    text-align: center; 
-}
-.logo-box { 
-    width: 75px; 
-    font-weight: 900; 
-    font-size: 13px; 
-    color: #007e7a; 
-    letter-spacing: 1.5px;
-    background-color: var(--slate-50); 
-}
-.titulo-box { 
-    font-size: 9.5px; 
-    font-weight: 800; 
-    text-transform: uppercase; 
-    color: var(--slate-900); 
-    padding: 0 5px; 
-}
-.meta-box { 
-    width: 110px; 
-    font-size: 7.5px; 
-    text-align: left !important; 
-    padding-left: 5px !important; 
-    background-color: var(--slate-50); 
-    line-height: 1.2; 
-}
-
-.info-aniver-bar { 
-    font-size: 8px; 
-    font-weight: 700; 
-    background-color: var(--slate-50); 
-}
-.info-aniver-bar td { text-align: left; padding: 1.5px 5px; }
-.campo-editavel { outline: none; display: inline-block; min-width: 25px; font-weight: 600; color: var(--slate-900); }
-
-/* CONTENTOR DOS BLOCOS */
-.contentor-blocos {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-    margin-top: 2px;
-    width: 100%;
-}
-
-.bloco-mes { 
-    width: 100%; 
-    border: 1px solid var(--primary-border); 
-    border-radius: 4px; 
-    overflow: hidden; 
-    background: #fff;
-}
-.bloco-mes.mes-atual-destaque {
-    border: 1.5px solid var(--accent);
-}
-
-table.tabela-mes { 
-    width: 100%; 
-    border-collapse: collapse; 
-    table-layout: fixed; 
-}
-
-.td-mes-nome {
-    width: 120px;
-    text-align: center;
-    font-weight: 900;
-    font-size: 9px;
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    color: #fff;
-    border: 1px solid var(--primary-border);
-    padding: 1px 4px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-}
-.mes-atual-destaque .td-mes-nome {
-    background: linear-gradient(135deg, #d97706, #b45309);
-}
-
-table.tabela-mes td { 
-    border: 1px solid var(--primary-border); 
-    vertical-align: middle; 
-    font-size: 9px; 
-    height: 16px; 
-    padding: 1px 4px; 
-}
-
-/* CÉLULAS EDITÁVEIS */
-.col-nome-aniver { 
-    text-align: left !important; 
-    font-weight: 700; 
-    font-size: 9px !important;
-    text-transform: uppercase; 
-    padding-left: 6px !important; 
-    outline: none; 
-    cursor: text;
-    background: #fff;
-    color: #0f172a;
-}
-.col-nome-aniver:focus, .col-data-aniver:focus {
-    background-color: #fce7f3 !important;
-}
-.col-data-aniver { 
-    width: 75px; 
-    text-align: center;
-    font-weight: 800; 
-    font-size: 9px !important;
-    background: #fff; 
-    outline: none; 
-    cursor: text;
-    color: #9d174d;
-}
-.col-acoes-aniver { 
-    width: 40px; 
-    text-align: center;
-    background: #fff;
-}
-
-.botoes-acoes { display: flex; align-items: center; justify-content: center; gap: 2px; opacity: 0.35; transition: opacity 0.2s; }
-tr:hover .botoes-acoes { opacity: 1; }
-.btn-acao { 
-    background: var(--slate-100); 
-    border: 1px solid var(--slate-300); 
-    border-radius: 3px; 
-    cursor: pointer; 
-    padding: 1px 2px; 
-    font-size: 7px; 
-}
-.btn-mais-linha { color: var(--success); font-weight: 900; }
-.btn-lixeira { color: var(--danger); font-weight: 900; }
-.btn-wpp { color: #059669; font-weight: 900; }
-
-.tr-linha-em-branco {
-    background: #ffffff;
-}
-
-/* IMPRESSÃO A4 VERTICAL RÍGIDA EM 1 PÁGINA */
-@media print {
-    @page { 
-        size: A4 portrait; 
-        margin: 2mm 3mm !important; 
-    }
-    html, body { 
-        background: #fff !important; 
-        margin: 0 !important; 
-        padding: 0 !important; 
-        height: 100% !important;
-        -webkit-print-color-adjust: exact !important; 
-        print-color-adjust: exact !important; 
-    }
-    .painel-controle, .botoes-acoes, .col-acoes-aniver, #toastNotificacao { 
-        display: none !important; 
-    }
-    .folha-a4 { 
-        box-shadow: none !important; 
-        border: none !important; 
-        width: 100% !important; 
-        max-width: 100% !important; 
-        padding: 0 !important; 
-        margin: 0 !important; 
-        page-break-after: avoid !important;
-        break-after: avoid !important;
-    }
-    .contentor-blocos {
-        gap: 1px !important;
-        margin-top: 1px !important;
-    }
-    .bloco-mes { 
-        page-break-inside: avoid !important; 
-        break-inside: avoid !important; 
-        margin-bottom: 1px !important;
-        border-width: 1px !important;
-    }
-    .td-mes-nome { 
-        background-color: var(--primary) !important; 
-        color: #fff !important; 
-        font-size: 7.5px !important;
-        padding: 1px 3px !important;
-    }
-    table.tabela-mes td { 
-        border: 1px solid #f9a8d4 !important; 
-        font-size: 8px !important;
-        height: 14px !important;
-        line-height: 14px !important;
-        padding: 0 3px !important;
-    }
-    .col-data-aniver {
-        font-size: 8px !important;
-    }
-    .cabecalho-container, .info-aniver-bar {
-        margin-bottom: 1px !important;
-    }
-    .cabecalho-container td, .info-aniver-bar td {
-        padding: 1px 3px !important;
-        font-size: 7px !important;
-    }
-    .logo-box {
-        font-size: 10px !important;
-        width: 50px !important;
-    }
-    .titulo-box {
-        font-size: 8px !important;
-    }
-}
-</style>
-</head>
-<body>
-
-    <div id="toastNotificacao">Mensagem</div>
-    <input type="file" id="arquivoBackupAniver" style="display:none;" accept=".json" onchange="processarArquivoBackup(this)">
-
-    <div class="painel-controle">
-        <div class="topo-modulo-info">
-            <span class="badge-modulo">Módulo 4: Aniversariantes do Ano <span class="tag-v07">v07</span></span>
-            <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
-        </div>
-        
-        <div class="barra-metricas">
-            <span class="card-metrica" id="metricaTotal">🎂 Total de Aniversariantes: 0</span>
-            <span class="card-metrica" id="metricaMesAtual">🎉 Aniversariantes deste Mês: 0</span>
-        </div>
-
-        <div class="campos-painel">
-            <div class="campo-grupo">
-                <label>Ano:</label>
-                <input type="text" id="anoInputAniver" value="2026" oninput="sincronizarCabecalhosAniver()">
-            </div>
-            <div class="campo-grupo">
-                <label>Área / Gerência:</label>
-                <input type="text" id="areaInputAniver" placeholder="Operação / Logística" oninput="sincronizarCabecalhosAniver()">
-            </div>
-        </div>
-        <div class="campo-grupo">
-            <label>Importação Rápida de Nomes (Qualquer formato: NOME 10/DEZ ou NOME - 10/12):</label>
-            <textarea id="importarTextoAniver" placeholder="Cole aqui seus nomes... O sistema distribui e organiza do dia 01 ao dia 31 automaticamente!"></textarea>
-        </div>
-        <div class="botoes-painel">
-            <button type="button" class="btn btn-pink" onclick="distribuirNomesImportados()">⚡ Distribuir & Ordenar nos Meses</button>
-            <button type="button" class="btn btn-ordenar" onclick="ordenarAniversariosPorDia(true)">📅 Reordenar por Dia</button>
-            <button type="button" class="btn btn-salvar" onclick="salvarTudoAniver()">💾 Salvar</button>
-            <button type="button" class="btn btn-carregar" onclick="carregarTudoAniver()">📂 Carregar</button>
-            <button type="button" class="btn btn-exportar" onclick="exportarBackupJSON()">⬇️ Backup</button>
-            <button type="button" class="btn btn-exportar" onclick="document.getElementById('arquivoBackupAniver').click()">⬆️ Restaurar</button>
-            <button type="button" class="btn btn-limpar" onclick="limparTudoAniver()">Limpar</button>
-            <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir (A4)</button>
-        </div>
-    </div>
-
-    <div id="contentorFolhasAniver"></div>
-
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Operacional - Vale (Menu Mestre)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        const MESES_ANO = [
-            "JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO",
-            "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"
-        ];
-
-        const MAPA_MESES_TEXTO = {
-            "JAN": 1, "JANEIRO": 1, "01": 1,
-            "FEV": 2, "FEVEREIRO": 2, "02": 2,
-            "MAR": 3, "MARCO": 3, "MARÇO": 3, "03": 3,
-            "ABR": 4, "ABRIL": 4, "04": 4,
-            "MAI": 5, "MAIO": 5, "05": 5,
-            "JUN": 6, "JUNHO": 6, "06": 6,
-            "JUL": 7, "JULHO": 7, "07": 7,
-            "AGO": 8, "AGOSTO": 8, "08": 8,
-            "SET": 9, "SETEMBRO": 9, "09": 9,
-            "OUT": 10, "OUTUBRO": 10, "10": 10,
-            "NOV": 11, "NOVEMBRO": 11, "11": 11,
-            "DEZ": 12, "DEZEMBRO": 12, "12": 12
-        };
-
-        const DADOS_INICIAIS = {
-            "JANEIRO": ["MARIANA PEREIRA CRUZ - 11/01", "RICARDO GONCALVES DE MELLO LEITE - 13/01", "JOAO SILVA RAMOS - 18/01", "ALFREDO AUGUSTO RAMOS NETO - 22/01"],
-            "FEVEREIRO": ["MARCOS AURELIO CATALLARES MATTOS - 01/02", "VANDERSON TEIXEIRA - 04/02", "BRUNO RICARDO - 07/02", "GABRIEL CARNEIRO - 07/02"],
-            "MARÇO": ["GLEIVSTON SILVA MENDES - 22/03", "REINALDO DO NASCIMENTO MOUREIRA - 26/03"],
-            "ABRIL": ["CAMILA MAGALHAES GONCALVES - 27/04"],
-            "MAIO": ["LEONAM MOTA PEIXOTO - 22/05", "LUCAS BRAGA - 29/05"],
-            "JUNHO": ["ROBSON DE SOUZA MENDONCA - 04/06", "PAULO HENRIQUE - 08/06", "PAULO HENRIQUE FIRMIANO DE PAIVA - 08/06", "LUIZ CARLOS DOS SANTOS - 15/06"],
-            "JULHO": ["BRUNO GOMES FIDELIS - 02/07", "ATMISTO SILVA - 20/07", "ATMISTO ALEXANDRE MUNIZ DA SILVA - 20/07", "GIOVANA CORREA DA SILVA - 30/07"],
-            "AGOSTO": ["CAIO HENRIQUE - 06/08", "PABLO MESQUITA - 25/08", "DAVID MARCELO DELGADO DOS SANTOS - 26/08"],
-            "SETEMBRO": ["CLAUDIO ALVES - 16/09", "PABLO GOMES DO COUTO - 25/09"],
-            "OUTUBRO": [],
-            "NOVEMBRO": ["DOMINIQUE SILVA - 02/11", "DOMINIQUE WENDOS DA SILVA - 02/11", "SAINT CLAIR DA CONCEICAO LOPES - 03/11", "RICHARD SILVA - 24/11"],
-            "DEZEMBRO": ["EMERSON RIBEIRO DOS SANTOS - 04/12", "AMANDA FERNANDA VASCONCELOS - 10/12", "ALLAN SOUZA DE CARVALHO - 15/12", "TITO DACAL - 27/12"]
-        };
-
-        function mostrarToast(msg) {
-            const toast = document.getElementById('toastNotificacao');
-            toast.innerText = msg;
-            toast.classList.add('ativo');
-            setTimeout(() => { toast.classList.remove('ativo'); }, 2600);
-        }
-
-        function obterIndiceMesAtual() {
-            return new Date().getMonth();
-        }
-
-        function sincronizarCabecalhosAniver() {
-            const ano = document.getElementById('anoInputAniver').value || '2026';
-            const area = document.getElementById('areaInputAniver').value || '---';
-
-            document.querySelectorAll('#contentorFolhasAniver .folha-a4').forEach(f => {
-                const elAno = f.querySelector('.val-ano');
-                const elArea = f.querySelector('.val-area');
-                if (elAno) elAno.innerText = ano;
-                if (elArea) elArea.innerText = area;
-            });
-        }
-
-        function atualizarMetricas() {
-            const dados = capturarDadosAtuais();
-            let total = 0;
-            const mesAtualNome = MESES_ANO[obterIndiceMesAtual()];
-            let totalMesAtual = dados[mesAtualNome] ? dados[mesAtualNome].length : 0;
-
-            for (let m in dados) {
-                total += dados[m].length;
-            }
-
-            document.getElementById('metricaTotal').innerText = `🎂 Total de Aniversariantes: ${total}`;
-            document.getElementById('metricaMesAtual').innerText = `🎉 Aniversariantes de ${mesAtualNome}: ${totalMesAtual}`;
-        }
-
-        function criarBlocoMes(mesNome, itens = []) {
-            const ehMesAtual = (mesNome === MESES_ANO[obterIndiceMesAtual()]);
-            const classeDestaque = ehMesAtual ? 'mes-atual-destaque' : '';
-            const tagMes = ehMesAtual ? ' ★' : '';
-
-            let totalLinhas = Math.max(itens.length, 1);
-            let linhasHTML = '';
-
-            for (let i = 0; i < totalLinhas; i++) {
-                let nome = '';
-                let data = '';
-                if (itens[i]) {
-                    const [n, d] = itens[i].split('-');
-                    nome = (n || '').trim();
-                    data = (d || '').trim();
-                }
-
-                const ehPrimeira = (i === 0);
-                const tdMes = ehPrimeira ? `<td class="td-mes-nome" rowspan="${totalLinhas + 1}">📅 ${mesNome}${tagMes}</td>` : '';
-
-                linhasHTML += `
-                    <tr>
-                        ${tdMes}
-                        <td class="col-nome-aniver" contenteditable="true" onblur="atualizarMetricas()">${nome}</td>
-                        <td class="col-data-aniver" contenteditable="true" placeholder="DD/MM" onblur="atualizarMetricas()">${data}</td>
-                        <td class="col-acoes-aniver">
-                            <div class="botoes-acoes">
-                                <button type="button" class="btn-acao btn-wpp" onclick="copiarMensagemParabens(this)" title="Copiar Parabéns">💬</button>
-                                <button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixo(this)" title="Nova Linha">➕</button>
-                                <button type="button" class="btn-acao btn-lixeira" onclick="limparOuRemoverLinha(this)" title="Remover">✕</button>
-                            </div>
-                        </td>
-                    </tr>
-                `;
-            }
-
-            linhasHTML += `
-                <tr class="tr-linha-em-branco">
-                    <td class="col-nome-aniver" contenteditable="true" onblur="atualizarMetricas()" placeholder="Nome..."></td>
-                    <td class="col-data-aniver" contenteditable="true" placeholder="DD/MM" onblur="atualizarMetricas()"></td>
-                    <td class="col-acoes-aniver">
-                        <div class="botoes-acoes">
-                            <button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixo(this)" title="Nova Linha">➕</button>
-                        </div>
-                    </td>
-                </tr>
-            `;
-
-            return `
-                <div class="bloco-mes ${classeDestaque}" data-mes="${mesNome}">
-                    <table class="tabela-mes">
-                        <tbody>${linhasHTML}</tbody>
-                    </table>
-                </div>
-            `;
-        }
-
-        function copiarMensagemParabens(btn) {
-            const tr = btn.closest('tr');
-            const nome = tr.querySelector('.col-nome-aniver').innerText.trim();
-            if(!nome) {
-                mostrarToast('Sem nome nesta linha para parabenizar.');
-                return;
-            }
-            const [primeiroNome] = nome.split(' ');
-            const msg = `🎉 Parabéns, ${primeiroNome}! Que seu novo ciclo seja de muita saúde, paz e conquistas. Grande abraço de toda a equipe Vale! 🎂✨`;
-            navigator.clipboard.writeText(msg).then(() => {
-                mostrarToast(`Mensagem copiada para parabenizar ${primeiroNome}!`);
-            });
-        }
-
-        function adicionarLinhaAbaixo(btn) {
-            const tr = btn.closest('tr');
-            const tbody = tr.closest('tbody');
-            const tdMes = tbody.querySelector('.td-mes-nome');
-            
-            if (tdMes) {
-                let atual = parseInt(tdMes.getAttribute('rowspan') || '2', 10);
-                tdMes.setAttribute('rowspan', atual + 1);
-            }
-
-            const nova = document.createElement('tr');
-            nova.innerHTML = `
-                <td class="col-nome-aniver" contenteditable="true" onblur="atualizarMetricas()"></td>
-                <td class="col-data-aniver" contenteditable="true" placeholder="DD/MM" onblur="atualizarMetricas()"></td>
-                <td class="col-acoes-aniver">
-                    <div class="botoes-acoes">
-                        <button type="button" class="btn-acao btn-wpp" onclick="copiarMensagemParabens(this)" title="Copiar Parabéns">💬</button>
-                        <button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixo(this)" title="Nova Linha">➕</button>
-                        <button type="button" class="btn-acao btn-lixeira" onclick="limparOuRemoverLinha(this)" title="Remover">✕</button>
-                    </div>
-                </td>
-            `;
-            tr.after(nova);
-            nova.querySelector('.col-nome-aniver').focus();
-        }
-
-        function limparOuRemoverLinha(btn) {
-            const tr = btn.closest('tr');
-            const tbody = tr.closest('tbody');
-            const totalLinhas = tbody.querySelectorAll('tr').length;
-            const tdMes = tbody.querySelector('.td-mes-nome');
-
-            if (totalLinhas > 2) {
-                if (tdMes && !tr.contains(tdMes)) {
-                    let atual = parseInt(tdMes.getAttribute('rowspan') || '2', 10);
-                    tdMes.setAttribute('rowspan', atual - 1);
-                }
-                tr.remove();
-            } else {
-                tr.querySelector('.col-nome-aniver').innerText = '';
-                tr.querySelector('.col-data-aniver').innerText = '';
-            }
-            atualizarMetricas();
-        }
-
-        function criarEstruturaFolhaAniver(dadosObj) {
-            let blocosHTML = '';
-            MESES_ANO.forEach(m => {
-                blocosHTML += criarBlocoMes(m, dadosObj[m] || []);
-            });
-
-            const anoAtual = document.getElementById('anoInputAniver').value || '2026';
-            const areaAtual = document.getElementById('areaInputAniver').value || '---';
-
-            const f = document.createElement('div'); 
-            f.className = 'folha-a4';
-            f.innerHTML = `
-                <table class="cabecalho-container">
-                    <tr>
-                        <td class="logo-box">VALE</td>
-                        <td class="titulo-box">🎂 CRONOGRAMA ANUAL DE ANIVERSÁRIOS DA EQUIPE</td>
-                        <td class="meta-box">
-                            <strong>Ano:</strong> <span class="val-ano">${anoAtual}</span><br>
-                            <span><strong>Página:</strong> 01 / 01</span>
-                        </td>
-                    </tr>
-                </table>
-                <table class="info-aniver-bar">
-                    <tr>
-                        <td><strong>Área / Gerência:</strong> <span class="val-area campo-editavel" contenteditable="true">${areaAtual}</span></td>
-                    </tr>
-                </table>
-                <div class="contentor-blocos">${blocosHTML}</div>`;
-            return f;
-        }
-
-        function capturarDadosAtuais() {
-            let obj = {};
-            document.querySelectorAll('.bloco-mes').forEach(bloco => {
-                let mes = bloco.getAttribute('data-mes');
-                let itens = [];
-                bloco.querySelectorAll('tbody tr').forEach(tr => {
-                    let nome = tr.querySelector('.col-nome-aniver') ? tr.querySelector('.col-nome-aniver').innerText.trim() : '';
-                    let data = tr.querySelector('.col-data-aniver') ? tr.querySelector('.col-data-aniver').innerText.trim() : '';
-                    if(nome !== "") {
-                        itens.push(nome + " - " + data);
-                    }
-                });
-                obj[mes] = itens;
-            });
-            return obj;
-        }
-
-        function ordenarObjeto(dados) {
-            for (let mes in dados) {
-                dados[mes].sort((a, b) => {
-                    const [, dataA = ''] = a.split('-');
-                    const [, dataB = ''] = b.split('-');
-                    const [diaAStr = '99'] = dataA.trim().split('/');
-                    const [diaBStr = '99'] = dataB.trim().split('/');
-                    const diaA = parseInt(diaAStr, 10) || 99;
-                    const diaB = parseInt(diaBStr, 10) || 99;
-                    return diaA - diaB;
-                });
-            }
-            return dados;
-        }
-
-        function ordenarAniversariosPorDia(mostrarMsg = false) {
-            let dados = capturarDadosAtuais();
-            dados = ordenarObjeto(dados);
-            renderizarComDados(dados);
-            if (mostrarMsg) mostrarToast('Aniversários organizados por dia com sucesso!');
-        }
-
-        function distribuirNomesImportados() {
-            const texto = document.getElementById('importarTextoAniver').value;
-            if(!texto.trim()) {
-                mostrarToast('Cole os nomes na caixa de texto primeiro!');
-                return;
-            }
-            const linhas = texto.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-            let dados = capturarDadosAtuais();
-
-            let adicionados = 0;
-
-            linhas.forEach(linha => {
-                const regexData = /(\d{1,2})\/([A-Za-z0-9]+)$/;
-                const match = linha.match(regexData);
-
-                if (match) {
-                    const dia = match[1].padStart(2, '0');
-                    const mesTexto = match[2].toUpperCase().trim();
-                    let nome = linha.substring(0, match.index).replace(/[-–—]\s*$/, '').trim().toUpperCase();
-
-                    let mesNum = null;
-                    if (MAPA_MESES_TEXTO[mesTexto]) {
-                        mesNum = MAPA_MESES_TEXTO[mesTexto];
-                    } else {
-                        const parsed = parseInt(mesTexto, 10);
-                        if (parsed >= 1 && parsed <= 12) mesNum = parsed;
-                    }
-
-                    if (mesNum && nome) {
-                        const mesNome = MESES_ANO[mesNum - 1];
-                        const dataFormatada = `${dia}/${String(mesNum).padStart(2, '0')}`;
-                        if (!dados[mesNome]) dados[mesNome] = [];
-
-                        const jaExiste = dados[mesNome].some(item => item.startsWith(nome));
-                        if (!jaExiste) {
-                            dados[mesNome].push(`${nome} - ${dataFormatada}`);
-                            adicionados++;
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        vale: {
+                            DEFAULT: '#007e7a',
+                            dark: '#005a57',
+                            light: '#e6f4f4',
+                            amber: '#f59e0b'
                         }
                     }
                 }
-            });
-
-            dados = ordenarObjeto(dados);
-
-            document.getElementById('importarTextoAniver').value = '';
-            renderizarComDados(dados);
-            mostrarToast(`🎉 SUCESSO! ${adicionados} aniversariante(s) distribuído(s) e ordenados!`);
+            }
         }
-
-        function renderizarComDados(dados) {
-            const box = document.getElementById('contentorFolhasAniver');
-            box.innerHTML = '';
-            box.appendChild(criarEstruturaFolhaAniver(dados));
-            sincronizarCabecalhosAniver();
-            atualizarMetricas();
+    </script>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            background: #f0f4f8; 
+            color: #1e293b; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px 16px; 
         }
+        .container-menu { max-width: 1100px; width: 100%; }
+        
+        /* CARD DOS MÓDULOS */
+        .card-modulo { 
+            background: #fff; 
+            border-radius: 12px; 
+            border: 1px solid #e2e8f0; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03); 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            text-decoration: none; 
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); 
+            position: relative; 
+            overflow: hidden; 
+            min-height: 180px; 
+        }
+        .card-modulo::before { 
+            content: ''; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            height: 4px; 
+        }
+        
+        .card-modulo.m1::before, .card-modulo.m2::before { background: #007e7a; }
+        .card-modulo.m3::before, .card-modulo.m4::before, .card-modulo.m5::before { background: #db2777; }
+        .card-modulo.m6::before { background: #059669; }
+        .card-modulo.m7::before { background: #6366f1; }
+        .card-modulo.m8::before { background: #0891b2; }
+        .card-modulo.m9::before { background: #f59e0b; }
+        .card-modulo.m10::before { background: #475569; }
+        
+        .card-modulo:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 14px 25px -4px rgba(0, 0, 0, 0.08); 
+            border-color: #cbd5e1;
+        }
+        
+        .card-icone { 
+            width: 42px; 
+            height: 42px; 
+            border-radius: 10px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 20px; 
+        }
+        
+        .m1 .card-icone, .m2 .card-icone { background: #e6f4f4; color: #007e7a; }
+        .m3 .card-icone, .m4 .card-icone, .m5 .card-icone { background: #fce7f3; color: #db2777; }
+        .m6 .card-icone { background: #ecfdf5; color: #059669; }
+        .m7 .card-icone { background: #eef2ff; color: #6366f1; }
+        .m8 .card-icone { background: #ecfeff; color: #0891b2; }
+        .m9 .card-icone { background: #fef3c7; color: #d97706; }
+        .m10 .card-icone { background: #f1f5f9; color: #475569; }
+        
+        .tecla-atalho {
+            font-size: 10px;
+            font-weight: 800;
+            background: #f1f5f9;
+            color: #64748b;
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+        }
+    </style>
+</head>
+<body class="select-none">
 
-        function salvarTudoAniver() { 
-            const backup = {
-                ano: document.getElementById('anoInputAniver').value,
-                area: document.getElementById('areaInputAniver').value,
-                dados: capturarDadosAtuais()
+    <!-- CAPA DE BLOQUEIO DE SEGURANÇA MOBILE -->
+    <div id="tela-bloqueio-mobile" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 md:hidden">
+        <div class="bg-white p-7 rounded-3xl shadow-2xl max-w-xs w-full text-center space-y-4 border border-slate-100">
+            <div class="w-16 h-16 bg-teal-50 text-teal-700 rounded-3xl mx-auto flex items-center justify-center text-3xl font-black shadow-inner">
+                🔒
+            </div>
+            
+            <div>
+                <h2 class="text-base font-black text-slate-900">Portal Vale Operacional</h2>
+                <p class="text-slate-500 mt-1 text-[11px] leading-relaxed">Autentique sua identidade para liberar o acesso móvel.</p>
+            </div>
+
+            <button type="button" id="btnBiometria" onclick="desbloquearPorBiometria()" class="w-full bg-[#007e7a] hover:bg-[#005a57] active:scale-95 text-white font-bold py-3 rounded-2xl transition shadow-md text-xs flex items-center justify-center gap-2 cursor-pointer">
+                <span>👆</span>
+                <span>Validar Digital / Face ID</span>
+            </button>
+
+            <div id="area-pin" class="space-y-2 pt-2 border-t border-slate-100">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase">Ou digite o PIN de Segurança:</label>
+                <div class="flex gap-2 justify-center">
+                    <input type="password" id="pinInput" maxlength="4" placeholder="••••" class="w-28 text-center text-lg font-black tracking-widest py-1.5 border border-slate-300 rounded-xl bg-slate-50 outline-none focus:border-teal-600">
+                    <button type="button" onclick="verificarPIN()" class="bg-slate-800 text-white font-bold px-3 py-1.5 rounded-xl text-xs">Entrar</button>
+                </div>
+            </div>
+
+            <p id="erro-auth" class="text-rose-500 font-bold text-[11px] hidden"></p>
+        </div>
+    </div>
+
+    <!-- CONTEÚDO PRINCIPAL DO MENU MESTRE -->
+    <div id="conteudo-portal" class="container-menu">
+        
+        <!-- CABEÇALHO CORPORATIVO VALE -->
+        <header class="bg-gradient-to-r from-[#007e7a] to-[#005a57] text-white p-6 sm:p-7 rounded-2xl shadow-lg shadow-teal-900/10 mb-6">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="text-center sm:text-left">
+                    <div class="flex items-center justify-center sm:justify-start gap-3">
+                        <span class="text-2xl font-black tracking-widest text-teal-100">VALE</span>
+                        <div class="h-5 w-px bg-teal-300/40"></div>
+                        <span class="text-lg font-extrabold tracking-wide">Portal Operacional</span>
+                        <span class="bg-amber-500 text-white font-black text-[10px] px-2 py-0.5 rounded shadow-sm">v05</span>
+                    </div>
+                    <p class="text-xs text-teal-100/90 mt-1 font-medium">Suíte integrada de gestão diária, segurança, equipamentos, equipes e FMDS</p>
+                </div>
+
+                <div class="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-3.5 py-1.5 rounded-xl text-xs font-semibold border border-white/10">
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="relogioTopo">--:--:--</span>
+                    <span class="text-teal-200">|</span>
+                    <span id="dataTopo">--/--/----</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- GRADE COM OS MÓDULOS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-left">
+            
+            <!-- MÓDULO 1 -->
+            <a href="modulo1.html" class="card-modulo m1" title="Pressione [1] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">📋</div>
+                        <span class="tecla-atalho">Tecla 1</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">DDS & Emociograma</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Controle semanal com carinhas de emociograma, registro de rubricas e impressão A4 paisagem.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#007e7a]">
+                    <span>Abrir Módulo 1</span><span>➔</span>
+                </div>
+            </a>
+
+            <!-- MÓDULO 2 -->
+            <a href="modulo2.html" class="card-modulo m2" title="Pressione [2] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">📅</div>
+                        <span class="tecla-atalho">Tecla 2</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Matriz Anual de DDS</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Grelha anual completa (12 meses) com visibilidade dinâmica por semestre/trimestre e autoajuste.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#007e7a]">
+                    <span>Abrir Módulo 2</span><span>➔</span>
+                </div>
+            </a>
+
+            <!-- MÓDULO 3 -->
+            <a href="modulo3.html" class="card-modulo m3" title="Pressione [3] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">🏖️</div>
+                        <span class="tecla-atalho">Tecla 3</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Cronograma de Férias</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Planejamento anual de início e término das férias da equipe com controle de saldo de dias.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#db2777]">
+                    <span>Abrir Módulo 3</span><span>➔</span>
+                </div>
+            </a>
+
+            <!-- MÓDULO 4 -->
+            <a href="modulo4.html" class="card-modulo m4" title="Pressione [4] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">🎂</div>
+                        <span class="tecla-atalho">Tecla 4</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Aniversariantes do Ano</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Grade vertical dos 12 meses preenchendo a folha A4 com ordenação cronológica por dia.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#db2777]">
+                    <span>Abrir Módulo 4</span><span>➔</span>
+                </div>
+            </a>
+
+            <!-- MÓDULO 5 -->
+            <a href="modulo5.html" class="card-modulo m5" title="Pressione [5] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">📊</div>
+                        <span class="tecla-atalho">Tecla 5</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Absenteísmo & Justificativas</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Registro padronizado de ocorrências (AT, FA, CO, FO) com resumo e lançamento rápido.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#db2777]">
+                    <span>Abrir Módulo 5</span><span>➔</span>
+                </div>
+            </a>
+
+            <!-- MÓDULO 6 -->
+            <a href="modulo6.html" class="card-modulo m6" title="Pressione [6] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">🎓</div>
+                        <span class="tecla-atalho">Tecla 6</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Gestão de Treinamentos</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Capacitações com suporte à turma em lote, sincronização em nuvem e exportação em Excel.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#059669]">
+                    <span>Abrir Módulo 6</span><span>➔</span>
+                </div>
+            </a>
+
+            <!-- MÓDULO 7 -->
+            <a href="modulo7.html" class="card-modulo m7" title="Pressione [7] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">💳</div>
+                        <span class="tecla-atalho">Tecla 7</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Compras Cartão Corporativo</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Lançamento e controle de compras no cartão corporativo, extração via links e exportação para planilha.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#6366f1]">
+                    <span>Abrir Módulo 7</span><span>➔</span>
+                </div>
+            </a>
+
+            <!-- MÓDULO 8 -->
+            <a href="modulo8.html" class="card-modulo m8" title="Pressione [8] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">📄</div>
+                        <span class="tecla-atalho">Tecla 8</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Procura e Gestão de FDS / FISPQ</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Consulta rápida de Fichas de Dados de Segurança com miniaturas visuais, fotos e links diretos.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#0891b2]">
+                    <span>Abrir Módulo 8</span><span>➔</span>
+                </div>
+            </a>
+
+            <!-- MÓDULO 9 -->
+            <a href="modulo9.html" class="card-modulo m9" title="Pressione [9] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">💻</div>
+                        <span class="tecla-atalho">Tecla 9</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Controle de Notebooks</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Gestão de entrega e recebimento, patrimônio, termos de responsabilidade e status operacional.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#d97706]">
+                    <span>Abrir Módulo 9</span><span>➔</span>
+                </div>
+            </a>
+
+            <!-- MÓDULO 10 -->
+            <a href="modulo10.html" class="card-modulo m10" title="Pressione [0] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">👥</div>
+                        <span class="tecla-atalho">Tecla 0</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Troca dos Participantes FMDS</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Matriz de controle e rotação de participantes por temas (DSS, SSMA, Produtividade, Qualidade).
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#475569]">
+                    <span>Abrir Módulo 10</span><span>➔</span>
+                </div>
+            </a>
+
+        </div>
+
+        <!-- RODAPÉ -->
+        <footer class="mt-8 text-center text-xs text-slate-400 font-medium space-y-1">
+            <p>Sistema Operacional Integrado • Portal Vale Corporativo</p>
+            <p class="text-[10px] text-slate-400/80">Dica: Utilize os números de 1 a 9 e 0 no teclado para navegação rápida entre os módulos.</p>
+        </footer>
+    </div>
+
+    <!-- SCRIPT DE ATALHOS E SEGURANÇA -->
+    <script>
+        const PIN_CORRETO = "1234";
+
+        function atualizarRelogio() {
+            const agora = new Date();
+            const relogioEl = document.getElementById('relogioTopo');
+            const dataEl = document.getElementById('dataTopo');
+            if (relogioEl) relogioEl.innerText = agora.toLocaleTimeString('pt-BR');
+            if (dataEl) dataEl.innerText = agora.toLocaleDateString('pt-BR');
+        }
+        setInterval(atualizarRelogio, 1000);
+        atualizarRelogio();
+
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+            const rotas = {
+                '1': 'modulo1.html',
+                '2': 'modulo2.html',
+                '3': 'modulo3.html',
+                '4': 'modulo4.html',
+                '5': 'modulo5.html',
+                '6': 'modulo6.html',
+                '7': 'modulo7.html',
+                '8': 'modulo8.html',
+                '9': 'modulo9.html',
+                '0': 'modulo10.html'
             };
-            localStorage.setItem('valeaniversarios_v07', JSON.stringify(backup)); 
-            mostrarToast('Aniversários salvos com sucesso!'); 
+
+            if (rotas[e.key]) {
+                window.location.href = rotas[e.key];
+            }
+        });
+
+        function ehDispositivoMovel() {
+            return window.innerWidth < 768;
         }
 
-        function carregarTudoAniver() { 
-            const s = localStorage.getItem('valeaniversarios_v07'); 
-            if(s) { 
-                const res = JSON.parse(s);
-                if(res.ano) document.getElementById('anoInputAniver').value = res.ano;
-                if(res.area) document.getElementById('areaInputAniver').value = res.area;
-                renderizarComDados(res.dados || {});
-                mostrarToast('Dados carregados com sucesso!'); 
-            } else {
-                mostrarToast('Nenhum dado salvo encontrado.');
+        function liberarAcesso() {
+            const tela = document.getElementById('tela-bloqueio-mobile');
+            if (tela) {
+                tela.classList.add('transition-opacity', 'duration-300', 'opacity-0');
+                setTimeout(() => {
+                    tela.style.display = 'none';
+                    tela.classList.remove('opacity-0');
+                }, 300);
             }
         }
 
-        function exportarBackupJSON() {
-            const backup = {
-                ano: document.getElementById('anoInputAniver').value,
-                area: document.getElementById('areaInputAniver').value,
-                dados: capturarDadosAtuais()
-            };
-            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `backup_aniversarios_${document.getElementById('anoInputAniver').value || '2026'}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            mostrarToast('Backup exportado com sucesso!');
+        function bloquearAcesso() {
+            if (!ehDispositivoMovel()) return;
+            sessionStorage.removeItem('vale_sessao_biometria');
+            const tela = document.getElementById('tela-bloqueio-mobile');
+            if (tela) {
+                document.getElementById('erro-auth').classList.add('hidden');
+                document.getElementById('pinInput').value = '';
+                tela.style.display = 'flex';
+            }
         }
 
-        function processarArquivoBackup(input) {
-            const file = input.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const dados = JSON.parse(e.target.result);
-                    if(dados.ano) document.getElementById('anoInputAniver').value = dados.ano;
-                    if(dados.area) document.getElementById('areaInputAniver').value = dados.area;
-                    renderizarComDados(dados.dados || {});
-                    mostrarToast('Backup restaurado com sucesso!');
-                } catch(err) {
-                    mostrarToast('Erro ao ler arquivo de backup.');
+        function verificarPIN() {
+            const input = document.getElementById('pinInput');
+            const erroEl = document.getElementById('erro-auth');
+
+            if (input.value === PIN_CORRETO) {
+                sessionStorage.setItem('vale_sessao_biometria', 'true');
+                liberarAcesso();
+            } else {
+                erroEl.innerText = "PIN incorreto. Tente novamente.";
+                erroEl.classList.remove('hidden');
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        document.getElementById('pinInput')?.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') verificarPIN();
+        });
+
+        async function desbloquearPorBiometria() {
+            const erroEl = document.getElementById('erro-auth');
+            erroEl.classList.add('hidden');
+
+            if (!window.isSecureContext || !window.PublicKeyCredential) {
+                erroEl.innerText = "Biometria indisponível. Utilize o PIN de segurança.";
+                erroEl.classList.remove('hidden');
+                document.getElementById('pinInput').focus();
+                return;
+            }
+
+            try {
+                const disponivel = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+                if (!disponivel) {
+                    erroEl.innerText = "Nenhuma biometria ativa no aparelho. Utilize o PIN.";
+                    erroEl.classList.remove('hidden');
+                    document.getElementById('pinInput').focus();
+                    return;
                 }
-            };
-            reader.readAsText(file);
-            input.value = '';
+
+                const challenge = new Uint8Array(32);
+                window.crypto.getRandomValues(challenge);
+
+                const options = {
+                    publicKey: {
+                        challenge: challenge,
+                        rp: { name: "Portal Vale" },
+                        user: {
+                            id: new Uint8Array([1, 2, 3, 4]),
+                            name: "operacional@vale",
+                            displayName: "Operador Vale"
+                        },
+                        pubKeyCredParams: [{ type: "public-key", alg: -7 }],
+                        authenticatorSelection: {
+                            authenticatorAttachment: "platform",
+                            userVerification: "required"
+                        },
+                        timeout: 30000
+                    }
+                };
+
+                const cred = await navigator.credentials.create(options);
+                if (cred) {
+                    sessionStorage.setItem('vale_sessao_biometria', 'true');
+                    liberarAcesso();
+                }
+            } catch (err) {
+                if (err.name !== "NotAllowedError") {
+                    erroEl.innerText = "Validação não concluída. Digite o PIN de 4 dígitos.";
+                    erroEl.classList.remove('hidden');
+                    document.getElementById('pinInput').focus();
+                }
+            }
         }
 
-        function limparTudoAniver() { 
-            let vazio = {};
-            MESES_ANO.forEach(m => vazio[m] = []);
-            renderizarComDados(vazio);
-            mostrarToast('Todos os meses foram limpos.');
-        }
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                bloquearAcesso();
+            } else if (ehDispositivoMovel() && sessionStorage.getItem('vale_sessao_biometria') !== 'true') {
+                setTimeout(desbloquearPorBiometria, 350);
+            }
+        });
 
-        window.onload = function() { 
-            let base = ordenarObjeto(DADOS_INICIAIS);
-            renderizarComDados(base); 
-        };
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!ehDispositivoMovel()) {
+                sessionStorage.setItem('vale_sessao_biometria', 'true');
+                const tela = document.getElementById('tela-bloqueio-mobile');
+                if (tela) tela.style.display = 'none';
+                return;
+            }
+
+            if (sessionStorage.getItem('vale_sessao_biometria') === 'true') {
+                liberarAcesso();
+            } else {
+                bloquearAcesso();
+                setTimeout(desbloquearPorBiometria, 400);
+            }
+        });
     </script>
 </body>
 </html>
