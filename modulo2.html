@@ -209,7 +209,6 @@ body {
 
 .btn-verde { background-color: var(--primary); } 
 .btn-azul { background-color: #0284c7; } 
-.btn-renumerar { background-color: #ea580c; }
 .btn-salvar { background-color: #2563eb; } 
 .btn-carregar { background-color: #0891b2; } 
 .btn-exportar { background-color: #4f46e5; }
@@ -296,9 +295,8 @@ table.tabela-matriz th, table.tabela-matriz td {
     vertical-align: middle; 
     font-size: 9px; 
 }
-.th-matriz-id { width: 38px; background-color: var(--slate-100); font-weight: 800; }
 .th-matriz-colab { 
-    width: 240px; 
+    width: 260px; 
     background-color: var(--primary); 
     color: #fff; 
     font-size: 10px; 
@@ -317,11 +315,6 @@ table.tabela-matriz th, table.tabela-matriz td {
 
 table.tabela-matriz tbody tr { height: 25px; }
 table.tabela-matriz tbody tr:nth-child(even) { background-color: #fafbfc; }
-
-/* NÚMEROS E DADOS */
-.td-matriz-id { background-color: var(--slate-50); font-weight: 800; padding: 0 1px; }
-.col-id-texto { outline: none; font-size: 9px; font-weight: 800; color: var(--slate-900); background: #e2e8f0; padding: 1px 4px; border-radius: 3px; display: inline-block; width: 100%; text-align: center; }
-.col-id-texto:focus { background: #fef3c7; }
 
 .celula-data { 
     outline: none; 
@@ -384,8 +377,6 @@ tr:hover .botoes-acoes { opacity: 1; }
         background-color: var(--primary) !important; 
         color: #fff !important; 
     }
-    .td-matriz-id { background-color: #fff !important; }
-    .col-id-texto { background-color: transparent !important; border: none !important; }
 }
 </style>
 </head>
@@ -456,13 +447,12 @@ tr:hover .botoes-acoes { opacity: 1; }
         <div class="botoes-painel">
             <button type="button" class="btn btn-verde" onclick="gerarTabelaMatriz()">Atualizar Grelha (A-Z)</button>
             <button type="button" class="btn btn-azul" onclick="adicionarFolhaMatriz()">📄➕ Folha Extra</button>
-            <button type="button" class="btn btn-renumerar" onclick="reordenarNumMatriz()">🔢 Renumerar</button>
             <button type="button" class="btn btn-salvar" onclick="salvarTudoMatriz()">💾 Salvar</button>
             <button type="button" class="btn btn-carregar" onclick="carregarTudoMatriz()">📂 Carregar</button>
             <button type="button" class="btn btn-exportar" onclick="exportarBackupJSON()">⬇️ Backup</button>
             <button type="button" class="btn btn-exportar" onclick="document.getElementById('arquivoBackupMatriz').click()">⬆️ Restaurar</button>
             <button type="button" class="btn btn-limpar" onclick="limparTudoMatriz()">Limpar</button>
-            <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
+            <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️️ Imprimir</button>
         </div>
     </div>
 
@@ -511,7 +501,7 @@ tr:hover .botoes-acoes { opacity: 1; }
             document.querySelectorAll('table.tabela-matriz').forEach(tabela => {
                 const mesesVisiveis = Array.from(tabela.querySelectorAll('th.th-mes-anual')).filter(th => !th.classList.contains('mes-oculto'));
                 if (mesesVisiveis.length > 0) {
-                    const larguraDisponivel = 1060 - 38 - 240; 
+                    const larguraDisponivel = 1060 - 260; 
                     const larguraCada = Math.floor(larguraDisponivel / mesesVisiveis.length);
                     mesesVisiveis.forEach(th => {
                         th.style.width = larguraCada + 'px';
@@ -565,13 +555,12 @@ tr:hover .botoes-acoes { opacity: 1; }
             mostrarToast(`Exibindo Q${tri}`);
         }
 
-        function criarLinhaMatriz(numStr, nome='') {
+        function criarLinhaMatriz(nome='') {
             let tds = ''; 
             for(let i=0; i<12; i++) {
                 tds += `<td class="celula-data col-mes-${i} ${visMeses[i]?'':'mes-oculto'}" contenteditable="true" title="Preencher DDS"></td>`;
             }
-            return `<td class="td-matriz-id"><div class="col-id-container"><span class="col-id-texto" contenteditable="true" title="Editar número">${numStr}</span></div></td>` +
-                   `<td><div class="col-nome-container"><span class="col-nome-texto" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()" title="Nome do colaborador">${nome}</span>` +
+            return `<td><div class="col-nome-container"><span class="col-nome-texto" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()" title="Nome do colaborador">${nome}</span>` +
                    `<div class="botoes-acoes"><button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixoMatriz(this)" title="Adicionar linha abaixo">➕</button><button type="button" class="btn-acao btn-menos-linha" onclick="removerLinhaMatriz(this)" title="Remover linha">➖</button><button type="button" class="btn-acao btn-lixeira" onclick="apagarLinhaMatriz(this)" title="Apagar nome">🗑️</button></div></div></td>${tds}`;
         }
 
@@ -581,7 +570,7 @@ tr:hover .botoes-acoes { opacity: 1; }
 
         function adicionarLinhaAbaixoMatriz(btn) { 
             const tr = document.createElement('tr'); 
-            tr.innerHTML = criarLinhaMatriz('00',''); 
+            tr.innerHTML = criarLinhaMatriz(''); 
             btn.closest('tr').after(tr); 
             recalcularLargurasMeses();
         }
@@ -589,9 +578,7 @@ tr:hover .botoes-acoes { opacity: 1; }
         function adicionarLinhaFimMatriz(btn) { 
             const corpo = btn.closest('.folha-a4').querySelector('.corpo-tabela-matriz'); 
             const tr = document.createElement('tr'); 
-            const total = corpo.querySelectorAll('tr').length + 1;
-            const numStr = total < 10 ? '0' + total : total;
-            tr.innerHTML = criarLinhaMatriz(numStr,''); 
+            tr.innerHTML = criarLinhaMatriz(''); 
             corpo.appendChild(tr); 
             recalcularLargurasMeses();
         }
@@ -606,23 +593,11 @@ tr:hover .botoes-acoes { opacity: 1; }
             atualizarPaginacaoMatriz(); 
         }
 
-        function reordenarNumMatriz() {
-            document.querySelectorAll('#contentorFolhasMatriz .wrapper-tabela').forEach(folha => {
-                const linhas = folha.querySelectorAll('.corpo-tabela-matriz tr');
-                linhas.forEach((tr, i) => {
-                    const spanNum = tr.querySelector('.col-id-texto');
-                    if (spanNum) spanNum.innerText = (i + 1 < 10 ? '0' + (i + 1) : (i + 1));
-                });
-            });
-            mostrarToast('Numeração reorganizada sequencialmente');
-        }
-
         function criarEstruturaFolhaMatriz(nomesArr, tot) {
             let linhas = ''; 
             for(let i=0; i<tot; i++) { 
                 let n = nomesArr[i] ? nomesArr[i].trim().toUpperCase() : ''; 
-                let numStr = (i+1 < 10 ? '0'+(i+1) : (i+1)); 
-                linhas += `<tr>${criarLinhaMatriz(numStr, n)}</tr>`; 
+                linhas += `<tr>${criarLinhaMatriz(n)}</tr>`; 
             }
             const anoAtual = document.getElementById('anoInputMatriz').value || '2026';
             const areaAtual = document.getElementById('areaInputMatriz').value || '---';
@@ -659,7 +634,6 @@ tr:hover .botoes-acoes { opacity: 1; }
                 <table class="tabela-matriz">
                     <thead>
                         <tr>
-                            <th class="th-matriz-id">Nº</th>
                             <th class="th-matriz-colab">DDS (Colaboradores)</th>
                             <th class="th-mes-anual col-mes-0">JAN</th><th class="th-mes-anual col-mes-1">FEV</th>
                             <th class="th-mes-anual col-mes-2">MAR</th><th class="th-mes-anual col-mes-3">ABR</th>
