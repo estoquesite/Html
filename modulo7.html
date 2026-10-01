@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 7 - Compras Cartão Corporativo | Portal Vale</title>
+    <title>Módulo 7 - Compras Cartão Corporativo (v2) | Portal Vale</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -41,7 +41,6 @@
             border-width: 1.5px !important;
         }
 
-        /* Cores de Glow para os Cards de Pessoas */
         .glow-azul { border: 2px solid #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
         .glow-roxo { border: 2px solid #c084fc; box-shadow: 0 0 10px rgba(192, 132, 252, 0.5); }
         .glow-verde { border: 2px solid #4ade80; box-shadow: 0 0 10px rgba(74, 222, 128, 0.5); }
@@ -63,11 +62,12 @@
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300">Módulo 7</span>
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
+                        <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded">v2 Corrigido</span>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
                         <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale Operacional</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                        <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Banco de Dados Ativo</span>
+                        <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Banco Conectado</span>
                     </div>
                 </div>
             </div>
@@ -82,25 +82,25 @@
                 </button>
                 
                 <!-- RECUPERAR PLANILHA -->
-                <label class="bg-amber-600 hover:bg-amber-700 text-white px-3.5 py-2 rounded-xl text-xs font-black transition shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95" title="Importar o Excel ou CSV que você baixou">
+                <label class="bg-amber-600 hover:bg-amber-700 text-white px-3.5 py-2 rounded-xl text-xs font-black transition shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95">
                     <span>📂</span>
                     <span>Recuperar Planilha</span>
                     <input type="file" id="inputRecuperarCSV" accept=".csv,.txt" class="hidden" onchange="importarCSVRecuperacao(this.files)">
                 </label>
 
                 <!-- SALVAR DEFINITIVO NA NUVEM -->
-                <button onclick="salvarTudoNaNuvem()" class="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 rounded-xl text-xs font-black transition shadow-sm flex items-center gap-1.5 cursor-pointer" title="Grava toda a lista atual direto no banco de dados na nuvem">
+                <button type="button" onclick="salvarTudoNaNuvem()" class="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 rounded-xl text-xs font-black transition shadow-sm flex items-center gap-1.5 cursor-pointer">
                     <span>☁️</span>
                     <span>Salvar na Nuvem (Subir Tudo)</span>
                 </button>
 
                 <!-- SINCRONIZAR -->
-                <button onclick="carregarDoSupabase()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-sm" title="Baixa novidades da nuvem sem apagar o local">
+                <button type="button" onclick="carregarDoSupabase()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-sm">
                     🔄 Sincronizar
                 </button>
 
                 <!-- EXPORTAR CSV -->
-                <button onclick="exportarParaCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer">
+                <button type="button" onclick="exportarParaCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer">
                     📥 CSV
                 </button>
             </div>
@@ -136,20 +136,17 @@
             </div>
             
             <div class="flex flex-1 flex-col sm:flex-row items-center gap-2 w-full">
-                <!-- PESQUISA DE PRODUTO -->
                 <div class="relative w-full sm:w-1/3">
                     <input type="text" id="inputPesquisaProduto" oninput="renderizarTabela()" placeholder="Pesquisar produto..." class="uppercase-input w-full text-xs pl-8 pr-7 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-indigo-600 dark:text-white font-bold">
                     <span class="absolute left-2.5 top-2 text-slate-400 text-xs">📦</span>
                 </div>
 
-                <!-- FILTRO POR VALOR -->
                 <div class="relative w-full sm:w-1/3">
                     <input type="number" step="0.01" id="inputFiltroValor" oninput="renderizarTabela()" placeholder="Filtrar por valor exato (R$)..." class="w-full text-xs pl-8 pr-7 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-indigo-600 dark:text-white font-bold">
                     <span class="absolute left-2.5 top-2 text-slate-400 text-xs">💲</span>
                     <button type="button" onclick="document.getElementById('inputFiltroValor').value=''; renderizarTabela();" class="absolute right-2.5 top-2 text-slate-400 hover:text-rose-500 font-bold text-xs" title="Limpar Valor">✕</button>
                 </div>
 
-                <!-- FILTRO POR SOLICITANTE -->
                 <div class="w-full sm:w-1/3">
                     <select id="selectFiltroSolicitante" onchange="aplicarFiltroPorSelect(this.value)" class="w-full text-xs py-2 px-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-indigo-600 dark:text-white font-bold">
                         <option value="">TODOS OS SOLICITANTES</option>
@@ -171,11 +168,10 @@
                 <span class="text-[10px] font-bold text-slate-400">Preencha os campos abaixo</span>
             </div>
 
-            <!-- LINHA 1 -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
                 <div>
                     <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Data Compra</label>
-                    <input type="date" id="manualData" onchange="atualizarDataEntregaManualDefault()" class="neon-pulsante w-full text-xs p-2.5 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white">
+                    <input type="date" id="manualData" class="neon-pulsante w-full text-xs p-2.5 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white">
                 </div>
 
                 <div>
@@ -197,7 +193,6 @@
                 </div>
             </div>
 
-            <!-- LINHA 2 -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end pt-1">
                 <div class="md:col-span-3">
                     <div class="flex justify-between items-center mb-1">
@@ -207,7 +202,7 @@
                     <select id="manualCategoria" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-semibold outline-none"></select>
                 </div>
 
-                <div class="md:col-span-1">
+                <div class="md:col-span-2">
                     <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Qtd</label>
                     <input type="number" id="manualQtd" value="1" min="1" oninput="calcularManualPorTotal()" class="w-full text-xs p-2.5 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white outline-none">
                 </div>
@@ -222,16 +217,8 @@
                     <input type="number" step="0.01" id="manualUnit" placeholder="0,00" oninput="calcularManualPorUnitario()" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
 
-                <div class="md:col-span-2 bg-slate-100 dark:bg-slate-900/60 p-2.5 rounded-xl border border-indigo-200 dark:border-indigo-800">
-                    <label class="flex items-center gap-1.5 cursor-pointer mb-1">
-                        <input type="checkbox" id="manualEntregue" onchange="toggleManualDataEntrega(this.checked)" class="w-4 h-4 text-indigo-600 rounded cursor-pointer">
-                        <span class="text-[10px] font-bold uppercase text-indigo-700 dark:text-indigo-300">📦 Entregue?</span>
-                    </label>
-                    <input type="date" id="manualDataEntrega" class="neon-pulsante w-full text-[10px] p-1.5 rounded font-bold hidden bg-white dark:bg-slate-800 dark:text-white">
-                </div>
-
-                <div class="md:col-span-2">
-                    <button type="button" onclick="lancarCompraManual()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer">
+                <div class="md:col-span-3">
+                    <button type="button" onclick="lancarCompraManual()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2.5 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer">
                         <span>✅ Salvar Compra</span>
                     </button>
                 </div>
@@ -259,7 +246,6 @@
                             <th class="py-2.5 px-3 text-center">Qtd</th>
                             <th class="py-2.5 px-3 text-right">Unitário</th>
                             <th class="py-2.5 px-3 text-right">Total</th>
-                            <th class="py-2.5 px-3 text-center">Entrega 📦</th>
                             <th class="py-2.5 px-3 text-center">Ações</th>
                         </tr>
                     </thead>
@@ -329,7 +315,6 @@
             
             const hoje = new Date().toISOString().split('T')[0];
             document.getElementById('manualData').value = hoje;
-            atualizarDataEntregaManualDefault();
             atualizarTodosOsSelectsCategorias();
 
             const solManual = document.getElementById('manualSolicitante');
@@ -440,27 +425,6 @@
             }
         }
 
-        function atualizarDataEntregaManualDefault() {
-            const dataCompraEl = document.getElementById('manualData');
-            const dataEntregaEl = document.getElementById('manualDataEntrega');
-            if (!dataCompraEl || !dataEntregaEl) return;
-            let d = new Date(dataCompraEl.value + 'T00:00:00');
-            d.setDate(d.getDate() + 10);
-            dataEntregaEl.value = d.toISOString().split('T')[0];
-        }
-
-        function toggleManualDataEntrega(isChecked) {
-            const el = document.getElementById('manualDataEntrega');
-            if (!el) return;
-            if (isChecked) {
-                el.classList.remove('hidden');
-                atualizarDataEntregaManualDefault();
-            } else {
-                el.classList.add('hidden');
-                el.value = '';
-            }
-        }
-
         async function lancarCompraManual() {
             const inputSol = document.getElementById('manualSolicitante');
             const solicitante = inputSol.value.trim().toUpperCase();
@@ -486,8 +450,6 @@
             const qtd = parseFloat(document.getElementById('manualQtd').value) || 1;
             const total = parseFloat(document.getElementById('manualTotal').value) || 0;
             const unit = parseFloat(document.getElementById('manualUnit').value) || (total / qtd);
-            const entregue = document.getElementById('manualEntregue').checked;
-            const dataEntrega = entregue ? document.getElementById('manualDataEntrega').value : "";
 
             const novoItem = {
                 id: Date.now(),
@@ -499,9 +461,7 @@
                 qtd: qtd,
                 unit: unit,
                 total: total || (qtd * unit),
-                link: "",
-                entregue: entregue,
-                data_entrega: dataEntrega
+                link: ""
             };
 
             compras.unshift(novoItem);
@@ -517,8 +477,6 @@
             document.getElementById('manualTotal').value = '';
             document.getElementById('manualUnit').value = '';
             document.getElementById('manualQtd').value = '1';
-            document.getElementById('manualEntregue').checked = false;
-            document.getElementById('manualDataEntrega').classList.add('hidden');
         }
 
         // ================= IMPORTAÇÃO DA PLANILHA BAIXADA =================
@@ -565,10 +523,6 @@
                         let totalStr = (matches[7] || "0").replace(/\./g, '').replace(',', '.');
                         const unit = parseFloat(unitStr) || 0;
                         const total = parseFloat(totalStr) || (qtd * unit);
-
-                        const entregueStr = (matches[8] || "").trim().toUpperCase();
-                        const entregue = entregueStr === "SIM" || entregueStr === "TRUE";
-                        const dataEntrega = matches[9] ? converterDataParaISO(matches[9]) : "";
                         const link = matches[10] || "";
 
                         if (produto) {
@@ -582,9 +536,7 @@
                                 qtd: qtd,
                                 unit: unit,
                                 total: total,
-                                link: link,
-                                entregue: entregue,
-                                data_entrega: dataEntrega
+                                link: link
                             });
                         }
                     }
@@ -615,7 +567,7 @@
             return dataBR;
         }
 
-        // ================= BOTÃO: SALVAR TUDO NA NUVEM (SEM COLUNAS INCOMPATÍVEIS) =================
+        // ================= SALVAR TUDO NA NUVEM (SEM COLUNAS PROBLEMÁTICAS) =================
         async function salvarTudoNaNuvem() {
             if (!supabaseClient) {
                 alert("Conexão com a nuvem não inicializada.");
@@ -630,7 +582,7 @@
             mostrarAviso("Enviando todos os registros para a nuvem...", "sucesso");
 
             try {
-                // Envia APENAS as colunas existentes na tabela compras_corporativas
+                // Envia APENAS as colunas que comprovadamente existem
                 const dadosParaEnviar = compras.map(item => ({
                     data: item.data,
                     solicitante: item.solicitante,
@@ -656,7 +608,7 @@
             }
         }
 
-        // ================= SINCRONIZAR BLINDADO =================
+        // ================= SINCRONIZAR =================
         async function carregarDoSupabase() {
             if (!supabaseClient) return;
 
@@ -669,11 +621,7 @@
                 if (error) throw error;
 
                 if (data && data.length > 0) {
-                    compras = data.map(item => ({
-                        ...item,
-                        entregue: item.entregue || false,
-                        data_entrega: item.data_entrega || ''
-                    }));
+                    compras = data;
                     salvarNoLocalStorage();
                     atualizarListaSelectSolicitantes();
                     renderizarTabela();
@@ -818,36 +766,26 @@
                 listaExibicao = listaExibicao.filter(i => Number(i.total) === filtroValor || Number(i.unit) === filtroValor);
             }
 
-            listaExibicao.sort((a, b) => {
-                if (a.entregue !== b.entregue) return a.entregue ? 1 : -1;
-                return new Date(b.data) - new Date(a.data);
-            });
+            listaExibicao.sort((a, b) => new Date(b.data) - new Date(a.data));
 
             if (listaExibicao.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="10" class="text-center py-6 text-slate-400 italic">NENHUMA COMPRA REGISTRADA. CLIQUE EM "📂 RECUPERAR PLANILHA" PARA CARREGAR O ARQUIVO SALVO!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-400 italic">NENHUMA COMPRA REGISTRADA. CLIQUE EM "📂 RECUPERAR PLANILHA" PARA CARREGAR O ARQUIVO SALVO!</td></tr>`;
             } else {
                 listaExibicao.forEach((item) => {
                     totalGastoGeral += Number(item.total || 0);
                     solicitantesContador[item.solicitante] = (solicitantesContador[item.solicitante] || 0) + 1;
 
-                    const entregueChecked = item.entregue ? 'checked' : '';
-                    const estiloRiscado = item.entregue ? 'line-through text-slate-400 dark:text-slate-500 font-normal' : 'text-slate-900 dark:text-white font-medium';
-                    const linhaOpacidade = item.entregue ? 'bg-slate-100/70 dark:bg-slate-800/40 opacity-75' : 'hover:bg-slate-50 dark:hover:bg-slate-700/40';
-
                     const tr = document.createElement('tr');
-                    tr.className = `${linhaOpacidade} transition uppercase`;
+                    tr.className = `hover:bg-slate-50 dark:hover:bg-slate-700/40 transition uppercase`;
                     tr.innerHTML = `
                         <td class="py-2.5 px-3 font-semibold whitespace-nowrap">${formatarDataBR(item.data)}</td>
                         <td class="py-2.5 px-3 font-bold whitespace-nowrap">${item.solicitante}</td>
-                        <td class="py-2.5 px-3 max-w-xs truncate ${estiloRiscado}">${item.produto}</td>
+                        <td class="py-2.5 px-3 max-w-xs truncate">${item.produto}</td>
                         <td class="py-2.5 px-3 font-semibold text-indigo-700 whitespace-nowrap">${item.local}</td>
                         <td class="py-2.5 px-3 whitespace-nowrap"><span class="text-[10px] bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded-full font-bold">${item.categoria}</span></td>
                         <td class="py-2.5 px-3 text-center font-bold">${item.qtd}</td>
                         <td class="py-2.5 px-3 text-right text-slate-500 whitespace-nowrap">R$ ${Number(item.unit || 0).toFixed(2)}</td>
                         <td class="py-2.5 px-3 text-right font-black text-emerald-600 whitespace-nowrap">R$ ${Number(item.total || 0).toFixed(2)}</td>
-                        <td class="py-2.5 px-3 text-center whitespace-nowrap">
-                            <input type="checkbox" id="chk-entregue-${item.id}" ${entregueChecked} onchange="salvarAlteracaoEntrega(${item.id})" class="w-4 h-4 text-emerald-600 rounded cursor-pointer">
-                        </td>
                         <td class="py-2.5 px-3 text-center whitespace-nowrap">
                             <button onclick="removerItem(${item.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1 cursor-pointer">✕</button>
                         </td>
@@ -878,15 +816,6 @@
             return `${partes[2]}/${partes[1]}/${partes[0]}`;
         }
 
-        async function salvarAlteracaoEntrega(id) {
-            const item = compras.find(c => String(c.id) === String(id));
-            if (!item) return;
-            const chk = document.getElementById(`chk-entregue-${id}`);
-            item.entregue = chk ? chk.checked : false;
-            salvarNoLocalStorage();
-            renderizarTabela();
-        }
-
         async function removerItem(id) {
             if (confirm("Deseja realmente apagar este registro de compra?")) {
                 compras = compras.filter(i => String(i.id) !== String(id));
@@ -903,7 +832,7 @@
                 return;
             }
 
-            let csv = "\uFEFFDATA;SOLICITANTE;PRODUTO/SERVIÇO;LOCAL/FORNECEDOR;CATEGORIA;QUANTIDADE;VALOR UNITÁRIO (R$);TOTAL (R$);ENTREGUE;DATA ENTREGA;LINK DO PRODUTO\n";
+            let csv = "\uFEFFDATA;SOLICITANTE;PRODUTO/SERVIÇO;LOCAL/FORNECEDOR;CATEGORIA;QUANTIDADE;VALOR UNITÁRIO (R$);TOTAL (R$);LINK DO PRODUTO\n";
 
             compras.forEach(item => {
                 const linha = [
@@ -915,8 +844,6 @@
                     item.qtd,
                     Number(item.unit || 0).toFixed(2).replace('.', ','),
                     Number(item.total || 0).toFixed(2).replace('.', ','),
-                    item.entregue ? "SIM" : "NÃO",
-                    formatarDataBR(item.data_entrega || ''),
                     `"${(item.link || '').replace(/"/g, '""')}"`
                 ];
                 csv += linha.join(";") + "\n";
