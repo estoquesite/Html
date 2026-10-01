@@ -29,7 +29,7 @@ body {
     background: #fff5f8; 
     color: var(--slate-900); 
     min-height: 100vh; 
-    padding: 10px; 
+    padding: 12px; 
 }
 
 /* NOTIFICAÇÃO TOAST */
@@ -55,27 +55,27 @@ body {
 /* PAINEL DE CONTROLE */
 .painel-controle { 
     background: #ffffff; 
-    padding: 14px 18px; 
-    margin: 0 auto 12px auto; 
+    padding: 16px 20px; 
+    margin: 0 auto 16px auto; 
     border-radius: 12px; 
     box-shadow: 0 10px 25px -5px rgba(219, 39, 119, 0.08); 
     border: 1px solid #fbcfe8; 
-    max-width: 980px; 
+    max-width: 1120px; 
 }
 .topo-modulo-info { 
     display: flex; 
     align-items: center; 
     justify-content: space-between; 
-    margin-bottom: 10px; 
+    margin-bottom: 12px; 
     border-bottom: 2px solid var(--primary); 
-    padding-bottom: 6px; 
+    padding-bottom: 8px; 
 }
 .badge-modulo { 
     background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
     color: #fff; 
-    font-size: 11.5px; 
+    font-size: 12px; 
     font-weight: 800; 
-    padding: 4px 10px; 
+    padding: 5px 12px; 
     border-radius: 6px; 
     text-transform: uppercase; 
     letter-spacing: 0.8px; 
@@ -84,32 +84,32 @@ body {
     background-color: var(--accent); 
     color: #fff; 
     font-weight: 800; 
-    font-size: 9.5px; 
-    padding: 2px 6px; 
+    font-size: 10px; 
+    padding: 2px 7px; 
     border-radius: 4px; 
     margin-left: 6px; 
 }
 
 .campos-painel { 
     display: grid; 
-    gap: 10px; 
-    margin-bottom: 8px; 
-    grid-template-columns: 130px 1.5fr; 
+    gap: 12px; 
+    margin-bottom: 10px; 
+    grid-template-columns: 140px 1.5fr; 
 }
 .campo-grupo label { 
     display: flex;
     justify-content: space-between;
     font-weight: 700; 
-    margin-bottom: 3px; 
-    font-size: 10.5px; 
+    margin-bottom: 4px; 
+    font-size: 11px; 
     color: #9d174d; 
     text-transform: uppercase; 
 }
 .painel-controle input[type="text"] { 
     width: 100%; 
     font-family: inherit; 
-    font-size: 11.5px; 
-    padding: 6px 8px; 
+    font-size: 12px; 
+    padding: 8px 10px; 
     border: 1px solid var(--primary-border); 
     border-radius: 6px; 
     background: var(--primary-bg); 
@@ -121,10 +121,10 @@ body {
 }
 .painel-controle textarea { 
     width: 100%; 
-    height: 50px; 
+    height: 60px; 
     font-family: inherit; 
-    font-size: 11.5px; 
-    padding: 6px 8px; 
+    font-size: 12px; 
+    padding: 8px 10px; 
     border: 1px solid var(--primary-border); 
     border-radius: 6px; 
     resize: vertical; 
@@ -136,31 +136,31 @@ body {
 .barra-metricas {
     display: flex;
     gap: 10px;
-    margin-bottom: 8px;
+    margin-bottom: 10px;
     flex-wrap: wrap;
 }
 .card-metrica {
     background: var(--primary-bg);
     border: 1px solid #fbcfe8;
-    padding: 4px 10px;
+    padding: 5px 12px;
     border-radius: 6px;
-    font-size: 11px;
+    font-size: 12px;
     font-weight: 700;
     color: #9d174d;
 }
 
-.botoes-painel { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
+.botoes-painel { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
 .btn { 
     cursor: pointer; 
-    padding: 7px 12px; 
-    font-size: 11px; 
+    padding: 8px 14px; 
+    font-size: 11.5px; 
     font-weight: 700; 
     border: none; 
     border-radius: 6px; 
     color: #fff; 
     display: inline-flex; 
     align-items: center; 
-    gap: 4px; 
+    gap: 5px; 
     transition: filter 0.15s ease, transform 0.05s ease;
 }
 .btn:hover { filter: brightness(1.08); }
@@ -175,15 +175,15 @@ body {
 .btn-voltar { background-color: var(--slate-600); text-decoration: none; } 
 .btn-imprimir { background-color: var(--slate-900); margin-left: auto; }
 
-/* FOLHA A4 RETRATO EM 2 COLUNAS DE MESES (LAYOUT COMPACTO E EQUILIBRADO) */
+/* FOLHA A4 PAISAGEM (DEITADA) */
 .folha-a4 { 
     width: 100%; 
-    max-width: 980px; 
+    max-width: 1120px; 
     background: #fff; 
-    padding: 10px 14px; 
-    margin: 0 auto 10px auto; 
+    padding: 16px 20px; 
+    margin: 0 auto 20px auto; 
     box-shadow: 0 10px 30px rgba(219, 39, 119, 0.08); 
-    border-radius: 10px; 
+    border-radius: 12px; 
     border: 1.5px solid var(--primary-border); 
     position: relative; 
 }
@@ -192,66 +192,66 @@ body {
 .cabecalho-container, .info-aniver-bar { 
     width: 100%; 
     border-collapse: collapse; 
-    border: 1.2px solid var(--slate-900); 
-    margin-bottom: 4px; 
+    border: 1.5px solid var(--slate-900); 
+    margin-bottom: 6px; 
     table-layout: fixed; 
 }
 .cabecalho-container td, .info-aniver-bar td { 
     border: 1px solid var(--slate-700); 
-    padding: 2.5px 6px; 
+    padding: 4px 10px; 
     vertical-align: middle; 
     text-align: center; 
 }
 .logo-box { 
-    width: 80px; 
+    width: 100px; 
     font-weight: 900; 
-    font-size: 14px; 
+    font-size: 16px; 
     color: #007e7a; 
     letter-spacing: 1.5px;
     background-color: var(--slate-50); 
 }
 .titulo-box { 
-    font-size: 10.5px; 
+    font-size: 12px; 
     font-weight: 800; 
     text-transform: uppercase; 
     color: var(--slate-900); 
-    padding: 0 6px; 
+    padding: 0 10px; 
 }
 .meta-box { 
-    width: 120px; 
-    font-size: 8.5px; 
+    width: 140px; 
+    font-size: 9.5px; 
     text-align: left !important; 
-    padding-left: 6px !important; 
+    padding-left: 8px !important; 
     background-color: var(--slate-50); 
-    line-height: 1.25; 
+    line-height: 1.35; 
 }
 
 .info-aniver-bar { 
-    font-size: 8.5px; 
+    font-size: 9.5px; 
     font-weight: 700; 
     background-color: var(--slate-50); 
 }
-.info-aniver-bar td { text-align: left; padding: 2px 6px; }
+.info-aniver-bar td { text-align: left; padding: 3px 10px; }
 .campo-editavel { outline: none; display: inline-block; min-width: 25px; font-weight: 600; color: var(--slate-900); }
 
-/* CONTENTOR DOS BLOCOS EM 2 COLUNAS LADO A LADO */
+/* CONTENTOR DE BLOCOS EM 2 COLUNAS DE MESES LADO A LADO NA HORIZONTAL */
 .contentor-blocos {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 6px;
-    margin-top: 4px;
+    gap: 8px 12px;
+    margin-top: 6px;
     width: 100%;
 }
 
 .bloco-mes { 
     width: 100%; 
-    border: 1.2px solid var(--primary-border); 
-    border-radius: 4px; 
+    border: 1.5px solid var(--primary-border); 
+    border-radius: 6px; 
     overflow: hidden; 
     background: #fff;
 }
 .bloco-mes.mes-atual-destaque {
-    border: 1.5px solid var(--accent);
+    border: 2px solid var(--accent);
 }
 
 table.tabela-mes { 
@@ -261,15 +261,15 @@ table.tabela-mes {
 }
 
 .td-mes-nome {
-    width: 85px;
+    width: 110px;
     text-align: center;
     font-weight: 900;
-    font-size: 9px;
+    font-size: 10.5px;
     background: linear-gradient(135deg, var(--primary), var(--primary-dark));
     color: #fff;
     border: 1px solid var(--primary-border);
-    padding: 2px 4px;
-    letter-spacing: 0.4px;
+    padding: 4px 6px;
+    letter-spacing: 0.6px;
     text-transform: uppercase;
 }
 .mes-atual-destaque .td-mes-nome {
@@ -279,18 +279,18 @@ table.tabela-mes {
 table.tabela-mes td { 
     border: 1px solid var(--primary-border); 
     vertical-align: middle; 
-    font-size: 9px; 
-    height: 18px; 
-    padding: 1px 4px; 
+    font-size: 11px; 
+    height: 24px; 
+    padding: 2px 6px; 
 }
 
-/* CÉLULAS EDITÁVEIS MAIS PROXIMAS E HARMONIOSAS */
+/* CÉLULAS EDITÁVEIS */
 .col-nome-aniver { 
     text-align: left !important; 
     font-weight: 700; 
-    font-size: 9px !important;
+    font-size: 10.5px !important;
     text-transform: uppercase; 
-    padding-left: 6px !important; 
+    padding-left: 8px !important; 
     outline: none; 
     cursor: text;
     background: #fff;
@@ -300,44 +300,44 @@ table.tabela-mes td {
     background-color: #fce7f3 !important;
 }
 .col-data-aniver { 
-    width: 55px; 
+    width: 75px; 
     text-align: center;
     font-weight: 800; 
-    font-size: 9px !important;
+    font-size: 10.5px !important;
     background: #fff; 
     outline: none; 
     cursor: text;
     color: #9d174d;
 }
 .col-acoes-aniver { 
-    width: 30px; 
+    width: 50px; 
     text-align: center;
     background: #fff;
 }
 
-.botoes-acoes { display: flex; align-items: center; justify-content: center; gap: 1px; opacity: 0.35; transition: opacity 0.2s; }
+.botoes-acoes { display: flex; align-items: center; justify-content: center; gap: 2px; opacity: 0.35; transition: opacity 0.2s; }
 tr:hover .botoes-acoes { opacity: 1; }
 .btn-acao { 
     background: var(--slate-100); 
     border: 1px solid var(--slate-300); 
-    border-radius: 2px; 
+    border-radius: 3px; 
     cursor: pointer; 
-    padding: 1px 2px; 
-    font-size: 6.5px; 
+    padding: 1px 3px; 
+    font-size: 8px; 
 }
 .btn-mais-linha { color: var(--success); font-weight: 900; }
 .btn-lixeira { color: var(--danger); font-weight: 900; }
-.btn-wpp { display: none; } /* Oculto na visualização compacta de 2 colunas para poupar espaço */
+.btn-wpp { color: #059669; font-weight: 900; }
 
 .tr-linha-em-branco {
     background: #ffffff;
 }
 
-/* IMPRESSÃO A4 VERTICAL RÍGIDA EM 1 PÁGINA */
+/* IMPRESSÃO A4 PAISAGEM (HORIZONTAL) RÍGIDA EM 1 PÁGINA */
 @media print {
     @page { 
-        size: A4 portrait; 
-        margin: 3mm 4mm !important; 
+        size: A4 landscape; 
+        margin: 4mm 5mm !important; 
     }
     html, body { 
         background: #fff !important; 
@@ -362,8 +362,8 @@ tr:hover .botoes-acoes { opacity: 1; }
     }
     .contentor-blocos {
         grid-template-columns: 1fr 1fr !important;
-        gap: 3px !important;
-        margin-top: 2px !important;
+        gap: 6px 12px !important;
+        margin-top: 3px !important;
     }
     .bloco-mes { 
         page-break-inside: avoid !important; 
@@ -374,32 +374,32 @@ tr:hover .botoes-acoes { opacity: 1; }
     .td-mes-nome { 
         background-color: var(--primary) !important; 
         color: #fff !important; 
-        font-size: 8px !important;
-        padding: 1px 3px !important;
+        font-size: 9px !important;
+        padding: 2px 4px !important;
     }
     table.tabela-mes td { 
         border: 1px solid #f9a8d4 !important; 
-        font-size: 8.5px !important;
-        height: 16px !important;
-        line-height: 16px !important;
-        padding: 0 3px !important;
+        font-size: 9.5px !important;
+        height: 20px !important;
+        line-height: 20px !important;
+        padding: 0 4px !important;
     }
     .col-data-aniver {
-        font-size: 8.5px !important;
+        font-size: 9.5px !important;
     }
     .cabecalho-container, .info-aniver-bar {
-        margin-bottom: 2px !important;
+        margin-bottom: 3px !important;
     }
     .cabecalho-container td, .info-aniver-bar td {
-        padding: 1.5px 4px !important;
-        font-size: 7.5px !important;
+        padding: 2px 6px !important;
+        font-size: 8.5px !important;
     }
     .logo-box {
-        font-size: 11px !important;
-        width: 55px !important;
+        font-size: 13px !important;
+        width: 70px !important;
     }
     .titulo-box {
-        font-size: 8.5px !important;
+        font-size: 10px !important;
     }
 }
 </style>
@@ -442,7 +442,7 @@ tr:hover .botoes-acoes { opacity: 1; }
             <button type="button" class="btn btn-exportar" onclick="exportarBackupJSON()">⬇️ Backup</button>
             <button type="button" class="btn btn-exportar" onclick="document.getElementById('arquivoBackupAniver').click()">⬆️ Restaurar</button>
             <button type="button" class="btn btn-limpar" onclick="limparTudoAniver()">Limpar</button>
-            <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir (A4)</button>
+            <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir (Horizontal)</button>
         </div>
     </div>
 
@@ -548,6 +548,7 @@ tr:hover .botoes-acoes { opacity: 1; }
                         <td class="col-data-aniver" contenteditable="true" placeholder="DD/MM" onblur="atualizarMetricas()">${data}</td>
                         <td class="col-acoes-aniver">
                             <div class="botoes-acoes">
+                                <button type="button" class="btn-acao btn-wpp" onclick="copiarMensagemParabens(this)" title="Copiar Parabéns">💬</button>
                                 <button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixo(this)" title="Nova Linha">➕</button>
                                 <button type="button" class="btn-acao btn-lixeira" onclick="limparOuRemoverLinha(this)" title="Remover">✕</button>
                             </div>
@@ -577,6 +578,20 @@ tr:hover .botoes-acoes { opacity: 1; }
             `;
         }
 
+        function copiarMensagemParabens(btn) {
+            const tr = btn.closest('tr');
+            const nome = tr.querySelector('.col-nome-aniver').innerText.trim();
+            if(!nome) {
+                mostrarToast('Sem nome nesta linha para parabenizar.');
+                return;
+            }
+            const [primeiroNome] = nome.split(' ');
+            const msg = `🎉 Parabéns, ${primeiroNome}! Que seu novo ciclo seja de muita saúde, paz e conquistas. Grande abraço de toda a equipe Vale! 🎂✨`;
+            navigator.clipboard.writeText(msg).then(() => {
+                mostrarToast(`Mensagem copiada para parabenizar ${primeiroNome}!`);
+            });
+        }
+
         function adicionarLinhaAbaixo(btn) {
             const tr = btn.closest('tr');
             const tbody = tr.closest('tbody');
@@ -593,6 +608,7 @@ tr:hover .botoes-acoes { opacity: 1; }
                 <td class="col-data-aniver" contenteditable="true" placeholder="DD/MM" onblur="atualizarMetricas()"></td>
                 <td class="col-acoes-aniver">
                     <div class="botoes-acoes">
+                        <button type="button" class="btn-acao btn-wpp" onclick="copiarMensagemParabens(this)" title="Copiar Parabéns">💬</button>
                         <button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixo(this)" title="Nova Linha">➕</button>
                         <button type="button" class="btn-acao btn-lixeira" onclick="limparOuRemoverLinha(this)" title="Remover">✕</button>
                     </div>
