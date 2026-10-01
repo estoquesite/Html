@@ -371,7 +371,7 @@ tr:hover .botoes-acoes { opacity: 1; }
             <button type="button" class="btn btn-verde" onclick="aplicarDadosDDS('verde')">Gerar c/ Carinha 1 (A-Z)</button>
             <button type="button" class="btn btn-azul" onclick="aplicarDadosDDS('limpo')">Gerar Limpo (A-Z)</button>
             <button type="button" class="btn btn-add-folha" onclick="adicionarFolhaManualDDS()">📄➕ Folha Extra</button>
-            <button type="button" class="btn btn-renumerar" onclick="reordenarNumDDS()">🔢 Renumerar</button>
+            <button type="button" class="btn btn-renumerar" onclick="reordenarNumDDS(true)">🔢 Renumerar</button>
             <button type="button" class="btn btn-salvar" onclick="salvarTudoDDS()">💾 Salvar</button>
             <button type="button" class="btn btn-carregar" onclick="carregarTudoDDS()">📂 Carregar</button>
             <button type="button" class="btn btn-exportar" onclick="exportarBackupJSON()">⬇️ Backup</button>
@@ -469,15 +469,20 @@ tr:hover .botoes-acoes { opacity: 1; }
             b.closest('tr').querySelector('.col-nome-texto').innerText = ''; 
         }
 
-        function reordenarNumDDS() {
+        /* REORDENAÇÃO CONTÍNUA ENTRE TODAS AS FOLHAS */
+        function reordenarNumDDS(notificar = false) {
+            let contadorGlobal = 1;
             document.querySelectorAll('#contentorFolhasDDS .folha-a4').forEach(folha => {
                 const linhas = folha.querySelectorAll('.corpo-tabela-folha tr');
-                linhas.forEach((tr, i) => {
+                linhas.forEach(tr => {
                     const spanNum = tr.querySelector('.col-id-texto');
-                    if (spanNum) spanNum.innerText = (i + 1 < 10 ? '0' + (i + 1) : (i + 1));
+                    if (spanNum) {
+                        spanNum.innerText = (contadorGlobal < 10 ? '0' + contadorGlobal : contadorGlobal);
+                        contadorGlobal++;
+                    }
                 });
             });
-            mostrarToast('Numeração reorganizada sequencialmente');
+            if (notificar) mostrarToast('Numeração sequencial atualizada (contínua entre folhas)');
         }
 
         function adicionarLinhaAbaixoDDS(b) { 
@@ -485,21 +490,23 @@ tr:hover .botoes-acoes { opacity: 1; }
             const nova = document.createElement('tr'); 
             nova.innerHTML = criarHTMLLinhaDDS('00','',null); 
             tr.after(nova); 
+            reordenarNumDDS();
         }
 
         function removerLinhaAtualDDS(b) { 
             const tr = b.closest('tr'); 
-            if(tr.parentNode.querySelectorAll('tr').length <= 1) return; 
+            const corpo = tr.parentNode;
+            if(corpo.querySelectorAll('tr').length <= 1) return; 
             tr.remove(); 
+            reordenarNumDDS();
         }
 
         function adicionarLinhaFimDDS(b) { 
             const corpo = b.closest('.folha-a4').querySelector('.corpo-tabela-folha'); 
             const nova = document.createElement('tr'); 
-            const total = corpo.querySelectorAll('tr').length + 1;
-            const numStr = total < 10 ? '0' + total : total;
-            nova.innerHTML = criarHTMLLinhaDDS(numStr, '', null); 
+            nova.innerHTML = criarHTMLLinhaDDS('00', '', null); 
             corpo.appendChild(nova); 
+            reordenarNumDDS();
         }
 
         function removerLinhaFimDDS(b) { 
@@ -507,18 +514,21 @@ tr:hover .botoes-acoes { opacity: 1; }
             const l = corpo.querySelectorAll('tr'); 
             if(l.length <= 1) return; 
             l[l.length-1].remove(); 
+            reordenarNumDDS();
         }
 
         function removerFolhaDDS(b) { 
             b.closest('.folha-a4').remove(); 
             atualizarPaginacaoDDS(); 
+            reordenarNumDDS();
         }
 
-        function criarEstruturaFolhaDDS(nomes, padrao, tot) {
+        function criarEstruturaFolhaDDS(nomes, padrao, tot, offsetInicial = 0) {
             let linhas = ''; 
-            for(let i=0; i<tot; i++) { 
+            for(let i = 0; i < tot; i++) { 
                 let n = nomes[i] ? nomes[i].trim().toUpperCase() : ''; 
-                let numStr = (i+1 < 10 ? '0'+(i+1) : (i+1)); 
+                let numSequencial = offsetInicial + i + 1;
+                let numStr = (numSequencial < 10 ? '0' + numSequencial : numSequencial); 
                 linhas += `<tr>${criarHTMLLinhaDDS(numStr, n, padrao ? 1 : null)}</tr>`; 
             }
             const f = document.createElement('div'); 
@@ -613,8 +623,10 @@ tr:hover .botoes-acoes { opacity: 1; }
         }
 
         function adicionarFolhaManualDDS() { 
-            document.getElementById('contentorFolhasDDS').appendChild(criarEstruturaFolhaDDS([], null, TOTAL_LINHAS_DDS)); 
+            const totalLinhasAtuais = document.querySelectorAll('#contentorFolhasDDS .corpo-tabela-folha tr').length;
+            document.getElementById('contentorFolhasDDS').appendChild(criarEstruturaFolhaDDS([], null, TOTAL_LINHAS_DDS, totalLinhasAtuais)); 
             atualizarPaginacaoDDS(); 
+            reordenarNumDDS();
         }
 
         function aplicarDadosDDS(modo) {
@@ -633,9 +645,13 @@ tr:hover .botoes-acoes { opacity: 1; }
                     blocos.push(nomes.slice(i, i+TOTAL_LINHAS_DDS));
                 }
             }
-            blocos.forEach(b => box.appendChild(criarEstruturaFolhaDDS(b, modo==='verde', TOTAL_LINHAS_DDS)));
+            blocos.forEach((b, idx) => {
+                const offset = idx * TOTAL_LINHAS_DDS;
+                box.appendChild(criarEstruturaFolhaDDS(b, modo==='verde', TOTAL_LINHAS_DDS, offset));
+            });
             atualizarPaginacaoDDS();
-            mostrarToast('Folhas geradas e ordenadas em A-Z');
+            reordenarNumDDS();
+            mostrarToast('Folhas geradas e ordenadas em A-Z com sequência contínua');
         }
 
         function obterEstadoCompleto() {
@@ -671,6 +687,7 @@ tr:hover .botoes-acoes { opacity: 1; }
             if(dados.html !== undefined) document.getElementById('contentorFolhasDDS').innerHTML = dados.html;
             atualizarContadorNomes();
             atualizarPaginacaoDDS();
+            reordenarNumDDS();
         }
 
         function exportarBackupJSON() {
