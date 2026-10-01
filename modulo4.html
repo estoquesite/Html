@@ -168,7 +168,6 @@ body {
 
 .btn-pink { background-color: var(--primary); } 
 .btn-ordenar { background-color: #ea580c; }
-.btn-ocultar-vazios { background-color: #0891b2; }
 .btn-salvar { background-color: #2563eb; } 
 .btn-carregar { background-color: #0284c7; } 
 .btn-exportar { background-color: #4f46e5; }
@@ -181,7 +180,7 @@ body {
     width: 100%; 
     max-width: 960px; 
     background: #fff; 
-    padding: 14px 18px; 
+    padding: 12px 16px; 
     margin: 0 auto 20px auto; 
     box-shadow: 0 10px 30px rgba(219, 39, 119, 0.08); 
     border-radius: 12px; 
@@ -189,36 +188,22 @@ body {
     position: relative; 
 }
 
-.barra-controle-folha { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    margin-bottom: 6px; 
-    background: var(--primary-bg); 
-    padding: 5px 10px; 
-    border: 1px solid #fbcfe8; 
-    border-radius: 6px; 
-    font-size: 11px;
-    font-weight: 700;
-    color: #9d174d;
-}
-
 /* CABEÇALHO PADRÃO VALE */
 .cabecalho-container, .info-aniver-bar { 
     width: 100%; 
     border-collapse: collapse; 
     border: 1.2px solid var(--slate-900); 
-    margin-bottom: 4px; 
+    margin-bottom: 3px; 
     table-layout: fixed; 
 }
 .cabecalho-container td, .info-aniver-bar td { 
     border: 1px solid var(--slate-700); 
-    padding: 3px 8px; 
+    padding: 2.5px 6px; 
     vertical-align: middle; 
     text-align: center; 
 }
 .logo-box { 
-    width: 85px; 
+    width: 80px; 
     font-weight: 900; 
     font-size: 15px; 
     color: #007e7a; 
@@ -226,41 +211,41 @@ body {
     background-color: var(--slate-50); 
 }
 .titulo-box { 
-    font-size: 10.5px; 
+    font-size: 10px; 
     font-weight: 800; 
     text-transform: uppercase; 
     color: var(--slate-900); 
-    padding: 0 8px; 
+    padding: 0 6px; 
 }
 .meta-box { 
-    width: 120px; 
+    width: 110px; 
     font-size: 8px; 
     text-align: left !important; 
     padding-left: 6px !important; 
     background-color: var(--slate-50); 
-    line-height: 1.3; 
+    line-height: 1.25; 
 }
 
 .info-aniver-bar { 
-    font-size: 8.5px; 
+    font-size: 8px; 
     font-weight: 700; 
     background-color: var(--slate-50); 
 }
-.info-aniver-bar td { text-align: left; padding: 2px 8px; }
+.info-aniver-bar td { text-align: left; padding: 2px 6px; }
 .campo-editavel { outline: none; display: inline-block; min-width: 25px; font-weight: 600; color: var(--slate-900); }
 
 /* CONTENTOR DOS BLOCOS */
 .contentor-blocos {
     display: flex;
     flex-direction: column;
-    gap: 4px;
-    margin-top: 4px;
+    gap: 3px;
+    margin-top: 3px;
     width: 100%;
 }
 
 .bloco-mes { 
     width: 100%;
-    border: 1px solid var(--primary); 
+    border: 1px solid var(--primary-border); 
     border-radius: 4px; 
     overflow: hidden; 
     background: #fff;
@@ -269,51 +254,42 @@ body {
     border: 1.5px solid var(--accent);
 }
 
-.bloco-mes-titulo { 
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
-    color: #fff; 
-    font-weight: 800; 
-    font-size: 9px; 
-    text-transform: uppercase; 
-    padding: 3px 6px; 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    letter-spacing: 0.5px; 
+table.tabela-mes { 
+    width: 100%; 
+    border-collapse: collapse; 
+    table-layout: fixed; 
 }
-.bloco-mes.mes-atual-destaque .bloco-mes-titulo {
+
+/* LINHA DO TÍTULO DO MÊS COM INFORMAÇÕES INTEGRADAS */
+.tr-mes-header {
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+    color: #fff;
+    font-weight: 800;
+    font-size: 8.5px;
+    text-transform: uppercase;
+}
+.mes-atual-destaque .tr-mes-header {
     background: linear-gradient(135deg, #d97706, #b45309);
 }
-
-.tag-mes-atual {
-    background: #fef3c7;
-    color: #92400e;
-    font-size: 7.5px;
+.td-mes-nome {
+    width: 110px;
+    text-align: center;
     font-weight: 900;
-    padding: 1px 5px;
-    border-radius: 3px;
-    margin-left: 6px;
+    color: #fff;
+    border: 1px solid var(--primary-border);
+    padding: 2px 4px;
+    letter-spacing: 0.5px;
 }
 
-table.tabela-mes { width: 100%; border-collapse: collapse; table-layout: fixed; }
-table.tabela-mes th, table.tabela-mes td { 
+table.tabela-mes td { 
     border: 1px solid var(--primary-border); 
-    text-align: center; 
     vertical-align: middle; 
-    font-size: 8.5px; 
-    height: 20px; 
-    padding: 1px 5px; 
-}
-table.tabela-mes th { 
-    background-color: #fdf2f8; 
-    color: #831843; 
-    font-weight: 800; 
     font-size: 8px; 
-    text-transform: uppercase; 
+    height: 18px; 
+    padding: 1px 4px; 
 }
-table.tabela-mes tbody tr:nth-child(even) { background-color: var(--primary-bg); }
 
-/* CÉLULAS DE TEXTO / DATA - TOTALMENTE EDITÁVEIS */
+/* CÉLULAS EDITÁVEIS */
 .col-nome-aniver { 
     text-align: left !important; 
     font-weight: 700; 
@@ -321,20 +297,26 @@ table.tabela-mes tbody tr:nth-child(even) { background-color: var(--primary-bg);
     padding-left: 6px !important; 
     outline: none; 
     cursor: text;
+    background: #fff;
 }
 .col-nome-aniver:focus, .col-data-aniver:focus {
     background-color: #fce7f3 !important;
 }
 .col-data-aniver { 
-    width: 85px; 
-    font-weight: 700; 
+    width: 80px; 
+    text-align: center;
+    font-weight: 800; 
     background: #fff; 
     outline: none; 
     cursor: text;
 }
-.col-acoes-aniver { width: 65px; }
+.col-acoes-aniver { 
+    width: 50px; 
+    text-align: center;
+    background: #fff;
+}
 
-.botoes-acoes { display: flex; align-items: center; justify-content: center; gap: 3px; opacity: 0.35; transition: opacity 0.2s; }
+.botoes-acoes { display: flex; align-items: center; justify-content: center; gap: 2px; opacity: 0.35; transition: opacity 0.2s; }
 tr:hover .botoes-acoes { opacity: 1; }
 .btn-acao { 
     background: var(--slate-100); 
@@ -348,10 +330,16 @@ tr:hover .botoes-acoes { opacity: 1; }
 .btn-lixeira { color: var(--danger); }
 .btn-wpp { color: #059669; font-weight: 900; }
 
-.bloco-oculto { display: none !important; }
+/* LINHAS EM BRANCO PARA PREENCHIMENTO */
+.tr-linha-em-branco {
+    background: #ffffff;
+}
+.tr-linha-em-branco td {
+    height: 17px;
+}
 
 /* ================================================================= */
-/* CONFIGURAÇÃO RÍGIDA DE IMPRESSÃO: CABER EM EXATAMENTE 1 PÁGINA A4  */
+/* CONFIGURAÇÃO RÍGIDA DE IMPRESSÃO: ENCAIXE TOTAL EM 1 FOLHA A4     */
 /* ================================================================= */
 @media print {
     @page { 
@@ -366,7 +354,7 @@ tr:hover .botoes-acoes { opacity: 1; }
         -webkit-print-color-adjust: exact !important; 
         print-color-adjust: exact !important; 
     }
-    .painel-controle, .botoes-acoes, .barra-controle-folha, .btn-acoes-bloco, .col-acoes-aniver, table.tabela-mes thead, #toastNotificacao { 
+    .painel-controle, .botoes-acoes, .col-acoes-aniver, #toastNotificacao { 
         display: none !important; 
     }
     .folha-a4 { 
@@ -380,8 +368,8 @@ tr:hover .botoes-acoes { opacity: 1; }
         break-after: avoid !important; 
     }
     .contentor-blocos {
-        gap: 2px !important;
-        margin-top: 2px !important;
+        gap: 1.5px !important;
+        margin-top: 1px !important;
     }
     .bloco-mes { 
         page-break-inside: avoid !important; 
@@ -389,32 +377,31 @@ tr:hover .botoes-acoes { opacity: 1; }
         margin-bottom: 1px !important;
         border-width: 1px !important;
     }
-    .bloco-mes-titulo { 
+    .tr-mes-header { 
         background-color: var(--primary) !important; 
         color: #fff !important; 
         font-size: 7.5px !important;
-        padding: 1px 4px !important;
     }
     table.tabela-mes td { 
         border: 1px solid #f9a8d4 !important; 
         font-size: 7.5px !important;
-        height: 15px !important;
-        line-height: 15px !important;
+        height: 14.5px !important;
+        line-height: 14.5px !important;
         padding: 0 4px !important;
     }
     .cabecalho-container, .info-aniver-bar {
-        margin-bottom: 2px !important;
+        margin-bottom: 1.5px !important;
     }
     .cabecalho-container td, .info-aniver-bar td {
-        padding: 2px 4px !important;
-        font-size: 7.5px !important;
+        padding: 1.5px 4px !important;
+        font-size: 7px !important;
     }
     .logo-box {
-        font-size: 13px !important;
-        width: 65px !important;
+        font-size: 12px !important;
+        width: 60px !important;
     }
     .titulo-box {
-        font-size: 8.5px !important;
+        font-size: 8px !important;
     }
 }
 </style>
@@ -452,10 +439,9 @@ tr:hover .botoes-acoes { opacity: 1; }
         <div class="botoes-painel">
             <button type="button" class="btn btn-pink" onclick="distribuirNomesImportados()">⚡ Distribuir nos Meses</button>
             <button type="button" class="btn btn-ordenar" onclick="ordenarAniversariosPorDia()">📅 Ordenar por Dia</button>
-            <button type="button" class="btn btn-ocultar-vazios" id="btnToggleVazios" onclick="alternarMesesVazios()">👁️ Ocultar Meses Vazios</button>
             <button type="button" class="btn btn-salvar" onclick="salvarTudoAniver()">💾 Salvar</button>
             <button type="button" class="btn btn-carregar" onclick="carregarTudoAniver()">📂 Carregar</button>
-            <button type="button" class="btn btn-exportar" onclick="exportarBackupJSON()">⬇️️ Backup</button>
+            <button type="button" class="btn btn-exportar" onclick="exportarBackupJSON()">⬇️ Backup</button>
             <button type="button" class="btn btn-exportar" onclick="document.getElementById('arquivoBackupAniver').click()">⬆️ Restaurar</button>
             <button type="button" class="btn btn-limpar" onclick="limparTudoAniver()">Limpar</button>
             <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir (A4)</button>
@@ -470,9 +456,7 @@ tr:hover .botoes-acoes { opacity: 1; }
             "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"
         ];
 
-        let ocultarVaziosAtivo = false;
-
-        const DADOS_INICIAIS_A = {
+        const DADOS_INICIAIS = {
             "JANEIRO": ["MARIANA PEREIRA CRUZ - 11/01", "RICARDO GONCALVES DE MELLO LEITE - 13/01", "JOAO SILVA RAMOS - 18/01", "ALFREDO AUGUSTO RAMOS NETO - 22/01"],
             "FEVEREIRO": ["MARCOS AURELIO CATALLARES MATTOS - 01/02", "VANDERSON TEIXEIRA - 04/02", "BRUNO RICARDO - 07/02", "GABRIEL CARNEIRO - 07/02"],
             "MARÇO": ["GLEIVSTON SILVA MENDES - 22/03"],
@@ -525,67 +509,85 @@ tr:hover .botoes-acoes { opacity: 1; }
         }
 
         function criarBlocoMes(mesNome, itens = []) {
-            let linhas = '';
             const ehMesAtual = (mesNome === MESES_ANO[obterIndiceMesAtual()]);
-            
-            if (!itens || itens.length === 0) {
-                linhas = `<tr>` +
-                    `<td class="col-nome-aniver" contenteditable="true" style="color:#94a3b8; font-style:italic;" onfocus="limparPlaceholder(this)" onblur="atualizarMetricas()">Sem aniversariantes</td>` +
-                    `<td class="col-data-aniver" contenteditable="true" placeholder="DD/MM" onblur="atualizarMetricas()"></td>` +
-                    `<td class="col-acoes-aniver"><div class="botoes-acoes">` +
-                        `<button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaBloco(this)" title="Adicionar">➕</button>` +
-                        `<button type="button" class="btn-acao btn-lixeira" onclick="removerLinhaBloco(this)" title="Apagar">🗑️</button>` +
-                    `</div></td>` +
-                `</tr>`;
-            } else {
-                itens.forEach(item => {
-                    const [nomeBruto, dataBruta] = item.split('-');
-                    let nome = (nomeBruto || '').trim();
-                    let data = (dataBruta || '').trim();
-                    if (nome === "-") nome = "";
-
-                    linhas += `<tr>` +
-                        `<td class="col-nome-aniver" contenteditable="true" onblur="atualizarMetricas()">${nome}</td>` +
-                        `<td class="col-data-aniver" contenteditable="true" placeholder="DD/MM" onblur="atualizarMetricas()">${data}</td>` +
-                        `<td class="col-acoes-aniver"><div class="botoes-acoes">` +
-                            `<button type="button" class="btn-acao btn-wpp" onclick="copiarMensagemParabens(this)" title="Copiar Mensagem">💬</button>` +
-                            `<button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaBloco(this)" title="Adicionar">➕</button>` +
-                            `<button type="button" class="btn-acao btn-lixeira" onclick="removerLinhaBloco(this)" title="Apagar">🗑️</button>` +
-                        `</div></td>` +
-                    `</tr>`;
-                });
-            }
-
-            const tagMes = ehMesAtual ? `<span class="tag-mes-atual">🎂 MÊS ATUAL</span>` : '';
             const classeDestaque = ehMesAtual ? 'mes-atual-destaque' : '';
+            const tagMes = ehMesAtual ? ' ★ MÊS ATUAL' : '';
 
-            return `<div class="bloco-mes ${classeDestaque}" data-mes="${mesNome}">
-                <div class="bloco-mes-titulo">
-                    <span>📅 ${mesNome} ${tagMes}</span>
-                    <div class="btn-acoes-bloco" style="display:flex; gap:4px;">
-                        <button type="button" onclick="adicionarLinhaPorCabecalho(this)" title="Adicionar linha" style="background:#fff; color:var(--primary); border:none; padding:1.5px 5px; border-radius:3px; font-weight:800; cursor:pointer; font-size:8.5px;">➕ Linha</button>
-                    </div>
-                </div>
-                <table class="tabela-mes">
-                    <thead><tr><th>Nome do Colaborador</th><th style="width:85px;">Data</th><th class="col-acoes-aniver th-acoes">Ações</th></tr></thead>
-                    <tbody>${linhas}</tbody>
-                </table>
-            </div>`;
-        }
+            let primeiroItemNome = '';
+            let primeiroItemData = '';
 
-        function limparPlaceholder(el) {
-            if (el.innerText.trim() === 'Sem aniversariantes') {
-                el.innerText = '';
-                el.style.fontStyle = 'normal';
-                el.style.color = 'inherit';
+            if (itens.length > 0) {
+                const [n, d] = itens[0].split('-');
+                primeiroItemNome = (n || '').trim();
+                primeiroItemData = (d || '').trim();
             }
+
+            // Primeira linha com o nome do mês integrado lado a lado
+            let linhas = `
+                <tr class="tr-mes-header">
+                    <td class="td-mes-nome" rowspan="${Math.max(itens.length + 1, 2)}">
+                        📅 ${mesNome}${tagMes}
+                    </td>
+                    <td class="col-nome-aniver" contenteditable="true" onblur="atualizarMetricas()">${primeiroItemNome}</td>
+                    <td class="col-data-aniver" contenteditable="true" placeholder="DD/MM" onblur="atualizarMetricas()">${primeiroItemData}</td>
+                    <td class="col-acoes-aniver">
+                        <div class="botoes-acoes">
+                            <button type="button" class="btn-acao btn-wpp" onclick="copiarMensagemParabens(this)" title="Copiar Parabéns">💬</button>
+                            <button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixo(this)" title="Nova Linha">➕</button>
+                            <button type="button" class="btn-acao btn-lixeira" onclick="limparLinha(this)" title="Limpar">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+
+            // Linhas com os outros nomes já cadastrados no mesmo mês
+            for (let i = 1; i < itens.length; i++) {
+                const [n, d] = itens[i].split('-');
+                let nome = (n || '').trim();
+                let data = (d || '').trim();
+                linhas += `
+                    <tr>
+                        <td class="col-nome-aniver" contenteditable="true" onblur="atualizarMetricas()">${nome}</td>
+                        <td class="col-data-aniver" contenteditable="true" placeholder="DD/MM" onblur="atualizarMetricas()">${data}</td>
+                        <td class="col-acoes-aniver">
+                            <div class="botoes-acoes">
+                                <button type="button" class="btn-acao btn-wpp" onclick="copiarMensagemParabens(this)" title="Copiar Parabéns">💬</button>
+                                <button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixo(this)" title="Nova Linha">➕</button>
+                                <button type="button" class="btn-acao btn-lixeira" onclick="removerLinha(this)" title="Remover">✕</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+
+            // Linha em branco extra fixa em baixo para preenchimento / escrita
+            linhas += `
+                <tr class="tr-linha-em-branco">
+                    <td class="col-nome-aniver" contenteditable="true" onblur="atualizarMetricas()" placeholder="Escreva o nome aqui..."></td>
+                    <td class="col-data-aniver" contenteditable="true" placeholder="DD/MM" onblur="atualizarMetricas()"></td>
+                    <td class="col-acoes-aniver">
+                        <div class="botoes-acoes">
+                            <button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixo(this)" title="Nova Linha">➕</button>
+                            <button type="button" class="btn-acao btn-lixeira" onclick="limparLinha(this)" title="Limpar">🗑️</button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+
+            return `
+                <div class="bloco-mes ${classeDestaque}" data-mes="${mesNome}">
+                    <table class="tabela-mes">
+                        <tbody>${linhas}</tbody>
+                    </table>
+                </div>
+            `;
         }
 
         function copiarMensagemParabens(btn) {
             const tr = btn.closest('tr');
             const nome = tr.querySelector('.col-nome-aniver').innerText.trim();
-            if(!nome || nome.toUpperCase() === "SEM ANIVERSARIANTES") {
-                mostrarToast('Linha sem nome para parabenizar.');
+            if(!nome) {
+                mostrarToast('Sem nome nesta linha para parabenizar.');
                 return;
             }
             const [primeiroNome] = nome.split(' ');
@@ -595,64 +597,51 @@ tr:hover .botoes-acoes { opacity: 1; }
             });
         }
 
-        function adicionarLinhaBloco(btn) {
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td class="col-nome-aniver" contenteditable="true" onblur="atualizarMetricas()"></td>` +
-                           `<td class="col-data-aniver" contenteditable="true" onblur="atualizarMetricas()"></td>` +
-                           `<td class="col-acoes-aniver"><div class="botoes-acoes">` +
-                           `<button type="button" class="btn-acao btn-wpp" onclick="copiarMensagemParabens(this)" title="Copiar Mensagem">💬</button>` +
-                           `<button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaBloco(this)" title="Adicionar">➕</button>` +
-                           `<button type="button" class="btn-acao btn-lixeira" onclick="removerLinhaBloco(this)" title="Apagar">🗑️</button></div></td>`;
-            btn.closest('tr').after(tr);
-            tr.querySelector('.col-nome-aniver').focus();
-        }
-
-        function adicionarLinhaPorCabecalho(btn) {
-            const tbody = btn.closest('.bloco-mes').querySelector('tbody');
-            const tr = document.createElement('tr');
-            tr.innerHTML = `<td class="col-nome-aniver" contenteditable="true" onblur="atualizarMetricas()"></td>` +
-                           `<td class="col-data-aniver" contenteditable="true" onblur="atualizarMetricas()"></td>` +
-                           `<td class="col-acoes-aniver"><div class="botoes-acoes">` +
-                           `<button type="button" class="btn-acao btn-wpp" onclick="copiarMensagemParabens(this)" title="Copiar Mensagem">💬</button>` +
-                           `<button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaBloco(this)" title="Adicionar">➕</button>` +
-                           `<button type="button" class="btn-acao btn-lixeira" onclick="removerLinhaBloco(this)" title="Apagar">🗑️</button></div></td>`;
-            tbody.appendChild(tr);
-            tr.querySelector('.col-nome-aniver').focus();
-        }
-
-        function removerLinhaBloco(btn) {
+        function adicionarLinhaAbaixo(btn) {
             const tr = btn.closest('tr');
-            const tbody = tr.parentNode;
-            if(tbody.querySelectorAll('tr').length > 1) {
-                tr.remove();
-            } else {
-                tr.querySelector('.col-nome-aniver').innerText = '';
-                tr.querySelector('.col-data-aniver').innerText = '';
+            const tbody = tr.closest('tbody');
+            const tdMes = tbody.querySelector('.td-mes-nome');
+            
+            // Aumenta o rowspan da coluna do mês
+            if (tdMes) {
+                let atual = parseInt(tdMes.getAttribute('rowspan') || '2', 10);
+                tdMes.setAttribute('rowspan', atual + 1);
             }
+
+            const nova = document.createElement('tr');
+            nova.innerHTML = `
+                <td class="col-nome-aniver" contenteditable="true" onblur="atualizarMetricas()"></td>
+                <td class="col-data-aniver" contenteditable="true" placeholder="DD/MM" onblur="atualizarMetricas()"></td>
+                <td class="col-acoes-aniver">
+                    <div class="botoes-acoes">
+                        <button type="button" class="btn-acao btn-wpp" onclick="copiarMensagemParabens(this)" title="Copiar Parabéns">💬</button>
+                        <button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixo(this)" title="Nova Linha">➕</button>
+                        <button type="button" class="btn-acao btn-lixeira" onclick="removerLinha(this)" title="Remover">✕</button>
+                    </div>
+                </td>
+            `;
+            tr.after(nova);
+            nova.querySelector('.col-nome-aniver').focus();
+        }
+
+        function removerLinha(btn) {
+            const tr = btn.closest('tr');
+            const tbody = tr.closest('tbody');
+            const tdMes = tbody.querySelector('.td-mes-nome');
+            
+            if (tdMes) {
+                let atual = parseInt(tdMes.getAttribute('rowspan') || '2', 10);
+                if (atual > 2) tdMes.setAttribute('rowspan', atual - 1);
+            }
+            tr.remove();
             atualizarMetricas();
         }
 
-        function alternarMesesVazios() {
-            ocultarVaziosAtivo = !ocultarVaziosAtivo;
-            const blocos = document.querySelectorAll('.bloco-mes');
-            
-            blocos.forEach(b => {
-                const linhas = b.querySelectorAll('tbody tr');
-                let temColaborador = false;
-                linhas.forEach(tr => {
-                    const nome = tr.querySelector('.col-nome-aniver').innerText.trim().toUpperCase();
-                    if(nome !== "" && nome !== "SEM ANIVERSARIANTES") temColaborador = true;
-                });
-
-                if(ocultarVaziosAtivo && !temColaborador) {
-                    b.classList.add('bloco-oculto');
-                } else {
-                    b.classList.remove('bloco-oculto');
-                }
-            });
-
-            document.getElementById('btnToggleVazios').innerText = ocultarVaziosAtivo ? '👁️️ Mostrar Todos os Meses' : '👁️ Ocultar Meses Vazios';
-            mostrarToast(ocultarVaziosAtivo ? 'Meses vazios ocultados' : 'Todos os meses visíveis');
+        function limparLinha(btn) {
+            const tr = btn.closest('tr');
+            tr.querySelector('.col-nome-aniver').innerText = '';
+            tr.querySelector('.col-data-aniver').innerText = '';
+            atualizarMetricas();
         }
 
         function criarEstruturaFolhaAniver(dadosObj) {
@@ -667,17 +656,13 @@ tr:hover .botoes-acoes { opacity: 1; }
             const f = document.createElement('div'); 
             f.className = 'folha-a4';
             f.innerHTML = `
-                <div class="barra-controle-folha">
-                    <span>Quadro Anual de Aniversariantes da Equipe</span>
-                    <span style="font-size:9.5px; opacity:0.8;">Padrão A4 Único</span>
-                </div>
                 <table class="cabecalho-container">
                     <tr>
                         <td class="logo-box">VALE</td>
                         <td class="titulo-box">🎂 CRONOGRAMA ANUAL DE ANIVERSÁRIOS DA EQUIPE</td>
                         <td class="meta-box">
                             <strong>Ano:</strong> <span class="val-ano">${anoAtual}</span><br>
-                            <span class="indicador-folha"><strong>Página:</strong> 01 / 01</span>
+                            <span><strong>Página:</strong> 01 / 01</span>
                         </td>
                     </tr>
                 </table>
@@ -696,9 +681,9 @@ tr:hover .botoes-acoes { opacity: 1; }
                 let mes = bloco.getAttribute('data-mes');
                 let itens = [];
                 bloco.querySelectorAll('tbody tr').forEach(tr => {
-                    let nome = tr.querySelector('.col-nome-aniver').innerText.trim();
-                    let data = tr.querySelector('.col-data-aniver').innerText.trim();
-                    if(nome !== "" && nome.toUpperCase() !== "SEM ANIVERSARIANTES") {
+                    let nome = tr.querySelector('.col-nome-aniver') ? tr.querySelector('.col-nome-aniver').innerText.trim() : '';
+                    let data = tr.querySelector('.col-data-aniver') ? tr.querySelector('.col-data-aniver').innerText.trim() : '';
+                    if(nome !== "") {
                         itens.push(nome + " - " + data);
                     }
                 });
@@ -721,7 +706,7 @@ tr:hover .botoes-acoes { opacity: 1; }
                 });
             }
             renderizarComDados(dados);
-            mostrarToast('Aniversários organizados por dia em cada mês');
+            mostrarToast('Aniversários ordenados por dia!');
         }
 
         function distribuirNomesImportados() {
@@ -754,7 +739,7 @@ tr:hover .botoes-acoes { opacity: 1; }
 
             document.getElementById('importarTextoAniver').value = '';
             renderizarComDados(dados);
-            mostrarToast(`${adicionados} aniversariante(s) distribuído(s) nos respectivos meses!`);
+            mostrarToast(`${adicionados} aniversariante(s) distribuído(s) com sucesso!`);
         }
 
         function renderizarComDados(dados) {
@@ -831,7 +816,7 @@ tr:hover .botoes-acoes { opacity: 1; }
         }
 
         window.onload = function() { 
-            renderizarComDados(DADOS_INICIAIS_A); 
+            renderizarComDados(DADOS_INICIAIS); 
         };
     </script>
 </body>
