@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Módulo 10 - Troca dos Participantes FMDS | Portal Vale v01</title>
+<title>Módulo 10 - Troca dos Participantes FMDS | Portal Vale v02</title>
 <style>
 :root {
     --primary: #007e7a;
     --primary-dark: #005a57;
-    --primary-light: #e6f4f4;
-    --accent: #f59e0b;
-    --danger: #ef4444;
-    --success: #10b981;
+    --vale-green: #10b981;
+    --vale-gray: #64748b;
+    --vale-orange: #f59e0b;
+    --vale-blue: #3b82f6;
     --slate-900: #0f172a;
     --slate-700: #334155;
     --slate-600: #475569;
@@ -27,7 +27,7 @@ body {
     background: #f8fafc; 
     color: #000; 
     min-height: 100vh; 
-    padding: 16px; 
+    padding: 12px; 
 }
 
 /* NOTIFICAÇÃO TOAST */
@@ -53,8 +53,8 @@ body {
 /* PAINEL DE CONTROLE */
 .painel-controle { 
     background: #ffffff; 
-    padding: 18px 22px; 
-    margin: 0 auto 16px auto; 
+    padding: 16px 20px; 
+    margin: 0 auto 14px auto; 
     border-radius: 12px; 
     box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
     border: 1px solid var(--slate-300); 
@@ -64,9 +64,9 @@ body {
     display: flex; 
     align-items: center; 
     justify-content: space-between; 
-    margin-bottom: 12px; 
+    margin-bottom: 10px; 
     border-bottom: 2px solid var(--primary); 
-    padding-bottom: 8px; 
+    padding-bottom: 6px; 
 }
 .badge-modulo { 
     background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
@@ -78,7 +78,7 @@ body {
     text-transform: uppercase; 
     letter-spacing: 0.8px; 
 }
-.tag-v01 { 
+.tag-v02 { 
     background-color: var(--accent); 
     color: #fff; 
     font-weight: 800; 
@@ -90,23 +90,23 @@ body {
 
 .campos-painel { 
     display: grid; 
-    gap: 12px; 
-    margin-bottom: 12px; 
+    gap: 10px; 
+    margin-bottom: 10px; 
     grid-template-columns: 1fr 1.5fr; 
 }
 .campo-grupo label { 
     display: block; 
     font-weight: 700; 
-    margin-bottom: 4px; 
-    font-size: 10.5px; 
+    margin-bottom: 3px; 
+    font-size: 10px; 
     color: var(--slate-700); 
     text-transform: uppercase; 
 }
 .painel-controle input[type="text"] { 
     width: 100%; 
     font-family: inherit; 
-    font-size: 12px; 
-    padding: 8px 10px; 
+    font-size: 11.5px; 
+    padding: 7px 10px; 
     border: 1px solid var(--slate-300); 
     border-radius: 6px; 
     background: #fff; 
@@ -114,10 +114,10 @@ body {
 }
 .painel-controle textarea { 
     width: 100%; 
-    height: 70px; 
+    height: 60px; 
     font-family: inherit; 
-    font-size: 11.5px; 
-    padding: 8px 10px; 
+    font-size: 11px; 
+    padding: 7px 10px; 
     border: 1px solid var(--slate-300); 
     border-radius: 6px; 
     resize: vertical; 
@@ -142,45 +142,21 @@ body {
 .btn:hover { filter: brightness(1.08); }
 
 .btn-verde { background-color: var(--primary); } 
-.btn-azul { background-color: #0284c7; } 
 .btn-salvar { background-color: #2563eb; } 
 .btn-carregar { background-color: #0891b2; } 
-.btn-exportar { background-color: #4f46e5; }
-.btn-limpar { background-color: var(--slate-100); color: var(--slate-600); border: 1px solid var(--slate-300); } 
 .btn-voltar { background-color: var(--slate-600); text-decoration: none; } 
 .btn-imprimir { background-color: var(--slate-900); margin-left: auto; }
 
-/* FOLHA A4 RETRATO */
+/* FOLHA A4 RETRATO PREENCHENDO DE PONTA A PONTA */
 .folha-a4 { 
     width: 100%; 
     max-width: 960px; 
     background: #fff; 
-    padding: 16px 20px; 
+    padding: 12px 16px; 
     margin: 0 auto 20px auto; 
     box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
     border-radius: 8px; 
     border: 1.5px solid #000; 
-}
-
-.barra-controle-folha { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    margin-bottom: 8px; 
-    background: #fff; 
-    padding: 5px 10px; 
-    border: 1px solid var(--slate-200); 
-    border-radius: 6px; 
-}
-.btn-remover-folha { 
-    background: #fff; 
-    color: var(--danger); 
-    border: 1px solid #fca5a5; 
-    border-radius: 4px; 
-    font-size: 9px; 
-    font-weight: 700; 
-    padding: 3px 8px; 
-    cursor: pointer; 
 }
 
 /* CABEÇALHO PADRÃO VALE */
@@ -193,14 +169,14 @@ body {
 }
 .cabecalho-container td, .info-bar td { 
     border: 1.5px solid #000; 
-    padding: 3px 8px; 
+    padding: 3px 6px; 
     vertical-align: middle; 
     text-align: center; 
 }
 .logo-box { 
-    width: 90px; 
+    width: 85px; 
     font-weight: 900; 
-    font-size: 16px; 
+    font-size: 15px; 
     color: #007e7a; 
     letter-spacing: 1.5px; 
 }
@@ -209,53 +185,63 @@ body {
     font-weight: 900; 
     text-transform: uppercase; 
     color: #000; 
-    padding: 0 10px; 
+    padding: 0 8px; 
 }
 .meta-box { 
-    width: 130px; 
-    font-size: 8.5px; 
+    width: 120px; 
+    font-size: 8px; 
     text-align: left !important; 
-    padding-left: 8px !important; 
-    line-height: 1.35; 
+    padding-left: 6px !important; 
+    line-height: 1.3; 
     font-weight: 700;
 }
 
-.info-bar { font-size: 8.5px; font-weight: 700; }
-.info-bar td { text-align: left; padding: 2px 8px; }
+.info-bar { font-size: 8px; font-weight: 700; }
+.info-bar td { text-align: left; padding: 2px 6px; }
 
-/* TABELA FMDS */
+/* TABELA FMDS COM CORES FIÉIS */
 table.tabela-fmds th, table.tabela-fmds td { 
     border: 1.5px solid #000; 
     text-align: center; 
     vertical-align: middle; 
     font-size: 9px; 
-    height: 24px; 
+    height: 29px; /* Altura calculada para preencher a folha inteira verticalmente */
     padding: 2px 4px; 
 }
 table.tabela-fmds th { 
-    background-color: #e2e8f0; 
-    color: #000; 
+    color: #fff; 
     font-weight: 900; 
     text-transform: uppercase; 
     font-size: 8.5px; 
+    letter-spacing: 0.3px;
 }
+
+/* CORES DAS COLUNAS CONFORME A SUA FOTO */
+.th-dss { background-color: #475569 !important; }
+.th-ssma { background-color: #10b981 !important; } /* Verde */
+.th-prod { background-color: #f59e0b !important; } /* Laranja / Âmbar */
+.th-qual { background-color: #3b82f6 !important; } /* Azul */
+
 table.tabela-fmds tbody tr { background-color: #fff; }
 
-.col-nome-part { text-align: left !important; font-weight: 700; text-transform: uppercase; padding-left: 8px !important; width: 240px; outline: none; }
+.col-nome-part { text-align: left !important; font-weight: 700; text-transform: uppercase; padding-left: 8px !important; width: 250px; outline: none; }
 .col-celula-fmds { outline: none; font-weight: 600; }
-.col-acoes { width: 45px; }
+.col-acoes { width: 40px; }
 
 .botoes-acoes { display: flex; align-items: center; justify-content: center; gap: 2px; opacity: 0.3; }
 tr:hover .botoes-acoes { opacity: 1; }
 .btn-acao { background: #fff; border: 1px solid #cbd5e1; border-radius: 3px; cursor: pointer; padding: 1px 3px; font-size: 8px; }
 
-/* IMPRESSÃO A4 RETRATO */
+/* IMPRESSÃO A4 RETRATO COM CORES EXATAS */
 @media print {
-    @page { size: A4 portrait; margin: 4mm 5mm !important; }
+    @page { size: A4 portrait; margin: 3mm 4mm !important; }
     body { background: #fff !important; margin: 0 !important; padding: 0 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     .painel-controle, .botoes-acoes, .barra-controle-folha, .col-acoes, th.th-acoes, #toastNotificacao { display: none !important; }
     .folha-a4 { box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
-    table.tabela-fmds th { background-color: #e2e8f0 !important; color: #000 !important; }
+    table.tabela-fmds th.th-dss { background-color: #475569 !important; color: #fff !important; }
+    table.tabela-fmds th.th-ssma { background-color: #10b981 !important; color: #fff !important; }
+    table.tabela-fmds th.th-prod { background-color: #f59e0b !important; color: #fff !important; }
+    table.tabela-fmds th.th-qual { background-color: #3b82f6 !important; color: #fff !important; }
 }
 </style>
 </head>
@@ -265,7 +251,7 @@ tr:hover .botoes-acoes { opacity: 1; }
 
     <div class="painel-controle">
         <div class="topo-modulo-info">
-            <span class="badge-modulo">Módulo 10: Troca dos Participantes FMDS <span class="tag-v01">v01</span></span>
+            <span class="badge-modulo">Módulo 10: Troca dos Participantes FMDS <span class="tag-v02">v02</span></span>
             <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
         </div>
         <div class="campos-painel">
@@ -279,7 +265,7 @@ tr:hover .botoes-acoes { opacity: 1; }
             </div>
         </div>
         <div class="campo-grupo">
-            <label>Lista de Participantes (Um por linha):</label>
+            <label>Lista de Participantes (Um por linha - exatos 24 preenchem a folha inteira):</label>
             <textarea id="nomesInputFmds" placeholder="COLE OS NOMES AQUI..." oninput="atualizarNomesFmds()"></textarea>
         </div>
         <div class="botoes-painel">
@@ -311,9 +297,18 @@ tr:hover .botoes-acoes { opacity: 1; }
 
         function criarEstruturaFmds(nomesArr) {
             let linhas = '';
-            const lista = nomesArr.length > 0 ? nomesArr : ["ALFREDO AUGUSTO RAMOS NETO", "ALLAN SOUZA DE CARVALHO", "ATMISTO SILVA", "ANDRÉ", "BIANCA MEDEIROS", "BRUNO GOMES FIDELIS", "BRUNO RICARDO", "CAIO FELIX", "CAIO HENRIQUE", "DAVID MARCELO DELGADO DOS SANTOS", "DOMINIQUE SILVA", "EDUARDO SILVA", "EMERSON RIBEIRO DOS SANTOS", "GABRIEL CARNEIRO", "GLEIVSTON SILVA MENDES", "HUMBERTO EXALTACAO DA SILVA", "MARCOS AURELIO CAVALLARES MATTOS", "MARIANA PEREIRA CRUZ", "PABLO MESQUITA", "PAULO HENRIQUE", "RICHARD SILVA", "RICARDO GONCALVES DE MELLO LEITE", "ROBSON DE SOUZA MENDONCA", "TITO DACAL"];
+            // 24 linhas exatas para ocupar a folha A4 de ponta a ponta perfeitamente
+            const listaPadrao = [
+                "ALFREDO AUGUSTO RAMOS NETO", "ALLAN SOUZA DE CARVALHO", "ATMISTO SILVA", "ANDRÉ", 
+                "BIANCA MEDEIROS", "BRUNO GOMES FIDELIS", "BRUNO RICARDO", "CAIO FELIX", 
+                "CAIO HENRIQUE", "DAVID MARCELO DELGADO DOS SANTOS", "DOMINIQUE SILVA", "EDUARDO SILVA", 
+                "EMERSON RIBEIRO DOS SANTOS", "GABRIEL CARNEIRO", "GLEIVSTON SILVA MENDES", "HUMBERTO EXALTACAO DA SILVA", 
+                "MARCOS AURELIO CAVALLARES MATTOS", "MARIANA PEREIRA CRUZ", "PABLO MESQUITA", "PAULO HENRIQUE", 
+                "RICHARD SILVA", "RICARDO GONCALVES DE MELLO LEITE", "ROBSON DE SOUZA MENDONCA", "TITO DACAL"
+            ];
+            const lista = nomesArr.length > 0 ? nomesArr : listaPadrao;
 
-            lista.forEach((nome, idx) => {
+            lista.forEach((nome) => {
                 linhas += `<tr>
                     <td class="col-nome-part" contenteditable="true">${nome.toUpperCase()}</td>
                     <td class="col-celula-fmds" contenteditable="true"></td>
@@ -348,12 +343,12 @@ tr:hover .botoes-acoes { opacity: 1; }
                 <table class="tabela-fmds">
                     <thead>
                         <tr>
-                            <th style="width:240px;">PARTICIPANTES</th>
-                            <th>DSS</th>
-                            <th>SSMA</th>
-                            <th>PRODUTIVIDADE</th>
-                            <th>QUALIDADE</th>
-                            <th class="col-acoes th-acoes">AÇAO</th>
+                            <th style="width:250px;" class="th-dss">PARTICIPANTES</th>
+                            <th class="th-dss">DSS</th>
+                            <th class="th-ssma">SSMA</th>
+                            <th class="th-prod">PRODUTIVIDADE</th>
+                            <th class="th-qual">QUALIDADE</th>
+                            <th class="col-acoes th-acoes th-dss">AÇÃO</th>
                         </tr>
                     </thead>
                     <tbody>${linhas}</tbody>
@@ -380,12 +375,12 @@ tr:hover .botoes-acoes { opacity: 1; }
                 area: document.getElementById('areaInputFmds').value,
                 nomes: nomes
             };
-            localStorage.setItem('valefmds_v01', JSON.stringify(dados));
+            localStorage.setItem('valefmds_v02', JSON.stringify(dados));
             mostrarToast('Dados salvos com sucesso!');
         }
 
         function carregarTudoFmds() {
-            const s = localStorage.getItem('valefmds_v01');
+            const s = localStorage.getItem('valefmds_v02');
             if(s) {
                 const res = JSON.parse(s);
                 if(res.ano) document.getElementById('anoInputFmds').value = res.ano;
