@@ -29,7 +29,7 @@ body {
     background: #fff5f8; 
     color: var(--slate-900); 
     min-height: 100vh; 
-    padding: 12px; 
+    padding: 10px; 
 }
 
 /* NOTIFICAÇÃO TOAST */
@@ -55,8 +55,8 @@ body {
 /* PAINEL DE CONTROLE */
 .painel-controle { 
     background: #ffffff; 
-    padding: 16px 20px; 
-    margin: 0 auto 16px auto; 
+    padding: 14px 18px; 
+    margin: 0 auto 12px auto; 
     border-radius: 12px; 
     box-shadow: 0 10px 25px -5px rgba(219, 39, 119, 0.08); 
     border: 1px solid #fbcfe8; 
@@ -66,16 +66,16 @@ body {
     display: flex; 
     align-items: center; 
     justify-content: space-between; 
-    margin-bottom: 12px; 
+    margin-bottom: 10px; 
     border-bottom: 2px solid var(--primary); 
-    padding-bottom: 8px; 
+    padding-bottom: 6px; 
 }
 .badge-modulo { 
     background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
     color: #fff; 
-    font-size: 12px; 
+    font-size: 11.5px; 
     font-weight: 800; 
-    padding: 5px 12px; 
+    padding: 4px 10px; 
     border-radius: 6px; 
     text-transform: uppercase; 
     letter-spacing: 0.8px; 
@@ -84,32 +84,32 @@ body {
     background-color: var(--accent); 
     color: #fff; 
     font-weight: 800; 
-    font-size: 10px; 
-    padding: 2px 7px; 
+    font-size: 9.5px; 
+    padding: 2px 6px; 
     border-radius: 4px; 
     margin-left: 6px; 
 }
 
 .campos-painel { 
     display: grid; 
-    gap: 12px; 
-    margin-bottom: 10px; 
-    grid-template-columns: 140px 1.5fr; 
+    gap: 10px; 
+    margin-bottom: 8px; 
+    grid-template-columns: 130px 1.5fr; 
 }
 .campo-grupo label { 
     display: flex;
     justify-content: space-between;
     font-weight: 700; 
-    margin-bottom: 4px; 
-    font-size: 11px; 
+    margin-bottom: 3px; 
+    font-size: 10.5px; 
     color: #9d174d; 
     text-transform: uppercase; 
 }
 .painel-controle input[type="text"] { 
     width: 100%; 
     font-family: inherit; 
-    font-size: 12px; 
-    padding: 8px 10px; 
+    font-size: 11.5px; 
+    padding: 6px 8px; 
     border: 1px solid var(--primary-border); 
     border-radius: 6px; 
     background: var(--primary-bg); 
@@ -121,10 +121,10 @@ body {
 }
 .painel-controle textarea { 
     width: 100%; 
-    height: 65px; 
+    height: 55px; 
     font-family: inherit; 
-    font-size: 12px; 
-    padding: 8px 10px; 
+    font-size: 11.5px; 
+    padding: 6px 8px; 
     border: 1px solid var(--primary-border); 
     border-radius: 6px; 
     resize: vertical; 
@@ -136,31 +136,31 @@ body {
 .barra-metricas {
     display: flex;
     gap: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     flex-wrap: wrap;
 }
 .card-metrica {
     background: var(--primary-bg);
     border: 1px solid #fbcfe8;
-    padding: 5px 12px;
+    padding: 4px 10px;
     border-radius: 6px;
-    font-size: 12px;
+    font-size: 11px;
     font-weight: 700;
     color: #9d174d;
 }
 
-.botoes-painel { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.botoes-painel { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 4px; }
 .btn { 
     cursor: pointer; 
-    padding: 8px 14px; 
-    font-size: 11.5px; 
+    padding: 7px 12px; 
+    font-size: 11px; 
     font-weight: 700; 
     border: none; 
     border-radius: 6px; 
     color: #fff; 
     display: inline-flex; 
     align-items: center; 
-    gap: 5px; 
+    gap: 4px; 
     transition: filter 0.15s ease, transform 0.05s ease;
 }
 .btn:hover { filter: brightness(1.08); }
@@ -175,15 +175,15 @@ body {
 .btn-voltar { background-color: var(--slate-600); text-decoration: none; } 
 .btn-imprimir { background-color: var(--slate-900); margin-left: auto; }
 
-/* FOLHA A4 RETRATO */
+/* FOLHA A4 RETRATO OTIMIZADA PARA 1 PÁGINA INTEIRA */
 .folha-a4 { 
     width: 100%; 
     max-width: 980px; 
     background: #fff; 
-    padding: 16px 20px; 
-    margin: 0 auto 20px auto; 
+    padding: 10px 14px; 
+    margin: 0 auto 10px auto; 
     box-shadow: 0 10px 30px rgba(219, 39, 119, 0.08); 
-    border-radius: 12px; 
+    border-radius: 10px; 
     border: 1.5px solid var(--primary-border); 
     position: relative; 
 }
@@ -192,66 +192,66 @@ body {
 .cabecalho-container, .info-aniver-bar { 
     width: 100%; 
     border-collapse: collapse; 
-    border: 1.5px solid var(--slate-900); 
-    margin-bottom: 5px; 
+    border: 1.2px solid var(--slate-900); 
+    margin-bottom: 3px; 
     table-layout: fixed; 
 }
 .cabecalho-container td, .info-aniver-bar td { 
     border: 1px solid var(--slate-700); 
-    padding: 4px 8px; 
+    padding: 2px 6px; 
     vertical-align: middle; 
     text-align: center; 
 }
 .logo-box { 
-    width: 95px; 
+    width: 80px; 
     font-weight: 900; 
-    font-size: 16px; 
+    font-size: 14px; 
     color: #007e7a; 
     letter-spacing: 1.5px;
     background-color: var(--slate-50); 
 }
 .titulo-box { 
-    font-size: 12px; 
+    font-size: 10.5px; 
     font-weight: 800; 
     text-transform: uppercase; 
     color: var(--slate-900); 
-    padding: 0 8px; 
+    padding: 0 6px; 
 }
 .meta-box { 
-    width: 130px; 
-    font-size: 9.5px; 
+    width: 120px; 
+    font-size: 8.5px; 
     text-align: left !important; 
-    padding-left: 8px !important; 
+    padding-left: 6px !important; 
     background-color: var(--slate-50); 
-    line-height: 1.35; 
+    line-height: 1.25; 
 }
 
 .info-aniver-bar { 
-    font-size: 9.5px; 
+    font-size: 8.5px; 
     font-weight: 700; 
     background-color: var(--slate-50); 
 }
-.info-aniver-bar td { text-align: left; padding: 3px 8px; }
+.info-aniver-bar td { text-align: left; padding: 2px 6px; }
 .campo-editavel { outline: none; display: inline-block; min-width: 25px; font-weight: 600; color: var(--slate-900); }
 
 /* CONTENTOR DOS BLOCOS */
 .contentor-blocos {
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    margin-top: 4px;
+    gap: 2px;
+    margin-top: 2px;
     width: 100%;
 }
 
 .bloco-mes { 
     width: 100%; 
-    border: 1.5px solid var(--primary-border); 
-    border-radius: 6px; 
+    border: 1.2px solid var(--primary-border); 
+    border-radius: 4px; 
     overflow: hidden; 
     background: #fff;
 }
 .bloco-mes.mes-atual-destaque {
-    border: 2px solid var(--accent);
+    border: 1.5px solid var(--accent);
 }
 
 table.tabela-mes { 
@@ -261,15 +261,15 @@ table.tabela-mes {
 }
 
 .td-mes-nome {
-    width: 140px;
+    width: 125px;
     text-align: center;
     font-weight: 900;
-    font-size: 11.5px;
+    font-size: 10px;
     background: linear-gradient(135deg, var(--primary), var(--primary-dark));
     color: #fff;
     border: 1px solid var(--primary-border);
-    padding: 4px 6px;
-    letter-spacing: 0.6px;
+    padding: 2px 4px;
+    letter-spacing: 0.5px;
     text-transform: uppercase;
 }
 .mes-atual-destaque .td-mes-nome {
@@ -279,18 +279,18 @@ table.tabela-mes {
 table.tabela-mes td { 
     border: 1px solid var(--primary-border); 
     vertical-align: middle; 
-    font-size: 11.5px; 
-    height: 25px; 
-    padding: 2px 8px; 
+    font-size: 10px; 
+    height: 19px; 
+    padding: 1px 6px; 
 }
 
 /* CÉLULAS EDITÁVEIS */
 .col-nome-aniver { 
     text-align: left !important; 
     font-weight: 700; 
-    font-size: 11.5px !important;
+    font-size: 10px !important;
     text-transform: uppercase; 
-    padding-left: 10px !important; 
+    padding-left: 8px !important; 
     outline: none; 
     cursor: text;
     background: #fff;
@@ -300,30 +300,30 @@ table.tabela-mes td {
     background-color: #fce7f3 !important;
 }
 .col-data-aniver { 
-    width: 95px; 
+    width: 85px; 
     text-align: center;
     font-weight: 800; 
-    font-size: 11.5px !important;
+    font-size: 10px !important;
     background: #fff; 
     outline: none; 
     cursor: text;
     color: #9d174d;
 }
 .col-acoes-aniver { 
-    width: 60px; 
+    width: 45px; 
     text-align: center;
     background: #fff;
 }
 
-.botoes-acoes { display: flex; align-items: center; justify-content: center; gap: 3px; opacity: 0.35; transition: opacity 0.2s; }
+.botoes-acoes { display: flex; align-items: center; justify-content: center; gap: 2px; opacity: 0.35; transition: opacity 0.2s; }
 tr:hover .botoes-acoes { opacity: 1; }
 .btn-acao { 
     background: var(--slate-100); 
     border: 1px solid var(--slate-300); 
-    border-radius: 4px; 
+    border-radius: 3px; 
     cursor: pointer; 
-    padding: 2px 4px; 
-    font-size: 9px; 
+    padding: 1px 3px; 
+    font-size: 8px; 
 }
 .btn-mais-linha { color: var(--success); font-weight: 900; }
 .btn-lixeira { color: var(--danger); font-weight: 900; }
@@ -333,17 +333,17 @@ tr:hover .botoes-acoes { opacity: 1; }
     background: #ffffff;
 }
 
-/* IMPRESSÃO A4 */
+/* IMPRESSÃO A4 EM 1 PÁGINA VERTICAL RÍGIDA */
 @media print {
     @page { 
         size: A4 portrait; 
-        margin: 4mm 5mm !important; 
+        margin: 2mm 3mm !important; 
     }
     html, body { 
         background: #fff !important; 
         margin: 0 !important; 
         padding: 0 !important; 
-        height: auto !important;
+        height: 100% !important;
         -webkit-print-color-adjust: exact !important; 
         print-color-adjust: exact !important; 
     }
@@ -357,32 +357,48 @@ tr:hover .botoes-acoes { opacity: 1; }
         max-width: 100% !important; 
         padding: 0 !important; 
         margin: 0 !important; 
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
     }
     .contentor-blocos {
-        gap: 3px !important;
-        margin-top: 2px !important;
+        gap: 1px !important;
+        margin-top: 1px !important;
     }
     .bloco-mes { 
         page-break-inside: avoid !important; 
         break-inside: avoid !important; 
-        margin-bottom: 2px !important;
+        margin-bottom: 1px !important;
         border-width: 1px !important;
     }
     .td-mes-nome { 
         background-color: var(--primary) !important; 
         color: #fff !important; 
-        font-size: 10px !important;
-        padding: 2px 4px !important;
+        font-size: 8.5px !important;
+        padding: 1px 3px !important;
     }
     table.tabela-mes td { 
         border: 1px solid #f9a8d4 !important; 
-        font-size: 10.5px !important;
-        height: 20px !important;
-        line-height: 20px !important;
-        padding: 0 6px !important;
+        font-size: 9px !important;
+        height: 16px !important;
+        line-height: 16px !important;
+        padding: 0 4px !important;
     }
     .col-data-aniver {
-        font-size: 10.5px !important;
+        font-size: 9px !important;
+    }
+    .cabecalho-container, .info-aniver-bar {
+        margin-bottom: 2px !important;
+    }
+    .cabecalho-container td, .info-aniver-bar td {
+        padding: 1.5px 4px !important;
+        font-size: 8px !important;
+    }
+    .logo-box {
+        font-size: 11px !important;
+        width: 55px !important;
+    }
+    .titulo-box {
+        font-size: 9px !important;
     }
 }
 </style>
@@ -455,16 +471,16 @@ tr:hover .botoes-acoes { opacity: 1; }
         const DADOS_INICIAIS = {
             "JANEIRO": ["MARIANA PEREIRA CRUZ - 11/01", "RICARDO GONCALVES DE MELLO LEITE - 13/01", "JOAO SILVA RAMOS - 18/01", "ALFREDO AUGUSTO RAMOS NETO - 22/01"],
             "FEVEREIRO": ["MARCOS AURELIO CATALLARES MATTOS - 01/02", "VANDERSON TEIXEIRA - 04/02", "BRUNO RICARDO - 07/02", "GABRIEL CARNEIRO - 07/02"],
-            "MARÇO": ["GLEIVSTON SILVA MENDES - 22/03"],
-            "ABRIL": [],
-            "MAIO": [],
-            "JUNHO": ["ROBSON DE SOUZA MENDONCA - 04/06", "PAULO HENRIQUE - 08/06"],
-            "JULHO": ["BRUNO GOMES FIDELIS - 02/07", "ATMISTO SILVA - 20/07"],
+            "MARÇO": ["GLEIVSTON SILVA MENDES - 22/03", "REINALDO DO NASCIMENTO MOUREIRA - 26/03"],
+            "ABRIL": ["CAMILA MAGALHAES GONCALVES - 27/04"],
+            "MAIO": ["LEONAM MOTA PEIXOTO - 22/05", "LUCAS BRAGA - 29/05"],
+            "JUNHO": ["ROBSON DE SOUZA MENDONCA - 04/06", "PAULO HENRIQUE - 08/06", "PAULO HENRIQUE FIRMIANO DE PAIVA - 08/06", "LUIZ CARLOS DOS SANTOS - 15/06"],
+            "JULHO": ["BRUNO GOMES FIDELIS - 02/07", "ATMISTO SILVA - 20/07", "ATMISTO ALEXANDRE MUNIZ DA SILVA - 20/07", "GIOVANA CORREA DA SILVA - 30/07"],
             "AGOSTO": ["CAIO HENRIQUE - 06/08", "PABLO MESQUITA - 25/08", "DAVID MARCELO DELGADO DOS SANTOS - 26/08"],
-            "SETEMBRO": [],
+            "SETEMBRO": ["CLAUDIO ALVES - 16/09", "PABLO GOMES DO COUTO - 25/09"],
             "OUTUBRO": [],
-            "NOVEMBRO": ["DOMINIQUE SILVA - 02/11", "RICHARD SILVA - 24/11"],
-            "DEZEMBRO": ["EMERSON RIBEIRO DOS SANTOS - 04/12", "ALLAN SOUZA DE CARVALHO - 15/12", "TITO DACAL - 27/12"]
+            "NOVEMBRO": ["DOMINIQUE SILVA - 02/11", "DOMINIQUE WENDOS DA SILVA - 02/11", "SAINT CLAIR DA CONCEICAO LOPES - 03/11", "RICHARD SILVA - 24/11"],
+            "DEZEMBRO": ["EMERSON RIBEIRO DOS SANTOS - 04/12", "AMANDA FERNANDA VASCONCELOS - 10/12", "ALLAN SOUZA DE CARVALHO - 15/12", "TITO DACAL - 27/12"]
         };
 
         function mostrarToast(msg) {
@@ -540,7 +556,6 @@ tr:hover .botoes-acoes { opacity: 1; }
                 `;
             }
 
-            // Linha extra em branco em baixo
             linhasHTML += `
                 <tr class="tr-linha-em-branco">
                     <td class="col-nome-aniver" contenteditable="true" onblur="atualizarMetricas()" placeholder="Nome..."></td>
@@ -669,7 +684,6 @@ tr:hover .botoes-acoes { opacity: 1; }
             return obj;
         }
 
-        // ORDENAÇÃO DE DIAS AUTOMÁTICA (DO 01 AO 31)
         function ordenarObjeto(dados) {
             for (let mes in dados) {
                 dados[mes].sort((a, b) => {
@@ -692,7 +706,6 @@ tr:hover .botoes-acoes { opacity: 1; }
             if (mostrarMsg) mostrarToast('Aniversários organizados por dia com sucesso!');
         }
 
-        // DISTRIBUIÇÃO E ORDENAÇÃO DIRETA
         function distribuirNomesImportados() {
             const texto = document.getElementById('importarTextoAniver').value;
             if(!texto.trim()) {
@@ -726,7 +739,6 @@ tr:hover .botoes-acoes { opacity: 1; }
                         const dataFormatada = `${dia}/${String(mesNum).padStart(2, '0')}`;
                         if (!dados[mesNome]) dados[mesNome] = [];
 
-                        // Evita duplicatas idênticas se já estiver cadastrado
                         const jaExiste = dados[mesNome].some(item => item.startsWith(nome));
                         if (!jaExiste) {
                             dados[mesNome].push(`${nome} - ${dataFormatada}`);
@@ -736,12 +748,11 @@ tr:hover .botoes-acoes { opacity: 1; }
                 }
             });
 
-            // Ordena os dias automaticamente do 01 ao 31
             dados = ordenarObjeto(dados);
 
             document.getElementById('importarTextoAniver').value = '';
             renderizarComDados(dados);
-            mostrarToast(`🎉 SUCESSO! ${adicionados} aniversariante(s) distribuído(s) e ordenados por dia!`);
+            mostrarToast(`🎉 SUCESSO! ${adicionados} aniversariante(s) distribuído(s) e ordenados!`);
         }
 
         function renderizarComDados(dados) {
