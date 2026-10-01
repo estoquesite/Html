@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 7 - Compras Cartão Corporativo (v2) | Portal Vale</title>
+    <title>Módulo 7 - Compras Cartão Corporativo (v5) | Portal Vale</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
@@ -11,6 +11,8 @@
     </script>
     <!-- SDK Oficial do Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Tesseract.js para leitura de Fotos por IA (OCR) -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <style>
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
@@ -62,7 +64,7 @@
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300">Módulo 7</span>
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
-                        <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded">v2 Corrigido</span>
+                        <span class="text-[10px] bg-emerald-100 text-emerald-800 font-bold px-1.5 py-0.5 rounded">v5 Completo</span>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
                         <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale Operacional</p>
@@ -81,26 +83,22 @@
                     <span>Pessoas</span>
                 </button>
                 
-                <!-- RECUPERAR PLANILHA -->
                 <label class="bg-amber-600 hover:bg-amber-700 text-white px-3.5 py-2 rounded-xl text-xs font-black transition shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95">
                     <span>📂</span>
                     <span>Recuperar Planilha</span>
                     <input type="file" id="inputRecuperarCSV" accept=".csv,.txt" class="hidden" onchange="importarCSVRecuperacao(this.files)">
                 </label>
 
-                <!-- SALVAR DEFINITIVO NA NUVEM -->
                 <button type="button" onclick="salvarTudoNaNuvem()" class="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 rounded-xl text-xs font-black transition shadow-sm flex items-center gap-1.5 cursor-pointer">
-                    <span>☁️</span>
-                    <span>Salvar na Nuvem (Subir Tudo)</span>
+                    <span>☁️️</span>
+                    <span>Salvar na Nuvem</span>
                 </button>
 
-                <!-- SINCRONIZAR -->
                 <button type="button" onclick="carregarDoSupabase()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-sm">
                     🔄 Sincronizar
                 </button>
 
-                <!-- EXPORTAR CSV -->
-                <button type="button" onclick="exportarParaCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer">
+                <button type="button" onclick="exportarParaCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1">
                     📥 CSV
                 </button>
             </div>
@@ -109,18 +107,54 @@
         <!-- AVISO DE STATUS -->
         <div id="alertaSistema" class="hidden p-3 rounded-xl text-xs font-bold text-center transition-all"></div>
 
+        <!-- PAINÉIS DE LEITURA INTELIGENTE POR IA (TEXTO, LINK E FOTO) -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- LEITOR POR TEXTO E LINK (IA) -->
+            <div class="bg-gradient-to-br from-indigo-900 to-slate-900 text-white p-4 rounded-2xl shadow-md border border-indigo-700/50 space-y-2.5">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-black uppercase text-indigo-200 flex items-center gap-1.5">
+                        <span>🤖</span> Leitor Inteligente por Texto e Links (IA)
+                    </span>
+                    <span class="text-[9px] bg-indigo-500/30 text-indigo-300 px-2 py-0.5 rounded font-bold">Cole fatura ou link</span>
+                </div>
+                <textarea id="textoIA" placeholder="Cole aqui o texto do pedido, comprovativo ou link (ex: Mercado Livre)..." class="w-full h-16 bg-slate-950/60 border border-indigo-700/60 rounded-xl p-2.5 text-xs text-white uppercase outline-none focus:border-indigo-400 font-medium"></textarea>
+                <div class="flex justify-end">
+                    <button type="button" onclick="processarTextoIA()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-black px-4 py-1.5 rounded-xl text-xs transition shadow cursor-pointer">
+                        ✨ Interpretar Texto/Link e Preencher
+                    </button>
+                </div>
+            </div>
+
+            <!-- LEITOR POR FOTO (OCR) -->
+            <div class="bg-gradient-to-br from-teal-900 to-slate-900 text-white p-4 rounded-2xl shadow-md border border-teal-700/50 space-y-2.5">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-black uppercase text-teal-200 flex items-center gap-1.5">
+                        <span>📷</span> Identificar Compra por Foto (OCR)
+                    </span>
+                    <span class="text-[9px] bg-teal-500/30 text-teal-300 px-2 py-0.5 rounded font-bold">Cupom / Nota Fiscal</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <label class="flex-1 bg-slate-950/60 hover:bg-slate-950 border border-teal-700/60 rounded-xl p-2 text-xs text-teal-200 font-bold text-center cursor-pointer truncate transition">
+                        <span id="nomeArquivoFoto">📂 Selecionar Imagem do Cupom...</span>
+                        <input type="file" id="inputFotoCupom" accept="image/*" class="hidden" onchange="processarFotoOCR(this)">
+                    </label>
+                </div>
+                <div id="statusOCR" class="text-[10px] text-teal-300 font-bold hidden"></div>
+            </div>
+        </div>
+
         <!-- CARTÕES DE RESUMO -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
-                <span id="labelTotalItens" class="text-[10px] font-bold uppercase text-slate-400">Total de Despesas</span>
+                <span class="text-[10px] font-bold uppercase text-slate-400">Total de Despesas</span>
                 <h3 id="cardTotalItens" class="text-xl font-black text-indigo-600 dark:text-indigo-400 mt-0.5">0</h3>
             </div>
             <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
-                <span id="labelValorTotal" class="text-[10px] font-bold uppercase text-slate-400">Total Faturado no Cartão</span>
+                <span class="text-[10px] font-bold uppercase text-slate-400">Total Faturado no Cartão</span>
                 <h3 id="cardValorTotal" class="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5">R$ 0,00</h3>
             </div>
             <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-indigo-400 transition" onclick="abrirModalUsuarios()" title="Clique para ver lista completa">
-                <span id="labelPessoaCard" class="text-[10px] font-bold uppercase text-slate-400">Principal Solicitante (Ver Todos 👥)</span>
+                <span class="text-[10px] font-bold uppercase text-slate-400">Principal Solicitante (Ver Todos 👥)</span>
                 <h3 id="cardTopSolicitante" class="text-base font-black text-slate-700 dark:text-slate-200 truncate mt-0.5 uppercase">Nenhum</h3>
             </div>
         </div>
@@ -128,7 +162,7 @@
         <!-- CARDS DINÂMICOS POR PESSOA -->
         <div id="containerCardsPessoas" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5"></div>
 
-        <!-- BARRA DE FILTRO, PESQUISA E VALORES -->
+        <!-- BARRA DE FILTRO E PESQUISA -->
         <div class="bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 p-3.5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="flex items-center gap-2 w-full sm:w-auto">
                 <span class="text-base">🔍</span>
@@ -193,6 +227,14 @@
                 </div>
             </div>
 
+            <!-- CAMPO DEDICADO PARA O LINK DO PRODUTO -->
+            <div class="grid grid-cols-1 md:grid-cols-12 gap-3">
+                <div class="md:col-span-12">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">🔗 Link do Produto / Comprovativo (Opcional)</label>
+                    <input type="url" id="manualLink" placeholder="https://www.mercadolivre.com.br/..." class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-semibold outline-none">
+                </div>
+            </div>
+
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end pt-1">
                 <div class="md:col-span-3">
                     <div class="flex justify-between items-center mb-1">
@@ -238,9 +280,10 @@
                 <table class="w-full text-left text-xs border-collapse">
                     <thead>
                         <tr class="border-b border-slate-100 dark:border-slate-700 text-slate-400 font-bold uppercase text-[10px]">
+                            <th class="py-2.5 px-2 text-center w-12">Entregue</th>
                             <th class="py-2.5 px-3">Data</th>
                             <th class="py-2.5 px-3">Solicitante</th>
-                            <th class="py-2.5 px-3">Produto / Serviço</th>
+                            <th class="py-2.5 px-3">Produto / Serviço & Link</th>
                             <th class="py-2.5 px-3">Local</th>
                             <th class="py-2.5 px-3">Categoria</th>
                             <th class="py-2.5 px-3 text-center">Qtd</th>
@@ -320,10 +363,8 @@
             const solManual = document.getElementById('manualSolicitante');
             if (solManual) solManual.classList.add('piscar-solicitante-forte');
 
-            // 1. Carrega o que está salvo localmente
             carregarDoLocalStorage();
 
-            // 2. Conecta ao Supabase
             if (window.supabase) {
                 try {
                     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -398,6 +439,89 @@
             setTimeout(() => el.classList.add('hidden'), 5000);
         }
 
+        // ================= RECONHECIMENTO DE LINKS E TEXTO (IA) =================
+        function processarTextoIA() {
+            const texto = document.getElementById('textoIA').value.trim();
+            if (!texto) {
+                alert("Cole um texto ou link na caixa de IA primeiro.");
+                return;
+            }
+
+            const linhas = texto.split('\n');
+            let produtoDetectado = "";
+            let valorDetectado = 0;
+            let localDetectado = "MERCADO LIVRE";
+            let linkDetectado = "";
+
+            if (texto.includes("http://") || texto.includes("https://")) {
+                const matchLink = texto.match(/(https?:\/\/[^\s]+)/g);
+                if (matchLink) linkDetectado = matchLink[0];
+            }
+
+            if (texto.toUpperCase().includes("AMAZON")) localDetectado = "AMAZON";
+            else if (texto.toUpperCase().includes("MAGALU")) localDetectado = "MAGAZINE LUIZA";
+
+            linhas.forEach(l => {
+                const lUp = l.toUpperCase();
+                if (lUp.includes("R$")) {
+                    const matchVal = lUp.replace(',', '.').match(/R\$\s*([\d\.]+)/);
+                    if (matchVal && matchVal[1]) {
+                        valorDetectado = parseFloat(matchVal[1]) || 0;
+                    }
+                }
+                if (!produtoDetectado && l.trim().length > 5 && !lUp.includes("HTTP")) {
+                    produtoDetectado = l.trim().toUpperCase();
+                }
+            });
+
+            if (produtoDetectado) document.getElementById('manualProduto').value = produtoDetectado;
+            if (valorDetectado > 0) {
+                document.getElementById('manualTotal').value = valorDetectado.toFixed(2);
+                calcularManualPorTotal();
+            }
+            document.getElementById('manualLocal').value = localDetectado;
+            if (linkDetectado) {
+                document.getElementById('manualLink').value = linkDetectado;
+            }
+
+            mostrarAviso("✨ Link/Texto interpretado com sucesso!");
+            document.getElementById('textoIA').value = '';
+        }
+
+        // ================= RECONHECIMENTO POR FOTO (OCR) =================
+        async function processarFotoOCR(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            document.getElementById('nomeArquivoFoto').innerText = `Lendo imagem: ${file.name}...`;
+            const statusDiv = document.getElementById('statusOCR');
+            statusDiv.innerText = "Processando imagem por OCR... Aguarde.";
+            statusDiv.classList.remove('hidden');
+
+            try {
+                const result = await Tesseract.recognize(file, 'por+eng', {
+                    logger: m => {
+                        if (m.status === 'recognizing text') {
+                            statusDiv.innerText = `Reconhecendo texto: ${Math.round(m.progress * 100)}%`;
+                        }
+                    }
+                });
+
+                const textoExtraido = result.data.text || "";
+                document.getElementById('textoIA').value = textoExtraido;
+                processarTextoIA();
+
+                document.getElementById('nomeArquivoFoto').innerText = "📂 Selecionar Imagem do Cupom...";
+                statusDiv.classList.add('hidden');
+                mostrarAviso("📸 Foto lida com sucesso!");
+            } catch (err) {
+                statusDiv.classList.add('hidden');
+                alert("Erro ao ler foto: " + err.message);
+                document.getElementById('nomeArquivoFoto').innerText = "📂 Selecionar Imagem do Cupom...";
+            }
+            input.value = '';
+        }
+
         function calcularManualPorTotal() {
             const qtd = parseFloat(document.getElementById('manualQtd').value) || 1;
             const total = parseFloat(document.getElementById('manualTotal').value) || 0;
@@ -450,6 +574,7 @@
             const qtd = parseFloat(document.getElementById('manualQtd').value) || 1;
             const total = parseFloat(document.getElementById('manualTotal').value) || 0;
             const unit = parseFloat(document.getElementById('manualUnit').value) || (total / qtd);
+            const link = document.getElementById('manualLink').value.trim();
 
             const novoItem = {
                 id: Date.now(),
@@ -461,7 +586,8 @@
                 qtd: qtd,
                 unit: unit,
                 total: total || (qtd * unit),
-                link: ""
+                entregue: false,
+                link: link
             };
 
             compras.unshift(novoItem);
@@ -476,10 +602,20 @@
             document.getElementById('manualLocal').value = '';
             document.getElementById('manualTotal').value = '';
             document.getElementById('manualUnit').value = '';
+            document.getElementById('manualLink').value = '';
             document.getElementById('manualQtd').value = '1';
         }
 
-        // ================= IMPORTAÇÃO DA PLANILHA BAIXADA =================
+        function alternarEntregue(id) {
+            const item = compras.find(i => String(i.id) === String(id));
+            if (item) {
+                item.entregue = !item.entregue;
+                salvarNoLocalStorage();
+                renderizarTabela();
+                atualizarEntregueNoSupabase(id, item.entregue);
+            }
+        }
+
         function importarCSVRecuperacao(files) {
             if (!files || files.length === 0) return;
             const file = files[0];
@@ -523,7 +659,7 @@
                         let totalStr = (matches[7] || "0").replace(/\./g, '').replace(',', '.');
                         const unit = parseFloat(unitStr) || 0;
                         const total = parseFloat(totalStr) || (qtd * unit);
-                        const link = matches[10] || "";
+                        const link = matches[8] || "";
 
                         if (produto) {
                             novosItens.push({
@@ -536,6 +672,7 @@
                                 qtd: qtd,
                                 unit: unit,
                                 total: total,
+                                entregue: false,
                                 link: link
                             });
                         }
@@ -547,9 +684,9 @@
                     salvarNoLocalStorage();
                     atualizarListaSelectSolicitantes();
                     renderizarTabela();
-                    mostrarAviso(`🎉 SUCESSO! ${novosItens.length} itens recuperados da sua planilha! Agora clique no botão azul "Salvar na Nuvem (Subir Tudo)".`);
+                    mostrarAviso(`🎉 SUCESSO! ${novosItens.length} itens recuperados! Clique em "Salvar na Nuvem" para sincronizar.`);
                 } else {
-                    alert("Não foi possível ler as colunas. Verifique se o arquivo é a planilha exportada do sistema.");
+                    alert("Não foi possível ler as colunas do arquivo.");
                 }
 
             } catch (err) {
@@ -567,7 +704,6 @@
             return dataBR;
         }
 
-        // ================= SALVAR TUDO NA NUVEM (SEM COLUNAS PROBLEMÁTICAS) =================
         async function salvarTudoNaNuvem() {
             if (!supabaseClient) {
                 alert("Conexão com a nuvem não inicializada.");
@@ -582,7 +718,6 @@
             mostrarAviso("Enviando todos os registros para a nuvem...", "sucesso");
 
             try {
-                // Envia APENAS as colunas que comprovadamente existem
                 const dadosParaEnviar = compras.map(item => ({
                     data: item.data,
                     solicitante: item.solicitante,
@@ -592,14 +727,12 @@
                     qtd: item.qtd || 1,
                     unit: item.unit || 0,
                     total: item.total || 0,
+                    entregue: item.entregue || false,
                     link: item.link || ''
                 }));
 
                 const { error } = await supabaseClient.from('compras_corporativas').insert(dadosParaEnviar);
-                
-                if (error) {
-                    throw error;
-                }
+                if (error) throw error;
 
                 mostrarAviso(`✅ Sucesso! Todos os ${compras.length} itens foram gravados na nuvem!`);
             } catch (err) {
@@ -608,7 +741,6 @@
             }
         }
 
-        // ================= SINCRONIZAR =================
         async function carregarDoSupabase() {
             if (!supabaseClient) return;
 
@@ -626,8 +758,6 @@
                     atualizarListaSelectSolicitantes();
                     renderizarTabela();
                     mostrarAviso(`✅ Sincronizado! ${data.length} itens carregados da nuvem.`);
-                } else {
-                    mostrarAviso("Nuvem vazia no momento. Os dados do seu computador foram preservados intactos!");
                 }
             } catch (err) {
                 console.warn("Aviso nuvem:", err.message);
@@ -646,10 +776,21 @@
                     qtd: item.qtd,
                     unit: item.unit,
                     total: item.total,
+                    entregue: item.entregue,
                     link: item.link || ''
                 };
                 await supabaseClient.from('compras_corporativas').insert([payload]);
             } catch (err) {}
+        }
+
+        async function atualizarEntregueNoSupabase(id, statusEntregue) {
+            if (!supabaseClient) return;
+            try {
+                await supabaseClient
+                    .from('compras_corporativas')
+                    .update({ entregue: statusEntregue })
+                    .eq('id', id);
+            } catch(e) {}
         }
 
         function salvarNoLocalStorage() {
@@ -769,18 +910,27 @@
             listaExibicao.sort((a, b) => new Date(b.data) - new Date(a.data));
 
             if (listaExibicao.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="9" class="text-center py-6 text-slate-400 italic">NENHUMA COMPRA REGISTRADA. CLIQUE EM "📂 RECUPERAR PLANILHA" PARA CARREGAR O ARQUIVO SALVO!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" class="text-center py-6 text-slate-400 italic">NENHUMA COMPRA REGISTRADA. CLIQUE EM "📂 RECUPERAR PLANILHA" PARA CARREGAR O ARQUIVO!</td></tr>`;
             } else {
                 listaExibicao.forEach((item) => {
                     totalGastoGeral += Number(item.total || 0);
                     solicitantesContador[item.solicitante] = (solicitantesContador[item.solicitante] || 0) + 1;
 
                     const tr = document.createElement('tr');
-                    tr.className = `hover:bg-slate-50 dark:hover:bg-slate-700/40 transition uppercase`;
+                    tr.className = `hover:bg-slate-50 dark:hover:bg-slate-700/40 transition uppercase ${item.entregue ? 'opacity-60 bg-emerald-50/40 dark:bg-emerald-950/20' : ''}`;
+                    
+                    let htmlProduto = `<span class="${item.entregue ? 'line-through text-slate-400' : ''}">${item.produto}</span>`;
+                    if (item.link && item.link.startsWith('http')) {
+                        htmlProduto += ` <a href="${item.link}" target="_blank" class="text-indigo-600 dark:text-indigo-400 font-bold hover:underline ml-1" title="Abrir Link">🔗 [Link]</a>`;
+                    }
+
                     tr.innerHTML = `
+                        <td class="py-2.5 px-2 text-center">
+                            <input type="checkbox" ${item.entregue ? 'checked' : ''} onchange="alternarEntregue(${item.id})" class="w-4 h-4 accent-emerald-600 rounded cursor-pointer">
+                        </td>
                         <td class="py-2.5 px-3 font-semibold whitespace-nowrap">${formatarDataBR(item.data)}</td>
                         <td class="py-2.5 px-3 font-bold whitespace-nowrap">${item.solicitante}</td>
-                        <td class="py-2.5 px-3 max-w-xs truncate">${item.produto}</td>
+                        <td class="py-2.5 px-3 max-w-xs truncate">${htmlProduto}</td>
                         <td class="py-2.5 px-3 font-semibold text-indigo-700 whitespace-nowrap">${item.local}</td>
                         <td class="py-2.5 px-3 whitespace-nowrap"><span class="text-[10px] bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded-full font-bold">${item.categoria}</span></td>
                         <td class="py-2.5 px-3 text-center font-bold">${item.qtd}</td>
@@ -795,7 +945,6 @@
             }
 
             document.getElementById('cardTotalItens').innerText = listaExibicao.length;
-            document.getElementById('labelContador').innerText = `${listaExibicao.length} ITENS EXIBIDOS`;
             document.getElementById('cardValorTotal').innerText = `R$ ${totalGastoGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
             let topSolicitante = "NENHUM";
@@ -832,10 +981,11 @@
                 return;
             }
 
-            let csv = "\uFEFFDATA;SOLICITANTE;PRODUTO/SERVIÇO;LOCAL/FORNECEDOR;CATEGORIA;QUANTIDADE;VALOR UNITÁRIO (R$);TOTAL (R$);LINK DO PRODUTO\n";
+            let csv = "\uFEFFENTREGUE;DATA;SOLICITANTE;PRODUTO/SERVIÇO;LOCAL/FORNECEDOR;CATEGORIA;QUANTIDADE;VALOR UNITÁRIO (R$);TOTAL (R$);LINK\n";
 
             compras.forEach(item => {
                 const linha = [
+                    item.entregue ? "SIM" : "NÃO",
                     formatarDataBR(item.data),
                     `"${(item.solicitante || '').replace(/"/g, '""')}"`,
                     `"${(item.produto || '').replace(/"/g, '""')}"`,
