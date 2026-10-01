@@ -201,14 +201,14 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end pt-1">
                 <div class="md:col-span-3">
                     <div class="flex justify-between items-center mb-1">
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Categoria</label>
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase">Categoria</label>
                         <button type="button" onclick="adicionarNovaCategoriaPrompt('manualCategoria')" class="text-[9px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline">+ Nova</button>
                     </div>
                     <select id="manualCategoria" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-semibold outline-none"></select>
                 </div>
 
                 <div class="md:col-span-1">
-                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Qtd</label>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Qtd</label>
                     <input type="number" id="manualQtd" value="1" min="1" oninput="calcularManualPorTotal()" class="w-full text-xs p-2.5 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white outline-none">
                 </div>
 
@@ -218,7 +218,7 @@
                 </div>
 
                 <div class="md:col-span-2">
-                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Unitário (R$)</label>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Unitário (R$)</label>
                     <input type="number" step="0.01" id="manualUnit" placeholder="0,00" oninput="calcularManualPorUnitario()" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
 
@@ -595,7 +595,7 @@
                     salvarNoLocalStorage();
                     atualizarListaSelectSolicitantes();
                     renderizarTabela();
-                    mostrarAviso(`🎉 SUCESSO! ${novosItens.length} itens recuperados da sua planilha! Agora clique no botão "Salvar na Nuvem".`);
+                    mostrarAviso(`🎉 SUCESSO! ${novosItens.length} itens recuperados da sua planilha! Agora clique no botão azul "Salvar na Nuvem (Subir Tudo)".`);
                 } else {
                     alert("Não foi possível ler as colunas. Verifique se o arquivo é a planilha exportada do sistema.");
                 }
@@ -615,7 +615,7 @@
             return dataBR;
         }
 
-        // ================= BOTÃO: SALVAR TUDO NA NUVEM =================
+        // ================= BOTÃO: SALVAR TUDO NA NUVEM (SEM COLUNAS INCOMPATÍVEIS) =================
         async function salvarTudoNaNuvem() {
             if (!supabaseClient) {
                 alert("Conexão com a nuvem não inicializada.");
@@ -630,6 +630,7 @@
             mostrarAviso("Enviando todos os registros para a nuvem...", "sucesso");
 
             try {
+                // Envia APENAS as colunas existentes na tabela compras_corporativas
                 const dadosParaEnviar = compras.map(item => ({
                     data: item.data,
                     solicitante: item.solicitante,
@@ -639,9 +640,7 @@
                     qtd: item.qtd || 1,
                     unit: item.unit || 0,
                     total: item.total || 0,
-                    link: item.link || '',
-                    entregue: !!item.entregue,
-                    data_entrega: item.data_entrega || ''
+                    link: item.link || ''
                 }));
 
                 const { error } = await supabaseClient.from('compras_corporativas').insert(dadosParaEnviar);
@@ -670,7 +669,11 @@
                 if (error) throw error;
 
                 if (data && data.length > 0) {
-                    compras = data;
+                    compras = data.map(item => ({
+                        ...item,
+                        entregue: item.entregue || false,
+                        data_entrega: item.data_entrega || ''
+                    }));
                     salvarNoLocalStorage();
                     atualizarListaSelectSolicitantes();
                     renderizarTabela();
@@ -695,9 +698,7 @@
                     qtd: item.qtd,
                     unit: item.unit,
                     total: item.total,
-                    link: item.link || '',
-                    entregue: !!item.entregue,
-                    data_entrega: item.data_entrega || ''
+                    link: item.link || ''
                 };
                 await supabaseClient.from('compras_corporativas').insert([payload]);
             } catch (err) {}
@@ -843,7 +844,7 @@
                         <td class="py-2.5 px-3 whitespace-nowrap"><span class="text-[10px] bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded-full font-bold">${item.categoria}</span></td>
                         <td class="py-2.5 px-3 text-center font-bold">${item.qtd}</td>
                         <td class="py-2.5 px-3 text-right text-slate-500 whitespace-nowrap">R$ ${Number(item.unit || 0).toFixed(2)}</td>
-                        <td class="py-2.5 px-3 text-right font-black text-emerald-600 dark:text-emerald-400 whitespace-nowrap">R$ ${Number(item.total || 0).toFixed(2)}</td>
+                        <td class="py-2.5 px-3 text-right font-black text-emerald-600 whitespace-nowrap">R$ ${Number(item.total || 0).toFixed(2)}</td>
                         <td class="py-2.5 px-3 text-center whitespace-nowrap">
                             <input type="checkbox" id="chk-entregue-${item.id}" ${entregueChecked} onchange="salvarAlteracaoEntrega(${item.id})" class="w-4 h-4 text-emerald-600 rounded cursor-pointer">
                         </td>
