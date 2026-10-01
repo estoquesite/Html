@@ -6,8 +6,8 @@
     <title>Módulo 9 - Controle de Notebooks | Portal Vale</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Leitor Rápido de Código de Barras (ZXing Ultra Leve) -->
-    <script src="https://unpkg.com/@zxing/library@latest"></script>
+    <!-- Leitor Oficial HTML5 QR/Barcode com suporte a Code-128 e Code-39 -->
+    <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -35,21 +35,11 @@
             box-shadow: 0 4px 14px -2px rgba(245, 158, 11, 0.18), 0 2px 6px rgba(0, 0, 0, 0.04) !important;
         }
 
-        /* Guia visual do Scanner */
-        .scanner-laser {
-            position: absolute;
-            top: 50%;
-            left: 5%;
-            right: 5%;
-            height: 2px;
-            background: #ef4444;
-            box-shadow: 0 0 10px #ef4444;
-            animation: laserScan 2s infinite ease-in-out;
-        }
-
-        @keyframes laserScan {
-            0%, 100% { transform: translateY(-50px); opacity: 0.8; }
-            50% { transform: translateY(50px); opacity: 1; }
+        /* Estilização da caixa da câmera */
+        #leitor-camera video {
+            border-radius: 12px;
+            object-fit: cover !important;
+            width: 100% !important;
         }
     </style>
 </head>
@@ -69,9 +59,9 @@
                         <h1 class="text-sm sm:text-base font-black text-slate-900 dark:text-white uppercase tracking-wide">Controle de Notebooks & Periféricos</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500">Leitor Instantâneo de Código de Barras (Barcode)</p>
+                        <p class="text-xs text-slate-500">Leitor Code-128 & Code-39 (Placa Vale / DXC)</p>
                         <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span class="text-[10px] font-bold text-emerald-600">Scan Ultrarrápido</span>
+                        <span class="text-[10px] font-bold text-emerald-600">Scanner Ativo</span>
                     </div>
                 </div>
             </div>
@@ -89,44 +79,42 @@
         <!-- AVISO DE STATUS -->
         <div id="alertaSistema" class="hidden p-3 rounded-xl text-xs font-bold text-center transition-all"></div>
 
-        <!-- QUADRO SCANNER DE CÓDIGO DE BARRAS -->
+        <!-- QUADRO DO SCANNER -->
         <div class="bloco-destacado bg-white dark:bg-slate-800 p-4 rounded-2xl space-y-3">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
                     <h2 class="text-sm font-black text-amber-800 dark:text-amber-300 uppercase flex items-center gap-2">
                         <span>⚡</span>
-                        <span>Leitor Instantâneo de Código de Barras</span>
+                        <span>Leitor de Código de Barras da Etiqueta</span>
                     </h2>
                     <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                        Aponte a câmera para as barrinhas da etiqueta do notebook ou envie uma foto. A leitura é imediata!
+                        Aponte para as barras pretas ou envie a foto da etiqueta.
                     </p>
                 </div>
 
                 <div class="flex flex-wrap gap-2 w-full sm:w-auto">
-                    <!-- BOTÃO SCAN AO VIVO -->
-                    <button type="button" onclick="iniciarScannerAoVivo()" id="btnScannerAoVivo" class="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 active:scale-95 text-white text-xs font-black px-4 py-2.5 rounded-xl cursor-pointer shadow-md transition">
+                    <!-- BOTÃO SCAN CÂMERA -->
+                    <button type="button" onclick="iniciarLeitorCamera()" id="btnIniciarCamera" class="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-black px-4 py-2.5 rounded-xl cursor-pointer shadow-md transition">
                         <span>📹</span>
-                        <span>Abrir Câmera ao Vivo</span>
+                        <span>Abrir Câmera</span>
                     </button>
 
                     <!-- BOTÃO FOTO / ARQUIVO -->
                     <label class="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 text-xs font-bold px-4 py-2.5 rounded-xl cursor-pointer shadow-sm transition">
                         <span>🖼️</span>
-                        <span>Ler de Foto/Print</span>
-                        <input type="file" id="inputFotoArquivo" accept="image/*" class="hidden" onchange="processarFotoBarcode(this.files)">
+                        <span>Ler Foto da Etiqueta</span>
+                        <input type="file" id="inputArquivoFoto" accept="image/*" class="hidden" onchange="lerCodigoDeFoto(this.files)">
                     </label>
                 </div>
             </div>
 
-            <!-- CONTAINER DO SCANNER AO VIVO (MODAL/VIEWPORT) -->
-            <div id="containerCamera" class="hidden relative rounded-2xl overflow-hidden bg-black max-w-md mx-auto aspect-video sm:aspect-square flex items-center justify-center border-2 border-amber-500">
-                <video id="videoPreview" class="w-full h-full object-cover"></video>
-                <div class="scanner-laser"></div>
-                <div class="absolute bottom-3 flex gap-2">
-                    <button type="button" onclick="pararScanner()" class="bg-rose-600 text-white text-xs font-bold px-4 py-1.5 rounded-xl shadow-lg cursor-pointer">
-                        ✕ Fechar Câmera
-                    </button>
-                </div>
+            <!-- JANELA DE VÍDEO DO SCANNER -->
+            <div id="boxCameraWrapper" class="hidden max-w-sm mx-auto bg-slate-900 rounded-2xl p-2.5 text-center space-y-2 border-2 border-amber-500">
+                <div id="leitor-camera" class="w-full rounded-xl overflow-hidden min-h-[240px]"></div>
+                <p class="text-[11px] text-amber-300 font-bold animate-pulse">Enquadre as barras pretas na linha central</p>
+                <button type="button" onclick="pararLeitorCamera()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-5 py-1.5 rounded-xl shadow cursor-pointer">
+                    ✕ Fechar Câmera
+                </button>
             </div>
         </div>
 
@@ -276,7 +264,7 @@
     </div>
 
     <script>
-        let codeReader = null;
+        let html5QrScanner = null;
         let notebooks = [];
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -292,121 +280,7 @@
                 tipo === 'sucesso' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
             }`;
             el.classList.remove('hidden');
-            setTimeout(() => el.classList.add('hidden'), 4000);
-        }
-
-        // ================= SCANNER AO VIVO (CÂMERA) =================
-        async function iniciarScannerAoVivo() {
-            const container = document.getElementById('containerCamera');
-            const video = document.getElementById('videoPreview');
-
-            container.classList.remove('hidden');
-
-            try {
-                codeReader = new ZXing.BrowserMultiFormatReader();
-                const videoInputDevices = await codeReader.listVideoInputDevices();
-                
-                // Escolhe a câmera traseira se disponível
-                const selectedDeviceId = videoInputDevices.find(device => 
-                    device.label.toLowerCase().includes('back') || 
-                    device.label.toLowerCase().includes('traseira')
-                )?.deviceId || videoInputDevices[0]?.deviceId;
-
-                codeReader.decodeFromVideoDevice(selectedDeviceId, video, (result, err) => {
-                    if (result) {
-                        tocarBip();
-                        aplicarResultadoBarcode(result.text);
-                        pararScanner();
-                    }
-                });
-            } catch (err) {
-                console.error(err);
-                alert("Não foi possível acessar a câmera para leitura.");
-                pararScanner();
-            }
-        }
-
-        function pararScanner() {
-            if (codeReader) {
-                codeReader.reset();
-                codeReader = null;
-            }
-            document.getElementById('containerCamera').classList.add('hidden');
-        }
-
-        // ================= LEITURA DE FOTO/PRINT RÁPIDA =================
-        async function processarFotoBarcode(files) {
-            if (!files || files.length === 0) return;
-            const file = files[0];
-
-            mostrarAviso("Lendo código de barras da imagem...", "sucesso");
-
-            try {
-                // Tenta API nativa do sistema (Ultra rápida)
-                if ('BarcodeDetector' in window) {
-                    const detector = new BarcodeDetector();
-                    const bitmap = await createImageBitmap(file);
-                    const barcodes = await detector.detect(bitmap);
-                    if (barcodes.length > 0) {
-                        tocarBip();
-                        aplicarResultadoBarcode(barcodes[0].rawValue);
-                        return;
-                    }
-                }
-
-                // Fallback instantâneo com ZXing
-                const reader = new ZXing.BrowserMultiFormatReader();
-                const imgUrl = URL.createObjectURL(file);
-                const result = await reader.decodeFromImageUrl(imgUrl);
-
-                if (result) {
-                    tocarBip();
-                    aplicarResultadoBarcode(result.text);
-                }
-            } catch (e) {
-                // Se o código de barras estiver invertido, inverte e tenta mais uma vez
-                tentarComRotacao(file);
-            }
-        }
-
-        async function tentarComRotacao(file) {
-            try {
-                const img = new Image();
-                img.onload = async () => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    canvas.width = img.width;
-                    canvas.height = img.height;
-                    ctx.translate(canvas.width / 2, canvas.height / 2);
-                    ctx.rotate(Math.PI); // 180 graus
-                    ctx.drawImage(img, -img.width / 2, -img.height / 2);
-
-                    const reader = new ZXing.BrowserMultiFormatReader();
-                    const result = await reader.decodeFromImageUrl(canvas.toDataURL());
-                    if (result) {
-                        tocarBip();
-                        aplicarResultadoBarcode(result.text);
-                    } else {
-                        mostrarAviso("Código de barras não detectado na imagem. Tente aproximar ou focar a câmera.", "erro");
-                    }
-                };
-                img.src = URL.createObjectURL(file);
-            } catch (err) {
-                mostrarAviso("Código de barras não detectado na foto. Tente a opção 'Câmera ao Vivo'.", "erro");
-            }
-        }
-
-        function aplicarResultadoBarcode(codigoLido) {
-            const limpo = codigoLido.trim().toUpperCase();
-            
-            // Se começa com BR (Asset), joga no patrimônio, senão joga no Serial
-            if (limpo.startsWith("BR")) {
-                document.getElementById('patrimonio').value = limpo;
-                mostrarAviso(`✅ Patrimônio lido: ${limpo}`);
-            } else {
-                document.getElementById('serial').value = limpo;
-                mostrarAviso(`✅ Serial lido: ${limpo}`);
-            }
+            setTimeout(() => el.classList.add('hidden'), 5000);
         }
 
         function tocarBip() {
@@ -415,14 +289,133 @@
                 const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
                 const osc = audioCtx.createOscillator();
                 osc.type = "sine";
-                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.frequency.setValueAtTime(900, audioCtx.currentTime);
                 osc.connect(audioCtx.destination);
                 osc.start();
-                osc.stop(audioCtx.currentTime + 0.15);
+                osc.stop(audioCtx.currentTime + 0.12);
             } catch (e) {}
         }
 
-        // ================= DADOS E PERSISTÊNCIA =================
+        // ================= LEITOR AO VIVO (HTML5 QRCODE COM SUPORTE 1D) =================
+        async function iniciarLeitorCamera() {
+            const wrapper = document.getElementById('boxCameraWrapper');
+            wrapper.classList.remove('hidden');
+
+            if (html5QrScanner) {
+                await pararLeitorCamera();
+            }
+
+            html5QrScanner = new Html5Qrcode("leitor-camera");
+
+            // Configuração específica para Código de Barras 1D (Code 128 / Code 39)
+            const config = {
+                fps: 15,
+                qrbox: { width: 300, height: 120 }, // Caixa retangular horizontal para código de barras
+                formatsToSupport: [
+                    Html5QrcodeSupportedFormats.CODE_128,
+                    Html5QrcodeSupportedFormats.CODE_39,
+                    Html5QrcodeSupportedFormats.EAN_13,
+                    Html5QrcodeSupportedFormats.QR_CODE
+                ]
+            };
+
+            html5QrScanner.start(
+                { facingMode: "environment" }, // Câmera traseira
+                config,
+                (decodedText) => {
+                    tocarBip();
+                    aplicarCodigoLido(decodedText);
+                    pararLeitorCamera();
+                },
+                (errorMessage) => {
+                    // leitura contínua (silencioso)
+                }
+            ).catch(err => {
+                alert("Erro ao abrir a câmera: Permissão negada ou câmera ocupada.");
+                pararLeitorCamera();
+            });
+        }
+
+        async function pararLeitorCamera() {
+            if (html5QrScanner) {
+                try {
+                    await html5QrScanner.stop();
+                    html5QrScanner.clear();
+                } catch(e) {}
+                html5QrScanner = null;
+            }
+            document.getElementById('boxCameraWrapper').classList.add('hidden');
+        }
+
+        // ================= LEITURA DIRETA POR FOTO/ARQUIVO =================
+        async function lerCodigoDeFoto(files) {
+            if (!files || files.length === 0) return;
+            const file = files[0];
+
+            mostrarAviso("Identificando código de barras na foto...", "sucesso");
+
+            const scannerArquivo = new Html5Qrcode("leitor-camera");
+            
+            // Tenta decodificar a imagem direta
+            scannerArquivo.scanFile(file, true)
+                .then(decodedText => {
+                    tocarBip();
+                    aplicarCodigoLido(decodedText);
+                })
+                .catch(err => {
+                    // Se falhar (ex: foto de cabeça para baixo), rotaciona a imagem em 180° e tenta de novo
+                    rotacionarETentar(file, scannerArquivo);
+                });
+        }
+
+        function rotacionarETentar(file, scannerArquivo) {
+            const img = new Image();
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                const ctx = canvas.getContext('2d');
+                canvas.width = img.width;
+                canvas.height = img.height;
+
+                // Inverte 180 graus
+                ctx.translate(canvas.width / 2, canvas.height / 2);
+                ctx.rotate(Math.PI);
+                ctx.drawImage(img, -img.width / 2, -img.height / 2);
+
+                canvas.toBlob(blob => {
+                    const novoArquivo = new File([blob], "invertida.png", { type: "image/png" });
+                    scannerArquivo.scanFile(novoArquivo, true)
+                        .then(decodedText => {
+                            tocarBip();
+                            aplicarCodigoLido(decodedText);
+                        })
+                        .catch(() => {
+                            mostrarAviso("Não foi possível ler as barras. Tente a opção 'Abrir Câmera' e aponte para o código.", "erro");
+                        });
+                });
+            };
+            img.src = URL.createObjectURL(file);
+        }
+
+        // ================= APLICAÇÃO DOS DADOS NO FORMULÁRIO =================
+        function aplicarCodigoLido(codigo) {
+            let limpo = (codigo || "").trim().toUpperCase();
+
+            // Remove prefixos comuns se existirem
+            limpo = limpo.replace(/^(SERIAL|ASSET|SN|BR)[-:\s]*/i, (match) => {
+                if (match.startsWith("BR")) return "BR";
+                return "";
+            });
+
+            if (limpo.startsWith("BR")) {
+                document.getElementById('patrimonio').value = limpo;
+                mostrarAviso(`✅ Patrimônio detectado: ${limpo}`);
+            } else {
+                document.getElementById('serial').value = limpo;
+                mostrarAviso(`✅ Serial detectado: ${limpo}`);
+            }
+        }
+
+        // ================= SALVAMENTO E TABELA =================
         function salvarNotebook(e) {
             e.preventDefault();
 
@@ -488,7 +481,7 @@
         }
 
         function removerNotebook(id) {
-            if (confirm("Remover este notebook?")) {
+            if (confirm("Remover este equipamento?")) {
                 notebooks = notebooks.filter(n => n.id !== id);
                 salvarNoLocalStorage();
                 renderizarTabela();
