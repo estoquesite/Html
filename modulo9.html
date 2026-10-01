@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Módulo 9 - Controle de Entrega e Recebimento de Notebooks</title>
+  <style>
+    :root {
+      --bg: #f3f4f6;
+      --card-bg: #ffffff;
+      --primary: #2563eb;
+      --primary-hover: #1d4ed8;
+      --text: #1f2937;
+      --muted: #6b7280;
+      --border: #e5e7eb;
+      --danger: #ef4444;
+      --danger-hover: #dc2626;
+      --badge-estoque: #10b981;
+      --badge-uso: #3b82f6;
+      --badge-manutencao: #f59e0b;
+      --badge-baixado: #6b7280;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      padding: 24px;
+    }
+
+    .container {
+      max-width: 1300px;
+      margin: 0 auto;
+    }
+
+    header {
+      margin-bottom: 24px;
+    }
+
+    header h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    header p {
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+
+    .card {
+      background: var(--card-bg);
+      border-radius: 8px;
+      padding: 20px;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      margin-bottom: 24px;
+    }
+
+    .card h2 {
+      font-size: 1.15rem;
+      margin-bottom: 16px;
+      color: #374151;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .section-title {
+      grid-column: 1 / -1;
+      font-weight: 600;
+      font-size: 0.9rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--primary);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 4px;
+      margin-top: 8px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: #4b5563;
+    }
+
+    input, select, textarea {
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus, select:focus, textarea:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      padding: 10px 18px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: background-color 0.2s;
+    }
+
+    .btn-primary {
+      background-color: var(--primary);
+      color: #ffffff;
+    }
+
+    .btn-primary:hover {
+      background-color: var(--primary-hover);
+    }
+
+    .filter-bar {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .filter-bar {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .table-container {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+      text-align: left;
+    }
+
+    th, td {
+      padding: 12px 14px;
+      border-bottom: 1px solid var(--border);
+      white-space: nowrap;
+    }
+
+    th {
+      background: #f9fafb;
+      font-weight: 600;
+      color: #374151;
+    }
+
+    tbody tr:hover {
+      background: #f9fafb;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #ffffff;
+      text-transform: capitalize;
+    }
+
+    .badge-estoque { background-color: var(--badge-estoque); }
+    .badge-uso { background-color: var(--badge-uso); }
+    .badge-manutencao { background-color: var(--badge-manutencao); }
+    .badge-baixado { background-color: var(--badge-baixado); }
+
+    .tag-termo {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 500;
+    }
+    .termo-sim { background: #dcfce7; color: #15803d; }
+    .termo-nao { background: #fee2e2; color: #b91c1c; }
+
+    .actions-cell {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-action-delete {
+      background: transparent;
+      border: 1px solid var(--danger);
+      color: var(--danger);
+      padding: 4px 8px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 0.75rem;
+    }
+
+    .btn-action-delete:hover {
+      background: var(--danger);
+      color: #ffffff;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>Módulo 9: Controle de Notebooks</h1>
+    <p>Gestão unificada de recebimento, saída, patrimônio e movimentações de equipamentos</p>
+  </header>
+
+  <!-- FORMULÁRIO DE CADASTRO -->
+  <div class="card">
+    <h2>Novo Registro / Entrada de Equipamento</h2>
+    <form id="notebookForm">
+      <div class="form-grid">
+        
+        <!-- Identificação -->
+        <div class="section-title">1. Identificação do Equipamento</div>
+        <div class="form-group">
+          <label>Marca *</label>
+          <input type="text" id="marca" placeholder="Ex: Dell, Lenovo, HP" required>
+        </div>
+        <div class="form-group">
+          <label>Modelo *</label>
+          <input type="text" id="modelo" placeholder="Ex: Latitude 3420, ThinkPad" required>
+        </div>
+        <div class="form-group">
+          <label>Nº de Série *</label>
+          <input type="text" id="serial" placeholder="Serial Number" required>
+        </div>
+        <div class="form-group">
+          <label>Nº de Patrimônio *</label>
+          <input type="text" id="patrimonio" placeholder="Etiqueta interna" required>
+        </div>
+
+        <!-- Recebimento -->
+        <div class="section-title">2. Dados de Recebimento</div>
+        <div class="form-group">
+          <label>Data de Entrada *</label>
+          <input type="date" id="dataEntrada" required>
+        </div>
+        <div class="form-group">
+          <label>Fornecedor / Origem</label>
+          <input type="text" id="origem" placeholder="Ex: Matriz, Dell Brasil, Devolução">
+        </div>
+        <div class="form-group">
+          <label>Estado de Conservação</label>
+          <select id="conservacao">
+            <option value="Novo">Novo</option>
+            <option value="Usado (Bom estado)">Usado (Bom estado)</option>
+            <option value="Avarias leves">Avarias leves</option>
+            <option value="Danificado">Danificado</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Conferido por (TI) *</label>
+          <input type="text" id="conferente" placeholder="Nome do técnico" required>
+        </div>
+
+        <!-- Entrega / Saída -->
+        <div class="section-title">3. Dados de Entrega (Saída)</div>
+        <div class="form-group">
+          <label>Data de Saída</label>
+          <input type="date" id="dataSaida">
+        </div>
+        <div class="form-group">
+          <label>Colaborador Responsável</label>
+          <input type="text" id="colaborador" placeholder="Nome do colaborador">
+        </div>
+        <div class="form-group">
+          <label>Setor / Departamento</label>
+          <input type="text" id="setor" placeholder="Ex: Financeiro, TI, Comercial">
+        </div>
+        <div class="form-group">
+          <label>Termo de Responsabilidade</label>
+          <select id="termoAssinado">
+            <option value="Não">Pendente / Não</option>
+            <option value="Sim">Assinado</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Previsão de Devolução</label>
+          <input type="date" id="previsaoDevolucao">
+        </div>
+
+        <!-- Status -->
+        <div class="section-title">4. Status Geral</div>
+        <div class="form-group">
+          <label>Status Atual *</label>
+          <select id="status">
+            <option value="Em estoque">Em estoque</option>
+            <option value="Em uso">Em uso</option>
+            <option value="Em manutenção">Em manutenção</option>
+            <option value="Baixado">Baixado</option>
+          </select>
+        </div>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Salvar Registro</button>
+    </form>
+  </div>
+
+  <!-- FILTROS E BUSCA -->
+  <div class="card">
+    <div class="filter-bar">
+      <div class="form-group">
+        <label>Busca Rápida</label>
+        <input type="text" id="searchBar" placeholder="Pesquisar por marca, serial, patrimônio, colaborador...">
+      </div>
+      <div class="form-group">
+        <label>Filtrar por Status</label>
+        <select id="filterStatus">
+          <option value="">Todos</option>
+          <option value="Em estoque">Em estoque</option>
+          <option value="Em uso">Em uso</option>
+          <option value="Em manutenção">Em manutenção</option>
+          <option value="Baixado">Baixado</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Filtrar por Setor</label>
+        <input type="text" id="filterSetor" placeholder="Ex: Financeiro, TI">
+      </div>
+    </div>
+
+    <!-- TABELA DE RESULTADOS -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Patrimônio</th>
+            <th>Equipamento</th>
+            <th>Serial</th>
+            <th>Status</th>
+            <th>Colaborador / Setor</th>
+            <th>Entrada</th>
+            <th>Saída</th>
+            <th>Termo</th>
+            <th>Previsão Dev.</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody">
+          <!-- Linhas renderizadas via JS -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+  let notebooks = JSON.parse(localStorage.getItem('modulo9_notebooks')) || [];
+
+  const form = document.getElementById('notebookForm');
+  const tableBody = document.getElementById('tableBody');
+  const searchBar = document.getElementById('searchBar');
+  const filterStatus = document.getElementById('filterStatus');
+  const filterSetor = document.getElementById('filterSetor');
+
+  // Salvar novo registro
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const item = {
+      id: Date.now(),
+      marca: document.getElementById('marca').value.trim(),
+      modelo: document.getElementById('modelo').value.trim(),
+      serial: document.getElementById('serial').value.trim(),
+      patrimonio: document.getElementById('patrimonio').value.trim(),
+      dataEntrada: document.getElementById('dataEntrada').value,
+      origem: document.getElementById('origem').value.trim() || '-',
+      conservacao: document.getElementById('conservacao').value,
+      conferente: document.getElementById('conferente').value.trim(),
+      dataSaida: document.getElementById('dataSaida').value || '-',
+      colaborador: document.getElementById('colaborador').value.trim() || '-',
+      setor: document.getElementById('setor').value.trim() || '-',
+      termoAssinado: document.getElementById('termoAssinado').value,
+      previsaoDevolucao: document.getElementById('previsaoDevolucao').value || '-',
+      status: document.getElementById('status').value
+    };
+
+    notebooks.push(item);
+    salvarDados();
+    form.reset();
+    render();
+  });
+
+  // Salvar no localStorage
+  function salvarDados() {
+    localStorage.setItem('modulo9_notebooks', JSON.stringify(notebooks));
+  }
+
+  // Deletar registro
+  function removerItem(id) {
+    if (confirm('Deseja realmente remover este equipamento?')) {
+      notebooks = notebooks.filter(item => item.id !== id);
+      salvarDados();
+      render();
+    }
+  }
+
+  // Renderizar tabela com filtros
+  function render() {
+    const q = searchBar.value.toLowerCase();
+    const st = filterStatus.value;
+    const sec = filterSetor.value.toLowerCase().trim();
+
+    const filtrados = notebooks.filter(item => {
+      const matchText = 
+        item.marca.toLowerCase().includes(q) ||
+        item.modelo.toLowerCase().includes(q) ||
+        item.serial.toLowerCase().includes(q) ||
+        item.patrimonio.toLowerCase().includes(q) ||
+        item.colaborador.toLowerCase().includes(q);
+
+      const matchStatus = st === '' || item.status === st;
+      const matchSetor = sec === '' || item.setor.toLowerCase().includes(sec);
+
+      return matchText && matchStatus && matchSetor;
+    });
+
+    if (filtrados.length === 0) {
+      tableBody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: var(--muted); padding: 24px;">Nenhum registro encontrado.</td></tr>`;
+      return;
+    }
+
+    tableBody.innerHTML = filtrados.map(item => {
+      let badgeClass = 'badge-estoque';
+      if (item.status === 'Em uso') badgeClass = 'badge-uso';
+      else if (item.status === 'Em manutenção') badgeClass = 'badge-manutencao';
+      else if (item.status === 'Baixado') badgeClass = 'badge-baixado';
+
+      const termoClass = item.termoAssinado === 'Sim' ? 'termo-sim' : 'termo-nao';
+
+      return `
+        <tr>
+          <td><strong>#${item.patrimonio}</strong></td>
+          <td>${item.marca} ${item.modelo}</td>
+          <td>${item.serial}</td>
+          <td><span class="badge ${badgeClass}">${item.status}</span></td>
+          <td>${item.colaborador} <span style="color: var(--muted); font-size: 0.8rem;">(${item.setor})</span></td>
+          <td>${formatarData(item.dataEntrada)}</td>
+          <td>${formatarData(item.dataSaida)}</td>
+          <td><span class="tag-termo ${termoClass}">${item.termoAssinado}</span></td>
+          <td>${formatarData(item.previsaoDevolucao)}</td>
+          <td class="actions-cell">
+            <button class="btn-action-delete" onclick="removerItem(${item.id})">Excluir</button>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function formatarData(dataStr) {
+    if (!dataStr || dataStr === '-') return '-';
+    const partes = dataStr.split('-');
+    if (partes.length === 3) {
+      return `${partes[2]}/${partes[1]}/${partes[0]}`;
+    }
+    return dataStr;
+  }
+
+  // Event listeners para filtros dinâmicos
+  searchBar.addEventListener('input', render);
+  filterStatus.addEventListener('change', render);
+  filterSetor.addEventListener('input', render);
+
+  // Inicialização inicial
+  render();
+</script>
+
+</body>
+</html>
