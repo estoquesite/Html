@@ -43,6 +43,51 @@
             width: 100% !important;
         }
 
+        /* ANIMAÇÃO PISCAR FORTE DO NOME DO USUÁRIO (ENTREGUE) */
+        @keyframes piscarUsuarioEntregue {
+            0%, 100% {
+                background-color: #dbeafe;
+                color: #1e40af;
+                box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
+            }
+            50% {
+                background-color: #ffffff;
+                color: #1d4ed8;
+            }
+        }
+        .piscar-usuario-forte {
+            animation: piscarUsuarioEntregue 1.1s infinite alternate ease-in-out;
+            border: 1.5px solid #3b82f6 !important;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 900 !important;
+            display: inline-block;
+        }
+
+        /* ANIMAÇÃO PISCAR DO SERIAL (NÃO ENTREGUE / PENDENTE) */
+        @keyframes piscarSerialPendente {
+            0%, 100% {
+                background-color: #fef3c7;
+                border-color: #d97706;
+                color: #b45309;
+                box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
+            }
+            50% {
+                background-color: #ffffff;
+                border-color: #f59e0b;
+                color: #78350f;
+            }
+        }
+        .piscar-serial-pendente {
+            animation: piscarSerialPendente 1s infinite alternate ease-in-out;
+            border: 1.5px dashed #d97706 !important;
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-weight: 900 !important;
+            display: inline-block;
+        }
+
+        /* ALERTA DUPLICADO */
         @keyframes brilhaDuplicado {
             0%, 100% { border-color: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
             50% { border-color: #f59e0b; box-shadow: 0 0 4px rgba(245, 158, 11, 0.4); }
@@ -75,7 +120,7 @@
                         <h1 class="text-sm sm:text-base font-black text-slate-900 dark:text-white uppercase tracking-wide">Controle de Notebooks & Periféricos</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500">Gestão de Equipamentos • Detecção de Duplicidade</p>
+                        <p class="text-xs text-slate-500">Gestão de Equipamentos • Status Personalizados</p>
                         <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                         <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600">Base Ativa</span>
                     </div>
@@ -86,6 +131,12 @@
                 <a href="index.html" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1">
                     ⬅ Menu
                 </a>
+
+                <!-- GERENCIAR STATUS -->
+                <button onclick="abrirModalStatus()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5 cursor-pointer">
+                    <span>⚙️</span>
+                    <span>Gerenciar Status</span>
+                </button>
 
                 <!-- RECUPERAR PLANILHA -->
                 <label class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95" title="Carregar ficheiro CSV ou Excel baixado anteriormente">
@@ -232,16 +283,14 @@
                     </h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 text-xs">
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Status Atual *</label>
-                            <select id="status" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
-                                <option value="Em estoque" selected>Em estoque</option>
-                                <option value="Em uso">Em uso</option>
-                                <option value="Em manutenção">Em manutenção</option>
-                                <option value="Baixado">Baixado</option>
-                            </select>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase">Status Atual *</label>
+                                <button type="button" onclick="abrirModalStatus()" class="text-[9px] text-purple-600 font-bold hover:underline">+ Gerenciar</button>
+                            </div>
+                            <select id="status" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none"></select>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Colaborador</label>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Colaborador (Usuário)</label>
                             <input type="text" id="colaborador" placeholder="Nome do utilizador" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
                         </div>
                         <div>
@@ -291,7 +340,7 @@
                             <th class="py-2.5 px-3">Patrimônio</th>
                             <th class="py-2.5 px-3">Equipamento</th>
                             <th class="py-2.5 px-3 text-center">Status</th>
-                            <th class="py-2.5 px-3">Colaborador / Setor</th>
+                            <th class="py-2.5 px-3">Colaborador / Usuário</th>
                             <th class="py-2.5 px-3 text-center">Termo</th>
                             <th class="py-2.5 px-3 text-center">Entregue?</th>
                             <th class="py-2.5 px-3 text-center">Ações</th>
@@ -304,7 +353,39 @@
 
     </div>
 
-    <!-- MODAL DE EDIÇÃO (LÁPIS ✏️️) -->
+    <!-- MODAL DE GERENCIAMENTO DE STATUS (CADASTRAR E EXCLUIR) -->
+    <div id="modalGerenciarStatus" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-slate-800 border-2 border-purple-400 dark:border-purple-600 w-full max-w-md rounded-2xl p-5 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
+                <h3 class="text-sm font-black text-purple-600 dark:text-purple-400 uppercase flex items-center gap-1.5">
+                    <span>⚙️</span> Gerenciar Status dos Notebooks
+                </h3>
+                <button onclick="fecharModalStatus()" class="text-slate-400 hover:text-slate-600 font-black text-sm">✕</button>
+            </div>
+
+            <!-- Adicionar novo status -->
+            <div class="flex gap-2">
+                <input type="text" id="inputNovoStatus" placeholder="Novo status (ex: Em trânsito, Reserva...)" class="uppercase-input flex-1 text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl outline-none font-bold">
+                <button type="button" onclick="adicionarNovoStatus()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow">
+                    + Adicionar
+                </button>
+            </div>
+
+            <!-- Lista de status existentes -->
+            <div>
+                <span class="block text-[10px] font-bold text-slate-400 uppercase mb-2">Status Disponíveis no Sistema:</span>
+                <div id="listaStatusContainer" class="space-y-1.5 max-h-56 overflow-y-auto"></div>
+            </div>
+
+            <div class="flex justify-end pt-2 border-t border-slate-100 dark:border-slate-700">
+                <button type="button" onclick="fecharModalStatus()" class="bg-slate-800 text-white px-4 py-1.5 rounded-xl text-xs font-bold">
+                    Fechar
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE EDIÇÃO (LÁPIS ✏) -->
     <div id="modalEdicaoNotebook" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 border-2 border-amber-400 dark:border-amber-600 w-full max-w-2xl rounded-2xl p-5 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
@@ -336,12 +417,7 @@
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Status</label>
-                    <select id="editStatus" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                        <option value="Em estoque">Em estoque</option>
-                        <option value="Em uso">Em uso</option>
-                        <option value="Em manutenção">Em manutenção</option>
-                        <option value="Baixado">Baixado</option>
-                    </select>
+                    <select id="editStatus" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></select>
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Colaborador</label>
@@ -380,6 +456,14 @@
         const SUPABASE_URL = "https://gloxtswcksbczinpwtzu.supabase.co";
         const SUPABASE_KEY = "sb_publishable_0kEiqthWKZZwjM120wQIYw_Hba7qeLc";
 
+        const STATUS_PADRAO = [
+            "Em estoque",
+            "Em uso",
+            "Em manutenção",
+            "Baixado"
+        ];
+
+        let listaStatus = [];
         let supabaseClient = null;
         let html5QrScanner = null;
         let notebooks = [];
@@ -387,6 +471,9 @@
         window.addEventListener('DOMContentLoaded', () => {
             const hoje = new Date().toISOString().split('T')[0];
             document.getElementById('dataEntrada').value = hoje;
+
+            carregarListaStatus();
+            atualizarSelectsStatus();
 
             // 1. Carrega do armazenamento local com segurança
             carregarDoLocalStorage();
@@ -425,6 +512,107 @@
             } catch (e) {}
         }
 
+        // ================= GERENCIAMENTO DE STATUS (CADASTRAR E EXCLUIR) =================
+        function carregarListaStatus() {
+            const salvas = localStorage.getItem('modulo9_status_custom');
+            if (salvas) {
+                try { listaStatus = JSON.parse(salvas); } catch(e) { listaStatus = [...STATUS_PADRAO]; }
+            } else {
+                listaStatus = [...STATUS_PADRAO];
+            }
+        }
+
+        function salvarListaStatus() {
+            localStorage.setItem('modulo9_status_custom', JSON.stringify(listaStatus));
+        }
+
+        function atualizarSelectsStatus() {
+            const selForm = document.getElementById('status');
+            const selEdit = document.getElementById('editStatus');
+
+            const valForm = selForm ? selForm.value : "";
+            const valEdit = selEdit ? selEdit.value : "";
+
+            preencherSelectGenerico(selForm, valForm || "Em estoque");
+            preencherSelectGenerico(selEdit, valEdit || "Em estoque");
+        }
+
+        function preencherSelectGenerico(selectEl, valorSelecionado) {
+            if (!selectEl) return;
+            selectEl.innerHTML = '';
+            listaStatus.forEach(st => {
+                const opt = document.createElement('option');
+                opt.value = st;
+                opt.innerText = st;
+                if (st === valorSelecionado) opt.selected = true;
+                selectEl.appendChild(opt);
+            });
+        }
+
+        function abrirModalStatus() {
+            renderizarListaStatusModal();
+            document.getElementById('inputNovoStatus').value = '';
+            document.getElementById('modalGerenciarStatus').classList.remove('hidden');
+        }
+
+        function fecharModalStatus() {
+            document.getElementById('modalGerenciarStatus').classList.add('hidden');
+        }
+
+        function renderizarListaStatusModal() {
+            const container = document.getElementById('listaStatusContainer');
+            container.innerHTML = '';
+
+            listaStatus.forEach((st, idx) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "flex justify-between items-center bg-slate-50 dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-xs";
+                itemDiv.innerHTML = `
+                    <span class="font-bold uppercase text-slate-700 dark:text-slate-300">${st}</span>
+                    <button type="button" onclick="excluirStatus(${idx})" class="text-rose-500 hover:text-rose-700 font-bold px-2 py-0.5 rounded text-[11px] cursor-pointer" title="Excluir este status">
+                        ✕ Excluir
+                    </button>
+                `;
+                container.appendChild(itemDiv);
+            });
+        }
+
+        function adicionarNovoStatus() {
+            const input = document.getElementById('inputNovoStatus');
+            const val = input.value.trim();
+            if (!val) {
+                alert("Digite o nome do status!");
+                return;
+            }
+
+            if (listaStatus.includes(val)) {
+                alert("Este status já existe!");
+                return;
+            }
+
+            listaStatus.push(val);
+            salvarListaStatus();
+            atualizarSelectsStatus();
+            renderizarListaStatusModal();
+            input.value = '';
+            mostrarAviso(`Novo status "${val}" cadastrado!`);
+        }
+
+        function excluirStatus(index) {
+            if (listaStatus.length <= 1) {
+                alert("Você precisa manter pelo menos um status cadastrado!");
+                return;
+            }
+
+            const removido = listaStatus[index];
+            if (confirm(`Deseja realmente excluir o status "${removido}"?`)) {
+                listaStatus.splice(index, 1);
+                salvarListaStatus();
+                atualizarSelectsStatus();
+                renderizarListaStatusModal();
+                mostrarAviso(`Status "${removido}" removido!`);
+            }
+        }
+
         // ================= VERIFICAÇÃO DE DUPLICIDADE EM TEMPO REAL =================
         function verificarDuplicidadeAoDigitar() {
             const serialDig = document.getElementById('serial').value.trim().toUpperCase();
@@ -433,7 +621,6 @@
             const avisoSerial = document.getElementById('avisoDuplicadoSerial');
             const avisoPat = document.getElementById('avisoDuplicadoPatrimonio');
 
-            // Verifica se o serial já existe nos equipamentos ainda não entregues / em estoque
             const duplicadoSerial = serialDig && notebooks.some(n => n.serial === serialDig && n.status !== 'Baixado');
             if (duplicadoSerial) {
                 avisoSerial.classList.remove('hidden');
@@ -443,7 +630,6 @@
                 document.getElementById('serial').classList.remove('border-rose-500');
             }
 
-            // Verifica se o patrimônio já existe
             const duplicadoPat = patDig && notebooks.some(n => n.patrimonio === patDig && n.status !== 'Baixado');
             if (duplicadoPat) {
                 avisoPat.classList.remove('hidden');
@@ -542,7 +728,6 @@
             const serial = document.getElementById('serial').value.trim().toUpperCase();
             const patrimonio = document.getElementById('patrimonio').value.trim().toUpperCase();
 
-            // Bloqueio de duplicidade para equipamentos que ainda não foram entregues / baixados
             const repetido = notebooks.find(n => (n.serial === serial || n.patrimonio === patrimonio) && n.status !== 'Baixado');
             if (repetido) {
                 const pendenteEntrega = repetido.status !== 'Em uso' ? ' (EQUIPAMENTO PENDENTE DE ENTREGA)' : '';
@@ -583,7 +768,7 @@
             verificarDuplicidadeAoDigitar();
         }
 
-        // ================= MODAL DE EDIÇÃO (LÁPIS ✏️️) =================
+        // ================= MODAL DE EDIÇÃO (LÁPIS ✏) =================
         function abrirModalEdicao(index) {
             const item = notebooks[index];
             if (!item) return;
@@ -594,7 +779,9 @@
             document.getElementById('editPatrimonio').value = item.patrimonio;
             document.getElementById('editMarca').value = item.marca;
             document.getElementById('editModelo').value = item.modelo;
-            document.getElementById('editStatus').value = item.status;
+
+            preencherSelectGenerico(document.getElementById('editStatus'), item.status);
+
             document.getElementById('editColaborador').value = item.colaborador === '-' ? '' : item.colaborador;
             document.getElementById('editSetor').value = item.setor === '-' ? '' : item.setor;
             document.getElementById('editDataSaida').value = item.dataSaida === '-' ? '' : item.dataSaida;
@@ -651,40 +838,44 @@
             }
 
             lista.forEach((n, idx) => {
-                // Checagem de duplicidade na listagem
                 const totalDuplicadosSerial = notebooks.filter(item => item.serial === n.serial).length;
                 const totalDuplicadosPat = notebooks.filter(item => item.patrimonio === n.patrimonio).length;
                 const ehDuplicado = totalDuplicadosSerial > 1 || totalDuplicadosPat > 1;
 
-                // Não entregue (status em estoque ou sem saída preenchida)
+                // Não entregue: status 'Em estoque' ou sem data de saída
                 const naoEntregue = n.status === 'Em estoque' || n.dataSaida === '-';
 
-                let classeDuplicado = '';
-                let rotuloDuplicado = '';
+                // Serial pisca se estiver PENDENTE / NÃO ENTREGUE
+                let serialFormatado = n.serial;
                 if (ehDuplicado) {
-                    classeDuplicado = 'alerta-duplicado';
-                    rotuloDuplicado = naoEntregue 
-                        ? ` title="⚠️ ATENÇÃO: DUPLICADO E NÃO ENTREGUE!"` 
-                        : ` title="⚠️ Equipamento duplicado na base"`;
+                    serialFormatado = `<span class="alerta-duplicado" title="⚠️ DUPLICADO">${n.serial}</span>`;
+                } else if (naoEntregue) {
+                    serialFormatado = `<span class="piscar-serial-pendente" title="⚠️ NÃO ENTREGUE - PENDENTE">${n.serial}</span>`;
                 }
 
-                const badgeStatus = n.status === 'Em uso' ? 'bg-blue-100 text-blue-800' : (n.status === 'Em estoque' ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800');
+                // Nome do Colaborador pisca forte se já foi ENTREGUE
+                let colaboradorFormatado = n.colaborador;
+                if (!naoEntregue && n.colaborador && n.colaborador !== '-') {
+                    colaboradorFormatado = `<span class="piscar-usuario-forte" title="Equipamento Entregue">👤 ${n.colaborador}</span>`;
+                } else {
+                    colaboradorFormatado = `<span>${n.colaborador}</span>`;
+                }
 
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/40 transition";
                 tr.innerHTML = `
-                    <td class="py-2.5 px-3 font-mono font-bold whitespace-nowrap">
-                        <span class="${classeDuplicado}" ${rotuloDuplicado}>${n.serial}</span>
+                    <td class="py-2.5 px-3 font-mono whitespace-nowrap">
+                        ${serialFormatado}
                     </td>
                     <td class="py-2.5 px-3 font-bold text-amber-600 dark:text-amber-400 whitespace-nowrap">
                         #${n.patrimonio}
                     </td>
                     <td class="py-2.5 px-3 whitespace-nowrap">${n.marca} ${n.modelo}</td>
                     <td class="py-2.5 px-3 text-center whitespace-nowrap">
-                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${badgeStatus}">${n.status}</span>
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-600">${n.status}</span>
                     </td>
                     <td class="py-2.5 px-3 whitespace-nowrap font-semibold">
-                        ${n.colaborador} <span class="text-slate-400 text-[10px]">(${n.setor})</span>
+                        ${colaboradorFormatado} <span class="text-slate-400 text-[10px]">(${n.setor})</span>
                     </td>
                     <td class="py-2.5 px-3 text-center whitespace-nowrap font-bold ${n.termoAssinado === 'Sim' ? 'text-emerald-600' : 'text-rose-500'}">
                         ${n.termoAssinado}
