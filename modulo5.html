@@ -26,7 +26,7 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { 
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
-    background: #fff5f8; 
+    background: #f8fafc; 
     color: var(--slate-900); 
     min-height: 100vh; 
     padding: 16px; 
@@ -58,9 +58,9 @@ body {
     padding: 18px 22px; 
     margin: 0 auto 16px auto; 
     border-radius: 12px; 
-    box-shadow: 0 10px 25px -5px rgba(219, 39, 119, 0.08); 
-    border: 1px solid #fce7f3; 
-    max-width: 1120px; 
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
+    border: 1px solid var(--slate-200); 
+    max-width: 960px; 
 }
 .topo-modulo-info { 
     display: flex; 
@@ -101,7 +101,7 @@ body {
     font-weight: 700; 
     margin-bottom: 4px; 
     font-size: 10.5px; 
-    color: #9d174d; 
+    color: var(--slate-700); 
     text-transform: uppercase; 
 }
 .painel-controle input[type="text"] { 
@@ -109,21 +109,20 @@ body {
     font-family: inherit; 
     font-size: 12px; 
     padding: 8px 10px; 
-    border: 1px solid var(--primary-border); 
+    border: 1px solid var(--slate-300); 
     border-radius: 6px; 
-    background: var(--primary-bg); 
+    background: #fff; 
     outline: none; 
     transition: border-color 0.2s, background-color 0.2s;
 }
 .painel-controle input[type="text"]:focus { 
     border-color: var(--primary); 
-    background: #fff; 
 }
 
 /* FORMULÁRIO DE LANÇAMENTO RÁPIDO */
 .painel-registro-rapido {
-    background: #fff0f5;
-    border: 1px dashed var(--primary-border);
+    background: #fff;
+    border: 1px dashed var(--slate-300);
     border-radius: 8px;
     padding: 10px 14px;
     margin-bottom: 12px;
@@ -132,7 +131,7 @@ body {
     font-size: 10.5px;
     font-weight: 800;
     text-transform: uppercase;
-    color: #9d174d;
+    color: var(--slate-700);
     margin-bottom: 8px;
     display: flex;
     justify-content: space-between;
@@ -148,7 +147,7 @@ body {
     font-family: inherit; 
     font-size: 11px; 
     padding: 6px 8px; 
-    border: 1px solid var(--primary-border); 
+    border: 1px solid var(--slate-300); 
     border-radius: 5px; 
     background: #fff; 
     outline: none; 
@@ -166,10 +165,10 @@ body {
 }
 .card-stat {
     background: #fff;
-    border: 1px solid #fbcfe8;
+    border: 1px solid var(--slate-300);
     padding: 2px 8px;
     border-radius: 4px;
-    color: #9d174d;
+    color: var(--slate-700);
 }
 
 .botoes-painel { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
@@ -199,16 +198,16 @@ body {
 .btn-voltar { background-color: var(--slate-600); text-decoration: none; } 
 .btn-imprimir { background-color: var(--slate-900); margin-left: auto; }
 
-/* FOLHA A4 PAISAGEM (DEITADA) */
+/* FOLHA A4 RETRATO */
 .folha-a4 { 
     width: 100%; 
-    max-width: 1120px; 
+    max-width: 960px; 
     background: #fff; 
-    padding: 14px 18px; 
+    padding: 16px 20px; 
     margin: 0 auto 20px auto; 
-    box-shadow: 0 10px 30px rgba(219, 39, 119, 0.06); 
-    border-radius: 12px; 
-    border: 1px solid #fbcfe8; 
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); 
+    border-radius: 8px; 
+    border: 1px solid var(--slate-300); 
     position: relative; 
 }
 
@@ -217,9 +216,9 @@ body {
     justify-content: space-between; 
     align-items: center; 
     margin-bottom: 8px; 
-    background: var(--primary-bg); 
+    background: #fff; 
     padding: 5px 10px; 
-    border: 1px solid #fce7f3; 
+    border: 1px solid var(--slate-200); 
     border-radius: 6px; 
 }
 .grupo-acoes-linhas { display: flex; align-items: center; gap: 6px; }
@@ -259,12 +258,12 @@ body {
     text-align: center; 
 }
 .logo-box { 
-    width: 100px; 
+    width: 90px; 
     font-weight: 900; 
     font-size: 16px; 
     color: #007e7a; 
     letter-spacing: 1.5px;
-    background-color: var(--slate-50); 
+    background-color: #fff; 
 }
 .titulo-box { 
     font-size: 11px; 
@@ -274,30 +273,30 @@ body {
     padding: 0 10px; 
 }
 .meta-box { 
-    width: 140px; 
+    width: 130px; 
     font-size: 8.5px; 
     text-align: left !important; 
     padding-left: 8px !important; 
-    background-color: var(--slate-50); 
+    background-color: #fff; 
     line-height: 1.35; 
 }
 
 .info-abs-bar { 
     font-size: 8.5px; 
     font-weight: 700; 
-    background-color: var(--slate-50); 
+    background-color: #fff; 
 }
 .info-abs-bar td { text-align: left; padding: 2px 8px; }
 .campo-editavel { outline: none; display: inline-block; min-width: 25px; font-weight: 600; color: var(--slate-900); }
 
-/* TABELA DE ABSENTEÍSMO */
-table.tabela-abs { border: 1.5px solid var(--primary); }
+/* TABELA DE ABSENTEÍSMO - CABEÇALHO ROSA E CORPO TOTALMENTE BRANCO */
+table.tabela-abs { border: 1.5px solid var(--slate-900); }
 table.tabela-abs th, table.tabela-abs td { 
-    border: 1px solid #f9a8d4; 
+    border: 1px solid var(--slate-300); 
     text-align: center; 
     vertical-align: middle; 
     font-size: 9px; 
-    height: 24px; 
+    height: 25px; 
     padding: 2px 6px; 
 }
 table.tabela-abs th { 
@@ -307,25 +306,26 @@ table.tabela-abs th {
     text-transform: uppercase; 
     font-size: 8.5px; 
     letter-spacing: 0.5px; 
+    border-color: var(--primary-dark);
 }
 
-table.tabela-abs tbody tr { background-color: #fff5f7; }
-table.tabela-abs tbody tr:nth-child(even) { background-color: #fef0f4; }
+table.tabela-abs tbody tr { background-color: #ffffff; }
+table.tabela-abs tbody tr:nth-child(even) { background-color: #ffffff; }
 
-.col-id { width: 40px; font-weight: 800; color: #9d174d; background: rgba(251, 207, 232, 0.4); }
+.col-id { width: 36px; font-weight: 800; color: var(--slate-900); background: #ffffff !important; }
 .col-id-texto { outline: none; display: inline-block; width: 100%; text-align: center; }
 
-.col-nome { text-align: left !important; font-weight: 700; text-transform: uppercase; padding-left: 8px !important; color: #831843; width: 280px; outline: none; }
-.col-data { width: 110px; font-weight: 700; color: #831843; outline: none; }
-.col-tipo { width: 85px; font-weight: 800; color: #9d174d; outline: none; background: #fff; }
-.col-motivo { text-align: left !important; font-weight: 600; padding-left: 8px !important; color: #374151; outline: none; }
-.col-acoes { width: 55px; background: #fff !important; }
+.col-nome { text-align: left !important; font-weight: 700; text-transform: uppercase; padding-left: 8px !important; color: var(--slate-900); width: 220px; outline: none; background: #fff; }
+.col-data { width: 90px; font-weight: 700; color: var(--slate-900); outline: none; background: #fff; }
+.col-tipo { width: 65px; font-weight: 800; color: var(--slate-900); outline: none; background: #fff; }
+.col-motivo { text-align: left !important; font-weight: 600; padding-left: 8px !important; color: var(--slate-900); outline: none; background: #fff; }
+.col-acoes { width: 50px; background: #fff !important; }
 
 .botoes-acoes { display: flex; align-items: center; justify-content: center; gap: 3px; opacity: 0.3; transition: opacity 0.2s; }
 tr:hover .botoes-acoes { opacity: 1; }
 .btn-acao { 
     background: #fff; 
-    border: 1px solid #fbcfe8; 
+    border: 1px solid var(--slate-300); 
     border-radius: 3px; 
     cursor: pointer; 
     padding: 1px 3px; 
@@ -334,13 +334,11 @@ tr:hover .botoes-acoes { opacity: 1; }
 .btn-mais-linha { color: var(--success); font-weight: 900; }
 .btn-lixeira { color: var(--danger); }
 
-/* ================================================================= */
-/* CONFIGURAÇÃO RÍGIDA DE IMPRESSÃO: FOLHA DEITADA (A4 LANDSCAPE)    */
-/* ================================================================= */
+/* IMPRESSÃO A4 RETRATO */
 @media print {
     @page { 
-        size: A4 landscape; 
-        margin: 4mm 5mm !important; 
+        size: A4 portrait; 
+        margin: 5mm 6mm; 
     }
     body { 
         background: #fff !important; 
@@ -366,13 +364,12 @@ tr:hover .botoes-acoes { opacity: 1; }
         page-break-after: auto !important;
         break-after: auto !important;
     }
-    table.tabela-abs { border: 1.5px solid var(--primary) !important; }
+    table.tabela-abs { border: 1.2px solid var(--slate-900) !important; }
     table.tabela-abs th { background-color: var(--primary) !important; color: #fff !important; }
-    table.tabela-abs td { border: 1px solid #f9a8d4 !important; height: 23px !important; }
-    table.tabela-abs tbody tr { background-color: #fff5f7 !important; }
-    table.tabela-abs tbody tr:nth-child(even) { background-color: #fef0f4 !important; }
-    .col-id { background: #fce7f3 !important; color: #9d174d !important; }
-    .col-nome, .col-data { color: #831843 !important; }
+    table.tabela-abs td { border: 1px solid #cbd5e1 !important; }
+    table.tabela-abs tbody tr, table.tabela-abs tbody tr:nth-child(even) { background-color: #ffffff !important; }
+    .col-id { background: #ffffff !important; color: var(--slate-900) !important; }
+    .col-nome, .col-data, .col-tipo, .col-motivo { color: var(--slate-900) !important; background: #ffffff !important; }
 }
 </style>
 </head>
@@ -413,19 +410,19 @@ tr:hover .botoes-acoes { opacity: 1; }
             </div>
             <div class="grid-registro-rapido">
                 <div>
-                    <label style="font-size:9px; font-weight:700; color:#9d174d;">COLABORADOR:</label>
+                    <label style="font-size:9px; font-weight:700; color:var(--slate-700);">COLABORADOR:</label>
                     <input type="text" id="rapidoNome" placeholder="NOME DO COLABORADOR" oninput="this.value=this.value.toUpperCase()">
                 </div>
                 <div>
-                    <label style="font-size:9px; font-weight:700; color:#9d174d;">DATA:</label>
+                    <label style="font-size:9px; font-weight:700; color:var(--slate-700);">DATA:</label>
                     <input type="text" id="rapidoData" placeholder="DD/MM/AAAA">
                 </div>
                 <div>
-                    <label style="font-size:9px; font-weight:700; color:#9d174d;">TIPO (SIGLA):</label>
+                    <label style="font-size:9px; font-weight:700; color:var(--slate-700);">TIPO (SIGLA):</label>
                     <input type="text" id="rapidoTipo" placeholder="AT, FA, CO..." oninput="this.value=this.value.toUpperCase()">
                 </div>
                 <div>
-                    <label style="font-size:9px; font-weight:700; color:#9d174d;">MOTIVO / JUSTIFICATIVA:</label>
+                    <label style="font-size:9px; font-weight:700; color:var(--slate-700);">MOTIVO / JUSTIFICATIVA:</label>
                     <input type="text" id="rapidoMotivo" placeholder="DESCREVA A JUSTIFICATIVA OU CID">
                 </div>
                 <button type="button" class="btn btn-pink" onclick="inserirRegistroRapido()" style="padding:6px 12px;">Inserir</button>
@@ -441,7 +438,7 @@ tr:hover .botoes-acoes { opacity: 1; }
             <button type="button" class="btn btn-exportar" onclick="exportarBackupJSON()">⬇️ Backup</button>
             <button type="button" class="btn btn-exportar" onclick="document.getElementById('arquivoBackupAbs').click()">⬆️ Restaurar</button>
             <button type="button" class="btn btn-limpar" onclick="limparTudoAbs()">Limpar</button>
-            <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir (Deitada)</button>
+            <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
         </div>
     </div>
 
@@ -544,10 +541,10 @@ tr:hover .botoes-acoes { opacity: 1; }
                 <table class="tabela-abs">
                     <thead>
                         <tr>
-                            <th style="width:40px;">Nº</th>
-                            <th style="width:280px;">COLABORADOR</th>
-                            <th style="width:110px;">DATA</th>
-                            <th style="width:85px;">TIPO</th>
+                            <th style="width:36px;">Nº</th>
+                            <th style="width:220px;">COLABORADOR</th>
+                            <th style="width:90px;">DATA</th>
+                            <th style="width:65px;">TIPO</th>
                             <th>MOTIVO / JUSTIFICATIVA</th>
                             <th class="col-acoes th-acoes">AÇÕES</th>
                         </tr>
