@@ -9,7 +9,7 @@
     --primary: #db2777;
     --primary-dark: #be185d;
     --primary-light: #fce7f3;
-    --primary-border: #f472b6;
+    --primary-border: #000000;
     --primary-bg: #fff5f8;
     --accent: #f59e0b;
     --danger: #ef4444;
@@ -27,7 +27,7 @@
 body { 
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
     background: #f8fafc; 
-    color: var(--slate-900); 
+    color: #000000; 
     min-height: 100vh; 
     padding: 16px; 
 }
@@ -59,8 +59,8 @@ body {
     margin: 0 auto 16px auto; 
     border-radius: 12px; 
     box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
-    border: 1px solid var(--slate-200); 
-    max-width: 960px; 
+    border: 1px solid var(--slate-300); 
+    max-width: 1140px; 
 }
 .topo-modulo-info { 
     display: flex; 
@@ -198,16 +198,16 @@ body {
 .btn-voltar { background-color: var(--slate-600); text-decoration: none; } 
 .btn-imprimir { background-color: var(--slate-900); margin-left: auto; }
 
-/* FOLHA A4 RETRATO */
+/* FOLHA HORIZONTAL (PAISAGEM) */
 .folha-a4 { 
     width: 100%; 
-    max-width: 960px; 
+    max-width: 1140px; 
     background: #fff; 
     padding: 16px 20px; 
     margin: 0 auto 20px auto; 
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05); 
     border-radius: 8px; 
-    border: 1px solid var(--slate-300); 
+    border: 1.5px solid #000000; 
     position: relative; 
 }
 
@@ -218,7 +218,7 @@ body {
     margin-bottom: 8px; 
     background: #fff; 
     padding: 5px 10px; 
-    border: 1px solid var(--slate-200); 
+    border: 1px solid var(--slate-300); 
     border-radius: 6px; 
 }
 .grupo-acoes-linhas { display: flex; align-items: center; gap: 6px; }
@@ -247,18 +247,18 @@ body {
 .cabecalho-container, .info-abs-bar, table.tabela-abs { 
     width: 100%; 
     border-collapse: collapse; 
-    border: 1.2px solid var(--slate-900); 
+    border: 2px solid #000000; 
     margin-bottom: 4px; 
     table-layout: fixed; 
 }
 .cabecalho-container td, .info-abs-bar td { 
-    border: 1px solid var(--slate-700); 
-    padding: 3px 8px; 
+    border: 1.5px solid #000000; 
+    padding: 4px 8px; 
     vertical-align: middle; 
     text-align: center; 
 }
 .logo-box { 
-    width: 90px; 
+    width: 100px; 
     font-weight: 900; 
     font-size: 16px; 
     color: #007e7a; 
@@ -269,57 +269,58 @@ body {
     font-size: 11px; 
     font-weight: 800; 
     text-transform: uppercase; 
-    color: var(--slate-900); 
+    color: #000000; 
     padding: 0 10px; 
 }
 .meta-box { 
-    width: 130px; 
-    font-size: 8.5px; 
+    width: 140px; 
+    font-size: 9px; 
     text-align: left !important; 
     padding-left: 8px !important; 
     background-color: #fff; 
     line-height: 1.35; 
+    font-weight: 700;
 }
 
 .info-abs-bar { 
-    font-size: 8.5px; 
+    font-size: 9px; 
     font-weight: 700; 
     background-color: #fff; 
 }
-.info-abs-bar td { text-align: left; padding: 2px 8px; }
-.campo-editavel { outline: none; display: inline-block; min-width: 25px; font-weight: 600; color: var(--slate-900); }
+.info-abs-bar td { text-align: left; padding: 3px 8px; }
+.campo-editavel { outline: none; display: inline-block; min-width: 25px; font-weight: 600; color: #000000; }
 
-/* TABELA DE ABSENTEÍSMO - CABEÇALHO ROSA E CORPO TOTALMENTE BRANCO */
-table.tabela-abs { border: 1.5px solid var(--slate-900); }
+/* TABELA DE ABSENTEÍSMO - BORDAS PRETAS BEM ESCURAS */
+table.tabela-abs { border: 2px solid #000000; }
 table.tabela-abs th, table.tabela-abs td { 
-    border: 1px solid var(--slate-300); 
+    border: 1.5px solid #000000; 
     text-align: center; 
     vertical-align: middle; 
-    font-size: 9px; 
+    font-size: 9.5px; 
     height: 25px; 
     padding: 2px 6px; 
 }
 table.tabela-abs th { 
     background-color: var(--primary); 
-    color: #fff; 
-    font-weight: 800; 
+    color: #ffffff; 
+    font-weight: 900; 
     text-transform: uppercase; 
-    font-size: 8.5px; 
+    font-size: 9px; 
     letter-spacing: 0.5px; 
-    border-color: var(--primary-dark);
+    border-color: #000000;
 }
 
 table.tabela-abs tbody tr { background-color: #ffffff; }
 table.tabela-abs tbody tr:nth-child(even) { background-color: #ffffff; }
 
-.col-id { width: 36px; font-weight: 800; color: var(--slate-900); background: #ffffff !important; }
+.col-id { width: 40px; font-weight: 800; color: #000000; background: #ffffff !important; }
 .col-id-texto { outline: none; display: inline-block; width: 100%; text-align: center; }
 
-.col-nome { text-align: left !important; font-weight: 700; text-transform: uppercase; padding-left: 8px !important; color: var(--slate-900); width: 220px; outline: none; background: #fff; }
-.col-data { width: 90px; font-weight: 700; color: var(--slate-900); outline: none; background: #fff; }
-.col-tipo { width: 65px; font-weight: 800; color: var(--slate-900); outline: none; background: #fff; }
-.col-motivo { text-align: left !important; font-weight: 600; padding-left: 8px !important; color: var(--slate-900); outline: none; background: #fff; }
-.col-acoes { width: 50px; background: #fff !important; }
+.col-nome { text-align: left !important; font-weight: 700; text-transform: uppercase; padding-left: 8px !important; color: #000000; width: 280px; outline: none; background: #fff; }
+.col-data { width: 110px; font-weight: 700; color: #000000; outline: none; background: #fff; }
+.col-tipo { width: 90px; font-weight: 800; color: #000000; outline: none; background: #fff; }
+.col-motivo { text-align: left !important; font-weight: 600; padding-left: 8px !important; color: #000000; outline: none; background: #fff; }
+.col-acoes { width: 55px; background: #fff !important; }
 
 .botoes-acoes { display: flex; align-items: center; justify-content: center; gap: 3px; opacity: 0.3; transition: opacity 0.2s; }
 tr:hover .botoes-acoes { opacity: 1; }
@@ -334,11 +335,13 @@ tr:hover .botoes-acoes { opacity: 1; }
 .btn-mais-linha { color: var(--success); font-weight: 900; }
 .btn-lixeira { color: var(--danger); }
 
-/* IMPRESSÃO A4 RETRATO */
+/* ================================================================= */
+/* CONFIGURAÇÃO RÍGIDA DE IMPRESSÃO: HORIZONTAL PREENCHENDO A FOLHA  */
+/* ================================================================= */
 @media print {
     @page { 
-        size: A4 portrait; 
-        margin: 5mm 6mm; 
+        size: A4 landscape; 
+        margin: 5mm 6mm !important; 
     }
     body { 
         background: #fff !important; 
@@ -364,12 +367,31 @@ tr:hover .botoes-acoes { opacity: 1; }
         page-break-after: auto !important;
         break-after: auto !important;
     }
-    table.tabela-abs { border: 1.2px solid var(--slate-900) !important; }
-    table.tabela-abs th { background-color: var(--primary) !important; color: #fff !important; }
-    table.tabela-abs td { border: 1px solid #cbd5e1 !important; }
-    table.tabela-abs tbody tr, table.tabela-abs tbody tr:nth-child(even) { background-color: #ffffff !important; }
-    .col-id { background: #ffffff !important; color: var(--slate-900) !important; }
-    .col-nome, .col-data, .col-tipo, .col-motivo { color: var(--slate-900) !important; background: #ffffff !important; }
+    .cabecalho-container, .info-abs-bar, table.tabela-abs {
+        width: 100% !important;
+        border: 2px solid #000000 !important;
+    }
+    .cabecalho-container td, .info-abs-bar td {
+        border: 1.5px solid #000000 !important;
+        padding: 3px 6px !important;
+    }
+    table.tabela-abs th { 
+        background-color: var(--primary) !important; 
+        color: #ffffff !important; 
+        border: 1.5px solid #000000 !important;
+    }
+    table.tabela-abs td { 
+        border: 1.5px solid #000000 !important; 
+        height: 24px !important;
+        color: #000000 !important;
+    }
+    table.tabela-abs tbody tr, table.tabela-abs tbody tr:nth-child(even) { 
+        background-color: #ffffff !important; 
+    }
+    .col-id, .col-nome, .col-data, .col-tipo, .col-motivo { 
+        color: #000000 !important; 
+        background: #ffffff !important; 
+    }
 }
 </style>
 </head>
@@ -438,7 +460,7 @@ tr:hover .botoes-acoes { opacity: 1; }
             <button type="button" class="btn btn-exportar" onclick="exportarBackupJSON()">⬇️ Backup</button>
             <button type="button" class="btn btn-exportar" onclick="document.getElementById('arquivoBackupAbs').click()">⬆️ Restaurar</button>
             <button type="button" class="btn btn-limpar" onclick="limparTudoAbs()">Limpar</button>
-            <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
+            <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir Horizontal</button>
         </div>
     </div>
 
@@ -541,10 +563,10 @@ tr:hover .botoes-acoes { opacity: 1; }
                 <table class="tabela-abs">
                     <thead>
                         <tr>
-                            <th style="width:36px;">Nº</th>
-                            <th style="width:220px;">COLABORADOR</th>
-                            <th style="width:90px;">DATA</th>
-                            <th style="width:65px;">TIPO</th>
+                            <th style="width:40px;">Nº</th>
+                            <th style="width:280px;">COLABORADOR</th>
+                            <th style="width:110px;">DATA</th>
+                            <th style="width:90px;">TIPO</th>
                             <th>MOTIVO / JUSTIFICATIVA</th>
                             <th class="col-acoes th-acoes">AÇÕES</th>
                         </tr>
