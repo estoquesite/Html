@@ -43,7 +43,7 @@
             width: 100% !important;
         }
 
-        /* ANIMAÇÃO PISCAR FORTE DO NOME DO USUÁRIO (ENTREGUE) */
+        /* ANIMAÇÃO PISCAR DO USUÁRIO ENTREGUE */
         @keyframes piscarUsuarioEntregue {
             0%, 100% {
                 background-color: #dbeafe;
@@ -64,7 +64,7 @@
             display: inline-block;
         }
 
-        /* ANIMAÇÃO PISCAR DO SERIAL (NÃO ENTREGUE / PENDENTE) */
+        /* ANIMAÇÃO PISCAR DO SERIAL PENDENTE */
         @keyframes piscarSerialPendente {
             0%, 100% {
                 background-color: #fef3c7;
@@ -120,7 +120,7 @@
                         <h1 class="text-sm sm:text-base font-black text-slate-900 dark:text-white uppercase tracking-wide">Controle de Notebooks & Periféricos</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500">Gestão de Equipamentos • Status Personalizados</p>
+                        <p class="text-xs text-slate-500">Gestão de Equipamentos • Nuvem Supabase</p>
                         <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                         <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600">Base Ativa</span>
                     </div>
@@ -139,25 +139,25 @@
                 </button>
 
                 <!-- RECUPERAR PLANILHA -->
-                <label class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95" title="Carregar ficheiro CSV ou Excel baixado anteriormente">
+                <label class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95" title="Carregar arquivo CSV/Excel salvo">
                     <span>📂</span>
                     <span>Recuperar CSV</span>
                     <input type="file" id="inputRecuperarCSV" accept=".csv,.txt" class="hidden" onchange="importarCSVNotebooks(this.files)">
                 </label>
 
-                <!-- SALVAR NA NUVEM -->
-                <button onclick="salvarTudoNaNuvem()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5 cursor-pointer" title="Subir todos os registros locais para a nuvem">
+                <!-- SALVAR DEFINITIVO NA NUVEM -->
+                <button onclick="salvarTudoNaNuvem()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5 cursor-pointer" title="Grava toda a lista local no Supabase">
                     <span>☁️</span>
-                    <span>Salvar na Nuvem</span>
+                    <span>Salvar na Nuvem (Subir Tudo)</span>
                 </button>
 
                 <!-- SINCRONIZAR -->
-                <button onclick="carregarDoSupabase()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-sm" title="Descarregar dados da nuvem sem apagar os locais">
+                <button onclick="carregarDoSupabase()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-sm" title="Baixa registros da nuvem sem apagar locais">
                     🔄 Sincronizar
                 </button>
 
                 <!-- EXPORTAR CSV -->
-                <button onclick="exportarCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer">
+                <button onclick="exportarCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer">
                     📥 CSV
                 </button>
             </div>
@@ -175,14 +175,14 @@
                         <span>Leitor de Código de Barras da Etiqueta</span>
                     </h2>
                     <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                        Aponte a câmara para as barras ou carregue uma fotografia da etiqueta para preenchimento imediato.
+                        Aponte a câmera para o código de barras ou envie a foto da placa da Vale/DXC.
                     </p>
                 </div>
 
                 <div class="flex flex-wrap gap-2 w-full sm:w-auto">
                     <button type="button" onclick="iniciarLeitorCamera()" id="btnIniciarCamera" class="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-black px-4 py-2.5 rounded-xl cursor-pointer shadow-md transition">
                         <span>📹</span>
-                        <span>Abrir Câmara</span>
+                        <span>Abrir Câmera</span>
                     </button>
 
                     <label class="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 text-xs font-bold px-4 py-2.5 rounded-xl cursor-pointer shadow-sm transition">
@@ -198,7 +198,7 @@
                 <div id="leitor-camera" class="w-full rounded-xl overflow-hidden min-h-[240px]"></div>
                 <p class="text-[11px] text-amber-300 font-bold animate-pulse">Enquadre as barras pretas na linha central</p>
                 <button type="button" onclick="pararLeitorCamera()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-5 py-1.5 rounded-xl shadow cursor-pointer">
-                    ✕ Fechar Câmara
+                    ✕ Fechar Câmera
                 </button>
             </div>
         </div>
@@ -208,7 +208,7 @@
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                 <span class="text-xs font-black text-slate-800 dark:text-slate-200 uppercase flex items-center gap-2">
                     <span>📝</span>
-                    <span>Novo Registo de Equipamento</span>
+                    <span>Novo Registro de Equipamento</span>
                 </span>
                 <span class="text-[10px] font-bold text-slate-400">Verificação automática de duplicidade</span>
             </div>
@@ -291,7 +291,7 @@
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Colaborador (Usuário)</label>
-                            <input type="text" id="colaborador" placeholder="Nome do utilizador" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                            <input type="text" id="colaborador" placeholder="Nome do colaborador" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Setor</label>
@@ -353,7 +353,7 @@
 
     </div>
 
-    <!-- MODAL DE GERENCIAMENTO DE STATUS (CADASTRAR E EXCLUIR) -->
+    <!-- MODAL DE GERENCIAMENTO DE STATUS -->
     <div id="modalGerenciarStatus" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 border-2 border-purple-400 dark:border-purple-600 w-full max-w-md rounded-2xl p-5 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
@@ -363,7 +363,6 @@
                 <button onclick="fecharModalStatus()" class="text-slate-400 hover:text-slate-600 font-black text-sm">✕</button>
             </div>
 
-            <!-- Adicionar novo status -->
             <div class="flex gap-2">
                 <input type="text" id="inputNovoStatus" placeholder="Novo status (ex: Em trânsito, Reserva...)" class="uppercase-input flex-1 text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl outline-none font-bold">
                 <button type="button" onclick="adicionarNovoStatus()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow">
@@ -371,7 +370,6 @@
                 </button>
             </div>
 
-            <!-- Lista de status existentes -->
             <div>
                 <span class="block text-[10px] font-bold text-slate-400 uppercase mb-2">Status Disponíveis no Sistema:</span>
                 <div id="listaStatusContainer" class="space-y-1.5 max-h-56 overflow-y-auto"></div>
@@ -475,7 +473,7 @@
             carregarListaStatus();
             atualizarSelectsStatus();
 
-            // 1. Carrega do armazenamento local com segurança
+            // 1. Carrega localmente
             carregarDoLocalStorage();
 
             // 2. Conecta ao Supabase
@@ -512,7 +510,7 @@
             } catch (e) {}
         }
 
-        // ================= GERENCIAMENTO DE STATUS (CADASTRAR E EXCLUIR) =================
+        // ================= GERENCIAMENTO DE STATUS =================
         function carregarListaStatus() {
             const salvas = localStorage.getItem('modulo9_status_custom');
             if (salvas) {
@@ -640,7 +638,7 @@
             }
         }
 
-        // ================= LEITOR AO VIVO (CÂMARA) =================
+        // ================= LEITOR AO VIVO (CÂMERA) =================
         async function iniciarLeitorCamera() {
             const wrapper = document.getElementById('boxCameraWrapper');
             wrapper.classList.remove('hidden');
@@ -672,7 +670,7 @@
                 },
                 () => {}
             ).catch(err => {
-                alert("Erro ao aceder à câmara: Autorização recusada ou câmara ocupada.");
+                alert("Erro ao aceder à câmera: Permissão negada ou câmera ocupada.");
                 pararLeitorCamera();
             });
         }
@@ -700,7 +698,7 @@
                     aplicarCodigoLido(decodedText);
                 })
                 .catch(() => {
-                    mostrarAviso("Não foi possível detetar o código. Tente 'Abrir Câmara'.", "erro");
+                    mostrarAviso("Não foi possível detectar o código. Tente 'Abrir Câmera'.", "erro");
                 });
         }
 
@@ -721,7 +719,7 @@
             verificarDuplicidadeAoDigitar();
         }
 
-        // ================= GRAVAÇÃO E GESTÃO =================
+        // ================= SALVAMENTO E GESTÃO =================
         function salvarNotebook(e) {
             e.preventDefault();
 
@@ -768,7 +766,7 @@
             verificarDuplicidadeAoDigitar();
         }
 
-        // ================= MODAL DE EDIÇÃO (LÁPIS ✏) =================
+        // ================= MODAL DE EDIÇÃO =================
         function abrirModalEdicao(index) {
             const item = notebooks[index];
             if (!item) return;
@@ -833,7 +831,7 @@
             );
 
             if (lista.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-slate-400 italic">Nenhum equipamento registado.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-slate-400 italic">Nenhum equipamento registrado.</td></tr>`;
                 return;
             }
 
@@ -842,18 +840,15 @@
                 const totalDuplicadosPat = notebooks.filter(item => item.patrimonio === n.patrimonio).length;
                 const ehDuplicado = totalDuplicadosSerial > 1 || totalDuplicadosPat > 1;
 
-                // Não entregue: status 'Em estoque' ou sem data de saída
                 const naoEntregue = n.status === 'Em estoque' || n.dataSaida === '-';
 
-                // Serial pisca se estiver PENDENTE / NÃO ENTREGUE
                 let serialFormatado = n.serial;
                 if (ehDuplicado) {
                     serialFormatado = `<span class="alerta-duplicado" title="⚠️ DUPLICADO">${n.serial}</span>`;
                 } else if (naoEntregue) {
-                    serialFormatado = `<span class="piscar-serial-pendente" title="⚠️ NÃO ENTREGUE - PENDENTE">${n.serial}</span>`;
+                    serialFormatado = `<span class="piscar-serial-pendente" title="⚠️️ NÃO ENTREGUE - PENDENTE">${n.serial}</span>`;
                 }
 
-                // Nome do Colaborador pisca forte se já foi ENTREGUE
                 let colaboradorFormatado = n.colaborador;
                 if (!naoEntregue && n.colaborador && n.colaborador !== '-') {
                     colaboradorFormatado = `<span class="piscar-usuario-forte" title="Equipamento Entregue">👤 ${n.colaborador}</span>`;
@@ -905,7 +900,7 @@
         // ================= SUPABASE & NUVEM =================
         async function salvarTudoNaNuvem() {
             if (!supabaseClient) {
-                alert("Ligação com a nuvem indisponível.");
+                alert("Conexão com a nuvem indisponível.");
                 return;
             }
             if (notebooks.length === 0) {
@@ -913,7 +908,7 @@
                 return;
             }
 
-            mostrarAviso("A sincronizar registos com a nuvem...", "sucesso");
+            mostrarAviso("Sincronizando registros com a nuvem...", "sucesso");
 
             try {
                 const dadosMapeados = notebooks.map(n => ({
@@ -1024,7 +1019,7 @@
             const reader = new FileReader();
             reader.onload = function(e) {
                 const linhas = e.target.result.split(/\r?\n/).filter(l => l.trim().length > 0);
-                if (linhas.length <= 1) return alert("Ficheiro vazio.");
+                if (linhas.length <= 1) return alert("Arquivo vazio.");
 
                 const delim = linhas[0].includes(';') ? ';' : ',';
                 let novos = [];
@@ -1055,7 +1050,7 @@
                     notebooks = novos;
                     salvarNoLocalStorage();
                     renderizarTabela();
-                    mostrarAviso(`🎉 SUCESSO! ${novos.length} equipamentos recuperados do ficheiro!`);
+                    mostrarAviso(`🎉 SUCESSO! ${novos.length} equipamentos recuperados do arquivo!`);
                 }
             };
             reader.readAsText(file, "UTF-8");
