@@ -4,17 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Módulo 7 - Compras Cartão Corporativo | Portal Vale</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = { darkMode: 'class' }
     </script>
+    <!-- SDK Oficial do Supabase -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         * { box-sizing: border-box; }
         body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
         .uppercase-input { text-transform: uppercase; }
 
-        /* Borda de Destaque elegante com espaçamento balanceado */
         .bloco-destacado {
             border: 1.5px solid #6366f1 !important;
             box-shadow: 0 2px 8px -1px rgba(99, 102, 241, 0.12), 0 1px 3px rgba(0, 0, 0, 0.04) !important;
@@ -43,28 +44,13 @@
             border-width: 1.5px !important;
         }
 
-        @keyframes neonDelicado {
-            0%, 100% { border-color: #38bdf8; }
-            50% { border-color: #818cf8; }
-        }
-        .neon-pulsante {
-            animation: neonDelicado 2s infinite alternate ease-in-out;
-            border-width: 1.5px !important;
-        }
-
-        /* Cores de Glow para Cards de Pessoas */
         .glow-azul { border: 1.5px solid #38bdf8; }
         .glow-roxo { border: 1.5px solid #c084fc; }
         .glow-verde { border: 1.5px solid #4ade80; }
         .glow-rosa { border: 1.5px solid #f472b6; }
         .glow-amarelo { border: 1.5px solid #facc15; }
 
-        @keyframes brilhaFluorescente {
-            0%, 100% { border-color: #22c55e; }
-            50% { border-color: #eab308; }
-        }
         .alerta-duplicado-fluorescente {
-            animation: brilhaFluorescente 1.2s infinite alternate ease-in-out;
             border: 1.5px dashed #22c55e !important;
             padding: 1px 4px;
             border-radius: 4px;
@@ -75,6 +61,7 @@
 
     <div class="max-w-[1380px] mx-auto space-y-4">
 
+        <!-- CABEÇALHO -->
         <header class="bloco-destacado flex flex-wrap justify-between items-center p-4 rounded-xl gap-3">
             <div class="flex items-center gap-3">
                 <div class="w-10 h-10 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 rounded-xl flex items-center justify-center text-xl font-black shadow-inner">
@@ -88,7 +75,7 @@
                     <div class="flex items-center gap-2 mt-0.5">
                         <p class="text-[11px] text-slate-500 dark:text-slate-400">Portal Vale • Gestão e Lançamentos</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                        <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Sincronizado</span>
+                        <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
                 </div>
             </div>
@@ -106,14 +93,13 @@
                 <button onclick="exportarParaCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer">
                     📥 CSV
                 </button>
-                <button onclick="abrirModalChaveIa()" class="bg-amber-100 hover:bg-amber-200 text-amber-900 border border-amber-300 px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 cursor-pointer" title="Configurar Chave IA">
-                    ⚙️ Chave IA
-                </button>
             </div>
         </header>
 
+        <!-- AVISO DE STATUS -->
         <div id="alertaSistema" class="hidden p-2.5 rounded-xl text-xs font-bold text-center transition-all"></div>
 
+        <!-- CARTÕES DE RESUMO -->
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
             <div class="bloco-destacado p-3.5 rounded-xl">
                 <span id="labelTotalItens" class="text-[10px] font-bold uppercase text-slate-400">Total de Despesas</span>
@@ -129,8 +115,10 @@
             </div>
         </div>
 
+        <!-- CARDS DINÂMICOS POR PESSOA -->
         <div id="containerCardsPessoas" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2"></div>
 
+        <!-- BARRA DE FILTRO, PESQUISA E VALORES -->
         <div class="bloco-destacado p-3 rounded-xl flex flex-col md:flex-row items-center justify-between gap-2.5 bg-slate-50 dark:bg-slate-800">
             <div class="flex items-center gap-2 flex-shrink-0">
                 <span class="text-sm">🔍</span>
@@ -138,17 +126,20 @@
             </div>
             
             <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 w-full">
+                <!-- PESQUISA DE PRODUTO -->
                 <div class="relative">
                     <input type="text" id="inputPesquisaProduto" oninput="renderizarTabela()" placeholder="Buscar por produto..." class="uppercase-input w-full text-xs pl-7 pr-3 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg outline-none focus:border-indigo-600 font-bold dark:text-white">
                     <span class="absolute left-2 top-1.5 text-slate-400 text-xs">📦</span>
                 </div>
 
+                <!-- FILTRO POR VALOR -->
                 <div class="relative">
                     <input type="number" step="0.01" id="inputFiltroValor" oninput="renderizarTabela()" placeholder="Valor exato (R$)..." class="w-full text-xs pl-7 pr-7 py-1.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg outline-none focus:border-indigo-600 font-bold dark:text-white">
                     <span class="absolute left-2 top-1.5 text-slate-400 text-xs">💲</span>
                     <button type="button" onclick="document.getElementById('inputFiltroValor').value=''; renderizarTabela();" class="absolute right-2 top-1.5 text-slate-400 hover:text-rose-500 font-bold text-xs" title="Limpar">✕</button>
                 </div>
 
+                <!-- FILTRO POR SOLICITANTE -->
                 <div>
                     <select id="selectFiltroSolicitante" onchange="aplicarFiltroPorSelect(this.value)" class="w-full text-xs py-1.5 px-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-lg outline-none focus:border-indigo-600 font-bold dark:text-white">
                         <option value="">TODOS OS SOLICITANTES</option>
@@ -162,154 +153,84 @@
             </div>
         </div>
 
-        <div class="bloco-destacado rounded-xl overflow-hidden">
-            <div class="flex border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 p-1 gap-1">
-                <button type="button" onclick="mudarAbaEntrada('manual')" id="tabBtn-manual" class="flex-1 py-2 px-3 rounded-lg text-xs font-black transition flex items-center justify-center gap-1.5 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-700">
-                    <span>✍️</span> <span>Digitar Manual</span>
-                </button>
-                <button type="button" onclick="mudarAbaEntrada('link')" id="tabBtn-link" class="flex-1 py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
-                    <span>🔗</span> <span>Link Web</span>
-                </button>
-                <button type="button" onclick="mudarAbaEntrada('foto')" id="tabBtn-foto" class="flex-1 py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
-                    <span>📸</span> <span>Foto / Câmera</span>
-                </button>
-                <button type="button" onclick="mudarAbaEntrada('texto')" id="tabBtn-texto" class="flex-1 py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
-                    <span>💬</span> <span>Colar Teams</span>
-                </button>
+        <!-- FORMULÁRIO DE ENTRADA -->
+        <div class="bloco-destacado rounded-xl overflow-hidden p-4 space-y-3.5">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-1.5">
+                <span class="text-xs font-black text-indigo-900 dark:text-indigo-300 uppercase flex items-center gap-1.5">
+                    <span>✍️</span> Lançamento de Compra
+                </span>
+                <span class="text-[10px] font-bold text-slate-400">Preencha os campos abaixo</span>
             </div>
 
-            <div id="aba-manual" class="p-4 space-y-3.5">
-                <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-1.5">
-                    <span class="text-xs font-black text-indigo-900 dark:text-indigo-300 uppercase flex items-center gap-1.5">
-                        <span>✍️</span> Lançamento de Compra
-                    </span>
-                    <span class="text-[10px] font-bold text-slate-400">Preencha os campos abaixo</span>
+            <!-- LINHA 1 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Data da Compra</label>
+                    <input type="date" id="manualData" onchange="atualizarDataEntregaManualDefault()" class="w-full text-xs p-2 rounded-lg outline-none border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 dark:text-white">
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Data da Compra</label>
-                        <input type="date" id="manualData" onchange="atualizarDataEntregaManualDefault()" class="neon-pulsante w-full text-xs p-2 rounded-lg outline-none bg-white dark:bg-slate-900 dark:text-white">
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase">Solicitante (*)</label>
+                        <span id="avisoManualSolicitante" class="text-[9px] font-black text-rose-600">OBRIGATÓRIO</span>
                     </div>
-
-                    <div>
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="block text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase">Solicitante (*)</label>
-                            <span id="avisoManualSolicitante" class="text-[9px] font-black text-rose-600">OBRIGATÓRIO</span>
-                        </div>
-                        <input type="text" id="manualSolicitante" oninput="validarInputManualSolicitante(this)" placeholder="QUEM PEDIU?" class="uppercase-input w-full text-xs p-2 rounded-lg outline-none piscar-solicitante-forte">
-                    </div>
-
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Produto / Serviço (*)</label>
-                        <input type="text" id="manualProduto" oninput="this.value = this.value.toUpperCase()" placeholder="EX: CHUMBADOR..." class="uppercase-input w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold outline-none">
-                    </div>
-
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Local / Fornecedor</label>
-                        <input type="text" id="manualLocal" oninput="this.value = this.value.toUpperCase()" placeholder="EX: MERCADO LIVRE..." class="uppercase-input w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold outline-none">
-                    </div>
+                    <input type="text" id="manualSolicitante" oninput="validarInputManualSolicitante(this)" placeholder="QUEM PEDIU?" class="uppercase-input w-full text-xs p-2 rounded-lg outline-none piscar-solicitante-forte">
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end pt-1">
-                    <div class="md:col-span-3">
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase">Categoria</label>
-                            <button type="button" onclick="adicionarNovaCategoriaPrompt('manualCategoria')" class="text-[9px] text-indigo-600 font-bold hover:underline">+ Nova</button>
-                        </div>
-                        <select id="manualCategoria" class="w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-semibold outline-none"></select>
-                    </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Produto / Serviço (*)</label>
+                    <input type="text" id="manualProduto" oninput="this.value = this.value.toUpperCase()" placeholder="EX: CHUMBADOR..." class="uppercase-input w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold outline-none">
+                </div>
 
-                    <div class="md:col-span-1">
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Qtd</label>
-                        <input type="number" id="manualQtd" value="1" min="1" oninput="calcularManualPorTotal()" class="w-full text-xs p-2 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white outline-none">
-                    </div>
-
-                    <div class="md:col-span-2">
-                        <label class="block text-[10px] font-black text-emerald-600 uppercase mb-1">Total (R$) 🔄</label>
-                        <input type="number" step="0.01" id="manualTotal" placeholder="0,00" oninput="calcularManualPorTotal()" class="w-full text-xs p-2 bg-emerald-50 border border-emerald-400 rounded-lg font-black text-emerald-700 outline-none">
-                    </div>
-
-                    <div class="md:col-span-2">
-                        <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Unitário (R$)</label>
-                        <input type="number" step="0.01" id="manualUnit" placeholder="0,00" oninput="calcularManualPorUnitario()" class="w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold outline-none">
-                    </div>
-
-                    <div class="md:col-span-2 bg-slate-50 dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-slate-700">
-                        <label class="flex items-center gap-1.5 cursor-pointer">
-                            <input type="checkbox" id="manualEntregue" onchange="toggleManualDataEntrega(this.checked)" class="w-3.5 h-3.5 text-indigo-600 rounded">
-                            <span class="text-[10px] font-bold uppercase text-slate-700 dark:text-slate-300">📦 Entregue?</span>
-                        </label>
-                        <input type="date" id="manualDataEntrega" class="w-full text-[10px] p-1 mt-1 rounded font-bold hidden border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 dark:text-white">
-                    </div>
-
-                    <div class="md:col-span-2">
-                        <button type="button" onclick="lancarCompraManual()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2 rounded-lg text-xs transition shadow-sm flex items-center justify-center gap-1 cursor-pointer">
-                            <span>✅</span>
-                            <span>Salvar Compra</span>
-                        </button>
-                    </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Local / Fornecedor</label>
+                    <input type="text" id="manualLocal" oninput="this.value = this.value.toUpperCase()" placeholder="EX: MERCADO LIVRE..." class="uppercase-input w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold outline-none">
                 </div>
             </div>
 
-            <div id="aba-link" class="p-4 space-y-3 hidden">
-                <div class="flex justify-between items-center">
-                    <label class="block text-xs font-black uppercase flex items-center gap-2">
-                        <span>🔗</span>
-                        <span>Colar Link do Produto</span>
+            <!-- LINHA 2 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end pt-1">
+                <div class="md:col-span-3">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-[10px] font-bold text-slate-500 uppercase">Categoria</label>
+                        <button type="button" onclick="adicionarNovaCategoriaPrompt('manualCategoria')" class="text-[9px] text-indigo-600 font-bold hover:underline">+ Nova</button>
+                    </div>
+                    <select id="manualCategoria" class="w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-semibold outline-none"></select>
+                </div>
+
+                <div class="md:col-span-1">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Qtd</label>
+                    <input type="number" id="manualQtd" value="1" min="1" oninput="calcularManualPorTotal()" class="w-full text-xs p-2 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white outline-none">
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-[10px] font-black text-emerald-600 uppercase mb-1">Total (R$) 🔄</label>
+                    <input type="number" step="0.01" id="manualTotal" placeholder="0,00" oninput="calcularManualPorTotal()" class="w-full text-xs p-2 bg-emerald-50 border border-emerald-400 rounded-lg font-black text-emerald-700 outline-none">
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Unitário (R$)</label>
+                    <input type="number" step="0.01" id="manualUnit" placeholder="0,00" oninput="calcularManualPorUnitario()" class="w-full text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold outline-none">
+                </div>
+
+                <div class="md:col-span-2 bg-slate-50 dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-slate-700">
+                    <label class="flex items-center gap-1.5 cursor-pointer">
+                        <input type="checkbox" id="manualEntregue" onchange="toggleManualDataEntrega(this.checked)" class="w-3.5 h-3.5 text-indigo-600 rounded">
+                        <span class="text-[10px] font-bold uppercase text-slate-700 dark:text-slate-300">📦 Entregue?</span>
                     </label>
-                    <div class="flex items-center gap-3">
-                        <button type="button" onclick="limparInputLink()" class="text-xs text-rose-500 font-bold hover:underline">✕ Limpar</button>
-                        <button type="button" onclick="colarLinkInput()" class="text-xs text-blue-600 font-bold hover:underline">📋 Colar</button>
-                    </div>
+                    <input type="date" id="manualDataEntrega" class="w-full text-[10px] p-1 mt-1 rounded font-bold hidden border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 dark:text-white">
                 </div>
-                
-                <div class="flex gap-2">
-                    <input type="text" id="inputLinkDireto" placeholder="Cole o link aqui..." class="neon-pulsante flex-1 text-xs px-3 py-2 rounded-lg outline-none bg-white dark:bg-slate-900 dark:text-white">
-                    <button type="button" onclick="processarLinkDireto()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2 rounded-lg transition shadow-sm">
-                        ⚡ Reconhecer
-                    </button>
-                </div>
-            </div>
 
-            <div id="aba-foto" class="p-4 space-y-3 hidden">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <label class="flex items-center justify-center gap-3 bg-purple-600 hover:bg-purple-700 text-white font-black py-3 px-4 rounded-xl cursor-pointer shadow transition text-xs">
-                        <span class="text-xl">📸</span>
-                        <span>TIRAR FOTO DA CÂMERA</span>
-                        <input type="file" id="inputCameraDireta" accept="image/*" capture="environment" class="hidden" onchange="processarArquivos(this.files)">
-                    </label>
-                    <label class="flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-3 px-4 rounded-xl cursor-pointer shadow transition text-xs">
-                        <span class="text-xl">🖼️</span>
-                        <span>ESCOLHER DA GALERIA</span>
-                        <input type="file" id="inputGaleria" accept="image/*" multiple class="hidden" onchange="processarArquivos(this.files)">
-                    </label>
-                </div>
-            </div>
-
-            <div id="aba-texto" class="p-4 space-y-3 hidden">
-                <textarea id="inputTextoTeams" rows="2" placeholder="Cole mensagens do Teams / WhatsApp aqui..." class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg outline-none dark:text-white"></textarea>
-                <div class="flex justify-end">
-                    <button type="button" onclick="processarTextoBruto(document.getElementById('inputTextoTeams').value)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-1.5 rounded-lg shadow-sm">
-                        ⚡ Reconhecer Texto
+                <div class="md:col-span-2">
+                    <button type="button" onclick="lancarCompraManual()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2 rounded-lg text-xs transition shadow-sm flex items-center justify-center gap-1 cursor-pointer">
+                        <span>✅</span>
+                        <span>Salvar Compra</span>
                     </button>
                 </div>
             </div>
         </div>
 
-        <div id="containerCardsPreenchidos" class="space-y-3 hidden">
-            <div class="flex justify-between items-center px-1">
-                <h3 class="text-xs font-black uppercase text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5">
-                    <span>📦</span>
-                    <span id="tituloItensPendentes">Itens Identificados:</span>
-                </h3>
-                <button type="button" onclick="confirmarTodosOsCards()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm">
-                    ⚡ Salvar Todos
-                </button>
-            </div>
-            <div id="listaCardsPendentes" class="space-y-2.5"></div>
-        </div>
-
+        <!-- TABELA DE COMPRAS REGISTRADAS -->
         <div class="bloco-destacado p-4 rounded-xl space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">
@@ -331,7 +252,6 @@
                             <th class="py-2 px-3 text-right">Unitário</th>
                             <th class="py-2 px-3 text-right">Total</th>
                             <th class="py-2 px-3 text-center">Entrega 📦</th>
-                            <th class="py-2 px-3 text-center">Link</th>
                             <th class="py-2 px-3 text-center">Ações</th>
                         </tr>
                     </thead>
@@ -342,6 +262,7 @@
 
     </div>
 
+    <!-- MODAL DO PAINEL DE SOLICITANTES -->
     <div id="modalUsuarios" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 w-full max-w-2xl rounded-xl p-5 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
@@ -377,82 +298,7 @@
         </div>
     </div>
 
-    <div id="modalChaveIa" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 w-full max-w-md rounded-xl p-5 shadow-2xl space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
-                <h3 class="text-sm font-black text-amber-600 uppercase flex items-center gap-1.5">
-                    ⚙️ Chave API da IA (Gemini)
-                </h3>
-                <button onclick="fecharModalChaveIa()" class="text-slate-400 font-black text-sm">✕</button>
-            </div>
-
-            <div class="space-y-2 text-xs">
-                <p class="text-slate-500">Cole abaixo a chave de API:</p>
-                <input type="password" id="modalInputGeminiKey" placeholder="Cole sua chave aqui..." class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-mono outline-none">
-            </div>
-
-            <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-700">
-                <button type="button" onclick="fecharModalChaveIa()" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600">Fechar</button>
-                <button type="button" onclick="salvarChaveIaModal()" class="bg-amber-600 hover:bg-amber-700 text-white px-4 py-1.5 rounded-lg text-xs font-bold">Salvar</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="modalEdicao" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 w-full max-w-xl rounded-xl p-5 shadow-2xl space-y-3">
-            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
-                <h3 class="text-sm font-black text-indigo-600 uppercase">✏️ Editar Registro</h3>
-                <button onclick="fecharModalEdicao()" class="text-slate-400 font-black text-sm">✕</button>
-            </div>
-
-            <input type="hidden" id="editItemIndex">
-            <input type="hidden" id="editItemId">
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Data</label>
-                    <input type="date" id="editData" class="w-full p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 rounded-lg dark:text-white outline-none">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Solicitante</label>
-                    <input type="text" id="editSolicitante" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 rounded-lg dark:text-white font-bold outline-none">
-                </div>
-                <div class="sm:col-span-2">
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Produto</label>
-                    <input type="text" id="editProduto" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 rounded-lg dark:text-white font-bold outline-none">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Local</label>
-                    <input type="text" id="editLocal" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 rounded-lg dark:text-white font-bold outline-none">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Categoria</label>
-                    <select id="editCategoria" class="w-full p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 rounded-lg dark:text-white font-semibold outline-none"></select>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Qtd</label>
-                    <input type="number" id="editQtd" min="1" oninput="calcularModalPorTotal()" class="w-full p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 rounded-lg dark:text-white font-bold outline-none">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-emerald-600 uppercase mb-1">Total (R$)</label>
-                    <input type="number" step="0.01" id="editTotal" oninput="calcularModalPorTotal()" class="w-full p-1.5 bg-emerald-50 border border-emerald-300 rounded-lg font-black text-emerald-600 outline-none">
-                </div>
-                <div class="sm:col-span-2">
-                    <label class="flex items-center gap-1.5 cursor-pointer">
-                        <input type="checkbox" id="editEntregue" onchange="toggleDataEntregaModal(this.checked)" class="w-3.5 h-3.5 text-indigo-600 rounded">
-                        <span class="font-bold text-slate-700 dark:text-slate-300 text-xs">PRODUTO ENTREGUE?</span>
-                    </label>
-                    <input type="date" id="editDataEntrega" class="w-full p-1.5 mt-1 border border-slate-300 rounded-lg dark:bg-slate-800 dark:text-white text-xs hidden">
-                </div>
-            </div>
-
-            <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-700">
-                <button type="button" onclick="fecharModalEdicao()" class="px-3 py-1.5 rounded-lg text-xs font-bold text-slate-600">Cancelar</button>
-                <button type="button" onclick="guardarEdicaoModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-1.5 rounded-lg text-xs font-bold">Salvar</button>
-            </div>
-        </div>
-    </div>
-
+    <!-- SCRIPT CORRIGIDO COM PROTEÇÃO DE DADOS -->
     <script>
         const SUPABASE_URL = "https://gloxtswcksbczinpwtzu.supabase.co";
         const SUPABASE_KEY = "sb_publishable_0kEiqthWKZZwjM120wQIYw_Hba7qeLc";
@@ -468,7 +314,6 @@
 
         let listaCategorias = [];
         let compras = [];
-        let itensPendentesAprovacao = [];
         let supabaseClient = null;
         let solicitanteFiltroAtual = "";
 
@@ -480,11 +325,10 @@
             atualizarDataEntregaManualDefault();
             atualizarTodosOsSelectsCategorias();
 
-            const solManual = document.getElementById('manualSolicitante');
-            solManual.classList.add('piscar-solicitante-forte');
-
+            // 1. Carrega primeiro e com prioridade o que está no localStorage
             carregarDoLocalStorage();
 
+            // 2. Conecta ao Supabase de forma segura sem apagar o local
             if (window.supabase) {
                 try {
                     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -494,20 +338,6 @@
                 }
             }
         });
-
-        function mudarAbaEntrada(aba) {
-            ['manual', 'link', 'foto', 'texto'].forEach(id => {
-                const elAba = document.getElementById(`aba-${id}`);
-                const elBtn = document.getElementById(`tabBtn-${id}`);
-                if (id === aba) {
-                    elAba.classList.remove('hidden');
-                    elBtn.className = "flex-1 py-2 px-3 rounded-lg text-xs font-black transition flex items-center justify-center gap-1.5 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-700";
-                } else {
-                    elAba.classList.add('hidden');
-                    elBtn.className = "flex-1 py-2 px-3 rounded-lg text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200";
-                }
-            });
-        }
 
         function carregarCategorias() {
             const salvas = localStorage.getItem('compras_categorias_lista');
@@ -526,10 +356,6 @@
             const selManual = document.getElementById('manualCategoria');
             const valManual = selManual ? selManual.value : "";
             preencherOpcoesCategoria(selManual, valManual || "OUTROS");
-
-            const selEdit = document.getElementById('editCategoria');
-            const valEdit = selEdit ? selEdit.value : "";
-            preencherOpcoesCategoria(selEdit, valEdit || "OUTROS");
         }
 
         function adicionarNovaCategoriaPrompt(selectId = null) {
@@ -570,12 +396,10 @@
         function mostrarAviso(msg, tipo = "sucesso") {
             const el = document.getElementById('alertaSistema');
             el.innerText = msg;
-            el.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
-            if (tipo === "sucesso") {
-                el.classList.add('bg-emerald-100', 'text-emerald-800');
-            } else {
-                el.classList.add('bg-rose-100', 'text-rose-800');
-            }
+            el.className = `p-2.5 rounded-xl text-xs font-bold text-center transition-all ${
+                tipo === 'sucesso' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+            }`;
+            el.classList.remove('hidden');
             setTimeout(() => el.classList.add('hidden'), 4000);
         }
 
@@ -813,35 +637,42 @@
             aplicarFiltroPorSelect(nome);
         }
 
-        function abrirModalChaveIa() {
-            document.getElementById('modalInputGeminiKey').value = localStorage.getItem('gemini_api_key') || '';
-            document.getElementById('modalChaveIa').classList.remove('hidden');
-        }
-
-        function fecharModalChaveIa() {
-            document.getElementById('modalChaveIa').classList.add('hidden');
-        }
-
-        function salvarChaveIaModal() {
-            localStorage.setItem('gemini_api_key', document.getElementById('modalInputGeminiKey').value.trim());
-            fecharModalChaveIa();
-            mostrarAviso("Chave da IA salva!");
-        }
-
-        // ================= SUPABASE =================
+        // ================= SUPABASE (SEM SOBRESCREVER LOCAL COM VAZIO) =================
         async function carregarDoSupabase() {
             if (!supabaseClient) return;
             try {
                 const { data, error } = await supabaseClient.from('compras_corporativas').select('*').order('id', { ascending: false });
-                if (!error && data) {
-                    compras = data;
+                
+                // Só mescla se a nuvem trouxer dados válidos
+                if (!error && data && data.length > 0) {
+                    const localSalvo = JSON.parse(localStorage.getItem('compras_corporativas_base') || '[]');
+                    const mapLocal = new Map();
+                    localSalvo.forEach(item => mapLocal.set(String(item.id), item));
+
+                    const listaMesclada = data.map(remoto => {
+                        const local = mapLocal.get(String(remoto.id));
+                        return {
+                            ...remoto,
+                            entregue: (local && local.entregue !== undefined) ? local.entregue : (remoto.entregue || false),
+                            data_entrega: (local && local.data_entrega !== undefined) ? local.data_entrega : (remoto.data_entrega || ''),
+                            local: (local && local.local) ? local.local : (remoto.local || 'MERCADO LIVRE')
+                        };
+                    });
+
+                    localSalvo.forEach(localItem => {
+                        if (!data.some(r => String(r.id) === String(localItem.id))) {
+                            listaMesclada.unshift(localItem);
+                        }
+                    });
+
+                    compras = listaMesclada;
                     salvarNoLocalStorage();
                     atualizarListaSelectSolicitantes();
                     renderizarTabela();
                     mostrarAviso("✅ Sincronizado com a nuvem!");
                 }
             } catch (err) {
-                console.warn(err);
+                console.warn("Aviso nuvem:", err);
             }
         }
 
@@ -850,7 +681,7 @@
             try {
                 await supabaseClient.from('compras_corporativas').insert([item]);
             } catch (err) {
-                console.warn(err);
+                console.warn("Erro ao inserir na nuvem:", err);
             }
         }
 
@@ -859,7 +690,7 @@
             try {
                 await supabaseClient.from('compras_corporativas').update(item).eq('id', item.id);
             } catch (err) {
-                console.warn(err);
+                console.warn("Erro ao atualizar na nuvem:", err);
             }
         }
 
@@ -868,11 +699,11 @@
             try {
                 await supabaseClient.from('compras_corporativas').delete().eq('id', id);
             } catch (err) {
-                console.warn(err);
+                console.warn("Erro ao remover na nuvem:", err);
             }
         }
 
-        // ================= ENTREGA & TABELA =================
+        // ================= CONTROLE DE ENTREGA NA TABELA =================
         async function salvarAlteracaoEntrega(id) {
             const item = compras.find(c => String(c.id) === String(id));
             if (!item) return;
@@ -900,8 +731,10 @@
             salvarAlteracaoEntrega(id);
         }
 
+        // ================= RENDERIZAR TABELA =================
         function renderizarTabela() {
             const tbody = document.getElementById('tabelaComprasCorpo');
+            if (!tbody) return;
             tbody.innerHTML = '';
 
             let totalGastoGeral = 0;
@@ -912,12 +745,14 @@
                 listaExibicao = listaExibicao.filter(i => (i.solicitante || "").toUpperCase().includes(solicitanteFiltroAtual));
             }
 
-            const termoPesquisa = document.getElementById('inputPesquisaProduto').value.trim().toUpperCase();
+            const inputPesq = document.getElementById('inputPesquisaProduto');
+            const termoPesquisa = inputPesq ? inputPesq.value.trim().toUpperCase() : "";
             if (termoPesquisa) {
                 listaExibicao = listaExibicao.filter(i => (i.produto || "").toUpperCase().includes(termoPesquisa));
             }
 
-            const filtroValor = parseFloat(document.getElementById('inputFiltroValor').value);
+            const inputFiltroVal = document.getElementById('inputFiltroValor');
+            const filtroValor = inputFiltroVal ? parseFloat(inputFiltroVal.value) : NaN;
             if (!isNaN(filtroValor) && filtroValor > 0) {
                 listaExibicao = listaExibicao.filter(i => Number(i.total) === filtroValor || Number(i.unit) === filtroValor);
             }
@@ -925,13 +760,12 @@
             listaExibicao.sort((a, b) => (a.entregue === b.entregue) ? new Date(b.data) - new Date(a.data) : (a.entregue ? 1 : -1));
 
             if (listaExibicao.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="11" class="text-center py-5 text-slate-400 italic">Nenhum registro encontrado.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" class="text-center py-5 text-slate-400 italic">Nenhum registro encontrado.</td></tr>`;
             } else {
                 listaExibicao.forEach(item => {
                     totalGastoGeral += Number(item.total || 0);
                     solicitantesContador[item.solicitante] = (solicitantesContador[item.solicitante] || 0) + 1;
 
-                    const originalIndex = compras.findIndex(c => String(c.id) === String(item.id));
                     const tr = document.createElement('tr');
                     tr.className = item.entregue ? 'bg-slate-50 dark:bg-slate-800/40 opacity-70' : 'hover:bg-slate-50 dark:hover:bg-slate-700/40';
 
@@ -951,11 +785,7 @@
                             <input type="date" id="data-entrega-${item.id}" value="${item.data_entrega || ''}" onchange="salvarAlteracaoEntrega(${item.id})" class="text-[9px] p-0.5 border rounded ml-1 ${item.entregue ? '' : 'hidden'}">
                         </td>
                         <td class="py-2 px-3 text-center whitespace-nowrap">
-                            ${item.link ? `<a href="${item.link}" target="_blank" class="text-blue-600 font-bold hover:underline">Link</a>` : '-'}
-                        </td>
-                        <td class="py-2 px-3 text-center whitespace-nowrap">
-                            <button onclick="abrirModalEdicao(${originalIndex})" class="text-indigo-600 font-bold p-1">✏️</button>
-                            <button onclick="removerItem(${item.id})" class="text-rose-500 font-bold p-1">✕</button>
+                            <button onclick="removerItem(${item.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1 cursor-pointer" title="Excluir">✕</button>
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -1017,67 +847,6 @@
             a.href = URL.createObjectURL(blob);
             a.download = `compras_cartao_${new Date().toISOString().split('T')[0]}.csv`;
             a.click();
-        }
-
-        function abrirModalEdicao(index) {
-            const item = compras[index];
-            if (!item) return;
-            document.getElementById('editItemIndex').value = index;
-            document.getElementById('editItemId').value = item.id;
-            document.getElementById('editData').value = item.data;
-            document.getElementById('editSolicitante').value = item.solicitante;
-            document.getElementById('editProduto').value = item.produto;
-            document.getElementById('editLocal').value = item.local;
-            atualizarTodosOsSelectsCategorias();
-            document.getElementById('editCategoria').value = item.categoria || 'OUTROS';
-            document.getElementById('editQtd').value = item.qtd || 1;
-            document.getElementById('editTotal').value = item.total;
-            document.getElementById('editEntregue').checked = item.entregue || false;
-            document.getElementById('editDataEntrega').value = item.data_entrega || '';
-            toggleDataEntregaModal(item.entregue);
-            document.getElementById('modalEdicao').classList.remove('hidden');
-        }
-
-        function fecharModalEdicao() {
-            document.getElementById('modalEdicao').classList.add('hidden');
-        }
-
-        function toggleDataEntregaModal(is) {
-            document.getElementById('editDataEntrega').classList.toggle('hidden', !is);
-        }
-
-        function calcularModalPorTotal() {
-            const q = parseFloat(document.getElementById('editQtd').value) || 1;
-            const t = parseFloat(document.getElementById('editTotal').value) || 0;
-        }
-
-        async function guardarEdicaoModal() {
-            const index = parseInt(document.getElementById('editItemIndex').value, 10);
-            if (isNaN(index) || !compras[index]) return;
-
-            const q = parseFloat(document.getElementById('editQtd').value) || 1;
-            const t = parseFloat(document.getElementById('editTotal').value) || 0;
-
-            const item = {
-                ...compras[index],
-                data: document.getElementById('editData').value,
-                solicitante: document.getElementById('editSolicitante').value.trim().toUpperCase(),
-                produto: document.getElementById('editProduto').value.trim().toUpperCase(),
-                local: document.getElementById('editLocal').value.trim().toUpperCase(),
-                categoria: document.getElementById('editCategoria').value,
-                qtd: q,
-                unit: t / q,
-                total: t,
-                entregue: document.getElementById('editEntregue').checked,
-                data_entrega: document.getElementById('editDataEntrega').value
-            };
-
-            compras[index] = item;
-            salvarNoLocalStorage();
-            atualizarListaSelectSolicitantes();
-            renderizarTabela();
-            fecharModalEdicao();
-            await atualizarNoSupabase(item);
         }
     </script>
 </body>
