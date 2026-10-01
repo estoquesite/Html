@@ -69,6 +69,7 @@
         .card-modulo.m7::before { background: #6366f1; }
         .card-modulo.m8::before { background: #0891b2; }
         .card-modulo.m9::before { background: #f59e0b; }
+        .card-modulo.m10::before { background: #475569; }
         
         .card-modulo:hover { 
             transform: translateY(-5px); 
@@ -92,6 +93,7 @@
         .m7 .card-icone { background: #eef2ff; color: #6366f1; }
         .m8 .card-icone { background: #ecfeff; color: #0891b2; }
         .m9 .card-icone { background: #fef3c7; color: #d97706; }
+        .m10 .card-icone { background: #f1f5f9; color: #475569; }
         
         .tecla-atalho {
             font-size: 10px;
@@ -146,9 +148,9 @@
                         <span class="text-2xl font-black tracking-widest text-teal-100">VALE</span>
                         <div class="h-5 w-px bg-teal-300/40"></div>
                         <span class="text-lg font-extrabold tracking-wide">Portal Operacional</span>
-                        <span class="bg-amber-500 text-white font-black text-[10px] px-2 py-0.5 rounded shadow-sm">v04</span>
+                        <span class="bg-amber-500 text-white font-black text-[10px] px-2 py-0.5 rounded shadow-sm">v05</span>
                     </div>
-                    <p class="text-xs text-teal-100/90 mt-1 font-medium">Suíte integrada de gestão diária, segurança, equipamentos, equipes e FDS</p>
+                    <p class="text-xs text-teal-100/90 mt-1 font-medium">Suíte integrada de gestão diária, segurança, equipamentos, equipes e FMDS</p>
                 </div>
 
                 <div class="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-3.5 py-1.5 rounded-xl text-xs font-semibold border border-white/10">
@@ -160,7 +162,7 @@
             </div>
         </header>
 
-        <!-- GRADE COM OS 9 MÓDULOS -->
+        <!-- GRADE COM OS MÓDULOS -->
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-left">
             
             <!-- MÓDULO 1 -->
@@ -223,7 +225,7 @@
                     </div>
                     <div class="text-sm font-bold text-slate-800 mb-1">Aniversariantes do Ano</div>
                     <div class="text-xs text-slate-500 leading-relaxed mb-3">
-                        Grade bimestral dos 12 meses com distribuição automática e ordenação cronológica por dia.
+                        Grade vertical dos 12 meses preenchendo a folha A4 com ordenação cronológica por dia.
                     </div>
                 </div>
                 <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#db2777]">
@@ -316,12 +318,29 @@
                 </div>
             </a>
 
+            <!-- MÓDULO 10 -->
+            <a href="modulo10.html" class="card-modulo m10" title="Pressione [0] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">👥</div>
+                        <span class="tecla-atalho">Tecla 0</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Troca dos Participantes FMDS</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Matriz de controle e rotação de participantes por temas (DSS, SSMA, Produtividade, Qualidade).
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#475569]">
+                    <span>Abrir Módulo 10</span><span>➔</span>
+                </div>
+            </a>
+
         </div>
 
         <!-- RODAPÉ -->
         <footer class="mt-8 text-center text-xs text-slate-400 font-medium space-y-1">
             <p>Sistema Operacional Integrado • Portal Vale Corporativo</p>
-            <p class="text-[10px] text-slate-400/80">Dica: Utilize os números de 1 a 9 no teclado para navegação rápida entre os módulos.</p>
+            <p class="text-[10px] text-slate-400/80">Dica: Utilize os números de 1 a 9 e 0 no teclado para navegação rápida entre os módulos.</p>
         </footer>
     </div>
 
@@ -351,7 +370,8 @@
                 '6': 'modulo6.html',
                 '7': 'modulo7.html',
                 '8': 'modulo8.html',
-                '9': 'modulo9.html'
+                '9': 'modulo9.html',
+                '0': 'modulo10.html'
             };
 
             if (rotas[e.key]) {
