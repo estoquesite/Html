@@ -3,16 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Relatório Unificado - Gestão Operacional Vale</title>
+<title>Módulo 4 - Aniversariantes da Equipe | Portal Vale v07</title>
 <style>
 :root {
-    --primary: #007e7a;
-    --primary-dark: #005a57;
-    --primary-light: #e6f4f4;
+    --primary: #db2777;
+    --primary-dark: #be185d;
+    --primary-light: #fce7f3;
+    --primary-border: #f472b6;
+    --primary-bg: #fff5f8;
     --accent: #f59e0b;
-    --pink: #db2777;
-    --pink-light: #fce7f3;
-    --pink-border: #f472b6;
     --danger: #ef4444;
     --success: #10b981;
     --slate-900: #0f172a;
@@ -27,652 +26,813 @@
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { 
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
-    background: #e2e8f0; 
+    background: #fff5f8; 
     color: var(--slate-900); 
-    padding: 20px;
+    min-height: 100vh; 
+    padding: 12px; 
 }
 
-/* BARRA SUPERIOR FIXA PARA IMPRESSÃO */
-.barra-impressao-topo {
-    max-width: 1140px;
-    margin: 0 auto 20px auto;
-    background: #ffffff;
-    padding: 14px 20px;
-    border-radius: 10px;
+/* NOTIFICAÇÃO TOAST */
+#toastNotificacao {
+    position: fixed; 
+    bottom: 24px; 
+    right: 24px; 
+    background: var(--slate-900); 
+    color: #fff;
+    padding: 10px 18px; 
+    border-radius: 6px; 
+    font-size: 11.5px; 
+    font-weight: 600;
+    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.25); 
+    opacity: 0; 
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease; 
+    transform: translateY(12px); 
+    z-index: 9999;
+}
+#toastNotificacao.ativo { opacity: 1; transform: translateY(0); }
+
+/* PAINEL DE CONTROLE */
+.painel-controle { 
+    background: #ffffff; 
+    padding: 16px 20px; 
+    margin: 0 auto 16px auto; 
+    border-radius: 12px; 
+    box-shadow: 0 10px 25px -5px rgba(219, 39, 119, 0.08); 
+    border: 1px solid #fbcfe8; 
+    max-width: 960px; 
+}
+.topo-modulo-info { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+    margin-bottom: 12px; 
+    border-bottom: 2px solid var(--primary); 
+    padding-bottom: 8px; 
+}
+.badge-modulo { 
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
+    color: #fff; 
+    font-size: 11.5px; 
+    font-weight: 800; 
+    padding: 5px 12px; 
+    border-radius: 6px; 
+    text-transform: uppercase; 
+    letter-spacing: 0.8px; 
+}
+.tag-v07 { 
+    background-color: var(--accent); 
+    color: #fff; 
+    font-weight: 800; 
+    font-size: 10px; 
+    padding: 2px 7px; 
+    border-radius: 4px; 
+    margin-left: 6px; 
+}
+
+.campos-painel { 
+    display: grid; 
+    gap: 12px; 
+    margin-bottom: 10px; 
+    grid-template-columns: 140px 1.5fr; 
+}
+.campo-grupo label { 
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.08);
-    border: 1px solid var(--slate-300);
+    font-weight: 700; 
+    margin-bottom: 4px; 
+    font-size: 10.5px; 
+    color: #9d174d; 
+    text-transform: uppercase; 
 }
-.barra-impressao-topo h2 {
-    font-size: 14px;
-    font-weight: 800;
-    color: var(--primary);
-    text-transform: uppercase;
+.painel-controle input[type="text"] { 
+    width: 100%; 
+    font-family: inherit; 
+    font-size: 12px; 
+    padding: 8px 10px; 
+    border: 1px solid var(--primary-border); 
+    border-radius: 6px; 
+    background: var(--primary-bg); 
+    outline: none; 
 }
-.btn-imprimir-tudo {
-    background: var(--slate-900);
-    color: #fff;
-    border: none;
-    padding: 9px 18px;
+.painel-controle input[type="text"]:focus, .painel-controle textarea:focus { 
+    border-color: var(--primary); 
+    background: #fff; 
+}
+.painel-controle textarea { 
+    width: 100%; 
+    height: 55px; 
+    font-family: inherit; 
+    font-size: 11.5px; 
+    padding: 8px 10px; 
+    border: 1px solid var(--primary-border); 
+    border-radius: 6px; 
+    resize: vertical; 
+    text-transform: uppercase; 
+    background: var(--primary-bg); 
+    outline: none; 
+}
+
+.barra-metricas {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+    flex-wrap: wrap;
+}
+.card-metrica {
+    background: var(--primary-bg);
+    border: 1px solid #fbcfe8;
+    padding: 4px 10px;
     border-radius: 6px;
-    font-weight: 700;
-    font-size: 12px;
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    transition: 0.2s;
-}
-.btn-imprimir-tudo:hover { background: #000; }
-
-/* SEÇÕES INDIVIDUAIS */
-.folha-bloco {
-    background: #fff;
-    margin: 0 auto 24px auto;
-    padding: 14px 18px;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
-    page-break-after: always;
-    break-after: page;
-}
-
-.folha-paisagem {
-    width: 1120px;
-    max-width: 1120px;
-}
-
-.folha-retrato {
-    width: 960px;
-    max-width: 960px;
-}
-
-/* ========================================================= */
-/* ESTILOS COMUNS DE CABEÇALHOS                              */
-/* ========================================================= */
-table.cabecalho-container, table.info-bar, table.tabela-dds, table.tabela-matriz, table.tabela-mes {
-    width: 100%;
-    border-collapse: collapse;
-    border: 1.2px solid var(--slate-900);
-    table-layout: fixed;
-}
-table.cabecalho-container td, table.info-bar td {
-    border: 1px solid var(--slate-700);
-    padding: 3px 6px;
-    vertical-align: middle;
-    text-align: center;
-}
-.logo-box {
-    width: 100px;
-    font-weight: 900;
-    font-size: 16px;
-    color: var(--primary);
-    letter-spacing: 1.5px;
-    background-color: var(--slate-50);
-}
-.titulo-box {
     font-size: 11px;
-    font-weight: 800;
-    text-transform: uppercase;
-    color: var(--slate-900);
-}
-.meta-box {
-    width: 130px;
-    font-size: 8.5px;
-    text-align: left !important;
-    padding-left: 8px !important;
-    background-color: var(--slate-50);
-    line-height: 1.35;
-}
-.info-bar {
-    font-size: 8.5px;
     font-weight: 700;
-    background-color: var(--slate-50);
-    margin-top: 3px;
-    margin-bottom: 4px;
+    color: #9d174d;
 }
-.info-bar td { text-align: left; padding: 2.5px 8px; }
 
-/* ========================================================= */
-/* MÓDULO 1: DDS SEMANAL & EMOCIOGRAMA                       */
-/* ========================================================= */
-table.tabela-dds th, table.tabela-dds td {
-    border: 1px solid var(--slate-700);
-    text-align: center;
-    vertical-align: middle;
+.botoes-painel { display: flex; gap: 6px; flex-wrap: wrap; margin-top: 6px; }
+.btn { 
+    cursor: pointer; 
+    padding: 7px 12px; 
+    font-size: 11px; 
+    font-weight: 700; 
+    border: none; 
+    border-radius: 6px; 
+    color: #fff; 
+    display: inline-flex; 
+    align-items: center; 
+    gap: 5px; 
+    transition: filter 0.15s ease, transform 0.05s ease;
 }
-table.tabela-dds th { background-color: var(--slate-50); font-weight: 800; font-size: 8px; }
-table.tabela-dds td { height: 21.5px; padding: 1px 2px; font-size: 8.5px; }
-table.tabela-dds tbody tr:nth-child(even) { background-color: #fafbfc; }
+.btn:hover { filter: brightness(1.08); }
+.btn:active { transform: translateY(1px); }
 
-.tabela-dds .col-id { width: 36px; background-color: var(--slate-100); font-weight: 800; }
-.tabela-dds .col-colaborador { width: 240px; text-align: left; padding-left: 6px; font-weight: 700; text-transform: uppercase; font-size: 8.5px; }
+.btn-pink { background-color: var(--primary); } 
+.btn-ordenar { background-color: #ea580c; }
+.btn-ocultar-vazios { background-color: #0891b2; }
+.btn-salvar { background-color: #2563eb; } 
+.btn-carregar { background-color: #0284c7; } 
+.btn-exportar { background-color: #4f46e5; }
+.btn-limpar { background-color: var(--slate-100); color: var(--slate-600); border: 1px solid var(--slate-300); } 
+.btn-voltar { background-color: var(--slate-600); text-decoration: none; } 
+.btn-imprimir { background-color: var(--slate-900); margin-left: auto; }
 
-.th-dia-semana {
-    font-size: 8.5px;
-    font-weight: 800;
-    text-transform: uppercase;
-    padding: 3px 0;
-    background: linear-gradient(180deg, var(--primary-light) 0%, #d8ecec 100%) !important;
-    color: var(--primary-dark);
+/* FOLHA A4 RETRATO */
+.folha-a4 { 
+    width: 100%; 
+    max-width: 960px; 
+    background: #fff; 
+    padding: 14px 18px; 
+    margin: 0 auto 20px auto; 
+    box-shadow: 0 10px 30px rgba(219, 39, 119, 0.08); 
+    border-radius: 12px; 
+    border: 1px solid var(--primary-border); 
+    position: relative; 
 }
-.th-sub { font-size: 7.5px !important; background-color: var(--slate-100) !important; padding: 2px 0; }
-.col-como-estou { width: 55px; padding: 1px !important; }
-.col-rubrica { width: 45px; background-color: #fff; }
 
-.grupo-carinhas { display: flex; align-items: center; justify-content: space-evenly; width: 100%; gap: 1px; }
-.carinha-item { display: flex; flex-direction: column; align-items: center; line-height: 1; padding: 1px; border-radius: 3px; }
-.carinha-num { font-size: 6px; font-weight: 800; color: var(--slate-600); margin-bottom: 0.5px; }
-.carinha-svg { width: 11px; height: 11px; display: block; }
-
-.c-verde circle.rosto { stroke: var(--success); stroke-width: 2.2; fill: #ecfdf5; }
-.c-verde circle.olho { fill: var(--success); }
-.c-verde path.boca { stroke: var(--success); stroke-width: 2.2; stroke-linecap: round; fill: none; }
-.c-amarela circle.rosto { stroke: var(--accent); stroke-width: 2.2; fill: #fffbeb; }
-.c-amarela circle.olho { fill: var(--accent); }
-.c-amarela line.boca { stroke: var(--accent); stroke-width: 2.2; stroke-linecap: round; fill: none; }
-.c-vermelha circle.rosto { stroke: var(--danger); stroke-width: 2.2; fill: #fef2f2; }
-.c-vermelha circle.olho { fill: var(--danger); }
-.c-vermelha path.boca { stroke: var(--danger); stroke-width: 2.2; stroke-linecap: round; fill: none; }
-
-.selecionado-1 { background-color: #d1fae5; outline: 1.2px solid var(--success); }
-
-.rodape-dds {
-    display: grid;
-    grid-template-columns: 140px 1.4fr 1.8fr;
-    gap: 6px;
-    width: 100%;
-    font-size: 7.5px;
-    line-height: 1.25;
-    margin-top: 4px;
-}
-.box-legenda {
-    border: 1px solid #cbd5e1;
-    padding: 4px 6px;
-    background-color: var(--slate-50);
-    border-radius: 5px;
-}
-.box-legenda h4 {
-    margin: 0 0 2px 0;
-    font-size: 8px;
-    font-weight: 800;
-    text-transform: uppercase;
-    border-bottom: 1px solid var(--slate-200);
-    padding-bottom: 2px;
-    color: var(--primary-dark);
-}
-.lista-legenda { list-style: none; padding: 0; margin: 0; }
-.lista-legenda li { margin-bottom: 1.5px; }
-
-/* ========================================================= */
-/* MÓDULO 2: MATRIZ ANUAL DE DDS (SEM COLUNA Nº)             */
-/* ========================================================= */
-table.tabela-matriz th, table.tabela-matriz td {
-    border: 1px solid #475569;
-    text-align: center;
-    vertical-align: middle;
-    font-size: 9px;
-}
-.th-matriz-colab {
-    width: 260px;
-    background-color: var(--primary);
-    color: #fff;
-    font-size: 10px;
-    font-weight: 800;
-    padding: 6px 8px;
-    text-align: left;
-}
-.th-mes-anual {
-    background-color: var(--primary);
-    color: #fff;
-    font-size: 9.5px;
-    font-weight: 800;
-    padding: 5px 2px;
-}
-table.tabela-matriz tbody tr { height: 25px; }
-table.tabela-matriz tbody tr:nth-child(even) { background-color: #fafbfc; }
-.td-colab-nome {
-    text-align: left !important;
-    padding-left: 8px !important;
+.barra-controle-folha { 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    margin-bottom: 6px; 
+    background: var(--primary-bg); 
+    padding: 5px 10px; 
+    border: 1px solid #fbcfe8; 
+    border-radius: 6px; 
+    font-size: 11px;
     font-weight: 700;
-    font-size: 9.5px;
-    text-transform: uppercase;
+    color: #9d174d;
 }
 
-/* ========================================================= */
-/* MÓDULO 4: ANIVERSARIANTES DO ANO                          */
-/* ========================================================= */
-.contentor-blocos-aniver {
+/* CABEÇALHO PADRÃO VALE */
+.cabecalho-container, .info-aniver-bar { 
+    width: 100%; 
+    border-collapse: collapse; 
+    border: 1.2px solid var(--slate-900); 
+    margin-bottom: 4px; 
+    table-layout: fixed; 
+}
+.cabecalho-container td, .info-aniver-bar td { 
+    border: 1px solid var(--slate-700); 
+    padding: 3px 8px; 
+    vertical-align: middle; 
+    text-align: center; 
+}
+.logo-box { 
+    width: 85px; 
+    font-weight: 900; 
+    font-size: 15px; 
+    color: #007e7a; 
+    letter-spacing: 1.5px;
+    background-color: var(--slate-50); 
+}
+.titulo-box { 
+    font-size: 10.5px; 
+    font-weight: 800; 
+    text-transform: uppercase; 
+    color: var(--slate-900); 
+    padding: 0 8px; 
+}
+.meta-box { 
+    width: 120px; 
+    font-size: 8px; 
+    text-align: left !important; 
+    padding-left: 6px !important; 
+    background-color: var(--slate-50); 
+    line-height: 1.3; 
+}
+
+.info-aniver-bar { 
+    font-size: 8.5px; 
+    font-weight: 700; 
+    background-color: var(--slate-50); 
+}
+.info-aniver-bar td { text-align: left; padding: 2px 8px; }
+.campo-editavel { outline: none; display: inline-block; min-width: 25px; font-weight: 600; color: var(--slate-900); }
+
+/* CONTENTOR DOS BLOCOS */
+.contentor-blocos {
     display: flex;
     flex-direction: column;
     gap: 4px;
     margin-top: 4px;
     width: 100%;
 }
-.bloco-mes {
+
+.bloco-mes { 
     width: 100%;
-    border: 1px solid var(--pink);
-    border-radius: 4px;
-    overflow: hidden;
+    border: 1px solid var(--primary); 
+    border-radius: 4px; 
+    overflow: hidden; 
     background: #fff;
 }
-.bloco-mes-titulo {
-    background: linear-gradient(135deg, var(--pink), var(--primary-dark));
-    color: #fff;
-    font-weight: 800;
-    font-size: 8.5px;
-    text-transform: uppercase;
-    padding: 2.5px 6px;
-    letter-spacing: 0.5px;
-}
-table.tabela-mes th, table.tabela-mes td {
-    border: 1px solid var(--pink-border);
-    text-align: center;
-    vertical-align: middle;
-    font-size: 8px;
-    height: 18px;
-    padding: 1px 5px;
-}
-table.tabela-mes th {
-    background-color: #fdf2f8;
-    color: #831843;
-    font-weight: 800;
-    text-transform: uppercase;
-}
-table.tabela-mes td.col-aniver-nome {
-    text-align: left !important;
-    font-weight: 700;
-    text-transform: uppercase;
-    padding-left: 6px !important;
-}
-table.tabela-mes td.col-aniver-data {
-    width: 80px;
-    font-weight: 700;
+.bloco-mes.mes-atual-destaque {
+    border: 1.5px solid var(--accent);
 }
 
-/* ========================================================= */
-/* CONFIGURAÇÃO RÍGIDA DE IMPRESSÃO A4                        */
-/* ========================================================= */
+.bloco-mes-titulo { 
+    background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
+    color: #fff; 
+    font-weight: 800; 
+    font-size: 9px; 
+    text-transform: uppercase; 
+    padding: 3px 6px; 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    letter-spacing: 0.5px; 
+}
+.bloco-mes.mes-atual-destaque .bloco-mes-titulo {
+    background: linear-gradient(135deg, #d97706, #b45309);
+}
+
+.tag-mes-atual {
+    background: #fef3c7;
+    color: #92400e;
+    font-size: 7.5px;
+    font-weight: 900;
+    padding: 1px 5px;
+    border-radius: 3px;
+    margin-left: 6px;
+}
+
+table.tabela-mes { width: 100%; border-collapse: collapse; table-layout: fixed; }
+table.tabela-mes th, table.tabela-mes td { 
+    border: 1px solid var(--primary-border); 
+    text-align: center; 
+    vertical-align: middle; 
+    font-size: 8.5px; 
+    height: 20px; 
+    padding: 1px 5px; 
+}
+table.tabela-mes th { 
+    background-color: #fdf2f8; 
+    color: #831843; 
+    font-weight: 800; 
+    font-size: 8px; 
+    text-transform: uppercase; 
+}
+table.tabela-mes tbody tr:nth-child(even) { background-color: var(--primary-bg); }
+
+/* CÉLULAS DE TEXTO / DATA - TOTALMENTE EDITÁVEIS */
+.col-nome-aniver { 
+    text-align: left !important; 
+    font-weight: 700; 
+    text-transform: uppercase; 
+    padding-left: 6px !important; 
+    outline: none; 
+    cursor: text;
+}
+.col-nome-aniver:focus, .col-data-aniver:focus {
+    background-color: #fce7f3 !important;
+}
+.col-data-aniver { 
+    width: 85px; 
+    font-weight: 700; 
+    background: #fff; 
+    outline: none; 
+    cursor: text;
+}
+.col-acoes-aniver { width: 65px; }
+
+.botoes-acoes { display: flex; align-items: center; justify-content: center; gap: 3px; opacity: 0.35; transition: opacity 0.2s; }
+tr:hover .botoes-acoes { opacity: 1; }
+.btn-acao { 
+    background: var(--slate-100); 
+    border: 1px solid var(--slate-300); 
+    border-radius: 3px; 
+    cursor: pointer; 
+    padding: 1px 3px; 
+    font-size: 7.5px; 
+}
+.btn-mais-linha { color: var(--success); font-weight: 900; }
+.btn-lixeira { color: var(--danger); }
+.btn-wpp { color: #059669; font-weight: 900; }
+
+.bloco-oculto { display: none !important; }
+
+/* ================================================================= */
+/* CONFIGURAÇÃO RÍGIDA DE IMPRESSÃO: CABER EM EXATAMENTE 1 PÁGINA A4  */
+/* ================================================================= */
 @media print {
-    body {
-        background: #fff !important;
-        margin: 0 !important;
-        padding: 0 !important;
-        -webkit-print-color-adjust: exact !important;
-        print-color-adjust: exact !important;
+    @page { 
+        size: A4 portrait; 
+        margin: 3mm 4mm !important; 
     }
-    .barra-impressao-topo { display: none !important; }
-    
-    .folha-bloco {
-        box-shadow: none !important;
-        border: none !important;
-        width: 100% !important;
-        max-width: 100% !important;
-        padding: 0 !important;
-        margin: 0 !important;
+    html, body { 
+        background: #fff !important; 
+        margin: 0 !important; 
+        padding: 0 !important; 
+        height: auto !important;
+        -webkit-print-color-adjust: exact !important; 
+        print-color-adjust: exact !important; 
     }
-    .folha-bloco:last-child {
-        page-break-after: auto !important;
-        break-after: auto !important;
+    .painel-controle, .botoes-acoes, .barra-controle-folha, .btn-acoes-bloco, .col-acoes-aniver, table.tabela-mes thead, #toastNotificacao { 
+        display: none !important; 
     }
-    .tabela-dds tbody tr:nth-child(even),
-    .tabela-matriz tbody tr:nth-child(even) {
-        background-color: #fafbfc !important;
+    .folha-a4 { 
+        box-shadow: none !important; 
+        border: none !important; 
+        width: 100% !important; 
+        max-width: 100% !important; 
+        padding: 0 !important; 
+        margin: 0 !important; 
+        page-break-after: avoid !important; 
+        break-after: avoid !important; 
+    }
+    .contentor-blocos {
+        gap: 2px !important;
+        margin-top: 2px !important;
+    }
+    .bloco-mes { 
+        page-break-inside: avoid !important; 
+        break-inside: avoid !important; 
+        margin-bottom: 1px !important;
+        border-width: 1px !important;
+    }
+    .bloco-mes-titulo { 
+        background-color: var(--primary) !important; 
+        color: #fff !important; 
+        font-size: 7.5px !important;
+        padding: 1px 4px !important;
+    }
+    table.tabela-mes td { 
+        border: 1px solid #f9a8d4 !important; 
+        font-size: 7.5px !important;
+        height: 15px !important;
+        line-height: 15px !important;
+        padding: 0 4px !important;
+    }
+    .cabecalho-container, .info-aniver-bar {
+        margin-bottom: 2px !important;
+    }
+    .cabecalho-container td, .info-aniver-bar td {
+        padding: 2px 4px !important;
+        font-size: 7.5px !important;
+    }
+    .logo-box {
+        font-size: 13px !important;
+        width: 65px !important;
+    }
+    .titulo-box {
+        font-size: 8.5px !important;
     }
 }
 </style>
 </head>
 <body>
 
-    <!-- BOTÃO FIXO PARA IMPRESSÃO -->
-    <div class="barra-impressao-topo">
-        <div>
-            <h2>Relatório Completo - Vale Operacional</h2>
-            <p style="font-size: 11px; color: #64748b; margin-top: 2px;">Módulo 1 (DDS Semanal), Módulo 2 (Matriz Anual) e Módulo 4 (Aniversariantes)</p>
-        </div>
-        <button type="button" class="btn-imprimir-tudo" onclick="window.print()">
-            🖨️ Imprimir Tudo em PDF Único
-        </button>
-    </div>
+    <div id="toastNotificacao">Mensagem</div>
+    <input type="file" id="arquivoBackupAniver" style="display:none;" accept=".json" onchange="processarArquivoBackup(this)">
 
-    <!-- =================================================================== -->
-    <!-- MÓDULO 1: FOLHA 1 (DDS 01 a 24)                                     -->
-    <!-- =================================================================== -->
-    <div class="folha-bloco folha-paisagem">
-        <table class="cabecalho-container">
-            <tr>
-                <td class="logo-box">VALE</td>
-                <td class="titulo-box">DIÁLOGO DIÁRIO DE SEGURANÇA (DDS) E EMOCIOGRAMA</td>
-                <td class="meta-box"><span><strong>Folha:</strong> 01 / 02</span></td>
-            </tr>
-        </table>
-        <table class="info-bar">
-            <tr>
-                <td><strong>Período:</strong> 21/09 a 25/09</td>
-                <td><strong>Semana:</strong> 38</td>
-                <td><strong>Ano:</strong> 2026</td>
-            </tr>
-        </table>
-        <table class="tabela-dds">
-            <thead>
-                <tr>
-                    <th rowspan="2" class="col-id">Nº</th>
-                    <th rowspan="2" class="col-colaborador">Colaborador</th>
-                    <th colspan="2" class="th-dia-semana">Segunda</th>
-                    <th colspan="2" class="th-dia-semana">Terça</th>
-                    <th colspan="2" class="th-dia-semana">Quarta</th>
-                    <th colspan="2" class="th-dia-semana">Quinta</th>
-                    <th colspan="2" class="th-dia-semana">Sexta</th>
-                </tr>
-                <tr>
-                    <th class="th-sub">Estou</th><th class="th-sub">Rub</th>
-                    <th class="th-sub">Estou</th><th class="th-sub">Rub</th>
-                    <th class="th-sub">Estou</th><th class="th-sub">Rub</th>
-                    <th class="th-sub">Estou</th><th class="th-sub">Rub</th>
-                    <th class="th-sub">Estou</th><th class="th-sub">Rub</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- LINHAS 01 a 24 -->
-                <script>
-                const NOMES_M1 = [
-                    "ALFREDO", "ALLAN SOUZA", "AMANDA FERNANDA", "ANDRÉ", "ATMISTO SILVA",
-                    "BRUNO FIDELIS", "BRUNO RICARDO", "CLAUDIO ALVES", "DIEGO", "DIOGO",
-                    "DOMINIQUE", "EMERSON", "GABRIEL", "GLEIVSTON", "ISAQUE",
-                    "JOÃO SILVA RAMOS", "JOSE ALEXANDRE", "LEONAM MOTA", "LUIZ CARLOS", "MARCOS",
-                    "MATHEUS ARAUJO", "PABLO MOTTA", "PABLO GOMES", "PAULO HENRIQUE"
-                ];
-                function gerarCarinhasVerde() {
-                    return `<div class="grupo-carinhas">
-                        <div class="carinha-item c-verde selecionado-1"><span class="carinha-num">1</span><svg class="carinha-svg" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><path class="boca" d="M 9.5 18 C 12 23 20 23 22.5 18"/></svg></div>
-                        <div class="carinha-item c-amarela"><span class="carinha-num">2</span><svg class="carinha-svg" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><line class="boca" x1="10" y1="20" x2="22" y2="20"/></svg></div>
-                        <div class="carinha-item c-vermelha"><span class="carinha-num">3</span><svg class="carinha-svg" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/><path class="boca" d="M 9.5 22 C 12 17 20 17 22.5 22"/></svg></div>
-                    </div>`;
-                }
-                for (let i = 0; i < 24; i++) {
-                    let num = (i + 1 < 10 ? '0' + (i + 1) : (i + 1));
-                    let nome = NOMES_M1[i] || '';
-                    let c = gerarCarinhasVerde();
-                    document.write(`<tr>
-                        <td class="col-id">${num}</td>
-                        <td class="col-colaborador">${nome}</td>
-                        <td class="col-como-estou">${c}</td><td class="col-rubrica"></td>
-                        <td class="col-como-estou">${c}</td><td class="col-rubrica"></td>
-                        <td class="col-como-estou">${c}</td><td class="col-rubrica"></td>
-                        <td class="col-como-estou">${c}</td><td class="col-rubrica"></td>
-                        <td class="col-como-estou">${c}</td><td class="col-rubrica"></td>
-                    </tr>`);
-                }
-                </script>
-            </tbody>
-        </table>
-        <div class="rodape-dds">
-            <div class="box-legenda">
-                <h4>Legenda:</h4>
-                <ul class="lista-legenda">
-                    <li><strong>FE</strong> = Feriado</li>
-                    <li><strong>AT</strong> = Atestado Médico</li>
-                    <li><strong>CO</strong> = Compensação</li>
-                    <li><strong>FA</strong> = Falta | <strong>FR</strong> = Férias | <strong>FO</strong> = Folga</li>
-                </ul>
+    <div class="painel-controle">
+        <div class="topo-modulo-info">
+            <span class="badge-modulo">Módulo 4: Aniversariantes do Ano <span class="tag-v07">v07</span></span>
+            <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
+        </div>
+        
+        <div class="barra-metricas">
+            <span class="card-metrica" id="metricaTotal">🎂 Total de Aniversariantes: 0</span>
+            <span class="card-metrica" id="metricaMesAtual">🎉 Aniversariantes deste Mês: 0</span>
+        </div>
+
+        <div class="campos-painel">
+            <div class="campo-grupo">
+                <label>Ano:</label>
+                <input type="text" id="anoInputAniver" value="2026" oninput="sincronizarCabecalhosAniver()">
             </div>
-            <div class="box-legenda">
-                <h4>Ação tomada:</h4>
-                <ul class="lista-legenda">
-                    <li><strong>ADM</strong> = Administrativo | <strong>ENG</strong> = Engenharia | <strong>OP</strong> = Operação</li>
-                    <li><strong>HOFF</strong> = Home Office | <strong>AE</strong> = Área Externa</li>
-                </ul>
+            <div class="campo-grupo">
+                <label>Área / Gerência:</label>
+                <input type="text" id="areaInputAniver" placeholder="Operação / Logística" oninput="sincronizarCabecalhosAniver()">
             </div>
-            <div class="box-legenda">
-                <h4>Emociograma:</h4>
-                <ul class="lista-legenda">
-                    <li><strong>1:</strong> Em plenas condições físicas e psicológicas.</li>
-                    <li><strong>2:</strong> Estado alterado, mas compatível. Requer acompanhamento.</li>
-                    <li><strong>3:</strong> Sem condições para exercer suas atividades.</li>
-                </ul>
-            </div>
+        </div>
+        <div class="campo-grupo">
+            <label>Importação Rápida de Nomes (Formato: NOME - DD/MM):</label>
+            <textarea id="importarTextoAniver" placeholder="COLE AQUI: FULANO DA SILVA - 15/03&#10;CICLANO OLIVEIRA - 22/07"></textarea>
+        </div>
+        <div class="botoes-painel">
+            <button type="button" class="btn btn-pink" onclick="distribuirNomesImportados()">⚡ Distribuir nos Meses</button>
+            <button type="button" class="btn btn-ordenar" onclick="ordenarAniversariosPorDia()">📅 Ordenar por Dia</button>
+            <button type="button" class="btn btn-ocultar-vazios" id="btnToggleVazios" onclick="alternarMesesVazios()">👁️ Ocultar Meses Vazios</button>
+            <button type="button" class="btn btn-salvar" onclick="salvarTudoAniver()">💾 Salvar</button>
+            <button type="button" class="btn btn-carregar" onclick="carregarTudoAniver()">📂 Carregar</button>
+            <button type="button" class="btn btn-exportar" onclick="exportarBackupJSON()">⬇️️ Backup</button>
+            <button type="button" class="btn btn-exportar" onclick="document.getElementById('arquivoBackupAniver').click()">⬆️ Restaurar</button>
+            <button type="button" class="btn btn-limpar" onclick="limparTudoAniver()">Limpar</button>
+            <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir (A4)</button>
         </div>
     </div>
 
-    <!-- =================================================================== -->
-    <!-- MÓDULO 1: FOLHA 2 (DDS 25 a 48 - SEQUÊNCIA CONTÍNUA)                -->
-    <!-- =================================================================== -->
-    <div class="folha-bloco folha-paisagem">
-        <table class="cabecalho-container">
-            <tr>
-                <td class="logo-box">VALE</td>
-                <td class="titulo-box">DIÁLOGO DIÁRIO DE SEGURANÇA (DDS) E EMOCIOGRAMA</td>
-                <td class="meta-box"><span><strong>Folha:</strong> 02 / 02</span></td>
-            </tr>
-        </table>
-        <table class="info-bar">
-            <tr>
-                <td><strong>Período:</strong> 21/09 a 25/09</td>
-                <td><strong>Semana:</strong> 38</td>
-                <td><strong>Ano:</strong> 2026</td>
-            </tr>
-        </table>
-        <table class="tabela-dds">
-            <thead>
-                <tr>
-                    <th rowspan="2" class="col-id">Nº</th>
-                    <th rowspan="2" class="col-colaborador">Colaborador</th>
-                    <th colspan="2" class="th-dia-semana">Segunda</th>
-                    <th colspan="2" class="th-dia-semana">Terça</th>
-                    <th colspan="2" class="th-dia-semana">Quarta</th>
-                    <th colspan="2" class="th-dia-semana">Quinta</th>
-                    <th colspan="2" class="th-dia-semana">Sexta</th>
-                </tr>
-                <tr>
-                    <th class="th-sub">Estou</th><th class="th-sub">Rub</th>
-                    <th class="th-sub">Estou</th><th class="th-sub">Rub</th>
-                    <th class="th-sub">Estou</th><th class="th-sub">Rub</th>
-                    <th class="th-sub">Estou</th><th class="th-sub">Rub</th>
-                    <th class="th-sub">Estou</th><th class="th-sub">Rub</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- LINHAS 25 a 48 -->
-                <script>
-                const NOMES_M1_F2 = [
-                    "REINALDO", "RICARDO", "RICHARD", "ROBSON", "SAINT CLAIR",
-                    "WANDERSON", "WILLIAN"
-                ];
-                for (let i = 0; i < 24; i++) {
-                    let num = (24 + i + 1);
-                    let nome = NOMES_M1_F2[i] || '';
-                    let c = gerarCarinhasVerde();
-                    document.write(`<tr>
-                        <td class="col-id">${num}</td>
-                        <td class="col-colaborador">${nome}</td>
-                        <td class="col-como-estou">${c}</td><td class="col-rubrica"></td>
-                        <td class="col-como-estou">${c}</td><td class="col-rubrica"></td>
-                        <td class="col-como-estou">${c}</td><td class="col-rubrica"></td>
-                        <td class="col-como-estou">${c}</td><td class="col-rubrica"></td>
-                        <td class="col-como-estou">${c}</td><td class="col-rubrica"></td>
-                    </tr>`);
-                }
-                </script>
-            </tbody>
-        </table>
-        <div class="rodape-dds">
-            <div class="box-legenda">
-                <h4>Legenda:</h4>
-                <ul class="lista-legenda">
-                    <li><strong>FE</strong> = Feriado | <strong>AT</strong> = Atestado | <strong>CO</strong> = Compensação</li>
-                    <li><strong>FA</strong> = Falta | <strong>FR</strong> = Férias | <strong>FO</strong> = Folga</li>
-                </ul>
-            </div>
-            <div class="box-legenda">
-                <h4>Ação tomada:</h4>
-                <ul class="lista-legenda">
-                    <li><strong>ADM</strong> = Administrativo | <strong>ENG</strong> = Engenharia | <strong>OP</strong> = Operação</li>
-                    <li><strong>HOFF</strong> = Home Office | <strong>AE</strong> = Área Externa</li>
-                </ul>
-            </div>
-            <div class="box-legenda">
-                <h4>Emociograma:</h4>
-                <ul class="lista-legenda">
-                    <li><strong>1:</strong> Plenas condições | <strong>2:</strong> Alterado compatível | <strong>3:</strong> Sem condições</li>
-                </ul>
-            </div>
-        </div>
-    </div>
+    <div id="contentorFolhasAniver"></div>
 
-    <!-- =================================================================== -->
-    <!-- MÓDULO 2: FOLHA 1 (MATRIZ ANUAL - 24 NOMES - SEM COLUNA Nº)         -->
-    <!-- =================================================================== -->
-    <div class="folha-bloco folha-paisagem">
-        <table class="cabecalho-container">
-            <tr>
-                <td class="logo-box">VALE</td>
-                <td class="titulo-box">MATRIZ ANUAL DE REGISTRO DE DIÁLOGO DIÁRIO DE SEGURANÇA (DDS)</td>
-                <td class="meta-box">
-                    <strong>Ano:</strong> 2026<br>
-                    <span><strong>Folha:</strong> 01 / 02</span>
-                </td>
-            </tr>
-        </table>
-        <table class="info-bar">
-            <tr>
-                <td><strong>Área:</strong> Operação / Manutenção</td>
-                <td><strong>Turno:</strong> Turno A</td>
-                <td><strong>Facilitador:</strong> Coordenação de Equipe</td>
-            </tr>
-        </table>
-        <table class="tabela-matriz">
-            <thead>
-                <tr>
-                    <th class="th-matriz-colab">DDS (Colaboradores)</th>
-                    <th class="th-mes-anual">JAN</th><th class="th-mes-anual">FEV</th>
-                    <th class="th-mes-anual">MAR</th><th class="th-mes-anual">ABR</th>
-                    <th class="th-mes-anual">MAI</th><th class="th-mes-anual">JUN</th>
-                    <th class="th-mes-anual">JUL</th><th class="th-mes-anual">AGO</th>
-                    <th class="th-mes-anual">SET</th><th class="th-mes-anual">OUT</th>
-                    <th class="th-mes-anual">NOV</th><th class="th-mes-anual">DEZ</th>
-                </tr>
-            </thead>
-            <tbody>
-                <script>
-                for (let i = 0; i < 24; i++) {
-                    let nome = NOMES_M1[i] || '';
-                    document.write(`<tr>
-                        <td class="td-colab-nome">${nome}</td>
-                        <td></td><td></td><td></td><td></td><td></td><td></td>
-                        <td></td><td></td><td></td><td></td><td></td><td></td>
-                    </tr>`);
-                }
-                </script>
-            </tbody>
-        </table>
-    </div>
+    <script>
+        const MESES_ANO = [
+            "JANEIRO", "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO",
+            "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"
+        ];
 
-    <!-- =================================================================== -->
-    <!-- MÓDULO 2: FOLHA 2 (MATRIZ ANUAL - NOMES RESTANTES - SEM COLUNA Nº)  -->
-    <!-- =================================================================== -->
-    <div class="folha-bloco folha-paisagem">
-        <table class="cabecalho-container">
-            <tr>
-                <td class="logo-box">VALE</td>
-                <td class="titulo-box">MATRIZ ANUAL DE REGISTRO DE DIÁLOGO DIÁRIO DE SEGURANÇA (DDS)</td>
-                <td class="meta-box">
-                    <strong>Ano:</strong> 2026<br>
-                    <span><strong>Folha:</strong> 02 / 02</span>
-                </td>
-            </tr>
-        </table>
-        <table class="info-bar">
-            <tr>
-                <td><strong>Área:</strong> Operação / Manutenção</td>
-                <td><strong>Turno:</strong> Turno A</td>
-                <td><strong>Facilitador:</strong> Coordenação de Equipe</td>
-            </tr>
-        </table>
-        <table class="tabela-matriz">
-            <thead>
-                <tr>
-                    <th class="th-matriz-colab">DDS (Colaboradores)</th>
-                    <th class="th-mes-anual">JAN</th><th class="th-mes-anual">FEV</th>
-                    <th class="th-mes-anual">MAR</th><th class="th-mes-anual">ABR</th>
-                    <th class="th-mes-anual">MAI</th><th class="th-mes-anual">JUN</th>
-                    <th class="th-mes-anual">JUL</th><th class="th-mes-anual">AGO</th>
-                    <th class="th-mes-anual">SET</th><th class="th-mes-anual">OUT</th>
-                    <th class="th-mes-anual">NOV</th><th class="th-mes-anual">DEZ</th>
-                </tr>
-            </thead>
-            <tbody>
-                <script>
-                for (let i = 0; i < 24; i++) {
-                    let nome = NOMES_M1_F2[i] || '';
-                    document.write(`<tr>
-                        <td class="td-colab-nome">${nome}</td>
-                        <td></td><td></td><td></td><td></td><td></td><td></td>
-                        <td></td><td></td><td></td><td></td><td></td><td></td>
-                    </tr>`);
-                }
-                </script>
-            </tbody>
-        </table>
-    </div>
+        let ocultarVaziosAtivo = false;
 
-    <!-- =================================================================== -->
-    <!-- MÓDULO 4: ANIVERSARIANTES DA EQUIPE (A4 RETRATO COMPACTO EM 1 PÁGINA) -->
-    <!-- =================================================================== -->
-    <div class="folha-bloco folha-retrato">
-        <table class="cabecalho-container">
-            <tr>
-                <td class="logo-box" style="color:var(--pink);">VALE</td>
-                <td class="titulo-box">🎂 CRONOGRAMA ANUAL DE ANIVERSÁRIOS DA EQUIPE</td>
-                <td class="meta-box">
-                    <strong>Ano:</strong> 2026<br>
-                    <span><strong>Página:</strong> 01 / 01</span>
-                </td>
-            </tr>
-        </table>
-        <table class="info-bar">
-            <tr>
-                <td><strong>Área / Gerência:</strong> Operação / Logística</td>
-            </tr>
-        </table>
-        <div class="contentor-blocos-aniver">
-            <script>
-            const DADOS_ANIVER = {
-                "JANEIRO": [["MARIANA PEREIRA CRUZ", "11/01"], ["RICARDO GONCALVES DE MELLO LEITE", "13/01"], ["JOAO SILVA RAMOS", "18/01"], ["ALFREDO AUGUSTO RAMOS NETO", "22/01"]],
-                "FEVEREIRO": [["MARCOS AURELIO CATALLARES MATTOS", "01/02"], ["VANDERSON TEIXEIRA", "04/02"], ["BRUNO RICARDO", "07/02"], ["GABRIEL CARNEIRO", "07/02"]],
-                "MARÇO": [["GLEIVSTON SILVA MENDES", "22/03"]],
-                "ABRIL": [],
-                "MAIO": [],
-                "JUNHO": [["ROBSON DE SOUZA MENDONCA", "04/06"], ["PAULO HENRIQUE", "08/06"]],
-                "JULHO": [["BRUNO GOMES FIDELIS", "02/07"], ["ATMISTO SILVA", "20/07"]],
-                "AGOSTO": [["CAIO HENRIQUE", "06/08"], ["PABLO MESQUITA", "25/08"], ["DAVID MARCELO DELGADO DOS SANTOS", "26/08"]],
-                "SETEMBRO": [],
-                "OUTUBRO": [],
-                "NOVEMBRO": [["DOMINIQUE SILVA", "02/11"], ["RICHARD SILVA", "24/11"]],
-                "DEZEMBRO": [["EMERSON RIBEIRO DOS SANTOS", "04/12"], ["ALLAN SOUZA DE CARVALHO", "15/12"], ["TITO DACAL", "27/12"]]
-            };
+        const DADOS_INICIAIS_A = {
+            "JANEIRO": ["MARIANA PEREIRA CRUZ - 11/01", "RICARDO GONCALVES DE MELLO LEITE - 13/01", "JOAO SILVA RAMOS - 18/01", "ALFREDO AUGUSTO RAMOS NETO - 22/01"],
+            "FEVEREIRO": ["MARCOS AURELIO CATALLARES MATTOS - 01/02", "VANDERSON TEIXEIRA - 04/02", "BRUNO RICARDO - 07/02", "GABRIEL CARNEIRO - 07/02"],
+            "MARÇO": ["GLEIVSTON SILVA MENDES - 22/03"],
+            "ABRIL": [],
+            "MAIO": [],
+            "JUNHO": ["ROBSON DE SOUZA MENDONCA - 04/06", "PAULO HENRIQUE - 08/06"],
+            "JULHO": ["BRUNO GOMES FIDELIS - 02/07", "ATMISTO SILVA - 20/07"],
+            "AGOSTO": ["CAIO HENRIQUE - 06/08", "PABLO MESQUITA - 25/08", "DAVID MARCELO DELGADO DOS SANTOS - 26/08"],
+            "SETEMBRO": [],
+            "OUTUBRO": [],
+            "NOVEMBRO": ["DOMINIQUE SILVA - 02/11", "RICHARD SILVA - 24/11"],
+            "DEZEMBRO": ["EMERSON RIBEIRO DOS SANTOS - 04/12", "ALLAN SOUZA DE CARVALHO - 15/12", "TITO DACAL - 27/12"]
+        };
 
-            for (let mes in DADOS_ANIVER) {
-                let itens = DADOS_ANIVER[mes];
-                let linhas = '';
-                if (itens.length === 0) {
-                    linhas = `<tr><td class="col-aniver-nome" style="color:#94a3b8; font-style:italic;">Sem aniversariantes</td><td class="col-aniver-data">-</td></tr>`;
-                } else {
-                    itens.forEach(it => {
-                        linhas += `<tr><td class="col-aniver-nome">${it[0]}</td><td class="col-aniver-data">${it[1]}</td></tr>`;
-                    });
-                }
+        function mostrarToast(msg) {
+            const toast = document.getElementById('toastNotificacao');
+            toast.innerText = msg;
+            toast.classList.add('ativo');
+            setTimeout(() => { toast.classList.remove('ativo'); }, 2600);
+        }
 
-                document.write(`<div class="bloco-mes">
-                    <div class="bloco-mes-titulo">📅 ${mes}</div>
-                    <table class="tabela-mes">
-                        <tbody>${linhas}</tbody>
-                    </table>
-                </div>`);
+        function obterIndiceMesAtual() {
+            return new Date().getMonth();
+        }
+
+        function sincronizarCabecalhosAniver() {
+            const ano = document.getElementById('anoInputAniver').value || '2026';
+            const area = document.getElementById('areaInputAniver').value || '---';
+
+            document.querySelectorAll('#contentorFolhasAniver .folha-a4').forEach(f => {
+                const elAno = f.querySelector('.val-ano');
+                const elArea = f.querySelector('.val-area');
+                if (elAno) elAno.innerText = ano;
+                if (elArea) elArea.innerText = area;
+            });
+        }
+
+        function atualizarMetricas() {
+            const dados = capturarDadosAtuais();
+            let total = 0;
+            const mesAtualNome = MESES_ANO[obterIndiceMesAtual()];
+            let totalMesAtual = dados[mesAtualNome] ? dados[mesAtualNome].length : 0;
+
+            for (let m in dados) {
+                total += dados[m].length;
             }
-            </script>
-        </div>
-    </div>
 
+            document.getElementById('metricaTotal').innerText = `🎂 Total de Aniversariantes: ${total}`;
+            document.getElementById('metricaMesAtual').innerText = `🎉 Aniversariantes de ${mesAtualNome}: ${totalMesAtual}`;
+        }
+
+        function criarBlocoMes(mesNome, itens = []) {
+            let linhas = '';
+            const ehMesAtual = (mesNome === MESES_ANO[obterIndiceMesAtual()]);
+            
+            if (!itens || itens.length === 0) {
+                linhas = `<tr>` +
+                    `<td class="col-nome-aniver" contenteditable="true" style="color:#94a3b8; font-style:italic;" onfocus="limparPlaceholder(this)" onblur="atualizarMetricas()">Sem aniversariantes</td>` +
+                    `<td class="col-data-aniver" contenteditable="true" placeholder="DD/MM" onblur="atualizarMetricas()"></td>` +
+                    `<td class="col-acoes-aniver"><div class="botoes-acoes">` +
+                        `<button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaBloco(this)" title="Adicionar">➕</button>` +
+                        `<button type="button" class="btn-acao btn-lixeira" onclick="removerLinhaBloco(this)" title="Apagar">🗑️</button>` +
+                    `</div></td>` +
+                `</tr>`;
+            } else {
+                itens.forEach(item => {
+                    const [nomeBruto, dataBruta] = item.split('-');
+                    let nome = (nomeBruto || '').trim();
+                    let data = (dataBruta || '').trim();
+                    if (nome === "-") nome = "";
+
+                    linhas += `<tr>` +
+                        `<td class="col-nome-aniver" contenteditable="true" onblur="atualizarMetricas()">${nome}</td>` +
+                        `<td class="col-data-aniver" contenteditable="true" placeholder="DD/MM" onblur="atualizarMetricas()">${data}</td>` +
+                        `<td class="col-acoes-aniver"><div class="botoes-acoes">` +
+                            `<button type="button" class="btn-acao btn-wpp" onclick="copiarMensagemParabens(this)" title="Copiar Mensagem">💬</button>` +
+                            `<button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaBloco(this)" title="Adicionar">➕</button>` +
+                            `<button type="button" class="btn-acao btn-lixeira" onclick="removerLinhaBloco(this)" title="Apagar">🗑️</button>` +
+                        `</div></td>` +
+                    `</tr>`;
+                });
+            }
+
+            const tagMes = ehMesAtual ? `<span class="tag-mes-atual">🎂 MÊS ATUAL</span>` : '';
+            const classeDestaque = ehMesAtual ? 'mes-atual-destaque' : '';
+
+            return `<div class="bloco-mes ${classeDestaque}" data-mes="${mesNome}">
+                <div class="bloco-mes-titulo">
+                    <span>📅 ${mesNome} ${tagMes}</span>
+                    <div class="btn-acoes-bloco" style="display:flex; gap:4px;">
+                        <button type="button" onclick="adicionarLinhaPorCabecalho(this)" title="Adicionar linha" style="background:#fff; color:var(--primary); border:none; padding:1.5px 5px; border-radius:3px; font-weight:800; cursor:pointer; font-size:8.5px;">➕ Linha</button>
+                    </div>
+                </div>
+                <table class="tabela-mes">
+                    <thead><tr><th>Nome do Colaborador</th><th style="width:85px;">Data</th><th class="col-acoes-aniver th-acoes">Ações</th></tr></thead>
+                    <tbody>${linhas}</tbody>
+                </table>
+            </div>`;
+        }
+
+        function limparPlaceholder(el) {
+            if (el.innerText.trim() === 'Sem aniversariantes') {
+                el.innerText = '';
+                el.style.fontStyle = 'normal';
+                el.style.color = 'inherit';
+            }
+        }
+
+        function copiarMensagemParabens(btn) {
+            const tr = btn.closest('tr');
+            const nome = tr.querySelector('.col-nome-aniver').innerText.trim();
+            if(!nome || nome.toUpperCase() === "SEM ANIVERSARIANTES") {
+                mostrarToast('Linha sem nome para parabenizar.');
+                return;
+            }
+            const [primeiroNome] = nome.split(' ');
+            const msg = `🎉 Parabéns, ${primeiroNome}! Que seu novo ciclo seja de muita saúde, paz e conquistas. Grande abraço de toda a equipe Vale! 🎂✨`;
+            navigator.clipboard.writeText(msg).then(() => {
+                mostrarToast(`Mensagem copiada para parabenizar ${primeiroNome}!`);
+            });
+        }
+
+        function adicionarLinhaBloco(btn) {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td class="col-nome-aniver" contenteditable="true" onblur="atualizarMetricas()"></td>` +
+                           `<td class="col-data-aniver" contenteditable="true" onblur="atualizarMetricas()"></td>` +
+                           `<td class="col-acoes-aniver"><div class="botoes-acoes">` +
+                           `<button type="button" class="btn-acao btn-wpp" onclick="copiarMensagemParabens(this)" title="Copiar Mensagem">💬</button>` +
+                           `<button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaBloco(this)" title="Adicionar">➕</button>` +
+                           `<button type="button" class="btn-acao btn-lixeira" onclick="removerLinhaBloco(this)" title="Apagar">🗑️</button></div></td>`;
+            btn.closest('tr').after(tr);
+            tr.querySelector('.col-nome-aniver').focus();
+        }
+
+        function adicionarLinhaPorCabecalho(btn) {
+            const tbody = btn.closest('.bloco-mes').querySelector('tbody');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `<td class="col-nome-aniver" contenteditable="true" onblur="atualizarMetricas()"></td>` +
+                           `<td class="col-data-aniver" contenteditable="true" onblur="atualizarMetricas()"></td>` +
+                           `<td class="col-acoes-aniver"><div class="botoes-acoes">` +
+                           `<button type="button" class="btn-acao btn-wpp" onclick="copiarMensagemParabens(this)" title="Copiar Mensagem">💬</button>` +
+                           `<button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaBloco(this)" title="Adicionar">➕</button>` +
+                           `<button type="button" class="btn-acao btn-lixeira" onclick="removerLinhaBloco(this)" title="Apagar">🗑️</button></div></td>`;
+            tbody.appendChild(tr);
+            tr.querySelector('.col-nome-aniver').focus();
+        }
+
+        function removerLinhaBloco(btn) {
+            const tr = btn.closest('tr');
+            const tbody = tr.parentNode;
+            if(tbody.querySelectorAll('tr').length > 1) {
+                tr.remove();
+            } else {
+                tr.querySelector('.col-nome-aniver').innerText = '';
+                tr.querySelector('.col-data-aniver').innerText = '';
+            }
+            atualizarMetricas();
+        }
+
+        function alternarMesesVazios() {
+            ocultarVaziosAtivo = !ocultarVaziosAtivo;
+            const blocos = document.querySelectorAll('.bloco-mes');
+            
+            blocos.forEach(b => {
+                const linhas = b.querySelectorAll('tbody tr');
+                let temColaborador = false;
+                linhas.forEach(tr => {
+                    const nome = tr.querySelector('.col-nome-aniver').innerText.trim().toUpperCase();
+                    if(nome !== "" && nome !== "SEM ANIVERSARIANTES") temColaborador = true;
+                });
+
+                if(ocultarVaziosAtivo && !temColaborador) {
+                    b.classList.add('bloco-oculto');
+                } else {
+                    b.classList.remove('bloco-oculto');
+                }
+            });
+
+            document.getElementById('btnToggleVazios').innerText = ocultarVaziosAtivo ? '👁️️ Mostrar Todos os Meses' : '👁️ Ocultar Meses Vazios';
+            mostrarToast(ocultarVaziosAtivo ? 'Meses vazios ocultados' : 'Todos os meses visíveis');
+        }
+
+        function criarEstruturaFolhaAniver(dadosObj) {
+            let blocosHTML = '';
+            MESES_ANO.forEach(m => {
+                blocosHTML += criarBlocoMes(m, dadosObj[m] || []);
+            });
+
+            const anoAtual = document.getElementById('anoInputAniver').value || '2026';
+            const areaAtual = document.getElementById('areaInputAniver').value || '---';
+
+            const f = document.createElement('div'); 
+            f.className = 'folha-a4';
+            f.innerHTML = `
+                <div class="barra-controle-folha">
+                    <span>Quadro Anual de Aniversariantes da Equipe</span>
+                    <span style="font-size:9.5px; opacity:0.8;">Padrão A4 Único</span>
+                </div>
+                <table class="cabecalho-container">
+                    <tr>
+                        <td class="logo-box">VALE</td>
+                        <td class="titulo-box">🎂 CRONOGRAMA ANUAL DE ANIVERSÁRIOS DA EQUIPE</td>
+                        <td class="meta-box">
+                            <strong>Ano:</strong> <span class="val-ano">${anoAtual}</span><br>
+                            <span class="indicador-folha"><strong>Página:</strong> 01 / 01</span>
+                        </td>
+                    </tr>
+                </table>
+                <table class="info-aniver-bar">
+                    <tr>
+                        <td><strong>Área / Gerência:</strong> <span class="val-area campo-editavel" contenteditable="true">${areaAtual}</span></td>
+                    </tr>
+                </table>
+                <div class="contentor-blocos">${blocosHTML}</div>`;
+            return f;
+        }
+
+        function capturarDadosAtuais() {
+            let obj = {};
+            document.querySelectorAll('.bloco-mes').forEach(bloco => {
+                let mes = bloco.getAttribute('data-mes');
+                let itens = [];
+                bloco.querySelectorAll('tbody tr').forEach(tr => {
+                    let nome = tr.querySelector('.col-nome-aniver').innerText.trim();
+                    let data = tr.querySelector('.col-data-aniver').innerText.trim();
+                    if(nome !== "" && nome.toUpperCase() !== "SEM ANIVERSARIANTES") {
+                        itens.push(nome + " - " + data);
+                    }
+                });
+                obj[mes] = itens;
+            });
+            return obj;
+        }
+
+        function ordenarAniversariosPorDia() {
+            const dados = capturarDadosAtuais();
+            for (let mes in dados) {
+                dados[mes].sort((a, b) => {
+                    const [, dataA = ''] = a.split('-');
+                    const [, dataB = ''] = b.split('-');
+                    const [diaAStr = '99'] = dataA.trim().split('/');
+                    const [diaBStr = '99'] = dataB.trim().split('/');
+                    const diaA = parseInt(diaAStr, 10) || 99;
+                    const diaB = parseInt(diaBStr, 10) || 99;
+                    return diaA - diaB;
+                });
+            }
+            renderizarComDados(dados);
+            mostrarToast('Aniversários organizados por dia em cada mês');
+        }
+
+        function distribuirNomesImportados() {
+            const texto = document.getElementById('importarTextoAniver').value;
+            if(!texto.trim()) {
+                mostrarToast('Cole ao menos um aniversariante no formato: NOME - DD/MM');
+                return;
+            }
+            const linhas = texto.split('\n').map(l => l.trim()).filter(l => l.length > 0);
+            const dados = capturarDadosAtuais();
+
+            let adicionados = 0;
+            linhas.forEach(linha => {
+                const [nomePart, dataPart] = linha.split('-');
+                if (nomePart && dataPart) {
+                    const nome = nomePart.trim().toUpperCase();
+                    const data = dataPart.trim();
+                    const [, mesPart] = data.split('/');
+                    if (mesPart) {
+                        const mesNum = parseInt(mesPart.trim(), 10);
+                        if (mesNum >= 1 && mesNum <= 12) {
+                            const mesNome = MESES_ANO[mesNum - 1];
+                            if (!dados[mesNome]) dados[mesNome] = [];
+                            dados[mesNome].push(`${nome} - ${data}`);
+                            adicionados++;
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('importarTextoAniver').value = '';
+            renderizarComDados(dados);
+            mostrarToast(`${adicionados} aniversariante(s) distribuído(s) nos respectivos meses!`);
+        }
+
+        function renderizarComDados(dados) {
+            const box = document.getElementById('contentorFolhasAniver');
+            box.innerHTML = '';
+            box.appendChild(criarEstruturaFolhaAniver(dados));
+            sincronizarCabecalhosAniver();
+            atualizarMetricas();
+        }
+
+        function salvarTudoAniver() { 
+            const backup = {
+                ano: document.getElementById('anoInputAniver').value,
+                area: document.getElementById('areaInputAniver').value,
+                dados: capturarDadosAtuais()
+            };
+            localStorage.setItem('valeaniversarios_v07', JSON.stringify(backup)); 
+            mostrarToast('Aniversários salvos com sucesso!'); 
+        }
+
+        function carregarTudoAniver() { 
+            const s = localStorage.getItem('valeaniversarios_v07'); 
+            if(s) { 
+                const res = JSON.parse(s);
+                if(res.ano) document.getElementById('anoInputAniver').value = res.ano;
+                if(res.area) document.getElementById('areaInputAniver').value = res.area;
+                renderizarComDados(res.dados || {});
+                mostrarToast('Dados carregados com sucesso!'); 
+            } else {
+                mostrarToast('Nenhum dado salvo encontrado.');
+            }
+        }
+
+        function exportarBackupJSON() {
+            const backup = {
+                ano: document.getElementById('anoInputAniver').value,
+                area: document.getElementById('areaInputAniver').value,
+                dados: capturarDadosAtuais()
+            };
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `backup_aniversarios_${document.getElementById('anoInputAniver').value || '2026'}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            mostrarToast('Backup exportado com sucesso!');
+        }
+
+        function processarArquivoBackup(input) {
+            const file = input.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const dados = JSON.parse(e.target.result);
+                    if(dados.ano) document.getElementById('anoInputAniver').value = dados.ano;
+                    if(dados.area) document.getElementById('areaInputAniver').value = dados.area;
+                    renderizarComDados(dados.dados || {});
+                    mostrarToast('Backup restaurado com sucesso!');
+                } catch(err) {
+                    mostrarToast('Erro ao ler arquivo de backup.');
+                }
+            };
+            reader.readAsText(file);
+            input.value = '';
+        }
+
+        function limparTudoAniver() { 
+            let vazio = {};
+            MESES_ANO.forEach(m => vazio[m] = []);
+            renderizarComDados(vazio);
+            mostrarToast('Todos os meses foram limpos.');
+        }
+
+        window.onload = function() { 
+            renderizarComDados(DADOS_INICIAIS_A); 
+        };
+    </script>
 </body>
 </html>
