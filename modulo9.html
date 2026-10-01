@@ -1,499 +1,570 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Módulo 9 - Controle de Entrega e Recebimento de Notebooks</title>
-  <style>
-    :root {
-      --bg: #f3f4f6;
-      --card-bg: #ffffff;
-      --primary: #2563eb;
-      --primary-hover: #1d4ed8;
-      --text: #1f2937;
-      --muted: #6b7280;
-      --border: #e5e7eb;
-      --danger: #ef4444;
-      --danger-hover: #dc2626;
-      --badge-estoque: #10b981;
-      --badge-uso: #3b82f6;
-      --badge-manutencao: #f59e0b;
-      --badge-baixado: #6b7280;
-    }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 9 - Controle de Notebooks | Portal Vale</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Tesseract OCR para leitura offline da etiqueta -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        vale: {
+                            DEFAULT: '#007e7a',
+                            dark: '#005a57',
+                            light: '#e6f4f4',
+                            amber: '#f59e0b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { box-sizing: border-box; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
+        .uppercase-input { text-transform: uppercase; }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-    }
+        .bloco-destacado {
+            border: 2px solid #f59e0b !important;
+            box-shadow: 0 4px 14px -2px rgba(245, 158, 11, 0.18), 0 2px 6px rgba(0, 0, 0, 0.04) !important;
+        }
+        .dark .bloco-destacado {
+            border: 2px solid #fbbf24 !important;
+            box-shadow: 0 4px 16px -2px rgba(251, 191, 36, 0.25) !important;
+        }
 
-    body {
-      background-color: var(--bg);
-      color: var(--text);
-      padding: 24px;
-    }
-
-    .container {
-      max-width: 1300px;
-      margin: 0 auto;
-    }
-
-    header {
-      margin-bottom: 24px;
-    }
-
-    header h1 {
-      font-size: 1.6rem;
-      font-weight: 700;
-      color: #111827;
-    }
-
-    header p {
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-
-    .card {
-      background: var(--card-bg);
-      border-radius: 8px;
-      padding: 20px;
-      border: 1px solid var(--border);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
-      margin-bottom: 24px;
-    }
-
-    .card h2 {
-      font-size: 1.15rem;
-      margin-bottom: 16px;
-      color: #374151;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .form-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 16px;
-      margin-bottom: 16px;
-    }
-
-    .section-title {
-      grid-column: 1 / -1;
-      font-weight: 600;
-      font-size: 0.9rem;
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      color: var(--primary);
-      border-bottom: 1px solid var(--border);
-      padding-bottom: 4px;
-      margin-top: 8px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .form-group label {
-      font-size: 0.85rem;
-      font-weight: 500;
-      color: #4b5563;
-    }
-
-    input, select, textarea {
-      padding: 9px 12px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      font-size: 0.9rem;
-      outline: none;
-      transition: border-color 0.2s;
-    }
-
-    input:focus, select:focus, textarea:focus {
-      border-color: var(--primary);
-      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.15);
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      padding: 10px 18px;
-      border-radius: 6px;
-      font-size: 0.9rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      transition: background-color 0.2s;
-    }
-
-    .btn-primary {
-      background-color: var(--primary);
-      color: #ffffff;
-    }
-
-    .btn-primary:hover {
-      background-color: var(--primary-hover);
-    }
-
-    .filter-bar {
-      display: grid;
-      grid-template-columns: 2fr 1fr 1fr;
-      gap: 16px;
-      margin-bottom: 20px;
-    }
-
-    @media (max-width: 768px) {
-      .filter-bar {
-        grid-template-columns: 1fr;
-      }
-    }
-
-    .table-container {
-      overflow-x: auto;
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.88rem;
-      text-align: left;
-    }
-
-    th, td {
-      padding: 12px 14px;
-      border-bottom: 1px solid var(--border);
-      white-space: nowrap;
-    }
-
-    th {
-      background: #f9fafb;
-      font-weight: 600;
-      color: #374151;
-    }
-
-    tbody tr:hover {
-      background: #f9fafb;
-    }
-
-    .badge {
-      display: inline-block;
-      padding: 4px 8px;
-      border-radius: 9999px;
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #ffffff;
-      text-transform: capitalize;
-    }
-
-    .badge-estoque { background-color: var(--badge-estoque); }
-    .badge-uso { background-color: var(--badge-uso); }
-    .badge-manutencao { background-color: var(--badge-manutencao); }
-    .badge-baixado { background-color: var(--badge-baixado); }
-
-    .tag-termo {
-      display: inline-block;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 0.75rem;
-      font-weight: 500;
-    }
-    .termo-sim { background: #dcfce7; color: #15803d; }
-    .termo-nao { background: #fee2e2; color: #b91c1c; }
-
-    .actions-cell {
-      display: flex;
-      gap: 8px;
-    }
-
-    .btn-action-delete {
-      background: transparent;
-      border: 1px solid var(--danger);
-      color: var(--danger);
-      padding: 4px 8px;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 0.75rem;
-    }
-
-    .btn-action-delete:hover {
-      background: var(--danger);
-      color: #ffffff;
-    }
-  </style>
+        @keyframes scanPulse {
+            0%, 100% { border-color: #f59e0b; box-shadow: 0 0 10px rgba(245, 158, 11, 0.5); }
+            50% { border-color: #10b981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.7); }
+        }
+        .scan-ativo {
+            animation: scanPulse 1.2s infinite ease-in-out;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen p-4 sm:p-6 transition-colors duration-200">
 
-<div class="container">
-  <header>
-    <h1>Módulo 9: Controle de Notebooks</h1>
-    <p>Gestão unificada de recebimento, saída, patrimônio e movimentações de equipamentos</p>
-  </header>
+    <div class="max-w-7xl mx-auto space-y-5">
 
-  <!-- FORMULÁRIO DE CADASTRO -->
-  <div class="card">
-    <h2>Novo Registro / Entrada de Equipamento</h2>
-    <form id="notebookForm">
-      <div class="form-grid">
-        
-        <!-- Identificação -->
-        <div class="section-title">1. Identificação do Equipamento</div>
-        <div class="form-group">
-          <label>Marca *</label>
-          <input type="text" id="marca" placeholder="Ex: Dell, Lenovo, HP" required>
-        </div>
-        <div class="form-group">
-          <label>Modelo *</label>
-          <input type="text" id="modelo" placeholder="Ex: Latitude 3420, ThinkPad" required>
-        </div>
-        <div class="form-group">
-          <label>Nº de Série *</label>
-          <input type="text" id="serial" placeholder="Serial Number" required>
-        </div>
-        <div class="form-group">
-          <label>Nº de Patrimônio *</label>
-          <input type="text" id="patrimonio" placeholder="Etiqueta interna" required>
-        </div>
+        <!-- CABEÇALHO -->
+        <header class="bloco-destacado flex flex-wrap justify-between items-center bg-white dark:bg-slate-800 p-5 rounded-2xl gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-12 h-12 bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 rounded-2xl flex items-center justify-center text-2xl font-black shadow-inner">
+                    💻
+                </div>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200">Módulo 9</span>
+                        <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Controle de Notebooks & Periféricos</h1>
+                    </div>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Leitor Automático de Etiqueta de Patrimônio / Serial</p>
+                        <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">OCR Integrado Ativo</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-2">
+                <a href="index.html" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1">
+                    ⬅ Menu Principal
+                </a>
+                <button onclick="exportarCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer">
+                    📥 Exportar CSV
+                </button>
+            </div>
+        </header>
 
-        <!-- Recebimento -->
-        <div class="section-title">2. Dados de Recebimento</div>
-        <div class="form-group">
-          <label>Data de Entrada *</label>
-          <input type="date" id="dataEntrada" required>
-        </div>
-        <div class="form-group">
-          <label>Fornecedor / Origem</label>
-          <input type="text" id="origem" placeholder="Ex: Matriz, Dell Brasil, Devolução">
-        </div>
-        <div class="form-group">
-          <label>Estado de Conservação</label>
-          <select id="conservacao">
-            <option value="Novo">Novo</option>
-            <option value="Usado (Bom estado)">Usado (Bom estado)</option>
-            <option value="Avarias leves">Avarias leves</option>
-            <option value="Danificado">Danificado</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Conferido por (TI) *</label>
-          <input type="text" id="conferente" placeholder="Nome do técnico" required>
-        </div>
+        <!-- AVISO DE STATUS / LEITURA -->
+        <div id="alertaSistema" class="hidden p-3 rounded-xl text-xs font-bold text-center transition-all"></div>
 
-        <!-- Entrega / Saída -->
-        <div class="section-title">3. Dados de Entrega (Saída)</div>
-        <div class="form-group">
-          <label>Data de Saída</label>
-          <input type="date" id="dataSaida">
-        </div>
-        <div class="form-group">
-          <label>Colaborador Responsável</label>
-          <input type="text" id="colaborador" placeholder="Nome do colaborador">
-        </div>
-        <div class="form-group">
-          <label>Setor / Departamento</label>
-          <input type="text" id="setor" placeholder="Ex: Financeiro, TI, Comercial">
-        </div>
-        <div class="form-group">
-          <label>Termo de Responsabilidade</label>
-          <select id="termoAssinado">
-            <option value="Não">Pendente / Não</option>
-            <option value="Sim">Assinado</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label>Previsão de Devolução</label>
-          <input type="date" id="previsaoDevolucao">
+        <!-- QUADRO DE CAPTURA RÁPIDA DA ETIQUETA -->
+        <div class="bloco-destacado bg-gradient-to-r from-amber-50 to-orange-50 dark:from-slate-800 dark:to-amber-950/30 p-5 rounded-2xl">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <h2 class="text-sm font-black text-amber-900 dark:text-amber-300 uppercase flex items-center gap-2">
+                        <span>📸</span>
+                        <span>Leitor Automático da Placa de Patrimônio</span>
+                    </h2>
+                    <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
+                        Fotografe a etiqueta branca traseira (Asset: <b>BR...</b> / Serial: <b>...</b>). O sistema extrai e preenche os campos automaticamente.
+                    </p>
+                </div>
+
+                <div class="flex flex-wrap gap-2 w-full sm:w-auto">
+                    <!-- BOTÃO CÂMERA -->
+                    <label class="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 active:scale-95 text-white text-xs font-black px-4 py-2.5 rounded-xl cursor-pointer shadow-md transition">
+                        <span>📷</span>
+                        <span>Tirar Foto da Etiqueta</span>
+                        <input type="file" id="inputFotoCamera" accept="image/*" capture="environment" class="hidden" onchange="processarFotoEtiqueta(this.files)">
+                    </label>
+
+                    <!-- BOTÃO GALERIA / ARQUIVO -->
+                    <label class="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white dark:bg-slate-700 hover:bg-slate-100 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 text-xs font-bold px-4 py-2.5 rounded-xl cursor-pointer shadow-sm transition">
+                        <span>🖼️</span>
+                        <span>Carregar Imagem</span>
+                        <input type="file" id="inputFotoArquivo" accept="image/*" class="hidden" onchange="processarFotoEtiqueta(this.files)">
+                    </label>
+                </div>
+            </div>
+
+            <!-- STATUS DO PROCESSAMENTO OCR -->
+            <div id="statusOcrContainer" class="hidden mt-4 bg-white dark:bg-slate-800 p-3 rounded-xl border border-amber-200 dark:border-amber-700/60 flex items-center gap-3">
+                <span class="inline-block w-4 h-4 border-2 border-amber-600 border-t-transparent rounded-full animate-spin"></span>
+                <span id="txtStatusOcr" class="text-xs font-bold text-amber-700 dark:text-amber-300">Iniciando leitura da imagem...</span>
+            </div>
         </div>
 
-        <!-- Status -->
-        <div class="section-title">4. Status Geral</div>
-        <div class="form-group">
-          <label>Status Atual *</label>
-          <select id="status">
-            <option value="Em estoque">Em estoque</option>
-            <option value="Em uso">Em uso</option>
-            <option value="Em manutenção">Em manutenção</option>
-            <option value="Baixado">Baixado</option>
-          </select>
+        <!-- FORMULÁRIO DE CADASTRO -->
+        <div class="bloco-destacado bg-white dark:bg-slate-800 p-5 rounded-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
+                <span class="text-xs font-black text-slate-800 dark:text-slate-200 uppercase flex items-center gap-2">
+                    <span>📝</span>
+                    <span>Dados do Notebook & Movimentação</span>
+                </span>
+                <span class="text-[10px] font-bold text-slate-400">Campos com (*) são obrigatórios</span>
+            </div>
+
+            <form id="notebookForm" onsubmit="salvarNotebook(event)" class="space-y-4">
+                
+                <!-- SEÇÃO 1: IDENTIFICAÇÃO -->
+                <div>
+                    <h3 class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 mb-2 tracking-wider">
+                        1. Identificação do Equipamento
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Patrimônio (Asset) *</label>
+                            <input type="text" id="patrimonio" placeholder="Ex: BR2357387" required class="uppercase-input w-full p-2.5 bg-amber-50/50 dark:bg-slate-900 border border-amber-300 dark:border-amber-700 rounded-xl font-black text-amber-700 dark:text-amber-400 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Nº de Série (Serial) *</label>
+                            <input type="text" id="serial" placeholder="Ex: GQ5WS54" required class="uppercase-input w-full p-2.5 bg-amber-50/50 dark:bg-slate-900 border border-amber-300 dark:border-amber-700 rounded-xl font-black text-amber-700 dark:text-amber-400 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Marca *</label>
+                            <input type="text" id="marca" placeholder="Ex: Dell, Lenovo, HP" required class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Modelo *</label>
+                            <input type="text" id="modelo" placeholder="Ex: Latitude 3420" required class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEÇÃO 2: RECEBIMENTO -->
+                <div>
+                    <h3 class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 mb-2 tracking-wider">
+                        2. Dados de Recebimento
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Data Entrada *</label>
+                            <input type="date" id="dataEntrada" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Origem / Fornecedor</label>
+                            <input type="text" id="origem" placeholder="Ex: DXC / VALE EUC PROGRAM" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Estado de Conservação</label>
+                            <select id="conservacao" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                                <option value="Novo">Novo</option>
+                                <option value="Usado (Bom Estado)" selected>Usado (Bom Estado)</option>
+                                <option value="Avarias Leves">Avarias Leves</option>
+                                <option value="Danificado / Manutenção">Danificado / Manutenção</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Conferido por (TI) *</label>
+                            <input type="text" id="conferente" placeholder="Nome do técnico" required class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- SEÇÃO 3: ENTREGA & STATUS -->
+                <div>
+                    <h3 class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 mb-2 tracking-wider">
+                        3. Dados de Entrega / Saída & Status Operacional
+                    </h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 text-xs">
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Status Atual *</label>
+                            <select id="status" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                                <option value="Em estoque" selected>Em estoque</option>
+                                <option value="Em uso">Em uso</option>
+                                <option value="Em manutenção">Em manutenção</option>
+                                <option value="Baixado">Baixado</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Colaborador</label>
+                            <input type="text" id="colaborador" placeholder="Quem está usando?" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Setor / Área</label>
+                            <input type="text" id="setor" placeholder="Ex: Operação, Manutenção" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Data Saída</label>
+                            <input type="date" id="dataSaida" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Termo Assinado?</label>
+                            <select id="termoAssinado" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                                <option value="Não">Pendente / Não</option>
+                                <option value="Sim">Sim, Assinado</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-2">
+                    <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white font-black py-3 px-8 rounded-xl text-xs transition shadow-md flex items-center gap-2 cursor-pointer">
+                        <span>💾</span>
+                        <span>Salvar Registro de Notebook</span>
+                    </button>
+                </div>
+            </form>
         </div>
-      </div>
 
-      <button type="submit" class="btn btn-primary">Salvar Registro</button>
-    </form>
-  </div>
+        <!-- BUSCA E FILTROS -->
+        <div class="bloco-destacado bg-slate-100 dark:bg-slate-800/90 p-3.5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <span class="text-base">🔍</span>
+                <span class="text-xs font-black uppercase text-slate-700 dark:text-slate-300 whitespace-nowrap">Filtros:</span>
+            </div>
 
-  <!-- FILTROS E BUSCA -->
-  <div class="card">
-    <div class="filter-bar">
-      <div class="form-group">
-        <label>Busca Rápida</label>
-        <input type="text" id="searchBar" placeholder="Pesquisar por marca, serial, patrimônio, colaborador...">
-      </div>
-      <div class="form-group">
-        <label>Filtrar por Status</label>
-        <select id="filterStatus">
-          <option value="">Todos</option>
-          <option value="Em estoque">Em estoque</option>
-          <option value="Em uso">Em uso</option>
-          <option value="Em manutenção">Em manutenção</option>
-          <option value="Baixado">Baixado</option>
-        </select>
-      </div>
-      <div class="form-group">
-        <label>Filtrar por Setor</label>
-        <input type="text" id="filterSetor" placeholder="Ex: Financeiro, TI">
-      </div>
+            <div class="flex flex-1 flex-col sm:flex-row items-center gap-2 w-full">
+                <!-- BUSCA GERAL -->
+                <div class="relative w-full sm:w-1/2">
+                    <input type="text" id="inputBusca" oninput="renderizarTabela()" placeholder="Buscar por patrimônio, serial, marca, colaborador..." class="uppercase-input w-full text-xs pl-8 pr-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-amber-600 dark:text-white font-bold">
+                    <span class="absolute left-2.5 top-2 text-slate-400 text-xs">🔎</span>
+                </div>
+
+                <!-- FILTRO POR STATUS -->
+                <div class="w-full sm:w-1/4">
+                    <select id="filtroStatus" onchange="renderizarTabela()" class="w-full text-xs py-2 px-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-amber-600 dark:text-white font-bold">
+                        <option value="">TODOS OS STATUS</option>
+                        <option value="Em estoque">Em estoque</option>
+                        <option value="Em uso">Em uso</option>
+                        <option value="Em manutenção">Em manutenção</option>
+                        <option value="Baixado">Baixado</option>
+                    </select>
+                </div>
+
+                <!-- FILTRO POR SETOR -->
+                <div class="w-full sm:w-1/4">
+                    <input type="text" id="filtroSetor" oninput="renderizarTabela()" placeholder="Filtrar por setor..." class="uppercase-input w-full text-xs py-2 px-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-amber-600 dark:text-white font-bold">
+                </div>
+            </div>
+        </div>
+
+        <!-- TABELA DE EQUIPAMENTOS -->
+        <div class="bloco-destacado bg-white dark:bg-slate-800 p-5 rounded-2xl space-y-3">
+            <div class="flex justify-between items-center">
+                <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">
+                    📋 Equipamentos Cadastrados
+                </h3>
+                <span id="labelContador" class="text-[11px] text-slate-400 font-bold">0 NOTEBOOKS</span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="border-b border-slate-100 dark:border-slate-700 text-slate-400 font-bold uppercase text-[10px]">
+                            <th class="py-2.5 px-3">Patrimônio</th>
+                            <th class="py-2.5 px-3">Serial</th>
+                            <th class="py-2.5 px-3">Equipamento</th>
+                            <th class="py-2.5 px-3 text-center">Status</th>
+                            <th class="py-2.5 px-3">Colaborador / Setor</th>
+                            <th class="py-2.5 px-3">Origem</th>
+                            <th class="py-2.5 px-3 text-center">Termo</th>
+                            <th class="py-2.5 px-3 text-center">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabelaNotebooksCorpo" class="divide-y divide-slate-100 dark:divide-slate-700/60 uppercase"></tbody>
+                </table>
+            </div>
+        </div>
+
     </div>
 
-    <!-- TABELA DE RESULTADOS -->
-    <div class="table-container">
-      <table>
-        <thead>
-          <tr>
-            <th>Patrimônio</th>
-            <th>Equipamento</th>
-            <th>Serial</th>
-            <th>Status</th>
-            <th>Colaborador / Setor</th>
-            <th>Entrada</th>
-            <th>Saída</th>
-            <th>Termo</th>
-            <th>Previsão Dev.</th>
-            <th>Ações</th>
-          </tr>
-        </thead>
-        <tbody id="tableBody">
-          <!-- Linhas renderizadas via JS -->
-        </tbody>
-      </table>
-    </div>
-  </div>
-</div>
+    <!-- SCRIPT DE PROCESSAMENTO E OCR -->
+    <script>
+        let notebooks = [];
 
-<script>
-  let notebooks = JSON.parse(localStorage.getItem('modulo9_notebooks')) || [];
+        window.addEventListener('DOMContentLoaded', () => {
+            const hoje = new Date().toISOString().split('T')[0];
+            document.getElementById('dataEntrada').value = hoje;
+            document.getElementById('origem').value = "DXC / VALE EUC PROGRAM";
+            carregarDoLocalStorage();
+        });
 
-  const form = document.getElementById('notebookForm');
-  const tableBody = document.getElementById('tableBody');
-  const searchBar = document.getElementById('searchBar');
-  const filterStatus = document.getElementById('filterStatus');
-  const filterSetor = document.getElementById('filterSetor');
+        function mostrarAviso(msg, tipo = "sucesso") {
+            const el = document.getElementById('alertaSistema');
+            el.innerText = msg;
+            el.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800');
+            
+            if (tipo === "sucesso") {
+                el.classList.add('bg-emerald-100', 'text-emerald-800');
+            } else if (tipo === "aviso") {
+                el.classList.add('bg-amber-100', 'text-amber-800');
+            } else {
+                el.classList.add('bg-rose-100', 'text-rose-800');
+            }
+            setTimeout(() => el.classList.add('hidden'), 5000);
+        }
 
-  // Salvar novo registro
-  form.addEventListener('submit', (e) => {
-    e.preventDefault();
+        // ================= FUNÇÃO DE OCR AUTOMÁTICO =================
+        async function processarFotoEtiqueta(files) {
+            if (!files || files.length === 0) return;
+            const file = files[0];
 
-    const item = {
-      id: Date.now(),
-      marca: document.getElementById('marca').value.trim(),
-      modelo: document.getElementById('modelo').value.trim(),
-      serial: document.getElementById('serial').value.trim(),
-      patrimonio: document.getElementById('patrimonio').value.trim(),
-      dataEntrada: document.getElementById('dataEntrada').value,
-      origem: document.getElementById('origem').value.trim() || '-',
-      conservacao: document.getElementById('conservacao').value,
-      conferente: document.getElementById('conferente').value.trim(),
-      dataSaida: document.getElementById('dataSaida').value || '-',
-      colaborador: document.getElementById('colaborador').value.trim() || '-',
-      setor: document.getElementById('setor').value.trim() || '-',
-      termoAssinado: document.getElementById('termoAssinado').value,
-      previsaoDevolucao: document.getElementById('previsaoDevolucao').value || '-',
-      status: document.getElementById('status').value
-    };
+            const statusContainer = document.getElementById('statusOcrContainer');
+            const txtStatus = document.getElementById('txtStatusOcr');
+            statusContainer.classList.remove('hidden');
+            txtStatus.innerText = "Lendo texto da etiqueta via OCR...";
 
-    notebooks.push(item);
-    salvarDados();
-    form.reset();
-    render();
-  });
+            try {
+                // Executa Tesseract OCR na imagem original
+                const worker = await Tesseract.createWorker(['por', 'eng']);
+                let ret = await worker.recognize(file);
+                let text = ret.data.text;
 
-  // Salvar no localStorage
-  function salvarDados() {
-    localStorage.setItem('modulo9_notebooks', JSON.stringify(notebooks));
-  }
+                // Tenta extrair da imagem direta
+                let dados = extrairDadosEtiqueta(text);
 
-  // Deletar registro
-  function removerItem(id) {
-    if (confirm('Deseja realmente remover este equipamento?')) {
-      notebooks = notebooks.filter(item => item.id !== id);
-      salvarDados();
-      render();
-    }
-  }
+                // Se não encontrou devido à rotação (de ponta-cabeça como no exemplo), rotaciona em 180 graus e tenta novamente
+                if (!dados.serial || !dados.asset) {
+                    txtStatus.innerText = "Ajustando orientação da foto (180°)...";
+                    const imagemRotacionada = await rotacionarImagem(file, 180);
+                    const retRot = await worker.recognize(imagemRotacionada);
+                    const dadosRot = extrairDadosEtiqueta(retRot.data.text);
+                    if (dadosRot.serial) dados.serial = dadosRot.serial;
+                    if (dadosRot.asset) dados.asset = dadosRot.asset;
+                    if (dadosRot.origem) dados.origem = dadosRot.origem;
+                }
 
-  // Renderizar tabela com filtros
-  function render() {
-    const q = searchBar.value.toLowerCase();
-    const st = filterStatus.value;
-    const sec = filterSetor.value.toLowerCase().trim();
+                await worker.terminate();
 
-    const filtrados = notebooks.filter(item => {
-      const matchText = 
-        item.marca.toLowerCase().includes(q) ||
-        item.modelo.toLowerCase().includes(q) ||
-        item.serial.toLowerCase().includes(q) ||
-        item.patrimonio.toLowerCase().includes(q) ||
-        item.colaborador.toLowerCase().includes(q);
+                // Preenchimento dos campos automáticos
+                let camposPreenchidos = [];
 
-      const matchStatus = st === '' || item.status === st;
-      const matchSetor = sec === '' || item.setor.toLowerCase().includes(sec);
+                if (dados.asset) {
+                    document.getElementById('patrimonio').value = dados.asset;
+                    camposPreenchidos.push(`Patrimônio: ${dados.asset}`);
+                }
+                if (dados.serial) {
+                    document.getElementById('serial').value = dados.serial;
+                    camposPreenchidos.push(`Serial: ${dados.serial}`);
+                }
+                if (dados.origem) {
+                    document.getElementById('origem').value = dados.origem;
+                }
 
-      return matchText && matchStatus && matchSetor;
-    });
+                statusContainer.classList.add('hidden');
 
-    if (filtrados.length === 0) {
-      tableBody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: var(--muted); padding: 24px;">Nenhum registro encontrado.</td></tr>`;
-      return;
-    }
+                if (camposPreenchidos.length > 0) {
+                    mostrarAviso(`✅ Sucesso! Campos preenchidos automaticamente: ${camposPreenchidos.join(' | ')}`);
+                } else {
+                    mostrarAviso("⚠️ Não foi possível identificar o Asset/Serial com clareza. Por favor, digite manualmente.", "aviso");
+                }
 
-    tableBody.innerHTML = filtrados.map(item => {
-      let badgeClass = 'badge-estoque';
-      if (item.status === 'Em uso') badgeClass = 'badge-uso';
-      else if (item.status === 'Em manutenção') badgeClass = 'badge-manutencao';
-      else if (item.status === 'Baixado') badgeClass = 'badge-baixado';
+            } catch (err) {
+                console.error("Erro OCR:", err);
+                statusContainer.classList.add('hidden');
+                mostrarAviso("Erro ao processar imagem. Verifique a foto e tente novamente.", "erro");
+            }
+        }
 
-      const termoClass = item.termoAssinado === 'Sim' ? 'termo-sim' : 'termo-nao';
+        // EXTRAI COM REGEX OS DADOS DA PLACA DA VALE / DXC
+        function extrairDadosEtiqueta(texto) {
+            const t = (texto || "").toUpperCase();
+            let asset = "";
+            let serial = "";
+            let origem = "";
 
-      return `
-        <tr>
-          <td><strong>#${item.patrimonio}</strong></td>
-          <td>${item.marca} ${item.modelo}</td>
-          <td>${item.serial}</td>
-          <td><span class="badge ${badgeClass}">${item.status}</span></td>
-          <td>${item.colaborador} <span style="color: var(--muted); font-size: 0.8rem;">(${item.setor})</span></td>
-          <td>${formatarData(item.dataEntrada)}</td>
-          <td>${formatarData(item.dataSaida)}</td>
-          <td><span class="tag-termo ${termoClass}">${item.termoAssinado}</span></td>
-          <td>${formatarData(item.previsaoDevolucao)}</td>
-          <td class="actions-cell">
-            <button class="btn-action-delete" onclick="removerItem(${item.id})">Excluir</button>
-          </td>
-        </tr>
-      `;
-    }).join('');
-  }
+            if (t.includes("DXC") || t.includes("VALE EUC PROGRAM") || t.includes("EUC")) {
+                origem = "DXC / VALE EUC PROGRAM";
+            }
 
-  function formatarData(dataStr) {
-    if (!dataStr || dataStr === '-') return '-';
-    const partes = dataStr.split('-');
-    if (partes.length === 3) {
-      return `${partes[2]}/${partes[1]}/${partes[0]}`;
-    }
-    return dataStr;
-  }
+            // Expressão para Asset-number: BR2357387 ou similar
+            const matchAsset = t.match(/ASSET\s*[-–—:]*\s*NUMBER\s*[:\s-]*([A-Z0-9]{5,15})/i) ||
+                               t.match(/(BR\d{6,10})/i);
+            if (matchAsset && matchAsset[1]) {
+                asset = matchAsset[1].trim();
+            }
 
-  // Event listeners para filtros dinâmicos
-  searchBar.addEventListener('input', render);
-  filterStatus.addEventListener('change', render);
-  filterSetor.addEventListener('input', render);
+            // Expressão para Serial-number: GQ5WS54 ou similar
+            const matchSerial = t.match(/SERIAL\s*[-–—:]*\s*NUMBER\s*[:\s-]*([A-Z0-9]{5,15})/i) ||
+                                t.match(/([A-Z0-9]{7})/);
+            if (matchSerial && matchSerial[1]) {
+                serial = matchSerial[1].trim();
+            }
 
-  // Inicialização inicial
-  render();
-</script>
+            return { asset, serial, origem };
+        }
 
+        // Rotaciona a imagem no Canvas se ela foi tirada invertida
+        function rotacionarImagem(file, graus) {
+            return new Promise((resolve) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+
+                    ctx.translate(canvas.width / 2, canvas.height / 2);
+                    ctx.rotate((graus * Math.PI) / 180);
+                    ctx.drawImage(img, -img.width / 2, -img.height / 2);
+
+                    resolve(canvas.toDataURL());
+                };
+                img.src = URL.createObjectURL(file);
+            });
+        }
+
+        // ================= CADASTRO E GERENCIAMENTO =================
+        function salvarNotebook(e) {
+            e.preventDefault();
+
+            const item = {
+                id: Date.now(),
+                patrimonio: document.getElementById('patrimonio').value.trim().toUpperCase(),
+                serial: document.getElementById('serial').value.trim().toUpperCase(),
+                marca: document.getElementById('marca').value.trim().toUpperCase(),
+                modelo: document.getElementById('modelo').value.trim().toUpperCase(),
+                dataEntrada: document.getElementById('dataEntrada').value,
+                origem: document.getElementById('origem').value.trim().toUpperCase() || "DXC / VALE EUC PROGRAM",
+                conservacao: document.getElementById('conservacao').value,
+                conferente: document.getElementById('conferente').value.trim().toUpperCase(),
+                status: document.getElementById('status').value,
+                colaborador: document.getElementById('colaborador').value.trim().toUpperCase() || "-",
+                setor: document.getElementById('setor').value.trim().toUpperCase() || "-",
+                dataSaida: document.getElementById('dataSaida').value || "-",
+                termoAssinado: document.getElementById('termoAssinado').value
+            };
+
+            notebooks.unshift(item);
+            salvarNoLocalStorage();
+            renderizarTabela();
+            mostrarAviso(`Notebook patrimônio #${item.patrimonio} salvo com sucesso!`);
+
+            // Reset parcial
+            document.getElementById('patrimonio').value = '';
+            document.getElementById('serial').value = '';
+            document.getElementById('colaborador').value = '';
+            document.getElementById('setor').value = '';
+            document.getElementById('dataSaida').value = '';
+        }
+
+        function renderizarTabela() {
+            const tbody = document.getElementById('tabelaNotebooksCorpo');
+            tbody.innerHTML = '';
+
+            const termo = document.getElementById('inputBusca').value.trim().toUpperCase();
+            const statusFiltro = document.getElementById('filtroStatus').value;
+            const setorFiltro = document.getElementById('filtroSetor').value.trim().toUpperCase();
+
+            let lista = notebooks.filter(item => {
+                const matchTexto = 
+                    item.patrimonio.includes(termo) ||
+                    item.serial.includes(termo) ||
+                    item.marca.includes(termo) ||
+                    item.modelo.includes(termo) ||
+                    item.colaborador.includes(termo);
+
+                const matchStatus = !statusFiltro || item.status === statusFiltro;
+                const matchSetor = !setorFiltro || item.setor.includes(setorFiltro);
+
+                return matchTexto && matchStatus && matchSetor;
+            });
+
+            document.getElementById('labelContador').innerText = `${lista.length} NOTEBOOKS`;
+
+            if (lista.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-400 italic">NENHUM NOTEBOOK ENCONTRADO.</td></tr>`;
+                return;
+            }
+
+            lista.forEach(item => {
+                let badgeStatus = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300';
+                if (item.status === 'Em uso') badgeStatus = 'bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300';
+                if (item.status === 'Em manutenção') badgeStatus = 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300';
+                if (item.status === 'Baixado') badgeStatus = 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300';
+
+                const termoClass = item.termoAssinado === 'Sim' ? 'text-emerald-600 font-bold' : 'text-rose-500 font-semibold';
+
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/40 transition uppercase";
+                tr.innerHTML = `
+                    <td class="py-2.5 px-3 font-black text-amber-600 dark:text-amber-400 whitespace-nowrap">#${item.patrimonio}</td>
+                    <td class="py-2.5 px-3 font-mono font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap">${item.serial}</td>
+                    <td class="py-2.5 px-3 font-semibold text-slate-900 dark:text-white whitespace-nowrap">${item.marca} ${item.modelo}</td>
+                    <td class="py-2.5 px-3 text-center whitespace-nowrap">
+                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${badgeStatus}">${item.status}</span>
+                    </td>
+                    <td class="py-2.5 px-3 font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">
+                        ${item.colaborador} <span class="text-slate-400 text-[10px]">(${item.setor})</span>
+                    </td>
+                    <td class="py-2.5 px-3 text-[10px] text-slate-500 whitespace-nowrap">${item.origem}</td>
+                    <td class="py-2.5 px-3 text-center whitespace-nowrap ${termoClass}">${item.termoAssinado}</td>
+                    <td class="py-2.5 px-3 text-center whitespace-nowrap">
+                        <button onclick="removerNotebook(${item.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1 cursor-pointer" title="Remover">✕</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function removerNotebook(id) {
+            if (confirm("Deseja realmente remover este equipamento?")) {
+                notebooks = notebooks.filter(n => n.id !== id);
+                salvarNoLocalStorage();
+                renderizarTabela();
+                mostrarAviso("Equipamento removido com sucesso!");
+            }
+        }
+
+        function salvarNoLocalStorage() {
+            localStorage.setItem('modulo9_notebooks_base', JSON.stringify(notebooks));
+        }
+
+        function carregarDoLocalStorage() {
+            const salvo = localStorage.getItem('modulo9_notebooks_base');
+            if (salvo) {
+                try { notebooks = JSON.parse(salvo); } catch (e) { notebooks = []; }
+            }
+            renderizarTabela();
+        }
+
+        function exportarCSV() {
+            if (notebooks.length === 0) {
+                alert("Nenhum registro para exportar!");
+                return;
+            }
+
+            let csv = "\uFEFFPATRIMONIO;SERIAL;MARCA;MODELO;STATUS;COLABORADOR;SETOR;DATA_ENTRADA;DATA_SAIDA;ORIGEM;TERMO_ASSINADO\n";
+            notebooks.forEach(n => {
+                csv += `"${n.patrimonio}";"${n.serial}";"${n.marca}";"${n.modelo}";"${n.status}";"${n.colaborador}";"${n.setor}";"${n.dataEntrada}";"${n.dataSaida}";"${n.origem}";"${n.termoAssinado}"\n`;
+            });
+
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Controle_Notebooks_Vale_${new Date().toISOString().split('T')[0]}.csv`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+    </script>
 </body>
 </html>
