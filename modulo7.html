@@ -77,7 +77,7 @@
             display: inline-block;
         }
 
-        /* Cores de Glow (Bordas Fluorescentes) para os Cards de Pessoas */
+        /* Cores de Glow para Cards de Pessoas */
         .glow-azul { border: 2px solid #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
         .glow-roxo { border: 2px solid #c084fc; box-shadow: 0 0 10px rgba(192, 132, 252, 0.5); }
         .glow-verde { border: 2px solid #4ade80; box-shadow: 0 0 10px rgba(74, 222, 128, 0.5); }
@@ -101,7 +101,7 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Filtro de Valores & Cards Glow</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Recuperação de Arquivo</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
                     </div>
@@ -122,6 +122,12 @@
                 <button onclick="exportarParaCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer">
                     📥 CSV
                 </button>
+                <!-- BOTÃO DE RECUPERAÇÃO VIA PLANILHA / CSV -->
+                <label class="bg-amber-600 hover:bg-amber-700 text-white px-3.5 py-2 rounded-xl text-xs font-black transition shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95" title="Carregar planilha/CSV baixado anteriormente">
+                    <span>📂</span>
+                    <span>Recuperar Planilha</span>
+                    <input type="file" id="inputRecuperarCSV" accept=".csv,.txt" class="hidden" onchange="importarCSVRecuperacao(this.files)">
+                </label>
                 <button onclick="abrirModalChaveIa()" class="bg-amber-100 hover:bg-amber-200 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 px-3 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer border border-amber-300 dark:border-amber-700 shadow-sm" title="Configurar Chave IA">
                     <span>⚙️</span>
                     <span>Chave IA</span>
@@ -582,10 +588,12 @@
             atualizarTodosOsSelectsCategorias();
 
             const solManual = document.getElementById('manualSolicitante');
-            solManual.classList.add('piscar-solicitante-forte');
+            if (solManual) solManual.classList.add('piscar-solicitante-forte');
 
+            // 1. Carrega localmente
             carregarDoLocalStorage();
 
+            // 2. Conecta ao Supabase sem sobrescrever se vier vazio
             if (window.supabase) {
                 try {
                     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -683,13 +691,15 @@
         function mostrarAviso(msg, tipo = "sucesso") {
             const el = document.getElementById('alertaSistema');
             el.innerText = msg;
-            el.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
+            el.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800');
             if (tipo === "sucesso") {
                 el.classList.add('bg-emerald-100', 'text-emerald-800');
+            } else if (tipo === "aviso") {
+                el.classList.add('bg-amber-100', 'text-amber-800');
             } else {
                 el.classList.add('bg-rose-100', 'text-rose-800');
             }
-            setTimeout(() => el.classList.add('hidden'), 4000);
+            setTimeout(() => el.classList.add('hidden'), 5000);
         }
 
         function calcularManualPorTotal() {
@@ -807,31 +817,188 @@
             document.getElementById('manualDataEntrega').classList.add('hidden');
         }
 
-        function verificarDigitacaoSolicitante(input, tempId) {
-            input.value = input.value.toUpperCase();
-            const val = input.value.trim();
-            const aviso = document.getElementById(`avisoSolicitante-${tempId}`);
+        // ================= FUNÇÃO DE RECUPERAÇÃO VIA PLANILHA / CSV =================
+        function importarCSVRecuperacao(files) {
+            if (!files || files.length === 0) return;
+            const file = files[0];
 
-            if (val === "" || val === "NÃO INFORMADO" || val === "NAO INFORMADO") {
-                input.classList.add('piscar-solicitante-forte');
-                if (aviso) aviso.classList.remove('hidden');
-            } else {
-                input.classList.remove('piscar-solicitante-forte');
-                if (aviso) aviso.classList.add('hidden');
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                const texto = e.target.result;
+                processarTextoCSVRecuperado(texto);
+            };
+            reader.readAsText(file, "UTF-8");
+        }
+
+        function processarTextoCSVRecuperado(textoCSV) {
+            try {
+                const linhas = textoCSV.split(/\r?\n/).filter(l => l.trim().length > 0);
+                if (linhas.length <= 1) {
+                    alert("O arquivo selecionado parece estar vazio.");
+                    return;
+                }
+
+                // Detecta delimitador (; ou ,)
+                const delimitador = linhas[0].includes(';') ? ';' : ',';
+                let novosItens = [];
+
+                for (let i = 1; i < linhas.length; i++) {
+                    const linha = linhas[i];
+                    
+                    // Regex para separar respeitando aspas
+                    const regex = new RegExp(`(?:^|${delimitador})(?:"([^"]*)"|([^"${delimitador}]*))`, 'g');
+                    let matches = [];
+                    let match;
+                    while ((match = regex.exec(linha)) !== null) {
+                        matches.push(match[1] !== undefined ? match[1] : match[2]);
+                    }
+
+                    if (matches.length >= 8) {
+                        const dataFormatada = converterDataParaISO(matches[0]);
+                        const solicitante = (matches[1] || "").trim().toUpperCase();
+                        const produto = (matches[2] || "").trim().toUpperCase();
+                        const local = (matches[3] || "MERCADO LIVRE").trim().toUpperCase();
+                        const categoria = (matches[4] || "OUTROS").trim().toUpperCase();
+                        const qtd = parseFloat(matches[5]) || 1;
+                        
+                        let unitStr = (matches[6] || "0").replace(/\./g, '').replace(',', '.');
+                        let totalStr = (matches[7] || "0").replace(/\./g, '').replace(',', '.');
+                        const unit = parseFloat(unitStr) || 0;
+                        const total = parseFloat(totalStr) || (qtd * unit);
+
+                        const entregueStr = (matches[8] || "").trim().toUpperCase();
+                        const entregue = entregueStr === "SIM" || entregueStr === "TRUE";
+                        const dataEntrega = matches[9] ? converterDataParaISO(matches[9]) : "";
+                        const link = matches[10] || "";
+
+                        if (produto) {
+                            novosItens.push({
+                                id: Date.now() + i,
+                                data: dataFormatada || new Date().toISOString().split('T')[0],
+                                solicitante: solicitante || "NÃO INFORMADO",
+                                produto: produto,
+                                local: local,
+                                categoria: categoria,
+                                qtd: qtd,
+                                unit: unit,
+                                total: total,
+                                link: link,
+                                entregue: entregue,
+                                data_entrega: dataEntrega
+                            });
+                        }
+                    }
+                }
+
+                if (novosItens.length > 0) {
+                    compras = novosItens;
+                    salvarNoLocalStorage();
+                    atualizarListaSelectSolicitantes();
+                    renderizarTabela();
+                    mostrarAviso(`🎉 SUCESSO! ${novosItens.length} itens foram restaurados da planilha!`);
+
+                    // Envia também para a nuvem
+                    novosItens.forEach(item => inserirNoSupabase(item));
+                } else {
+                    alert("Não foi possível identificar o formato da planilha. Verifique se o arquivo é o exportado pelo sistema.");
+                }
+
+            } catch (err) {
+                console.error(err);
+                alert("Erro ao ler o arquivo CSV. Detalhes: " + err.message);
             }
         }
 
-        function validarInputEditSolicitante(input) {
-            input.value = input.value.toUpperCase();
-            const val = input.value.trim();
-            const aviso = document.getElementById('avisoEditSolicitante');
-            if (val === "" || val === "NÃO INFORMADO" || val === "NAO INFORMADO") {
-                input.classList.add('piscar-solicitante-forte');
-                if (aviso) aviso.classList.remove('hidden');
-            } else {
-                input.classList.remove('piscar-solicitante-forte');
-                if (aviso) aviso.classList.add('hidden');
+        function converterDataParaISO(dataBR) {
+            if (!dataBR) return "";
+            if (dataBR.includes('-')) return dataBR; // já é ISO
+            const p = dataBR.split('/');
+            if (p.length === 3) {
+                return `${p[2]}-${p[1].padStart(2, '0')}-${p[0].padStart(2, '0')}`;
             }
+            return dataBR;
+        }
+
+        // ================= SUPABASE =================
+        async function carregarDoSupabase() {
+            if (!supabaseClient) return;
+
+            try {
+                const { data, error } = await supabaseClient
+                    .from('compras_corporativas')
+                    .select('*')
+                    .order('id', { ascending: false });
+
+                if (error) throw error;
+
+                // Só sobrescreve se a nuvem tiver itens
+                if (data && data.length > 0) {
+                    compras = data;
+                    salvarNoLocalStorage();
+                    atualizarListaSelectSolicitantes();
+                    renderizarTabela();
+                    mostrarAviso("✅ Sincronizado com a nuvem!");
+                }
+            } catch (err) {
+                console.warn("Aviso nuvem:", err.message);
+            }
+        }
+
+        async function inserirNoSupabase(item) {
+            if (!supabaseClient) return null;
+            try {
+                const payload = {
+                    data: item.data,
+                    solicitante: item.solicitante,
+                    produto: item.produto,
+                    local: item.local || '',
+                    categoria: item.categoria,
+                    qtd: item.qtd,
+                    unit: item.unit,
+                    total: item.total,
+                    link: item.link || '',
+                    entregue: !!item.entregue,
+                    data_entrega: item.data_entrega || ''
+                };
+                await supabaseClient.from('compras_corporativas').insert([payload]);
+            } catch (err) {
+                console.warn("Aviso Insert:", err.message);
+            }
+        }
+
+        async function atualizarNoSupabase(item) {
+            if (!supabaseClient || !item.id) return;
+            try {
+                await supabaseClient.from('compras_corporativas').update(item).eq('id', item.id);
+            } catch (err) {
+                console.warn("Aviso Update:", err.message);
+            }
+        }
+
+        async function removerDoSupabase(id) {
+            if (!supabaseClient) return;
+            try {
+                await supabaseClient.from('compras_corporativas').delete().eq('id', id);
+            } catch (err) {
+                console.warn("Aviso Delete:", err.message);
+            }
+        }
+
+        function salvarNoLocalStorage() {
+            localStorage.setItem('compras_corporativas_base', JSON.stringify(compras));
+        }
+
+        function carregarDoLocalStorage() {
+            const salvo = localStorage.getItem('compras_corporativas_base');
+            if (salvo) {
+                try { 
+                    compras = JSON.parse(salvo); 
+                    atualizarListaSelectSolicitantes();
+                } catch(e) { 
+                    compras = []; 
+                }
+            }
+            renderizarTabela();
         }
 
         function atualizarListaSelectSolicitantes() {
@@ -857,24 +1024,9 @@
             renderizarCardsPessoasDinamicos();
         }
 
-        function aplicarFiltroPorTexto(valor) {
-            solicitanteFiltroAtual = valor.trim().toUpperCase();
-            document.getElementById('selectFiltroSolicitante').value = '';
-            atualizarBadgeFiltro();
-            renderizarTabela();
-        }
-
         function aplicarFiltroPorSelect(valor) {
             solicitanteFiltroAtual = valor.trim().toUpperCase();
-            document.getElementById('inputBuscaSolicitante').value = solicitanteFiltroAtual;
-            atualizarBadgeFiltro();
-            renderizarTabela();
-        }
-
-        function limparBuscaSolicitante() {
-            solicitanteFiltroAtual = "";
-            document.getElementById('inputBuscaSolicitante').value = "";
-            document.getElementById('selectFiltroSolicitante').value = "";
+            document.getElementById('selectFiltroSolicitante').value = solicitanteFiltroAtual;
             atualizarBadgeFiltro();
             renderizarTabela();
         }
@@ -924,786 +1076,12 @@
             });
         }
 
-        function abrirModalUsuarios() {
-            const modal = document.getElementById('modalUsuarios');
-            const tbody = document.getElementById('tabelaUsuariosCorpo');
-            tbody.innerHTML = '';
-
-            let totaisPorPessoa = {};
-            compras.forEach(item => {
-                const s = (item.solicitante || "NÃO INFORMADO").toUpperCase();
-                if (!totaisPorPessoa[s]) totaisPorPessoa[s] = { count: 0, valor: 0 };
-                totaisPorPessoa[s].count += Number(item.qtd || 1);
-                totaisPorPessoa[s].valor += Number(item.total || 0);
-            });
-
-            const listaNomes = Object.keys(totaisPorPessoa).sort((a,b) => totaisPorPessoa[b].valor - totaisPorPessoa[a].valor);
-
-            if (listaNomes.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-5 text-slate-400 italic">Nenhum solicitante cadastrado ainda.</td></tr>`;
-            } else {
-                listaNomes.forEach(nome => {
-                    const dados = totaisPorPessoa[nome];
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/40 transition";
-                    tr.innerHTML = `
-                        <td class="py-2.5 px-3 font-bold text-slate-800 dark:text-slate-100">${nome}</td>
-                        <td class="py-2.5 px-3 text-center text-slate-600 dark:text-slate-300">${dados.count} un</td>
-                        <td class="py-2.5 px-3 text-right font-black text-emerald-600 dark:text-emerald-400">R$ ${dados.valor.toFixed(2)}</td>
-                        <td class="py-2.5 px-3 text-center">
-                            <button onclick="selecionarPessoaPeloModal('${nome}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-2 py-1 rounded-lg text-[10px] font-bold">
-                                🔍 Ver Compras
-                            </button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
-
-            document.getElementById('resumoGeralUsuarios').innerText = `Total: ${listaNomes.length} Solicitante(s) Registrado(s)`;
-            modal.classList.remove('hidden');
-        }
-
-        function fecharModalUsuarios() {
-            document.getElementById('modalUsuarios').classList.add('hidden');
-        }
-
-        function selecionarPessoaPeloModal(nome) {
-            fecharModalUsuarios();
-            aplicarFiltroPorSelect(nome);
-        }
-
-        function abrirModalChaveIa() {
-            const savedKey = localStorage.getItem('gemini_api_key') || '';
-            document.getElementById('modalInputGeminiKey').value = savedKey;
-            document.getElementById('modalChaveIa').classList.remove('hidden');
-        }
-
-        function fecharModalChaveIa() {
-            document.getElementById('modalChaveIa').classList.add('hidden');
-        }
-
-        function salvarChaveIaModal() {
-            const key = document.getElementById('modalInputGeminiKey').value.trim();
-            localStorage.setItem('gemini_api_key', key);
-            fecharModalChaveIa();
-            mostrarAviso("Chave da IA salva com sucesso!");
-        }
-
-        // ================= SUPABASE =================
-        async function carregarDoSupabase() {
-            if (!supabaseClient) return;
-
-            try {
-                const { data, error } = await supabaseClient
-                    .from('compras_corporativas')
-                    .select('*')
-                    .order('id', { ascending: false });
-
-                if (error) throw error;
-
-                if (data) {
-                    const localSalvo = JSON.parse(localStorage.getItem('compras_corporativas_base') || '[]');
-                    const mapLocal = new Map();
-                    localSalvo.forEach(item => mapLocal.set(String(item.id), item));
-
-                    const listaMesclada = data.map(remoto => {
-                        const local = mapLocal.get(String(remoto.id));
-                        return {
-                            ...remoto,
-                            entregue: (local && local.entregue !== undefined) ? local.entregue : (remoto.entregue || false),
-                            data_entrega: (local && local.data_entrega !== undefined) ? local.data_entrega : (remoto.data_entrega || ''),
-                            local: (local && local.local) ? local.local : (remoto.local || 'MERCADO LIVRE')
-                        };
-                    });
-
-                    localSalvo.forEach(localItem => {
-                        const existeNoRemoto = data.some(r => String(r.id) === String(localItem.id));
-                        if (!existeNoRemoto) {
-                            listaMesclada.unshift(localItem);
-                        }
-                    });
-
-                    compras = listaMesclada;
-                    salvarNoLocalStorage();
-                    atualizarListaSelectSolicitantes();
-                    renderizarTabela();
-                    mostrarAviso("✅ Sincronizado com a nuvem!");
-                }
-            } catch (err) {
-                console.warn("Aviso ao sincronizar nuvem:", err.message);
-            }
-        }
-
-        async function inserirNoSupabase(item) {
-            if (!supabaseClient) return null;
-            try {
-                const payload = {
-                    data: item.data,
-                    solicitante: item.solicitante,
-                    produto: item.produto,
-                    local: item.local || '',
-                    categoria: item.categoria,
-                    qtd: item.qtd,
-                    unit: item.unit,
-                    total: item.total,
-                    link: item.link || '',
-                    entregue: !!item.entregue,
-                    data_entrega: item.data_entrega || ''
-                };
-
-                let { data, error } = await supabaseClient.from('compras_corporativas').insert([payload]).select();
-                if (!error && data && data[0]) return data[0].id;
-            } catch (err) {
-                console.warn("Aviso Supabase Insert:", err.message);
-            }
-            return null;
-        }
-
-        async function atualizarNoSupabase(item) {
-            if (!supabaseClient || !item.id) return;
-            try {
-                const payload = {
-                    data: item.data,
-                    solicitante: item.solicitante,
-                    produto: item.produto,
-                    local: item.local || '',
-                    categoria: item.categoria,
-                    qtd: item.qtd,
-                    unit: item.unit,
-                    total: item.total,
-                    link: item.link || '',
-                    entregue: !!item.entregue,
-                    data_entrega: item.data_entrega || ''
-                };
-
-                await supabaseClient.from('compras_corporativas').update(payload).eq('id', item.id);
-            } catch (err) {
-                console.warn("Aviso Supabase Update:", err.message);
-            }
-        }
-
-        async function removerDoSupabase(id) {
-            if (!supabaseClient) return;
-            try {
-                await supabaseClient.from('compras_corporativas').delete().eq('id', id);
-            } catch (err) {
-                console.warn("Aviso Supabase Delete:", err.message);
-            }
-        }
-
-        // ================= CONTROLO DE ENTREGA NA TABELA =================
-        async function salvarAlteracaoEntrega(id) {
-            const item = compras.find(c => String(c.id) === String(id));
-            if (!item) return;
-
-            const chk = document.getElementById(`chk-entregue-${id}`);
-            const inputData = document.getElementById(`data-entrega-${id}`);
-
-            item.entregue = chk ? chk.checked : false;
-            
-            if (item.entregue) {
-                if (inputData && inputData.value) {
-                    item.data_entrega = inputData.value;
-                } else if (!item.data_entrega) {
-                    let dCompra = new Date(item.data + 'T00:00:00');
-                    dCompra.setDate(dCompra.getDate() + 10);
-                    item.data_entrega = dCompra.toISOString().split('T')[0];
-                }
-            } else {
-                item.data_entrega = '';
-            }
-
-            salvarNoLocalStorage();
-            renderizarTabela();
-            mostrarAviso("📦 Status de entrega salvo!");
-
-            await atualizarNoSupabase(item);
-        }
-
-        function toggleInputDataEntrega(id, isChecked) {
-            const inputData = document.getElementById(`data-entrega-${id}`);
-            if (isChecked) {
-                if (inputData) {
-                    inputData.classList.remove('hidden');
-                    if (!inputData.value) {
-                        let dCompra = new Date();
-                        const item = compras.find(c => String(c.id) === String(id));
-                        if (item && item.data) dCompra = new Date(item.data + 'T00:00:00');
-                        dCompra.setDate(dCompra.getDate() + 10);
-                        inputData.value = dCompra.toISOString().split('T')[0];
-                    }
-                }
-            } else {
-                if (inputData) {
-                    inputData.classList.add('hidden');
-                    inputData.value = '';
-                }
-            }
-            salvarAlteracaoEntrega(id);
-        }
-
-        // ================= RECONHECEDOR DE LINK INTELIGENTE =================
-        function extrairNomeDoLink(url) {
-            try {
-                let limpa = url.split('?')[0].split('#')[0];
-                let partes = limpa.split('/').filter(p => p.length > 0);
-                
-                for (let i = partes.length - 1; i >= 0; i--) {
-                    let p = partes[i];
-                    if (p.includes('-') && !p.startsWith('MLB') && !p.startsWith('p') && !p.startsWith('up') && p.length > 4 && !p.includes('mercadolivre') && !p.includes('amazon') && !p.includes('http')) {
-                        return decodeURIComponent(p).replace(/-/g, ' ').toUpperCase();
-                    }
-                }
-            } catch(e) {}
-            return "";
-        }
-
-        function identificarLocalPeloLink(url) {
-            const u = (url || "").toLowerCase();
-            if (u.includes('mercadolivre') || u.includes('mercadolv')) return "MERCADO LIVRE";
-            if (u.includes('amazon')) return "AMAZON";
-            if (u.includes('magazineluiza') || u.includes('magalu')) return "MAGAZINE LUIZA";
-            if (u.includes('shopee')) return "SHOPEE";
-            if (u.includes('americanas')) return "AMERICANAS";
-            return "LOJA WEB / INTERNET";
-        }
-
-        function processarLinkDireto() {
-            const entrada = document.getElementById('inputLinkDireto').value.trim();
-            if (!entrada) {
-                alert("Por favor, cole um link antes de clicar em Reconhecer!");
-                return;
-            }
-
-            let produto = "";
-            let link = "";
-            let localDetectado = "MERCADO LIVRE";
-            let qtd = 1;
-            let unit = 0;
-            let total = 0;
-
-            const matchUrl = entrada.match(/(https?:\/\/[^\s]+)/i);
-            if (matchUrl) {
-                link = matchUrl[1];
-                localDetectado = identificarLocalPeloLink(link);
-                produto = extrairNomeDoLink(link);
-            } else {
-                link = entrada;
-            }
-
-            if (!produto) {
-                let textoSemLink = entrada.replace(/(https?:\/\/[^\s]+)/gi, '').trim();
-                produto = textoSemLink.length > 2 ? textoSemLink.toUpperCase() : "";
-            }
-
-            const hoje = new Date().toISOString().split('T')[0];
-
-            itensPendentesAprovacao.unshift({
-                tempId: Date.now() + Math.random(),
-                data: hoje,
-                solicitante: "",
-                produto: produto.toUpperCase(),
-                local: localDetectado,
-                categoria: adivinharCategoria(produto),
-                qtd: qtd,
-                unit: unit,
-                total: total,
-                link: link,
-                entregue: false,
-                data_entrega: ""
-            });
-
-            renderizarCardsPendentes();
-            document.getElementById('inputLinkDireto').value = '';
-            mostrarAviso("⚡ Link reconhecido! Confira e clique em OK.");
-        }
-
-        async function colarLinkInput() {
-            try {
-                const texto = await navigator.clipboard.readText();
-                if (texto) {
-                    document.getElementById('inputLinkDireto').value = texto.trim();
-                    processarLinkDireto();
-                }
-            } catch(e) {
-                document.getElementById('inputLinkDireto').focus();
-            }
-        }
-
-        function limparInputLink() {
-            document.getElementById('inputLinkDireto').value = '';
-            document.getElementById('inputLinkDireto').focus();
-        }
-
-        async function colarTextoTeams() {
-            try {
-                const texto = await navigator.clipboard.readText();
-                if (texto) {
-                    document.getElementById('inputTextoTeams').value = texto.trim();
-                    processarTextoBruto(texto);
-                }
-            } catch(e) {
-                document.getElementById('inputTextoTeams').focus();
-            }
-        }
-
-        function processarTextoBruto(textoBruto) {
-            if (!textoBruto || !textoBruto.trim()) {
-                alert("Nenhum texto informado para processar!");
-                return;
-            }
-
-            let solicitanteDetectado = "";
-            const matchSolicitante = textoBruto.match(/(?:solicitante|de|por|para|quem pediu|pediu|atender|nome)[:\s-]+([A-Za-zÀ-ÖØ-öø-ÿ\s]{2,25})/i);
-            if (matchSolicitante && matchSolicitante[1]) {
-                solicitanteDetectado = matchSolicitante[1].trim().toUpperCase();
-            }
-
-            const hoje = new Date().toISOString().split('T')[0];
-            const matchUrl = textoBruto.match(/(https?:\/\/[^\s]+)/i);
-            const link = matchUrl ? matchUrl[1] : "";
-            const produtoExtraido = link ? extrairNomeDoLink(link) : "";
-            
-            let produtoLimpo = produtoExtraido || textoBruto
-                .replace(/(https?:\/\/[^\s]+)/gi, '')
-                .replace(/(?:solicitante|de|por|para)[:\s-]+[A-Za-zÀ-ÖØ-öø-ÿ\s]+/gi, '')
-                .trim()
-                .toUpperCase();
-
-            itensPendentesAprovacao.unshift({
-                tempId: Date.now() + Math.random(),
-                data: hoje,
-                solicitante: solicitanteDetectado,
-                produto: produtoLimpo || "PRODUTO",
-                local: "MERCADO LIVRE",
-                categoria: adivinharCategoria(produtoLimpo),
-                qtd: 1,
-                unit: 0,
-                total: 0,
-                link: link,
-                entregue: false,
-                data_entrega: ""
-            });
-
-            renderizarCardsPendentes();
-            document.getElementById('inputTextoTeams').value = '';
-        }
-
-        function adivinharCategoria(texto) {
-            const t = (texto || "").toLowerCase();
-            if (t.includes('teclado') || t.includes('mouse') || t.includes('cabo') || t.includes('monitor') || t.includes('hd') || t.includes('ssd') || t.includes('ti')) return "INFORMÁTICA / TI";
-            if (t.includes('papel') || t.includes('caneta') || t.includes('pasta') || t.includes('grampeador')) return "ESCRITÓRIO";
-            if (t.includes('ferramenta') || t.includes('broca') || t.includes('fita') || t.includes('parafuso') || t.includes('chumbador') || t.includes('macho') || t.includes('talabarte')) return "MANUTENÇÃO";
-            if (t.includes('curso') || t.includes('treinamento') || t.includes('livro')) return "TREINAMENTO";
-            if (t.includes('cafe') || t.includes('café') || t.includes('copo') || t.includes('açucar')) return "ALIMENTAÇÃO / COPA";
-            return "OUTROS";
-        }
-
-        // ================= CARDS PENDENTES =================
-        function renderizarCardsPendentes() {
-            const container = document.getElementById('containerCardsPreenchidos');
-            const lista = document.getElementById('listaCardsPendentes');
-            lista.innerHTML = '';
-
-            if (itensPendentesAprovacao.length === 0) {
-                container.classList.add('hidden');
-                return;
-            }
-
-            container.classList.remove('hidden');
-            document.getElementById('tituloItensPendentes').innerText = `${itensPendentesAprovacao.length} ITEM(NS) IDENTIFICADOS (Confira e dê OK):`;
-
-            itensPendentesAprovacao.forEach((item, index) => {
-                const totalCalculado = Number(item.total || (item.qtd * item.unit)).toFixed(2);
-                const unitCalculado = Number(item.unit || (totalCalculado / item.qtd)).toFixed(2);
-                
-                const estaSemSolicitante = !item.solicitante || item.solicitante.trim() === "" || item.solicitante === "NÃO INFORMADO";
-                const classePiscante = estaSemSolicitante ? "piscar-solicitante-forte" : "";
-                const exibirAviso = estaSemSolicitante ? "" : "hidden";
-
-                let dEntrega = new Date(item.data + 'T00:00:00');
-                dEntrega.setDate(dEntrega.getDate() + 10);
-                let dataEntregaDefault = dEntrega.toISOString().split('T')[0];
-
-                const card = document.createElement('div');
-                card.className = "bg-white dark:bg-slate-800 border-2 border-purple-400 dark:border-purple-600/80 p-4 rounded-2xl shadow-sm space-y-3";
-                card.id = `card-pendente-${item.tempId}`;
-
-                card.innerHTML = `
-                    <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
-                        <span class="text-xs font-black text-purple-700 dark:text-purple-400 uppercase">Item #${index + 1}</span>
-                        <button type="button" onclick="descartarCardPendente(${item.tempId})" class="text-slate-400 hover:text-rose-500 font-bold text-xs cursor-pointer">✕ Descartar</button>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-2.5 items-end">
-                        <div class="md:col-span-2">
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Data Compra</label>
-                            <input type="date" id="data-${item.tempId}" value="${item.data}" onchange="atualizarDataEntregaCard('${item.tempId}')" class="neon-pulsante w-full text-xs p-1.5 rounded-lg bg-white dark:bg-slate-900 dark:text-white">
-                        </div>
-
-                        <div class="md:col-span-3">
-                            <div class="flex justify-between items-center mb-0.5">
-                                <label class="block text-[9px] font-black text-rose-600 uppercase">Solicitante (*)</label>
-                                <span id="avisoSolicitante-${item.tempId}" class="text-[9px] font-black text-rose-600 animate-pulse ${exibirAviso}">⚠️ DIGITE O NOME!</span>
-                            </div>
-                            <input type="text" id="solicitante-${item.tempId}" value="${item.solicitante || ''}" 
-                                placeholder="QUEM PEDIU?" 
-                                oninput="verificarDigitacaoSolicitante(this, ${item.tempId})" 
-                                class="uppercase-input w-full text-xs p-1.5 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold outline-none transition-all ${classePiscante}">
-                        </div>
-
-                        <div class="md:col-span-4">
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Produto / Descrição</label>
-                            <input type="text" id="produto-${item.tempId}" value="${item.produto}" placeholder="EX: CHUMBADOR..." oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold">
-                        </div>
-
-                        <div class="md:col-span-3">
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Local / Fornecedor</label>
-                            <input type="text" id="local-${item.tempId}" value="${item.local || 'MERCADO LIVRE'}" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold">
-                        </div>
-
-                        <div class="md:col-span-3">
-                            <div class="flex justify-between items-center mb-0.5">
-                                <label class="block text-[9px] font-bold text-slate-400 uppercase">Categoria</label>
-                                <button type="button" onclick="adicionarNovaCategoriaPrompt('categoria-${item.tempId}')" class="text-[9px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline">+ Nova</button>
-                            </div>
-                            <select id="categoria-${item.tempId}" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-semibold"></select>
-                        </div>
-
-                        <div class="md:col-span-2">
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Qtd</label>
-                            <input type="number" id="qtd-${item.tempId}" value="${item.qtd}" min="1" oninput="calcularCardPorTotal(${item.tempId})" class="w-full text-xs p-1.5 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white">
-                        </div>
-
-                        <div class="md:col-span-3">
-                            <label class="block text-[9px] font-bold text-emerald-600 dark:text-emerald-400 uppercase">Total (R$) 🔄</label>
-                            <input type="number" step="0.01" id="total-${item.tempId}" value="${totalCalculado}" oninput="calcularCardPorTotal(${item.tempId})" class="w-full text-xs p-1.5 bg-emerald-50/50 border border-emerald-300 rounded-lg font-black text-emerald-600 outline-none">
-                        </div>
-
-                        <div class="md:col-span-2">
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Unitário (R$)</label>
-                            <input type="number" step="0.01" id="unit-${item.tempId}" value="${unitCalculado}" oninput="calcularCardPorUnitario(${item.tempId})" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold">
-                        </div>
-
-                        <div class="md:col-span-4 bg-slate-100 dark:bg-slate-900/60 p-2.5 rounded-xl border border-indigo-200 dark:border-indigo-800">
-                            <label class="flex items-center gap-1.5 cursor-pointer mb-1">
-                                <input type="checkbox" id="card-entregue-${item.tempId}" onchange="toggleCardDataEntrega('${item.tempId}', this.checked)" class="pulso-delicado w-4 h-4 text-indigo-600 rounded cursor-pointer">
-                                <span class="text-[9px] font-bold uppercase text-indigo-700 dark:text-indigo-300">📦 Entregue? (+10d)</span>
-                            </label>
-                            <input type="date" id="card-data-entrega-${item.tempId}" value="${dataEntregaDefault}" class="neon-pulsante w-full text-[10px] p-1.5 rounded font-bold hidden bg-white dark:bg-slate-800 dark:text-white">
-                        </div>
-
-                        <div class="md:col-span-3 flex gap-2">
-                            <input type="hidden" id="link-${item.tempId}" value="${item.link || ''}">
-                            <button type="button" onclick="confirmarCardIndividual('${item.tempId}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1 cursor-pointer">
-                                <span>✅</span>
-                                <span>OK (Salvar)</span>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                lista.appendChild(card);
-                preencherOpcoesCategoria(card.querySelector(`#categoria-${item.tempId}`), item.categoria || "OUTROS");
-            });
-        }
-
-        function atualizarDataEntregaCard(tempId) {
-            const dataCompra = document.getElementById(`data-${tempId}`).value;
-            const dataEntrega = document.getElementById(`card-data-entrega-${tempId}`);
-            if (!dataCompra || !dataEntrega) return;
-            let d = new Date(dataCompra + 'T00:00:00');
-            d.setDate(d.getDate() + 10);
-            dataEntrega.value = d.toISOString().split('T')[0];
-        }
-
-        function toggleCardDataEntrega(tempId, isChecked) {
-            const el = document.getElementById(`card-data-entrega-${tempId}`);
-            if (!el) return;
-            if (isChecked) {
-                el.classList.remove('hidden');
-                atualizarDataEntregaCard(tempId);
-            } else {
-                el.classList.add('hidden');
-                el.value = '';
-            }
-        }
-
-        function calcularCardPorTotal(tempId) {
-            const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1;
-            const total = parseFloat(document.getElementById(`total-${tempId}`).value) || 0;
-            const unit = (total / qtd).toFixed(2);
-            document.getElementById(`unit-${tempId}`).value = unit;
-        }
-
-        function calcularCardPorUnitario(tempId) {
-            const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1;
-            const unit = parseFloat(document.getElementById(`unit-${tempId}`).value) || 0;
-            const total = (qtd * unit).toFixed(2);
-            document.getElementById(`total-${tempId}`).value = total;
-        }
-
-        async function confirmarCardIndividual(tempId) {
-            const inputSol = document.getElementById(`solicitante-${tempId}`);
-            if (!inputSol) return;
-            const solicitante = inputSol.value.trim().toUpperCase();
-
-            if (!solicitante || solicitante === "NÃO INFORMADO" || solicitante === "NAO INFORMADO") {
-                inputSol.classList.add('piscar-solicitante-forte');
-                inputSol.focus();
-                alert("⚠️️ ATENÇÃO: Por favor, preencha quem é o SOLICITANTE desta compra antes de salvar!");
-                return;
-            }
-
-            const inputProd = document.getElementById(`produto-${tempId}`);
-            const produto = inputProd ? inputProd.value.trim().toUpperCase() : "PRODUTO";
-
-            const dataEl = document.getElementById(`data-${tempId}`);
-            const data = dataEl ? dataEl.value : new Date().toISOString().split('T')[0];
-
-            const localEl = document.getElementById(`local-${tempId}`);
-            const local = localEl ? localEl.value.trim().toUpperCase() : "MERCADO LIVRE";
-
-            const catEl = document.getElementById(`categoria-${tempId}`);
-            const categoria = catEl ? catEl.value : "OUTROS";
-
-            const qtdEl = document.getElementById(`qtd-${tempId}`);
-            const qtd = parseFloat(qtdEl ? qtdEl.value : 1) || 1;
-
-            const totalEl = document.getElementById(`total-${tempId}`);
-            const total = parseFloat(totalEl ? totalEl.value : 0) || 0;
-
-            const unitEl = document.getElementById(`unit-${tempId}`);
-            const unit = parseFloat(unitEl ? unitEl.value : (total / qtd)) || (total / qtd);
-
-            const linkEl = document.getElementById(`link-${tempId}`);
-            const link = linkEl ? linkEl.value : "";
-
-            const entregueEl = document.getElementById(`card-entregue-${tempId}`);
-            const entregue = entregueEl ? entregueEl.checked : false;
-
-            const dataEntregaEl = document.getElementById(`card-data-entrega-${tempId}`);
-            const dataEntrega = entregue ? (dataEntregaEl ? dataEntregaEl.value : "") : "";
-
-            const novoItem = {
-                id: Date.now(),
-                data,
-                solicitante,
-                produto: produto || "PRODUTO",
-                local: local || "MERCADO LIVRE",
-                categoria: categoria || "OUTROS",
-                qtd,
-                unit,
-                total: total || (qtd * unit),
-                link: link || "",
-                entregue: entregue,
-                data_entrega: dataEntrega
-            };
-
-            compras.unshift(novoItem);
-            itensPendentesAprovacao = itensPendentesAprovacao.filter(i => String(i.tempId) !== String(tempId));
-            salvarNoLocalStorage();
-            atualizarListaSelectSolicitantes();
-            renderizarTabela();
-            renderizarCardsPendentes();
-            mostrarAviso("✅ Item salvo com sucesso no histórico!");
-
-            await inserirNoSupabase(novoItem);
-        }
-
-        async function confirmarTodosOsCards() {
-            for (let item of itensPendentesAprovacao) {
-                const tempId = item.tempId;
-                const inputSol = document.getElementById(`solicitante-${tempId}`);
-                const solicitante = inputSol ? inputSol.value.trim().toUpperCase() : "";
-
-                if (!solicitante || solicitante === "NÃO INFORMADO" || solicitante === "NAO INFORMADO") {
-                    if (inputSol) {
-                        inputSol.classList.add('piscar-solicitante-forte');
-                        inputSol.focus();
-                    }
-                    alert("⚠️ Há itens sem Solicitante preenchido! Digite o nome para continuar.");
-                    return;
-                }
-            }
-
-            for (let item of itensPendentesAprovacao) {
-                const tempId = item.tempId;
-                const data = document.getElementById(`data-${tempId}`).value;
-                const solicitante = document.getElementById(`solicitante-${tempId}`).value.trim().toUpperCase();
-                const produto = document.getElementById(`produto-${tempId}`).value.trim().toUpperCase();
-                const local = document.getElementById(`local-${tempId}`).value.trim().toUpperCase();
-                const categoria = document.getElementById(`categoria-${tempId}`).value;
-                const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1;
-                const total = parseFloat(document.getElementById(`total-${tempId}`).value) || 0;
-                const unit = parseFloat(document.getElementById(`unit-${tempId}`).value) || (total / qtd);
-                const link = document.getElementById(`link-${tempId}`).value;
-                const entregue = document.getElementById(`card-entregue-${tempId}`).checked;
-                const dataEntrega = entregue ? document.getElementById(`card-data-entrega-${tempId}`).value : "";
-
-                const novoItem = {
-                    id: Date.now() + Math.random(),
-                    data,
-                    solicitante,
-                    produto: produto || "PRODUTO",
-                    local: local || "MERCADO LIVRE",
-                    categoria,
-                    qtd,
-                    unit,
-                    total,
-                    link,
-                    entregue,
-                    data_entrega: dataEntrega
-                };
-
-                compras.unshift(novoItem);
-                inserirNoSupabase(novoItem);
-            }
-
-            itensPendentesAprovacao = [];
-            salvarNoLocalStorage();
-            atualizarListaSelectSolicitantes();
-            renderizarTabela();
-            renderizarCardsPendentes();
-            mostrarAviso("✅ Todos os itens foram salvos!");
-        }
-
-        function descartarCardPendente(tempId) {
-            itensPendentesAprovacao = itensPendentesAprovacao.filter(i => String(i.tempId) !== String(tempId));
-            renderizarCardsPendentes();
-        }
-
-        // ================= EDIÇÃO (CANETA ✏️) =================
-        function abrirModalEdicao(index) {
-            const item = compras[index];
-            if (!item) return;
-
-            document.getElementById('editItemIndex').value = index;
-            document.getElementById('editItemId').value = item.id || '';
-            document.getElementById('editData').value = item.data || '';
-            
-            const editSol = document.getElementById('editSolicitante');
-            editSol.value = item.solicitante || '';
-            validarInputEditSolicitante(editSol);
-
-            document.getElementById('editProduto').value = item.produto || '';
-            document.getElementById('editLocal').value = item.local || '';
-            
-            atualizarTodosOsSelectsCategorias();
-            document.getElementById('editCategoria').value = item.categoria || 'OUTROS';
-            
-            document.getElementById('editQtd').value = item.qtd || 1;
-            document.getElementById('editTotal').value = Number(item.total || 0).toFixed(2);
-            document.getElementById('editUnit').value = Number(item.unit || 0).toFixed(2);
-            document.getElementById('editLink').value = item.link || '';
-
-            const chkEntregue = document.getElementById('editEntregue');
-            chkEntregue.checked = item.entregue || false;
-            
-            const inputDataEntrega = document.getElementById('editDataEntrega');
-            inputDataEntrega.value = item.data_entrega || '';
-            
-            toggleDataEntregaModal(chkEntregue.checked);
-
-            document.getElementById('modalEdicao').classList.remove('hidden');
-        }
-
-        function fecharModalEdicao() {
-            document.getElementById('modalEdicao').classList.add('hidden');
-        }
-
-        function toggleDataEntregaModal(isEntregue) {
-            const container = document.getElementById('containerDataEntrega');
-            const inputData = document.getElementById('editDataEntrega');
-            if (isEntregue) {
-                container.classList.remove('hidden');
-                if (!inputData.value) {
-                    let d = new Date(document.getElementById('editData').value || Date.now());
-                    d.setDate(d.getDate() + 10);
-                    inputData.value = d.toISOString().split('T')[0];
-                }
-            } else {
-                container.classList.add('hidden');
-                inputData.value = '';
-            }
-        }
-
-        function preencherDataHojeModal() {
-            document.getElementById('editEntregue').checked = true;
-            document.getElementById('containerDataEntrega').classList.remove('hidden');
-            let d = new Date(document.getElementById('editData').value || Date.now());
-            d.setDate(d.getDate() + 10);
-            document.getElementById('editDataEntrega').value = d.toISOString().split('T')[0];
-        }
-
-        function calcularModalPorTotal() {
-            const q = parseFloat(document.getElementById('editQtd').value) || 1;
-            const tot = parseFloat(document.getElementById('editTotal').value) || 0;
-            document.getElementById('editUnit').value = (tot / q).toFixed(2);
-        }
-
-        function calcularModalPorUnitario() {
-            const q = parseFloat(document.getElementById('editQtd').value) || 1;
-            const u = parseFloat(document.getElementById('editUnit').value) || 0;
-            document.getElementById('editTotal').value = (q * u).toFixed(2);
-        }
-
-        async function guardarEdicaoModal() {
-            const editSol = document.getElementById('editSolicitante');
-            const solicitante = editSol.value.trim().toUpperCase();
-
-            if (!solicitante || solicitante === "NÃO INFORMADO" || solicitante === "NAO INFORMADO") {
-                editSol.classList.add('piscar-solicitante-forte');
-                editSol.focus();
-                alert("⚠️ Por favor, informe o Solicitante para salvar as alterações!");
-                return;
-            }
-
-            const index = parseInt(document.getElementById('editItemIndex').value, 10);
-            if (isNaN(index) || !compras[index]) return;
-
-            const q = parseFloat(document.getElementById('editQtd').value) || 1;
-            const total = parseFloat(document.getElementById('editTotal').value) || 0;
-            const u = parseFloat(document.getElementById('editUnit').value) || (total / q);
-            const linkProduto = document.getElementById('editLink').value.trim();
-            const localProduto = document.getElementById('editLocal').value.trim().toUpperCase();
-            const entregue = document.getElementById('editEntregue').checked;
-            const dataEntrega = document.getElementById('editDataEntrega').value;
-
-            const itemAtualizado = {
-                ...compras[index],
-                data: document.getElementById('editData').value,
-                solicitante: solicitante,
-                produto: document.getElementById('editProduto').value.trim().toUpperCase(),
-                local: localProduto || "MERCADO LIVRE",
-                categoria: document.getElementById('editCategoria').value,
-                qtd: q,
-                unit: u,
-                total: total,
-                link: linkProduto,
-                entregue: entregue,
-                data_entrega: entregue ? dataEntrega : ''
-            };
-
-            compras[index] = itemAtualizado;
-
-            salvarNoLocalStorage();
-            atualizarListaSelectSolicitantes();
-            renderizarTabela();
-            fecharModalEdicao();
-            mostrarAviso("Registro atualizado com sucesso!");
-
-            await atualizarNoSupabase(itemAtualizado);
-        }
-
-        // ================= TABELA E RENDERIZAÇÃO =================
         function renderizarTabela() {
             const tbody = document.getElementById('tabelaComprasCorpo');
             tbody.innerHTML = '';
 
             let totalGastoGeral = 0;
             let solicitantesContador = {};
-
             let listaExibicao = [...compras];
 
             if (solicitanteFiltroAtual) {
@@ -1730,14 +1108,12 @@
             }
 
             listaExibicao.sort((a, b) => {
-                if (a.entregue !== b.entregue) {
-                    return a.entregue ? 1 : -1;
-                }
+                if (a.entregue !== b.entregue) return a.entregue ? 1 : -1;
                 return new Date(b.data) - new Date(a.data);
             });
 
             if (listaExibicao.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="11" class="text-center py-6 text-slate-400 italic">NENHUMA COMPRA ENCONTRADA COM ESSE FILTRO.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="11" class="text-center py-6 text-slate-400 italic">NENHUMA COMPRA REGISTRADA. CLIQUE EM "📂 RECUPERAR PLANILHA" PARA RESTAURAR!</td></tr>`;
             } else {
                 listaExibicao.forEach((item) => {
                     const originalIndex = compras.findIndex(c => String(c.id) === String(item.id));
@@ -1745,48 +1121,28 @@
                     solicitantesContador[item.solicitante] = (solicitantesContador[item.solicitante] || 0) + 1;
 
                     const entregueChecked = item.entregue ? 'checked' : '';
-                    const dataEntregaVal = item.data_entrega || '';
-                    
                     const estiloRiscado = item.entregue ? 'line-through text-slate-400 dark:text-slate-500 font-normal' : 'text-slate-900 dark:text-white font-medium';
                     const linhaOpacidade = item.entregue ? 'bg-slate-100/70 dark:bg-slate-800/40 opacity-75' : 'hover:bg-slate-50 dark:hover:bg-slate-700/40';
-
-                    const produtoAtual = (item.produto || "").trim().toUpperCase();
-                    const qtdDuplicados = compras.filter(c => (c.produto || "").trim().toUpperCase() === produtoAtual).length;
-                    const estiloDuplicado = qtdDuplicados > 1 ? 'alerta-duplicado-fluorescente' : '';
-                    const tooltipDuplicado = qtdDuplicados > 1 ? `⚠️️ ATENÇÃO: Este produto "${produtoAtual}" está duplicado (${qtdDuplicados}x)!` : '';
 
                     const tr = document.createElement('tr');
                     tr.className = `${linhaOpacidade} transition uppercase`;
                     tr.innerHTML = `
                         <td class="py-2.5 px-3 font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap">${formatarDataBR(item.data)}</td>
                         <td class="py-2.5 px-3 font-bold text-slate-800 dark:text-slate-200 whitespace-nowrap">${item.solicitante}</td>
-                        <td class="py-2.5 px-3 max-w-xs truncate ${estiloRiscado}" title="${tooltipDuplicado || item.produto}">
-                            <span class="${estiloDuplicado}">${item.produto}</span>
-                        </td>
+                        <td class="py-2.5 px-3 max-w-xs truncate ${estiloRiscado}">${item.produto}</td>
                         <td class="py-2.5 px-3 font-semibold text-indigo-700 dark:text-indigo-300 whitespace-nowrap">${item.local || 'MERCADO LIVRE'}</td>
                         <td class="py-2.5 px-3 whitespace-nowrap"><span class="text-[10px] bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-full font-bold">${item.categoria}</span></td>
                         <td class="py-2.5 px-3 text-center font-bold text-slate-700 dark:text-slate-300">${item.qtd}</td>
                         <td class="py-2.5 px-3 text-right text-slate-500 whitespace-nowrap">R$ ${Number(item.unit || 0).toFixed(2)}</td>
                         <td class="py-2.5 px-3 text-right font-black text-emerald-600 dark:text-emerald-400 whitespace-nowrap">R$ ${Number(item.total || 0).toFixed(2)}</td>
                         <td class="py-2.5 px-3 text-center whitespace-nowrap">
-                            <div class="flex flex-col items-center gap-1">
-                                <label class="flex items-center gap-1 cursor-pointer">
-                                    <input type="checkbox" id="chk-entregue-${item.id}" ${entregueChecked} onchange="toggleInputDataEntrega(${item.id}, this.checked)" class="w-4 h-4 text-emerald-600 rounded cursor-pointer">
-                                    <span class="text-[10px] font-bold">Entregue</span>
-                                </label>
-                                <input type="date" id="data-entrega-${item.id}" value="${dataEntregaVal}" onchange="salvarAlteracaoEntrega(${item.id})" class="text-[10px] p-1 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded dark:text-white font-bold ${item.entregue ? '' : 'hidden'}">
-                            </div>
+                            <input type="checkbox" id="chk-entregue-${item.id}" ${entregueChecked} onchange="salvarAlteracaoEntrega(${item.id})" class="w-4 h-4 text-emerald-600 rounded cursor-pointer">
                         </td>
                         <td class="py-2.5 px-3 text-center whitespace-nowrap">
-                            ${item.link && item.link.startsWith('http') 
-                                ? `<a href="${item.link}" target="_blank" class="text-blue-600 dark:text-blue-400 font-bold hover:underline normal-case">Ver Link ↗</a>` 
-                                : '<span class="text-slate-400">-</span>'}
+                            ${item.link && item.link.startsWith('http') ? `<a href="${item.link}" target="_blank" class="text-blue-600 font-bold hover:underline normal-case">Link ↗</a>` : '<span class="text-slate-400">-</span>'}
                         </td>
                         <td class="py-2.5 px-3 text-center whitespace-nowrap">
-                            <div class="flex items-center justify-center gap-1.5">
-                                <button onclick="abrirModalEdicao(${originalIndex})" class="text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 font-bold p-1 cursor-pointer" title="Editar com o lápis">✏️</button>
-                                <button onclick="removerItem(${item.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1 cursor-pointer" title="Excluir">✕</button>
-                            </div>
+                            <button onclick="removerItem(${item.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1 cursor-pointer">✕</button>
                         </td>
                     `;
                     tbody.appendChild(tr);
@@ -1797,26 +1153,15 @@
             document.getElementById('labelContador').innerText = `${listaExibicao.length} ITENS EXIBIDOS`;
             document.getElementById('cardValorTotal').innerText = `R$ ${totalGastoGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-            if (solicitanteFiltroAtual) {
-                document.getElementById('labelTotalItens').innerText = `Itens Pedidos por ${solicitanteFiltroAtual}`;
-                document.getElementById('labelValorTotal').innerText = `Gasto Total de ${solicitanteFiltroAtual}`;
-                document.getElementById('labelPessoaCard').innerText = `Filtro Selecionado`;
-                document.getElementById('cardTopSolicitante').innerText = solicitanteFiltroAtual;
-            } else {
-                document.getElementById('labelTotalItens').innerText = `Total de Despesas`;
-                document.getElementById('labelValorTotal').innerText = `Total Faturado no Cartão`;
-                document.getElementById('labelPessoaCard').innerText = `Principal Solicitante (Ver Todos 👥)`;
-
-                let topSolicitante = "NENHUM";
-                let maxCount = 0;
-                Object.keys(solicitantesContador).forEach(s => {
-                    if (solicitantesContador[s] > maxCount) {
-                        maxCount = solicitantesContador[s];
-                        topSolicitante = `${s} (${maxCount})`;
-                    }
-                });
-                document.getElementById('cardTopSolicitante').innerText = topSolicitante;
-            }
+            let topSolicitante = "NENHUM";
+            let maxCount = 0;
+            Object.keys(solicitantesContador).forEach(s => {
+                if (solicitantesContador[s] > maxCount) {
+                    maxCount = solicitantesContador[s];
+                    topSolicitante = `${s} (${maxCount})`;
+                }
+            });
+            document.getElementById('cardTopSolicitante').innerText = solicitanteFiltroAtual || topSolicitante;
         }
 
         function formatarDataBR(dataISO) {
@@ -1824,6 +1169,16 @@
             const partes = dataISO.split('-');
             if (partes.length < 3) return dataISO;
             return `${partes[2]}/${partes[1]}/${partes[0]}`;
+        }
+
+        async function salvarAlteracaoEntrega(id) {
+            const item = compras.find(c => String(c.id) === String(id));
+            if (!item) return;
+            const chk = document.getElementById(`chk-entregue-${id}`);
+            item.entregue = chk ? chk.checked : false;
+            salvarNoLocalStorage();
+            renderizarTabela();
+            await atualizarNoSupabase(item);
         }
 
         async function removerItem(id) {
@@ -1837,31 +1192,13 @@
             }
         }
 
-        function salvarNoLocalStorage() {
-            localStorage.setItem('compras_corporativas_base', JSON.stringify(compras));
-        }
-
-        function carregarDoLocalStorage() {
-            const salvo = localStorage.getItem('compras_corporativas_base');
-            if (salvo) {
-                try { 
-                    compras = JSON.parse(salvo); 
-                    atualizarListaSelectSolicitantes();
-                } catch(e) { 
-                    compras = []; 
-                }
-            }
-            renderizarTabela();
-        }
-
         function exportarParaCSV() {
             if (compras.length === 0) {
                 alert("A lista está vazia! Não há dados para exportar.");
                 return;
             }
 
-            let csv = "\uFEFF";
-            csv += "DATA;SOLICITANTE;PRODUTO/SERVIÇO;LOCAL/FORNECEDOR;CATEGORIA;QUANTIDADE;VALOR UNITÁRIO (R$);TOTAL (R$);ENTREGUE;DATA ENTREGA;LINK DO PRODUTO\n";
+            let csv = "\uFEFFDATA;SOLICITANTE;PRODUTO/SERVIÇO;LOCAL/FORNECEDOR;CATEGORIA;QUANTIDADE;VALOR UNITÁRIO (R$);TOTAL (R$);ENTREGUE;DATA ENTREGA;LINK DO PRODUTO\n";
 
             compras.forEach(item => {
                 const linha = [
@@ -1887,6 +1224,25 @@
             a.download = `Relatorio_Compras_Cartao_${new Date().toISOString().split('T')[0]}.csv`;
             a.click();
             URL.revokeObjectURL(url);
+        }
+
+        function abrirModalUsuarios() {
+            document.getElementById('modalUsuarios').classList.remove('hidden');
+        }
+        function fecharModalUsuarios() {
+            document.getElementById('modalUsuarios').classList.add('hidden');
+        }
+        function abrirModalChaveIa() {
+            document.getElementById('modalChaveIa').classList.remove('hidden');
+        }
+        function fecharModalChaveIa() {
+            document.getElementById('modalChaveIa').classList.add('hidden');
+        }
+        function salvarChaveIaModal() {
+            const key = document.getElementById('modalInputGeminiKey').value.trim();
+            localStorage.setItem('gemini_api_key', key);
+            fecharModalChaveIa();
+            mostrarAviso("Chave da IA salva com sucesso!");
         }
     </script>
 </body>
