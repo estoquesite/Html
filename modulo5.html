@@ -60,7 +60,7 @@ body {
     border-radius: 12px; 
     box-shadow: 0 10px 25px -5px rgba(219, 39, 119, 0.08); 
     border: 1px solid #fce7f3; 
-    max-width: 960px; 
+    max-width: 1120px; 
 }
 .topo-modulo-info { 
     display: flex; 
@@ -144,17 +144,17 @@ body {
     align-items: end;
 }
 .grid-registro-rapido input {
-    width: 100%;
-    font-family: inherit;
-    font-size: 11px;
-    padding: 6px 8px;
-    border: 1px solid var(--primary-border);
-    border-radius: 5px;
-    background: #fff;
-    outline: none;
+    width: 100%; 
+    font-family: inherit; 
+    font-size: 11px; 
+    padding: 6px 8px; 
+    border: 1px solid var(--primary-border); 
+    border-radius: 5px; 
+    background: #fff; 
+    outline: none; 
 }
-.grid-registro-rapido input:focus {
-    border-color: var(--primary);
+.grid-registro-rapido input:focus { 
+    border-color: var(--primary); 
 }
 
 /* RESUMO / ESTATÍSTICA */
@@ -199,12 +199,12 @@ body {
 .btn-voltar { background-color: var(--slate-600); text-decoration: none; } 
 .btn-imprimir { background-color: var(--slate-900); margin-left: auto; }
 
-/* FOLHA A4 RETRATO */
+/* FOLHA A4 PAISAGEM (DEITADA) */
 .folha-a4 { 
     width: 100%; 
-    max-width: 960px; 
+    max-width: 1120px; 
     background: #fff; 
-    padding: 16px 20px; 
+    padding: 14px 18px; 
     margin: 0 auto 20px auto; 
     box-shadow: 0 10px 30px rgba(219, 39, 119, 0.06); 
     border-radius: 12px; 
@@ -259,7 +259,7 @@ body {
     text-align: center; 
 }
 .logo-box { 
-    width: 90px; 
+    width: 100px; 
     font-weight: 900; 
     font-size: 16px; 
     color: #007e7a; 
@@ -274,7 +274,7 @@ body {
     padding: 0 10px; 
 }
 .meta-box { 
-    width: 130px; 
+    width: 140px; 
     font-size: 8.5px; 
     text-align: left !important; 
     padding-left: 8px !important; 
@@ -297,7 +297,7 @@ table.tabela-abs th, table.tabela-abs td {
     text-align: center; 
     vertical-align: middle; 
     font-size: 9px; 
-    height: 25px; 
+    height: 24px; 
     padding: 2px 6px; 
 }
 table.tabela-abs th { 
@@ -312,14 +312,14 @@ table.tabela-abs th {
 table.tabela-abs tbody tr { background-color: #fff5f7; }
 table.tabela-abs tbody tr:nth-child(even) { background-color: #fef0f4; }
 
-.col-id { width: 36px; font-weight: 800; color: #9d174d; background: rgba(251, 207, 232, 0.4); }
+.col-id { width: 40px; font-weight: 800; color: #9d174d; background: rgba(251, 207, 232, 0.4); }
 .col-id-texto { outline: none; display: inline-block; width: 100%; text-align: center; }
 
-.col-nome { text-align: left !important; font-weight: 700; text-transform: uppercase; padding-left: 8px !important; color: #831843; width: 220px; outline: none; }
-.col-data { width: 90px; font-weight: 700; color: #831843; outline: none; }
-.col-tipo { width: 65px; font-weight: 800; color: #9d174d; outline: none; background: #fff; }
+.col-nome { text-align: left !important; font-weight: 700; text-transform: uppercase; padding-left: 8px !important; color: #831843; width: 280px; outline: none; }
+.col-data { width: 110px; font-weight: 700; color: #831843; outline: none; }
+.col-tipo { width: 85px; font-weight: 800; color: #9d174d; outline: none; background: #fff; }
 .col-motivo { text-align: left !important; font-weight: 600; padding-left: 8px !important; color: #374151; outline: none; }
-.col-acoes { width: 50px; background: #fff !important; }
+.col-acoes { width: 55px; background: #fff !important; }
 
 .botoes-acoes { display: flex; align-items: center; justify-content: center; gap: 3px; opacity: 0.3; transition: opacity 0.2s; }
 tr:hover .botoes-acoes { opacity: 1; }
@@ -334,11 +334,13 @@ tr:hover .botoes-acoes { opacity: 1; }
 .btn-mais-linha { color: var(--success); font-weight: 900; }
 .btn-lixeira { color: var(--danger); }
 
-/* IMPRESSÃO A4 RETRATO */
+/* ================================================================= */
+/* CONFIGURAÇÃO RÍGIDA DE IMPRESSÃO: FOLHA DEITADA (A4 LANDSCAPE)    */
+/* ================================================================= */
 @media print {
     @page { 
-        size: A4 portrait; 
-        margin: 5mm 6mm; 
+        size: A4 landscape; 
+        margin: 4mm 5mm !important; 
     }
     body { 
         background: #fff !important; 
@@ -366,7 +368,7 @@ tr:hover .botoes-acoes { opacity: 1; }
     }
     table.tabela-abs { border: 1.5px solid var(--primary) !important; }
     table.tabela-abs th { background-color: var(--primary) !important; color: #fff !important; }
-    table.tabela-abs td { border: 1px solid #f9a8d4 !important; }
+    table.tabela-abs td { border: 1px solid #f9a8d4 !important; height: 23px !important; }
     table.tabela-abs tbody tr { background-color: #fff5f7 !important; }
     table.tabela-abs tbody tr:nth-child(even) { background-color: #fef0f4 !important; }
     .col-id { background: #fce7f3 !important; color: #9d174d !important; }
@@ -439,7 +441,7 @@ tr:hover .botoes-acoes { opacity: 1; }
             <button type="button" class="btn btn-exportar" onclick="exportarBackupJSON()">⬇️ Backup</button>
             <button type="button" class="btn btn-exportar" onclick="document.getElementById('arquivoBackupAbs').click()">⬆️ Restaurar</button>
             <button type="button" class="btn btn-limpar" onclick="limparTudoAbs()">Limpar</button>
-            <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
+            <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir (Deitada)</button>
         </div>
     </div>
 
@@ -494,9 +496,9 @@ tr:hover .botoes-acoes { opacity: 1; }
 
         function criarLinhaAbsHTML(numStr, n = '', d = '', t = '', m = '') {
             return `<td class="col-id"><span class="col-id-texto" contenteditable="true">${numStr}</span></td>` +
-                `<td class="col-nome" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase(); atualizarEstatisticas();">${n}</td>` +
+                `<td class="col-nome" contenteditable="true" onblur="atualizarEstatisticas()" oninput="this.innerText=this.innerText.toUpperCase()">${n}</td>` +
                 `<td class="col-data" contenteditable="true">${d}</td>` +
-                `<td class="col-tipo" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase(); atualizarEstatisticas();" title="Ex: AT, FA, CO, FO">${t}</td>` +
+                `<td class="col-tipo" contenteditable="true" onblur="atualizarEstatisticas()" oninput="this.innerText=this.innerText.toUpperCase()" title="Ex: AT, FA, CO, FO">${t}</td>` +
                 `<td class="col-motivo" contenteditable="true">${m}</td>` +
                 `<td class="col-acoes"><div class="botoes-acoes"><button type="button" class="btn-acao btn-mais-linha" onclick="adicionarAbaixo(this)" title="Adicionar Linha Abaixo">➕</button><button type="button" class="btn-acao btn-lixeira" onclick="removerLinhaAbs(this)" title="Apagar Registro">🗑️</button></div></td>`;
         }
@@ -542,10 +544,10 @@ tr:hover .botoes-acoes { opacity: 1; }
                 <table class="tabela-abs">
                     <thead>
                         <tr>
-                            <th style="width:36px;">Nº</th>
-                            <th style="width:220px;">COLABORADOR</th>
-                            <th style="width:90px;">DATA</th>
-                            <th style="width:65px;">TIPO</th>
+                            <th style="width:40px;">Nº</th>
+                            <th style="width:280px;">COLABORADOR</th>
+                            <th style="width:110px;">DATA</th>
+                            <th style="width:85px;">TIPO</th>
                             <th>MOTIVO / JUSTIFICATIVA</th>
                             <th class="col-acoes th-acoes">AÇÕES</th>
                         </tr>
@@ -577,7 +579,6 @@ tr:hover .botoes-acoes { opacity: 1; }
                 return;
             }
 
-            // Tenta encontrar a primeira linha vazia
             let preenchido = false;
             const linhas = document.querySelectorAll('#contentorFolhasAbs tbody tr');
             for (let tr of linhas) {
@@ -592,7 +593,6 @@ tr:hover .botoes-acoes { opacity: 1; }
                 }
             }
 
-            // Se não houver linha vazia, adiciona no final da última folha
             if (!preenchido) {
                 const ultimaFolha = document.querySelector('#contentorFolhasAbs .folha-a4:last-child tbody');
                 if (ultimaFolha) {
@@ -604,7 +604,6 @@ tr:hover .botoes-acoes { opacity: 1; }
                 }
             }
 
-            // Limpa os campos rápidos
             document.getElementById('rapidoNome').value = '';
             document.getElementById('rapidoData').value = '';
             document.getElementById('rapidoTipo').value = '';
@@ -659,11 +658,14 @@ tr:hover .botoes-acoes { opacity: 1; }
         }
 
         function reordenarIdsGeral() {
+            let contadorGlobal = 1;
             document.querySelectorAll('#contentorFolhasAbs .folha-a4').forEach(folha => {
-                folha.querySelectorAll('tbody tr').forEach((row, idx) => {
-                    const n = idx + 1;
+                folha.querySelectorAll('tbody tr').forEach(row => {
                     const span = row.querySelector('.col-id-texto');
-                    if(span) span.innerText = n < 10 ? '0' + n : n;
+                    if(span) {
+                        span.innerText = contadorGlobal < 10 ? '0' + contadorGlobal : contadorGlobal;
+                        contadorGlobal++;
+                    }
                 });
             });
             mostrarToast('Numeração reorganizada sequencialmente');
@@ -672,6 +674,7 @@ tr:hover .botoes-acoes { opacity: 1; }
         function adicionarFolhaAbs() {
             document.getElementById('contentorFolhasAbs').appendChild(criarEstruturaFolhaAbs([]));
             atualizarPaginacaoAbs();
+            reordenarIdsGeral();
             mostrarToast('Nova folha adicionada');
         }
 
@@ -680,6 +683,7 @@ tr:hover .botoes-acoes { opacity: 1; }
             if(folhas.length > 1) {
                 btn.closest('.folha-a4').remove();
                 atualizarPaginacaoAbs();
+                reordenarIdsGeral();
             } else {
                 mostrarToast('Mantenha ao menos uma folha na tela.');
             }
@@ -739,6 +743,7 @@ tr:hover .botoes-acoes { opacity: 1; }
             blocos.forEach(b => box.appendChild(criarEstruturaFolhaAbs(b)));
             atualizarPaginacaoAbs();
             sincronizarCabecalhosAbs();
+            reordenarIdsGeral();
         }
 
         function exportarBackupJSON() {
