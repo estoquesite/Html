@@ -6,8 +6,8 @@
     <title>Módulo 9 - Controle de Notebooks | Portal Vale</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Tesseract OCR para leitura offline da etiqueta -->
-    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <!-- Leitor Rápido de Código de Barras (ZXing Ultra Leve) -->
+    <script src="https://unpkg.com/@zxing/library@latest"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -34,45 +34,50 @@
             border: 2px solid #f59e0b !important;
             box-shadow: 0 4px 14px -2px rgba(245, 158, 11, 0.18), 0 2px 6px rgba(0, 0, 0, 0.04) !important;
         }
-        .dark .bloco-destacado {
-            border: 2px solid #fbbf24 !important;
-            box-shadow: 0 4px 16px -2px rgba(251, 191, 36, 0.25) !important;
+
+        /* Guia visual do Scanner */
+        .scanner-laser {
+            position: absolute;
+            top: 50%;
+            left: 5%;
+            right: 5%;
+            height: 2px;
+            background: #ef4444;
+            box-shadow: 0 0 10px #ef4444;
+            animation: laserScan 2s infinite ease-in-out;
         }
 
-        @keyframes scanPulse {
-            0%, 100% { border-color: #f59e0b; box-shadow: 0 0 10px rgba(245, 158, 11, 0.5); }
-            50% { border-color: #10b981; box-shadow: 0 0 15px rgba(16, 185, 129, 0.7); }
-        }
-        .scan-ativo {
-            animation: scanPulse 1.2s infinite ease-in-out;
+        @keyframes laserScan {
+            0%, 100% { transform: translateY(-50px); opacity: 0.8; }
+            50% { transform: translateY(50px); opacity: 1; }
         }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen p-4 sm:p-6 transition-colors duration-200">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen p-3 sm:p-5 transition-colors duration-200">
 
-    <div class="max-w-7xl mx-auto space-y-5">
+    <div class="max-w-7xl mx-auto space-y-4">
 
         <!-- CABEÇALHO -->
-        <header class="bloco-destacado flex flex-wrap justify-between items-center bg-white dark:bg-slate-800 p-5 rounded-2xl gap-4">
+        <header class="bloco-destacado flex flex-wrap justify-between items-center bg-white dark:bg-slate-800 p-4 rounded-2xl gap-3">
             <div class="flex items-center gap-3">
-                <div class="w-12 h-12 bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 rounded-2xl flex items-center justify-center text-2xl font-black shadow-inner">
+                <div class="w-11 h-11 bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 rounded-2xl flex items-center justify-center text-2xl font-black shadow-inner">
                     💻
                 </div>
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200">Módulo 9</span>
-                        <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Controle de Notebooks & Periféricos</h1>
+                        <h1 class="text-sm sm:text-base font-black text-slate-900 dark:text-white uppercase tracking-wide">Controle de Notebooks & Periféricos</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Leitor Automático de Etiqueta de Patrimônio / Serial</p>
-                        <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                        <span class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">OCR Integrado Ativo</span>
+                        <p class="text-xs text-slate-500">Leitor Instantâneo de Código de Barras (Barcode)</p>
+                        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span class="text-[10px] font-bold text-emerald-600">Scan Ultrarrápido</span>
                     </div>
                 </div>
             </div>
             
             <div class="flex flex-wrap items-center gap-2">
-                <a href="index.html" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1">
+                <a href="index.html" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1">
                     ⬅ Menu Principal
                 </a>
                 <button onclick="exportarCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer">
@@ -81,43 +86,47 @@
             </div>
         </header>
 
-        <!-- AVISO DE STATUS / LEITURA -->
+        <!-- AVISO DE STATUS -->
         <div id="alertaSistema" class="hidden p-3 rounded-xl text-xs font-bold text-center transition-all"></div>
 
-        <!-- QUADRO DE CAPTURA RÁPIDA DA ETIQUETA -->
-        <div class="bloco-destacado bg-gradient-to-r from-amber-50 to-orange-50 dark:from-slate-800 dark:to-amber-950/30 p-5 rounded-2xl">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <!-- QUADRO SCANNER DE CÓDIGO DE BARRAS -->
+        <div class="bloco-destacado bg-white dark:bg-slate-800 p-4 rounded-2xl space-y-3">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
-                    <h2 class="text-sm font-black text-amber-900 dark:text-amber-300 uppercase flex items-center gap-2">
-                        <span>📸</span>
-                        <span>Leitor Automático da Placa de Patrimônio</span>
+                    <h2 class="text-sm font-black text-amber-800 dark:text-amber-300 uppercase flex items-center gap-2">
+                        <span>⚡</span>
+                        <span>Leitor Instantâneo de Código de Barras</span>
                     </h2>
-                    <p class="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-                        Fotografe a etiqueta branca traseira (Asset: <b>BR...</b> / Serial: <b>...</b>). O sistema extrai e preenche os campos automaticamente.
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                        Aponte a câmera para as barrinhas da etiqueta do notebook ou envie uma foto. A leitura é imediata!
                     </p>
                 </div>
 
                 <div class="flex flex-wrap gap-2 w-full sm:w-auto">
-                    <!-- BOTÃO CÂMERA -->
-                    <label class="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 active:scale-95 text-white text-xs font-black px-4 py-2.5 rounded-xl cursor-pointer shadow-md transition">
-                        <span>📷</span>
-                        <span>Tirar Foto da Etiqueta</span>
-                        <input type="file" id="inputFotoCamera" accept="image/*" capture="environment" class="hidden" onchange="processarFotoEtiqueta(this.files)">
-                    </label>
+                    <!-- BOTÃO SCAN AO VIVO -->
+                    <button type="button" onclick="iniciarScannerAoVivo()" id="btnScannerAoVivo" class="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 active:scale-95 text-white text-xs font-black px-4 py-2.5 rounded-xl cursor-pointer shadow-md transition">
+                        <span>📹</span>
+                        <span>Abrir Câmera ao Vivo</span>
+                    </button>
 
-                    <!-- BOTÃO GALERIA / ARQUIVO -->
-                    <label class="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-white dark:bg-slate-700 hover:bg-slate-100 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 text-xs font-bold px-4 py-2.5 rounded-xl cursor-pointer shadow-sm transition">
+                    <!-- BOTÃO FOTO / ARQUIVO -->
+                    <label class="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 text-xs font-bold px-4 py-2.5 rounded-xl cursor-pointer shadow-sm transition">
                         <span>🖼️</span>
-                        <span>Carregar Imagem</span>
-                        <input type="file" id="inputFotoArquivo" accept="image/*" class="hidden" onchange="processarFotoEtiqueta(this.files)">
+                        <span>Ler de Foto/Print</span>
+                        <input type="file" id="inputFotoArquivo" accept="image/*" class="hidden" onchange="processarFotoBarcode(this.files)">
                     </label>
                 </div>
             </div>
 
-            <!-- STATUS DO PROCESSAMENTO OCR -->
-            <div id="statusOcrContainer" class="hidden mt-4 bg-white dark:bg-slate-800 p-3 rounded-xl border border-amber-200 dark:border-amber-700/60 flex items-center gap-3">
-                <span class="inline-block w-4 h-4 border-2 border-amber-600 border-t-transparent rounded-full animate-spin"></span>
-                <span id="txtStatusOcr" class="text-xs font-bold text-amber-700 dark:text-amber-300">Iniciando leitura da imagem...</span>
+            <!-- CONTAINER DO SCANNER AO VIVO (MODAL/VIEWPORT) -->
+            <div id="containerCamera" class="hidden relative rounded-2xl overflow-hidden bg-black max-w-md mx-auto aspect-video sm:aspect-square flex items-center justify-center border-2 border-amber-500">
+                <video id="videoPreview" class="w-full h-full object-cover"></video>
+                <div class="scanner-laser"></div>
+                <div class="absolute bottom-3 flex gap-2">
+                    <button type="button" onclick="pararScanner()" class="bg-rose-600 text-white text-xs font-bold px-4 py-1.5 rounded-xl shadow-lg cursor-pointer">
+                        ✕ Fechar Câmera
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -128,37 +137,37 @@
                     <span>📝</span>
                     <span>Dados do Notebook & Movimentação</span>
                 </span>
-                <span class="text-[10px] font-bold text-slate-400">Campos com (*) são obrigatórios</span>
+                <span class="text-[10px] font-bold text-slate-400">Preenchimento automático via leitura</span>
             </div>
 
             <form id="notebookForm" onsubmit="salvarNotebook(event)" class="space-y-4">
                 
-                <!-- SEÇÃO 1: IDENTIFICAÇÃO -->
+                <!-- 1. IDENTIFICAÇÃO -->
                 <div>
                     <h3 class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 mb-2 tracking-wider">
                         1. Identificação do Equipamento
                     </h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Patrimônio (Asset) *</label>
-                            <input type="text" id="patrimonio" placeholder="Ex: BR2357387" required class="uppercase-input w-full p-2.5 bg-amber-50/50 dark:bg-slate-900 border border-amber-300 dark:border-amber-700 rounded-xl font-black text-amber-700 dark:text-amber-400 outline-none">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Nº de Série (Serial) *</label>
+                            <input type="text" id="serial" placeholder="Ex: GQ5WS54" required class="uppercase-input w-full p-2.5 bg-amber-50/60 dark:bg-slate-900 border-2 border-amber-400 rounded-xl font-black text-amber-700 dark:text-amber-400 outline-none">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Nº de Série (Serial) *</label>
-                            <input type="text" id="serial" placeholder="Ex: GQ5WS54" required class="uppercase-input w-full p-2.5 bg-amber-50/50 dark:bg-slate-900 border border-amber-300 dark:border-amber-700 rounded-xl font-black text-amber-700 dark:text-amber-400 outline-none">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Patrimônio (Asset) *</label>
+                            <input type="text" id="patrimonio" placeholder="Ex: BR2357387" required class="uppercase-input w-full p-2.5 bg-amber-50/60 dark:bg-slate-900 border-2 border-amber-400 rounded-xl font-black text-amber-700 dark:text-amber-400 outline-none">
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Marca *</label>
-                            <input type="text" id="marca" placeholder="Ex: Dell, Lenovo, HP" required class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                            <input type="text" id="marca" value="DELL" placeholder="Ex: DELL, LENOVO" required class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Modelo *</label>
-                            <input type="text" id="modelo" placeholder="Ex: Latitude 3420" required class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                            <input type="text" id="modelo" value="LATITUDE" placeholder="Ex: LATITUDE 3420" required class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
                         </div>
                     </div>
                 </div>
 
-                <!-- SEÇÃO 2: RECEBIMENTO -->
+                <!-- 2. RECEBIMENTO -->
                 <div>
                     <h3 class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 mb-2 tracking-wider">
                         2. Dados de Recebimento
@@ -170,7 +179,7 @@
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Origem / Fornecedor</label>
-                            <input type="text" id="origem" placeholder="Ex: DXC / VALE EUC PROGRAM" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                            <input type="text" id="origem" value="DXC / VALE EUC PROGRAM" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Estado de Conservação</label>
@@ -183,15 +192,15 @@
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Conferido por (TI) *</label>
-                            <input type="text" id="conferente" placeholder="Nome do técnico" required class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                            <input type="text" id="conferente" placeholder="Seu nome" required class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
                         </div>
                     </div>
                 </div>
 
-                <!-- SEÇÃO 3: ENTREGA & STATUS -->
+                <!-- 3. SAÍDA E STATUS -->
                 <div>
                     <h3 class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 mb-2 tracking-wider">
-                        3. Dados de Entrega / Saída & Status Operacional
+                        3. Entrega & Status Operacional
                     </h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 text-xs">
                         <div>
@@ -205,11 +214,11 @@
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Colaborador</label>
-                            <input type="text" id="colaborador" placeholder="Quem está usando?" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                            <input type="text" id="colaborador" placeholder="Quem recebeu?" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Setor / Área</label>
-                            <input type="text" id="setor" placeholder="Ex: Operação, Manutenção" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Setor</label>
+                            <input type="text" id="setor" placeholder="Ex: Operação" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Data Saída</label>
@@ -228,222 +237,203 @@
                 <div class="flex justify-end pt-2">
                     <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white font-black py-3 px-8 rounded-xl text-xs transition shadow-md flex items-center gap-2 cursor-pointer">
                         <span>💾</span>
-                        <span>Salvar Registro de Notebook</span>
+                        <span>Salvar Registro</span>
                     </button>
                 </div>
             </form>
         </div>
 
-        <!-- BUSCA E FILTROS -->
-        <div class="bloco-destacado bg-slate-100 dark:bg-slate-800/90 p-3.5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div class="flex items-center gap-2 w-full sm:w-auto">
-                <span class="text-base">🔍</span>
-                <span class="text-xs font-black uppercase text-slate-700 dark:text-slate-300 whitespace-nowrap">Filtros:</span>
-            </div>
-
-            <div class="flex flex-1 flex-col sm:flex-row items-center gap-2 w-full">
-                <!-- BUSCA GERAL -->
-                <div class="relative w-full sm:w-1/2">
-                    <input type="text" id="inputBusca" oninput="renderizarTabela()" placeholder="Buscar por patrimônio, serial, marca, colaborador..." class="uppercase-input w-full text-xs pl-8 pr-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-amber-600 dark:text-white font-bold">
-                    <span class="absolute left-2.5 top-2 text-slate-400 text-xs">🔎</span>
-                </div>
-
-                <!-- FILTRO POR STATUS -->
-                <div class="w-full sm:w-1/4">
-                    <select id="filtroStatus" onchange="renderizarTabela()" class="w-full text-xs py-2 px-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-amber-600 dark:text-white font-bold">
-                        <option value="">TODOS OS STATUS</option>
-                        <option value="Em estoque">Em estoque</option>
-                        <option value="Em uso">Em uso</option>
-                        <option value="Em manutenção">Em manutenção</option>
-                        <option value="Baixado">Baixado</option>
-                    </select>
-                </div>
-
-                <!-- FILTRO POR SETOR -->
-                <div class="w-full sm:w-1/4">
-                    <input type="text" id="filtroSetor" oninput="renderizarTabela()" placeholder="Filtrar por setor..." class="uppercase-input w-full text-xs py-2 px-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-amber-600 dark:text-white font-bold">
-                </div>
-            </div>
-        </div>
-
-        <!-- TABELA DE EQUIPAMENTOS -->
+        <!-- BUSCA E TABELA -->
         <div class="bloco-destacado bg-white dark:bg-slate-800 p-5 rounded-2xl space-y-3">
-            <div class="flex justify-between items-center">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">
                     📋 Equipamentos Cadastrados
                 </h3>
-                <span id="labelContador" class="text-[11px] text-slate-400 font-bold">0 NOTEBOOKS</span>
+                <div class="relative w-full sm:w-72">
+                    <input type="text" id="inputBusca" oninput="renderizarTabela()" placeholder="Buscar serial, patrimônio..." class="uppercase-input w-full text-xs pl-8 pr-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg outline-none font-bold">
+                    <span class="absolute left-2.5 top-1.5 text-slate-400 text-xs">🔍</span>
+                </div>
             </div>
 
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-xs border-collapse">
                     <thead>
                         <tr class="border-b border-slate-100 dark:border-slate-700 text-slate-400 font-bold uppercase text-[10px]">
-                            <th class="py-2.5 px-3">Patrimônio</th>
                             <th class="py-2.5 px-3">Serial</th>
+                            <th class="py-2.5 px-3">Patrimônio</th>
                             <th class="py-2.5 px-3">Equipamento</th>
                             <th class="py-2.5 px-3 text-center">Status</th>
-                            <th class="py-2.5 px-3">Colaborador / Setor</th>
-                            <th class="py-2.5 px-3">Origem</th>
+                            <th class="py-2.5 px-3">Colaborador</th>
                             <th class="py-2.5 px-3 text-center">Termo</th>
                             <th class="py-2.5 px-3 text-center">Ações</th>
                         </tr>
                     </thead>
-                    <tbody id="tabelaNotebooksCorpo" class="divide-y divide-slate-100 dark:divide-slate-700/60 uppercase"></tbody>
+                    <tbody id="tabelaNotebooksCorpo" class="divide-y divide-slate-100 dark:divide-slate-700 uppercase"></tbody>
                 </table>
             </div>
         </div>
 
     </div>
 
-    <!-- SCRIPT DE PROCESSAMENTO E OCR -->
     <script>
+        let codeReader = null;
         let notebooks = [];
 
         window.addEventListener('DOMContentLoaded', () => {
             const hoje = new Date().toISOString().split('T')[0];
             document.getElementById('dataEntrada').value = hoje;
-            document.getElementById('origem').value = "DXC / VALE EUC PROGRAM";
             carregarDoLocalStorage();
         });
 
         function mostrarAviso(msg, tipo = "sucesso") {
             const el = document.getElementById('alertaSistema');
             el.innerText = msg;
-            el.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800');
-            
-            if (tipo === "sucesso") {
-                el.classList.add('bg-emerald-100', 'text-emerald-800');
-            } else if (tipo === "aviso") {
-                el.classList.add('bg-amber-100', 'text-amber-800');
-            } else {
-                el.classList.add('bg-rose-100', 'text-rose-800');
-            }
-            setTimeout(() => el.classList.add('hidden'), 5000);
+            el.className = `p-3 rounded-xl text-xs font-bold text-center transition-all ${
+                tipo === 'sucesso' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+            }`;
+            el.classList.remove('hidden');
+            setTimeout(() => el.classList.add('hidden'), 4000);
         }
 
-        // ================= FUNÇÃO DE OCR AUTOMÁTICO =================
-        async function processarFotoEtiqueta(files) {
+        // ================= SCANNER AO VIVO (CÂMERA) =================
+        async function iniciarScannerAoVivo() {
+            const container = document.getElementById('containerCamera');
+            const video = document.getElementById('videoPreview');
+
+            container.classList.remove('hidden');
+
+            try {
+                codeReader = new ZXing.BrowserMultiFormatReader();
+                const videoInputDevices = await codeReader.listVideoInputDevices();
+                
+                // Escolhe a câmera traseira se disponível
+                const selectedDeviceId = videoInputDevices.find(device => 
+                    device.label.toLowerCase().includes('back') || 
+                    device.label.toLowerCase().includes('traseira')
+                )?.deviceId || videoInputDevices[0]?.deviceId;
+
+                codeReader.decodeFromVideoDevice(selectedDeviceId, video, (result, err) => {
+                    if (result) {
+                        tocarBip();
+                        aplicarResultadoBarcode(result.text);
+                        pararScanner();
+                    }
+                });
+            } catch (err) {
+                console.error(err);
+                alert("Não foi possível acessar a câmera para leitura.");
+                pararScanner();
+            }
+        }
+
+        function pararScanner() {
+            if (codeReader) {
+                codeReader.reset();
+                codeReader = null;
+            }
+            document.getElementById('containerCamera').classList.add('hidden');
+        }
+
+        // ================= LEITURA DE FOTO/PRINT RÁPIDA =================
+        async function processarFotoBarcode(files) {
             if (!files || files.length === 0) return;
             const file = files[0];
 
-            const statusContainer = document.getElementById('statusOcrContainer');
-            const txtStatus = document.getElementById('txtStatusOcr');
-            statusContainer.classList.remove('hidden');
-            txtStatus.innerText = "Lendo texto da etiqueta via OCR...";
+            mostrarAviso("Lendo código de barras da imagem...", "sucesso");
 
             try {
-                // Executa Tesseract OCR na imagem original
-                const worker = await Tesseract.createWorker(['por', 'eng']);
-                let ret = await worker.recognize(file);
-                let text = ret.data.text;
-
-                // Tenta extrair da imagem direta
-                let dados = extrairDadosEtiqueta(text);
-
-                // Se não encontrou devido à rotação (de ponta-cabeça como no exemplo), rotaciona em 180 graus e tenta novamente
-                if (!dados.serial || !dados.asset) {
-                    txtStatus.innerText = "Ajustando orientação da foto (180°)...";
-                    const imagemRotacionada = await rotacionarImagem(file, 180);
-                    const retRot = await worker.recognize(imagemRotacionada);
-                    const dadosRot = extrairDadosEtiqueta(retRot.data.text);
-                    if (dadosRot.serial) dados.serial = dadosRot.serial;
-                    if (dadosRot.asset) dados.asset = dadosRot.asset;
-                    if (dadosRot.origem) dados.origem = dadosRot.origem;
+                // Tenta API nativa do sistema (Ultra rápida)
+                if ('BarcodeDetector' in window) {
+                    const detector = new BarcodeDetector();
+                    const bitmap = await createImageBitmap(file);
+                    const barcodes = await detector.detect(bitmap);
+                    if (barcodes.length > 0) {
+                        tocarBip();
+                        aplicarResultadoBarcode(barcodes[0].rawValue);
+                        return;
+                    }
                 }
 
-                await worker.terminate();
+                // Fallback instantâneo com ZXing
+                const reader = new ZXing.BrowserMultiFormatReader();
+                const imgUrl = URL.createObjectURL(file);
+                const result = await reader.decodeFromImageUrl(imgUrl);
 
-                // Preenchimento dos campos automáticos
-                let camposPreenchidos = [];
-
-                if (dados.asset) {
-                    document.getElementById('patrimonio').value = dados.asset;
-                    camposPreenchidos.push(`Patrimônio: ${dados.asset}`);
+                if (result) {
+                    tocarBip();
+                    aplicarResultadoBarcode(result.text);
                 }
-                if (dados.serial) {
-                    document.getElementById('serial').value = dados.serial;
-                    camposPreenchidos.push(`Serial: ${dados.serial}`);
-                }
-                if (dados.origem) {
-                    document.getElementById('origem').value = dados.origem;
-                }
-
-                statusContainer.classList.add('hidden');
-
-                if (camposPreenchidos.length > 0) {
-                    mostrarAviso(`✅ Sucesso! Campos preenchidos automaticamente: ${camposPreenchidos.join(' | ')}`);
-                } else {
-                    mostrarAviso("⚠️ Não foi possível identificar o Asset/Serial com clareza. Por favor, digite manualmente.", "aviso");
-                }
-
-            } catch (err) {
-                console.error("Erro OCR:", err);
-                statusContainer.classList.add('hidden');
-                mostrarAviso("Erro ao processar imagem. Verifique a foto e tente novamente.", "erro");
+            } catch (e) {
+                // Se o código de barras estiver invertido, inverte e tenta mais uma vez
+                tentarComRotacao(file);
             }
         }
 
-        // EXTRAI COM REGEX OS DADOS DA PLACA DA VALE / DXC
-        function extrairDadosEtiqueta(texto) {
-            const t = (texto || "").toUpperCase();
-            let asset = "";
-            let serial = "";
-            let origem = "";
-
-            if (t.includes("DXC") || t.includes("VALE EUC PROGRAM") || t.includes("EUC")) {
-                origem = "DXC / VALE EUC PROGRAM";
-            }
-
-            // Expressão para Asset-number: BR2357387 ou similar
-            const matchAsset = t.match(/ASSET\s*[-–—:]*\s*NUMBER\s*[:\s-]*([A-Z0-9]{5,15})/i) ||
-                               t.match(/(BR\d{6,10})/i);
-            if (matchAsset && matchAsset[1]) {
-                asset = matchAsset[1].trim();
-            }
-
-            // Expressão para Serial-number: GQ5WS54 ou similar
-            const matchSerial = t.match(/SERIAL\s*[-–—:]*\s*NUMBER\s*[:\s-]*([A-Z0-9]{5,15})/i) ||
-                                t.match(/([A-Z0-9]{7})/);
-            if (matchSerial && matchSerial[1]) {
-                serial = matchSerial[1].trim();
-            }
-
-            return { asset, serial, origem };
-        }
-
-        // Rotaciona a imagem no Canvas se ela foi tirada invertida
-        function rotacionarImagem(file, graus) {
-            return new Promise((resolve) => {
+        async function tentarComRotacao(file) {
+            try {
                 const img = new Image();
-                img.onload = () => {
+                img.onload = async () => {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
                     canvas.width = img.width;
                     canvas.height = img.height;
-
                     ctx.translate(canvas.width / 2, canvas.height / 2);
-                    ctx.rotate((graus * Math.PI) / 180);
+                    ctx.rotate(Math.PI); // 180 graus
                     ctx.drawImage(img, -img.width / 2, -img.height / 2);
 
-                    resolve(canvas.toDataURL());
+                    const reader = new ZXing.BrowserMultiFormatReader();
+                    const result = await reader.decodeFromImageUrl(canvas.toDataURL());
+                    if (result) {
+                        tocarBip();
+                        aplicarResultadoBarcode(result.text);
+                    } else {
+                        mostrarAviso("Código de barras não detectado na imagem. Tente aproximar ou focar a câmera.", "erro");
+                    }
                 };
                 img.src = URL.createObjectURL(file);
-            });
+            } catch (err) {
+                mostrarAviso("Código de barras não detectado na foto. Tente a opção 'Câmera ao Vivo'.", "erro");
+            }
         }
 
-        // ================= CADASTRO E GERENCIAMENTO =================
+        function aplicarResultadoBarcode(codigoLido) {
+            const limpo = codigoLido.trim().toUpperCase();
+            
+            // Se começa com BR (Asset), joga no patrimônio, senão joga no Serial
+            if (limpo.startsWith("BR")) {
+                document.getElementById('patrimonio').value = limpo;
+                mostrarAviso(`✅ Patrimônio lido: ${limpo}`);
+            } else {
+                document.getElementById('serial').value = limpo;
+                mostrarAviso(`✅ Serial lido: ${limpo}`);
+            }
+        }
+
+        function tocarBip() {
+            try {
+                if (navigator.vibrate) navigator.vibrate(150);
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const osc = audioCtx.createOscillator();
+                osc.type = "sine";
+                osc.frequency.setValueAtTime(800, audioCtx.currentTime);
+                osc.connect(audioCtx.destination);
+                osc.start();
+                osc.stop(audioCtx.currentTime + 0.15);
+            } catch (e) {}
+        }
+
+        // ================= DADOS E PERSISTÊNCIA =================
         function salvarNotebook(e) {
             e.preventDefault();
 
             const item = {
                 id: Date.now(),
-                patrimonio: document.getElementById('patrimonio').value.trim().toUpperCase(),
                 serial: document.getElementById('serial').value.trim().toUpperCase(),
+                patrimonio: document.getElementById('patrimonio').value.trim().toUpperCase(),
                 marca: document.getElementById('marca').value.trim().toUpperCase(),
                 modelo: document.getElementById('modelo').value.trim().toUpperCase(),
                 dataEntrada: document.getElementById('dataEntrada').value,
-                origem: document.getElementById('origem').value.trim().toUpperCase() || "DXC / VALE EUC PROGRAM",
+                origem: document.getElementById('origem').value.trim().toUpperCase(),
                 conservacao: document.getElementById('conservacao').value,
                 conferente: document.getElementById('conferente').value.trim().toUpperCase(),
                 status: document.getElementById('status').value,
@@ -456,69 +446,41 @@
             notebooks.unshift(item);
             salvarNoLocalStorage();
             renderizarTabela();
-            mostrarAviso(`Notebook patrimônio #${item.patrimonio} salvo com sucesso!`);
+            mostrarAviso(`Notebook ${item.serial} registrado com sucesso!`);
 
-            // Reset parcial
-            document.getElementById('patrimonio').value = '';
             document.getElementById('serial').value = '';
+            document.getElementById('patrimonio').value = '';
             document.getElementById('colaborador').value = '';
             document.getElementById('setor').value = '';
-            document.getElementById('dataSaida').value = '';
         }
 
         function renderizarTabela() {
             const tbody = document.getElementById('tabelaNotebooksCorpo');
             tbody.innerHTML = '';
+            const busca = document.getElementById('inputBusca').value.trim().toUpperCase();
 
-            const termo = document.getElementById('inputBusca').value.trim().toUpperCase();
-            const statusFiltro = document.getElementById('filtroStatus').value;
-            const setorFiltro = document.getElementById('filtroSetor').value.trim().toUpperCase();
-
-            let lista = notebooks.filter(item => {
-                const matchTexto = 
-                    item.patrimonio.includes(termo) ||
-                    item.serial.includes(termo) ||
-                    item.marca.includes(termo) ||
-                    item.modelo.includes(termo) ||
-                    item.colaborador.includes(termo);
-
-                const matchStatus = !statusFiltro || item.status === statusFiltro;
-                const matchSetor = !setorFiltro || item.setor.includes(setorFiltro);
-
-                return matchTexto && matchStatus && matchSetor;
-            });
-
-            document.getElementById('labelContador').innerText = `${lista.length} NOTEBOOKS`;
+            const lista = notebooks.filter(n => 
+                n.serial.includes(busca) || 
+                n.patrimonio.includes(busca) || 
+                n.colaborador.includes(busca)
+            );
 
             if (lista.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-6 text-slate-400 italic">NENHUM NOTEBOOK ENCONTRADO.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-slate-400 italic">Nenhum notebook cadastrado.</td></tr>`;
                 return;
             }
 
-            lista.forEach(item => {
-                let badgeStatus = 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300';
-                if (item.status === 'Em uso') badgeStatus = 'bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300';
-                if (item.status === 'Em manutenção') badgeStatus = 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300';
-                if (item.status === 'Baixado') badgeStatus = 'bg-slate-200 text-slate-700 dark:bg-slate-700 dark:text-slate-300';
-
-                const termoClass = item.termoAssinado === 'Sim' ? 'text-emerald-600 font-bold' : 'text-rose-500 font-semibold';
-
+            lista.forEach(n => {
                 const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/40 transition uppercase";
                 tr.innerHTML = `
-                    <td class="py-2.5 px-3 font-black text-amber-600 dark:text-amber-400 whitespace-nowrap">#${item.patrimonio}</td>
-                    <td class="py-2.5 px-3 font-mono font-bold text-slate-700 dark:text-slate-300 whitespace-nowrap">${item.serial}</td>
-                    <td class="py-2.5 px-3 font-semibold text-slate-900 dark:text-white whitespace-nowrap">${item.marca} ${item.modelo}</td>
-                    <td class="py-2.5 px-3 text-center whitespace-nowrap">
-                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full ${badgeStatus}">${item.status}</span>
-                    </td>
-                    <td class="py-2.5 px-3 font-semibold text-slate-700 dark:text-slate-300 whitespace-nowrap">
-                        ${item.colaborador} <span class="text-slate-400 text-[10px]">(${item.setor})</span>
-                    </td>
-                    <td class="py-2.5 px-3 text-[10px] text-slate-500 whitespace-nowrap">${item.origem}</td>
-                    <td class="py-2.5 px-3 text-center whitespace-nowrap ${termoClass}">${item.termoAssinado}</td>
-                    <td class="py-2.5 px-3 text-center whitespace-nowrap">
-                        <button onclick="removerNotebook(${item.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1 cursor-pointer" title="Remover">✕</button>
+                    <td class="py-2.5 px-3 font-mono font-black text-amber-700">${n.serial}</td>
+                    <td class="py-2.5 px-3 font-bold text-slate-800">#${n.patrimonio}</td>
+                    <td class="py-2.5 px-3">${n.marca} ${n.modelo}</td>
+                    <td class="py-2.5 px-3 text-center font-bold text-[10px]"><span class="bg-amber-100 text-amber-800 px-2 py-0.5 rounded-full">${n.status}</span></td>
+                    <td class="py-2.5 px-3 font-semibold">${n.colaborador}</td>
+                    <td class="py-2.5 px-3 text-center">${n.termoAssinado}</td>
+                    <td class="py-2.5 px-3 text-center">
+                        <button onclick="removerNotebook(${n.id})" class="text-rose-500 font-bold">✕</button>
                     </td>
                 `;
                 tbody.appendChild(tr);
@@ -526,11 +488,10 @@
         }
 
         function removerNotebook(id) {
-            if (confirm("Deseja realmente remover este equipamento?")) {
+            if (confirm("Remover este notebook?")) {
                 notebooks = notebooks.filter(n => n.id !== id);
                 salvarNoLocalStorage();
                 renderizarTabela();
-                mostrarAviso("Equipamento removido com sucesso!");
             }
         }
 
@@ -541,29 +502,23 @@
         function carregarDoLocalStorage() {
             const salvo = localStorage.getItem('modulo9_notebooks_base');
             if (salvo) {
-                try { notebooks = JSON.parse(salvo); } catch (e) { notebooks = []; }
+                try { notebooks = JSON.parse(salvo); } catch(e) { notebooks = []; }
             }
             renderizarTabela();
         }
 
         function exportarCSV() {
-            if (notebooks.length === 0) {
-                alert("Nenhum registro para exportar!");
-                return;
-            }
-
-            let csv = "\uFEFFPATRIMONIO;SERIAL;MARCA;MODELO;STATUS;COLABORADOR;SETOR;DATA_ENTRADA;DATA_SAIDA;ORIGEM;TERMO_ASSINADO\n";
+            if (notebooks.length === 0) return alert("Lista vazia!");
+            let csv = "\uFEFFSERIAL;PATRIMONIO;MARCA;MODELO;STATUS;COLABORADOR;DATA_ENTRADA\n";
             notebooks.forEach(n => {
-                csv += `"${n.patrimonio}";"${n.serial}";"${n.marca}";"${n.modelo}";"${n.status}";"${n.colaborador}";"${n.setor}";"${n.dataEntrada}";"${n.dataSaida}";"${n.origem}";"${n.termoAssinado}"\n`;
+                csv += `"${n.serial}";"${n.patrimonio}";"${n.marca}";"${n.modelo}";"${n.status}";"${n.colaborador}";"${n.dataEntrada}"\n`;
             });
-
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = `Controle_Notebooks_Vale_${new Date().toISOString().split('T')[0]}.csv`;
+            a.download = `notebooks_${new Date().toISOString().split('T')[0]}.csv`;
             a.click();
-            URL.revokeObjectURL(url);
         }
     </script>
 </body>
