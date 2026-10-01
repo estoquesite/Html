@@ -3,13 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Módulo 10 - Troca dos Participantes FMDS | Portal Vale v04</title>
+<title>Módulo 10 - Troca dos Participantes FMDS | Portal Vale v05</title>
 <style>
 :root {
     --primary: #007e7a;
     --primary-dark: #005a57;
     --vale-green: #10b981;
-    --vale-gray: #64748b;
     --vale-dark-gray: #475569;
     --vale-orange: #f59e0b;
     --vale-blue: #3b82f6;
@@ -79,7 +78,7 @@ body {
     text-transform: uppercase; 
     letter-spacing: 0.8px; 
 }
-.tag-v04 { 
+.tag-v05 { 
     background-color: var(--accent); 
     color: #fff; 
     font-weight: 800; 
@@ -200,7 +199,7 @@ body {
 .info-bar { font-size: 8px; font-weight: 700; }
 .info-bar td { text-align: left; padding: 2px 6px; }
 
-/* TABELA FMDS COM AS 5 COLUNAS EXATAS */
+/* TABELA FMDS SEM A COLUNA DSS */
 table.tabela-fmds th, table.tabela-fmds td { 
     border: 1.5px solid #000; 
     text-align: center; 
@@ -218,15 +217,15 @@ table.tabela-fmds th {
 }
 
 /* CORES DOS PILARES */
-.th-dss { background-color: #64748b !important; } /* Cinza / Chumbo */
+.th-header-base { background-color: var(--primary) !important; }
 .th-ssma { background-color: #10b981 !important; } /* Verde */
-.th-pessoas { background-color: #475569 !important; } /* Cinza Escuro para PESSOAS */
+.th-pessoas { background-color: #475569 !important; } /* Cinza Escuro */
 .th-prod { background-color: #f59e0b !important; } /* Laranja / Âmbar */
 .th-qual { background-color: #3b82f6 !important; } /* Azul */
 
 table.tabela-fmds tbody tr { background-color: #fff; }
 
-.col-nome-part { text-align: left !important; font-weight: 700; text-transform: uppercase; padding-left: 8px !important; width: 230px; outline: none; }
+.col-nome-part { text-align: left !important; font-weight: 700; text-transform: uppercase; padding-left: 8px !important; width: 260px; outline: none; }
 .col-celula-fmds { outline: none; font-weight: 600; }
 .col-acoes { width: 35px; }
 
@@ -240,7 +239,7 @@ tr:hover .botoes-acoes { opacity: 1; }
     body { background: #fff !important; margin: 0 !important; padding: 0 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
     .painel-controle, .botoes-acoes, .barra-controle-folha, .col-acoes, th.th-acoes, #toastNotificacao { display: none !important; }
     .folha-a4 { box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
-    table.tabela-fmds th.th-dss { background-color: #64748b !important; color: #fff !important; }
+    table.tabela-fmds th.th-header-base { background-color: var(--primary) !important; color: #fff !important; }
     table.tabela-fmds th.th-ssma { background-color: #10b981 !important; color: #fff !important; }
     table.tabela-fmds th.th-pessoas { background-color: #475569 !important; color: #fff !important; }
     table.tabela-fmds th.th-prod { background-color: #f59e0b !important; color: #fff !important; }
@@ -254,7 +253,7 @@ tr:hover .botoes-acoes { opacity: 1; }
 
     <div class="painel-controle">
         <div class="topo-modulo-info">
-            <span class="badge-modulo">Módulo 10: Troca dos Participantes FMDS <span class="tag-v04">v04</span></span>
+            <span class="badge-modulo">Módulo 10: Troca dos Participantes FMDS <span class="tag-v05">v05</span></span>
             <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
         </div>
         <div class="campos-painel">
@@ -317,7 +316,6 @@ tr:hover .botoes-acoes { opacity: 1; }
                     <td class="col-celula-fmds" contenteditable="true"></td>
                     <td class="col-celula-fmds" contenteditable="true"></td>
                     <td class="col-celula-fmds" contenteditable="true"></td>
-                    <td class="col-celula-fmds" contenteditable="true"></td>
                     <td class="col-acoes th-acoes"><div class="botoes-acoes"><button type="button" class="btn-acao" onclick="this.closest('tr').remove()">✕</button></div></td>
                 </tr>`;
             });
@@ -346,13 +344,12 @@ tr:hover .botoes-acoes { opacity: 1; }
                 <table class="tabela-fmds">
                     <thead>
                         <tr>
-                            <th style="width:230px;" class="th-dss">PARTICIPANTES</th>
-                            <th class="th-dss">DSS</th>
+                            <th style="width:260px;" class="th-header-base">PARTICIPANTES</th>
                             <th class="th-ssma">SSMA</th>
                             <th class="th-pessoas">PESSOAS</th>
                             <th class="th-prod">PRODUTIVIDADE</th>
                             <th class="th-qual">QUALIDADE</th>
-                            <th class="col-acoes th-acoes th-dss">AÇÃO</th>
+                            <th class="col-acoes th-acoes th-header-base">AÇÃO</th>
                         </tr>
                     </thead>
                     <tbody>${linhas}</tbody>
@@ -379,12 +376,12 @@ tr:hover .botoes-acoes { opacity: 1; }
                 area: document.getElementById('areaInputFmds').value,
                 nomes: nomes
             };
-            localStorage.setItem('valefmds_v04', JSON.stringify(dados));
+            localStorage.setItem('valefmds_v05', JSON.stringify(dados));
             mostrarToast('Dados salvos com sucesso!');
         }
 
         function carregarTudoFmds() {
-            const s = localStorage.getItem('valefmds_v04');
+            const s = localStorage.getItem('valefmds_v05');
             if(s) {
                 const res = JSON.parse(s);
                 if(res.ano) document.getElementById('anoInputFmds').value = res.ano;
