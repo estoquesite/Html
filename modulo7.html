@@ -36,48 +36,12 @@
             border-width: 1.5px !important;
         }
 
-        @keyframes neonDelicado {
-            0%, 100% {
-                border-color: #38bdf8;
-                box-shadow: 0 0 6px rgba(56, 189, 248, 0.4);
-            }
-            50% {
-                border-color: #818cf8;
-                box-shadow: 0 0 2px rgba(129, 140, 248, 0.2);
-            }
-        }
         .neon-pulsante {
-            animation: neonDelicado 2s infinite alternate ease-in-out;
+            border-color: #38bdf8 !important;
             border-width: 1.5px !important;
         }
 
-        @keyframes pulsoSuave {
-            0%, 100% { transform: scale(1); opacity: 0.9; }
-            50% { transform: scale(1.03); opacity: 1; }
-        }
-        .pulso-delicado {
-            animation: pulsoSuave 1.5s infinite ease-in-out;
-        }
-
-        @keyframes brilhaFluorescente {
-            0%, 100% {
-                border-color: #22c55e;
-                box-shadow: 0 0 8px rgba(34, 197, 94, 0.7);
-            }
-            50% {
-                border-color: #eab308;
-                box-shadow: 0 0 3px rgba(234, 179, 8, 0.4);
-            }
-        }
-        .alerta-duplicado-fluorescente {
-            animation: brilhaFluorescente 1.2s infinite alternate ease-in-out;
-            border: 2px dashed #22c55e !important;
-            padding: 2px 6px;
-            border-radius: 8px;
-            display: inline-block;
-        }
-
-        /* Cores de Glow para Cards de Pessoas */
+        /* Cores de Glow para os Cards de Pessoas */
         .glow-azul { border: 2px solid #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
         .glow-roxo { border: 2px solid #c084fc; box-shadow: 0 0 10px rgba(192, 132, 252, 0.5); }
         .glow-verde { border: 2px solid #4ade80; box-shadow: 0 0 10px rgba(74, 222, 128, 0.5); }
@@ -101,36 +65,43 @@
                         <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Recuperação de Arquivo</p>
+                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale Operacional</p>
                         <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                        <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
+                        <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Banco de Dados Ativo</span>
                     </div>
                 </div>
             </div>
             
             <div class="flex flex-wrap items-center gap-2">
-                <a href="index.html" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1">
+                <a href="index.html" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1">
                     ⬅ Menu
                 </a>
                 <button onclick="abrirModalUsuarios()" class="bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 px-3 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer shadow-sm">
                     <span>👥</span>
-                    <span>Painel Pessoas</span>
+                    <span>Pessoas</span>
                 </button>
-                <button onclick="carregarDoSupabase()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-sm">
-                    🔄 Sincronizar
-                </button>
-                <button onclick="exportarParaCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer">
-                    📥 CSV
-                </button>
-                <!-- BOTÃO DE RECUPERAÇÃO VIA PLANILHA / CSV -->
-                <label class="bg-amber-600 hover:bg-amber-700 text-white px-3.5 py-2 rounded-xl text-xs font-black transition shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95" title="Carregar planilha/CSV baixado anteriormente">
+                
+                <!-- RECUPERAR PLANILHA -->
+                <label class="bg-amber-600 hover:bg-amber-700 text-white px-3.5 py-2 rounded-xl text-xs font-black transition shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95" title="Importar o Excel ou CSV que você baixou">
                     <span>📂</span>
                     <span>Recuperar Planilha</span>
                     <input type="file" id="inputRecuperarCSV" accept=".csv,.txt" class="hidden" onchange="importarCSVRecuperacao(this.files)">
                 </label>
-                <button onclick="abrirModalChaveIa()" class="bg-amber-100 hover:bg-amber-200 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 px-3 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer border border-amber-300 dark:border-amber-700 shadow-sm" title="Configurar Chave IA">
-                    <span>⚙️</span>
-                    <span>Chave IA</span>
+
+                <!-- SALVAR DEFINITIVO NA NUVEM -->
+                <button onclick="salvarTudoNaNuvem()" class="bg-blue-600 hover:bg-blue-700 text-white px-3.5 py-2 rounded-xl text-xs font-black transition shadow-sm flex items-center gap-1.5 cursor-pointer" title="Grava toda a lista atual direto no banco de dados na nuvem">
+                    <span>☁️</span>
+                    <span>Salvar na Nuvem (Subir Tudo)</span>
+                </button>
+
+                <!-- SINCRONIZAR -->
+                <button onclick="carregarDoSupabase()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-sm" title="Baixa novidades da nuvem sem apagar o local">
+                    🔄 Sincronizar
+                </button>
+
+                <!-- EXPORTAR CSV -->
+                <button onclick="exportarParaCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer">
+                    📥 CSV
                 </button>
             </div>
         </header>
@@ -154,10 +125,10 @@
             </div>
         </div>
 
-        <!-- CARDS DINÂMICOS POR PESSOA (COM BORDAS GLOW FLUORESCENTES) -->
-        <div id="containerCardsPessoas" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
+        <!-- CARDS DINÂMICOS POR PESSOA -->
+        <div id="containerCardsPessoas" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-2.5"></div>
 
-        <!-- 🔍 BARRA DE FILTRO, PESQUISA E VALORES -->
+        <!-- BARRA DE FILTRO, PESQUISA E VALORES -->
         <div class="bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 p-3.5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
             <div class="flex items-center gap-2 w-full sm:w-auto">
                 <span class="text-base">🔍</span>
@@ -191,191 +162,87 @@
             </div>
         </div>
 
-        <!-- ================= ABAS PARA ENTRADA DE DADOS ================= -->
-        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm overflow-hidden">
-            <div class="flex border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 p-1.5 gap-1 overflow-x-auto">
-                <button type="button" onclick="mudarAbaEntrada('manual')" id="tabBtn-manual" class="flex-1 min-w-[120px] py-2.5 px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-700">
-                    <span>✍️</span> <span>Digitar Manual</span>
-                </button>
-                <button type="button" onclick="mudarAbaEntrada('link')" id="tabBtn-link" class="flex-1 min-w-[110px] py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
-                    <span>🔗</span> <span>Link Web</span>
-                </button>
-                <button type="button" onclick="mudarAbaEntrada('foto')" id="tabBtn-foto" class="flex-1 min-w-[110px] py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
-                    <span>📸</span> <span>Foto / Câmera</span>
-                </button>
-                <button type="button" onclick="mudarAbaEntrada('texto')" id="tabBtn-texto" class="flex-1 min-w-[120px] py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
-                    <span>💬</span> <span>Colar Teams</span>
-                </button>
+        <!-- FORMULÁRIO DE LANÇAMENTO MANUAL -->
+        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm p-4 sm:p-5 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
+                <span class="text-xs font-black text-indigo-900 dark:text-indigo-300 uppercase flex items-center gap-1.5">
+                    <span>✍️</span> Lançar Compra no Cartão
+                </span>
+                <span class="text-[10px] font-bold text-slate-400">Preencha os campos abaixo</span>
             </div>
 
-            <!-- CONTEÚDO 1: DIGITAÇÃO MANUAL -->
-            <div id="aba-manual" class="p-4 sm:p-5 space-y-4">
-                <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
-                    <span class="text-xs font-black text-indigo-900 dark:text-indigo-300 uppercase flex items-center gap-1.5">
-                        <span>✍️</span> Novo Lançamento Manual
-                    </span>
-                    <span class="text-[10px] font-bold text-slate-400">Preencha os campos abaixo</span>
+            <!-- LINHA 1 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Data Compra</label>
+                    <input type="date" id="manualData" onchange="atualizarDataEntregaManualDefault()" class="neon-pulsante w-full text-xs p-2.5 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white">
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end">
-                    <div class="md:col-span-2">
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Data Compra</label>
-                        <input type="date" id="manualData" onchange="atualizarDataEntregaManualDefault()" class="neon-pulsante w-full text-xs p-2.5 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white">
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase">Solicitante (*)</label>
+                        <span id="avisoManualSolicitante" class="text-[9px] font-black text-rose-600 animate-pulse">OBRIGATÓRIO!</span>
                     </div>
+                    <input type="text" id="manualSolicitante" oninput="validarInputManualSolicitante(this)" placeholder="QUEM PEDIU?" class="uppercase-input w-full text-xs p-2.5 rounded-xl outline-none transition-all piscar-solicitante-forte">
+                </div>
 
-                    <div class="md:col-span-3">
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="block text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase">Solicitante (*)</label>
-                            <span id="avisoManualSolicitante" class="text-[9px] font-black text-rose-600 animate-pulse">OBRIGATÓRIO!</span>
-                        </div>
-                        <input type="text" id="manualSolicitante" oninput="validarInputManualSolicitante(this)" placeholder="QUEM PEDIU?" class="uppercase-input w-full text-xs p-2.5 rounded-xl outline-none transition-all piscar-solicitante-forte">
-                    </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Produto / Serviço</label>
+                    <input type="text" id="manualProduto" oninput="this.value = this.value.toUpperCase()" placeholder="EX: CHUMBADOR..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                </div>
 
-                    <div class="md:col-span-4">
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Produto / Serviço</label>
-                        <input type="text" id="manualProduto" oninput="this.value = this.value.toUpperCase()" placeholder="EX: CHUMBADOR..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                    </div>
-
-                    <div class="md:col-span-3">
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Local / Fornecedor</label>
-                        <input type="text" id="manualLocal" oninput="this.value = this.value.toUpperCase()" placeholder="EX: MERCADO LIVRE..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                    </div>
-
-                    <div class="md:col-span-3">
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Categoria</label>
-                            <button type="button" onclick="adicionarNovaCategoriaPrompt('manualCategoria')" class="text-[9px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline">+ Nova</button>
-                        </div>
-                        <select id="manualCategoria" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-semibold outline-none"></select>
-                    </div>
-
-                    <div class="md:col-span-2">
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Qtd</label>
-                        <input type="number" id="manualQtd" value="1" min="1" oninput="calcularManualPorTotal()" class="w-full text-xs p-2.5 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white outline-none">
-                    </div>
-
-                    <div class="md:col-span-2">
-                        <label class="block text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase mb-1">Total (R$) 🔄</label>
-                        <input type="number" step="0.01" id="manualTotal" placeholder="0,00" oninput="calcularManualPorTotal()" class="w-full text-xs p-2.5 bg-emerald-50/70 border border-emerald-400 rounded-xl font-black text-emerald-600 outline-none">
-                    </div>
-
-                    <div class="md:col-span-2">
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Unitário (R$)</label>
-                        <input type="number" step="0.01" id="manualUnit" placeholder="0,00" oninput="calcularManualPorUnitario()" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                    </div>
-
-                    <!-- CHECKBOX DE ENTREGA MANUAL COM NEON PULSANTE -->
-                    <div class="md:col-span-3 bg-slate-100 dark:bg-slate-900/60 p-2.5 rounded-xl border border-indigo-200 dark:border-indigo-800">
-                        <label class="flex items-center gap-1.5 cursor-pointer mb-1">
-                            <input type="checkbox" id="manualEntregue" onchange="toggleManualDataEntrega(this.checked)" class="pulso-delicado w-4 h-4 text-indigo-600 rounded cursor-pointer">
-                            <span class="text-[10px] font-bold uppercase text-indigo-700 dark:text-indigo-300">📦 Entregue? (+10d)</span>
-                        </label>
-                        <input type="date" id="manualDataEntrega" class="neon-pulsante w-full text-[10px] p-1.5 rounded font-bold hidden bg-white dark:bg-slate-800 dark:text-white">
-                    </div>
-
-                    <div class="md:col-span-12 flex justify-end pt-2">
-                        <button type="button" onclick="lancarCompraManual()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 px-8 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer">
-                            <span>✅</span>
-                            <span>Salvar Compra na Tabela</span>
-                        </button>
-                    </div>
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Local / Fornecedor</label>
+                    <input type="text" id="manualLocal" oninput="this.value = this.value.toUpperCase()" placeholder="EX: MERCADO LIVRE..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
             </div>
 
-            <!-- CONTEÚDO 2: LINK WEB -->
-            <div id="aba-link" class="p-4 sm:p-5 space-y-3 hidden">
-                <div class="flex justify-between items-center">
-                    <label class="block text-xs font-black text-blue-950 dark:text-blue-200 uppercase flex items-center gap-2">
-                        <span>🔗</span>
-                        <span>Colar / Digitar Link do Produto (Mercado Livre, Amazon, etc.)</span>
+            <!-- LINHA 2 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end pt-1">
+                <div class="md:col-span-3">
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Categoria</label>
+                        <button type="button" onclick="adicionarNovaCategoriaPrompt('manualCategoria')" class="text-[9px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline">+ Nova</button>
+                    </div>
+                    <select id="manualCategoria" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-semibold outline-none"></select>
+                </div>
+
+                <div class="md:col-span-1">
+                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Qtd</label>
+                    <input type="number" id="manualQtd" value="1" min="1" oninput="calcularManualPorTotal()" class="w-full text-xs p-2.5 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white outline-none">
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase mb-1">Total (R$) 🔄</label>
+                    <input type="number" step="0.01" id="manualTotal" placeholder="0,00" oninput="calcularManualPorTotal()" class="w-full text-xs p-2.5 bg-emerald-50 border border-emerald-400 rounded-xl font-black text-emerald-700 outline-none">
+                </div>
+
+                <div class="md:col-span-2">
+                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Unitário (R$)</label>
+                    <input type="number" step="0.01" id="manualUnit" placeholder="0,00" oninput="calcularManualPorUnitario()" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                </div>
+
+                <div class="md:col-span-2 bg-slate-100 dark:bg-slate-900/60 p-2.5 rounded-xl border border-indigo-200 dark:border-indigo-800">
+                    <label class="flex items-center gap-1.5 cursor-pointer mb-1">
+                        <input type="checkbox" id="manualEntregue" onchange="toggleManualDataEntrega(this.checked)" class="w-4 h-4 text-indigo-600 rounded cursor-pointer">
+                        <span class="text-[10px] font-bold uppercase text-indigo-700 dark:text-indigo-300">📦 Entregue?</span>
                     </label>
-                    <div class="flex items-center gap-3">
-                        <button type="button" onclick="limparInputLink()" class="text-xs text-rose-500 font-bold hover:underline flex items-center gap-1 cursor-pointer">
-                            🗑️ Limpar Link
-                        </button>
-                        <button type="button" onclick="colarLinkInput()" class="text-xs text-blue-700 dark:text-blue-300 font-bold hover:underline flex items-center gap-1 cursor-pointer">
-                            📋 Colar
-                        </button>
-                    </div>
+                    <input type="date" id="manualDataEntrega" class="neon-pulsante w-full text-[10px] p-1.5 rounded font-bold hidden bg-white dark:bg-slate-800 dark:text-white">
                 </div>
-                
-                <div class="flex flex-col sm:flex-row gap-2">
-                    <div class="relative flex-1">
-                        <input type="text" id="inputLinkDireto" placeholder="Cole o link aqui..." class="neon-pulsante w-full text-xs px-3 py-2.5 pr-8 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white">
-                        <button type="button" onclick="limparInputLink()" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-rose-500 font-bold text-xs">✕</button>
-                    </div>
-                    <button type="button" onclick="processarLinkDireto()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer flex-shrink-0">
-                        <span>⚡</span>
-                        <span>Reconhecer Link</span>
+
+                <div class="md:col-span-2">
+                    <button type="button" onclick="lancarCompraManual()" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer">
+                        <span>✅ Salvar Compra</span>
                     </button>
                 </div>
             </div>
-
-            <!-- CONTEÚDO 3: FOTO -->
-            <div id="aba-foto" class="p-4 sm:p-5 space-y-3 hidden">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <label class="flex items-center justify-center gap-3 bg-purple-600 hover:bg-purple-700 text-white font-black py-4 px-4 rounded-2xl shadow-md cursor-pointer transition active:scale-95 text-xs">
-                        <span class="text-2xl">📸</span>
-                        <div class="text-left">
-                            <span class="block">TIRAR FOTO AGORA</span>
-                            <span class="block text-[10px] font-normal text-purple-200">Abre a câmera do celular direto</span>
-                        </div>
-                        <input type="file" id="inputCameraDireta" accept="image/*" capture="environment" class="hidden" onchange="processarArquivos(this.files)">
-                    </label>
-
-                    <label class="flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-4 px-4 rounded-2xl shadow-md cursor-pointer transition active:scale-95 text-xs">
-                        <span class="text-2xl">🖼️</span>
-                        <div class="text-left">
-                            <span class="block">ESCOLHER DA GALERIA</span>
-                            <span class="block text-[10px] font-normal text-indigo-200">Selecione prints salvos ou fotos</span>
-                        </div>
-                        <input type="file" id="inputGaleria" accept="image/*" multiple class="hidden" onchange="processarArquivos(this.files)">
-                    </label>
-                </div>
-            </div>
-
-            <!-- CONTEÚDO 4: TEAMS -->
-            <div id="aba-texto" class="p-4 sm:p-5 space-y-3 hidden">
-                <div class="flex justify-between items-center">
-                    <label class="block text-xs font-black text-indigo-950 dark:text-indigo-200 uppercase flex items-center gap-2">
-                        <span>💬</span>
-                        <span>Cole a Mensagem do Teams / WhatsApp</span>
-                    </label>
-                    <button type="button" onclick="colarTextoTeams()" class="text-xs text-indigo-700 dark:text-indigo-300 font-bold hover:underline flex items-center gap-1 cursor-pointer">
-                        📋 Colar Texto
-                    </button>
-                </div>
-                
-                <textarea id="inputTextoTeams" rows="2" placeholder="Ex: Diogo pediu no Mercado Livre: 3 Itens total R$ 500,00..." class="w-full text-xs p-3 bg-slate-50 dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800 rounded-xl outline-none focus:border-indigo-600 dark:text-white leading-relaxed"></textarea>
-                
-                <div class="flex justify-end pt-1">
-                    <button type="button" onclick="processarTextoBruto(document.getElementById('inputTextoTeams').value)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-4 py-2 rounded-xl transition shadow-md flex items-center gap-1.5 cursor-pointer">
-                        <span>⚡</span>
-                        <span>Reconhecer Texto</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- CARDS PRÉ-PREENCHIDOS -->
-        <div id="containerCardsPreenchidos" class="space-y-3 hidden">
-            <div class="flex justify-between items-center px-1">
-                <h3 class="text-xs font-black uppercase text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5">
-                    <span>📦</span>
-                    <span id="tituloItensPendentes">Itens Identificados (Confira e dê OK):</span>
-                </h3>
-                <button type="button" onclick="confirmarTodosOsCards()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-xl shadow-sm transition cursor-pointer">
-                    ⚡ Confirmar Todos e Salvar
-                </button>
-            </div>
-            <div id="listaCardsPendentes" class="space-y-3"></div>
         </div>
 
         <!-- TABELA DE COMPRAS REGISTRADAS -->
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
             <div class="flex justify-between items-center">
                 <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">
-                    📋 Histórico de Compras no Cartão (Sincronizado na Nuvem)
+                    📋 Histórico de Compras Registradas
                 </h3>
                 <span id="labelContador" class="text-[11px] text-slate-400 font-bold">0 ITENS REGISTRADOS</span>
             </div>
@@ -387,13 +254,12 @@
                             <th class="py-2.5 px-3">Data</th>
                             <th class="py-2.5 px-3">Solicitante</th>
                             <th class="py-2.5 px-3">Produto / Serviço</th>
-                            <th class="py-2.5 px-3">Local / Fornecedor</th>
+                            <th class="py-2.5 px-3">Local</th>
                             <th class="py-2.5 px-3">Categoria</th>
                             <th class="py-2.5 px-3 text-center">Qtd</th>
                             <th class="py-2.5 px-3 text-right">Unitário</th>
                             <th class="py-2.5 px-3 text-right">Total</th>
                             <th class="py-2.5 px-3 text-center">Entrega 📦</th>
-                            <th class="py-2.5 px-3 text-center">Link</th>
                             <th class="py-2.5 px-3 text-center">Ações</th>
                         </tr>
                     </thead>
@@ -404,20 +270,17 @@
 
     </div>
 
-    <!-- MODAL DO PAINEL DE SOLICITANTES (👥) -->
+    <!-- MODAL DO PAINEL DE SOLICITANTES -->
     <div id="modalUsuarios" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 w-full max-w-2xl rounded-2xl p-5 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
                 <div class="flex items-center gap-2">
                     <span class="text-lg">👥</span>
-                    <div>
-                        <h3 class="text-xs sm:text-sm font-black text-indigo-600 dark:text-indigo-400 uppercase">
-                            Painel de Solicitantes
-                        </h3>
-                        <p class="text-[10px] text-slate-500">Resumo de pedidos e gastos por pessoa (Clique para filtrar)</p>
-                    </div>
+                    <h3 class="text-xs sm:text-sm font-black text-indigo-600 dark:text-indigo-400 uppercase">
+                        Painel de Solicitantes
+                    </h3>
                 </div>
-                <button onclick="fecharModalUsuarios()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-black text-sm">✕</button>
+                <button onclick="fecharModalUsuarios()" class="text-slate-400 hover:text-slate-600 font-black text-sm">✕</button>
             </div>
 
             <div class="max-h-96 overflow-y-auto">
@@ -436,125 +299,8 @@
 
             <div class="flex justify-between items-center pt-2 border-t border-slate-100 dark:border-slate-700 text-xs">
                 <span id="resumoGeralUsuarios" class="font-bold text-slate-500"></span>
-                <button type="button" onclick="fecharModalUsuarios()" class="bg-slate-900 hover:bg-black dark:bg-slate-700 dark:hover:bg-slate-600 text-white px-4 py-1.5 rounded-xl font-bold transition">
+                <button type="button" onclick="fecharModalUsuarios()" class="bg-slate-900 text-white px-4 py-1.5 rounded-xl font-bold">
                     Fechar
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL DA CHAVE DA IA (ENGRENAGEM ⚙️) -->
-    <div id="modalChaveIa" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 w-full max-w-md rounded-2xl p-5 shadow-2xl space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
-                <h3 class="text-xs sm:text-sm font-black text-amber-600 dark:text-amber-400 uppercase flex items-center gap-1.5">
-                    <span>⚙️</span> Chave API da IA (Google Gemini)
-                </h3>
-                <button onclick="fecharModalChaveIa()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-black text-sm">✕</button>
-            </div>
-
-            <div class="space-y-2 text-xs">
-                <p class="text-slate-500 dark:text-slate-400 leading-relaxed">
-                    Cole abaixo a chave de API gerada no Google AI Studio para análise de fotos.
-                </p>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Chave Gemini (AIzaSy...):</label>
-                    <input type="password" id="modalInputGeminiKey" placeholder="Cole aqui sua chave da IA..." class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-mono outline-none focus:border-amber-500">
-                </div>
-            </div>
-
-            <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-700">
-                <button type="button" onclick="fecharModalChaveIa()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
-                    Fechar
-                </button>
-                <button type="button" onclick="salvarChaveIaModal()" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2 rounded-xl text-xs font-black transition shadow-md flex items-center gap-1.5">
-                    <span>💾</span> Salvar Chave
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL DE EDIÇÃO (CANETA ✏️) -->
-    <div id="modalEdicao" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 w-full max-w-xl rounded-2xl p-5 shadow-2xl space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
-                <h3 class="text-xs sm:text-sm font-black text-indigo-600 dark:text-indigo-400 uppercase flex items-center gap-1.5">
-                    <span>✏️</span> Editar Registo de Compra & Entregas
-                </h3>
-                <button onclick="fecharModalEdicao()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-black text-sm">✕</button>
-            </div>
-
-            <input type="hidden" id="editItemIndex">
-            <input type="hidden" id="editItemId">
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Data da Compra</label>
-                    <input type="date" id="editData" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none">
-                </div>
-                <div>
-                    <div class="flex justify-between items-center mb-1">
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase">Solicitante</label>
-                        <span id="avisoEditSolicitante" class="text-[9px] font-black text-rose-500 hidden animate-pulse">OBRIGATÓRIO</span>
-                    </div>
-                    <input type="text" id="editSolicitante" oninput="validarInputEditSolicitante(this)" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                </div>
-                <div class="sm:col-span-2">
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Produto / Descrição</label>
-                    <input type="text" id="editProduto" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                </div>
-                <div class="sm:col-span-2">
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Local / Fornecedor</label>
-                    <input type="text" id="editLocal" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                </div>
-                <div>
-                    <div class="flex justify-between items-center mb-1">
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase">Categoria</label>
-                        <button type="button" onclick="adicionarNovaCategoriaPrompt('editCategoria')" class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline">+ Nova</button>
-                    </div>
-                    <select id="editCategoria" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-semibold outline-none"></select>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Quantidade de Itens</label>
-                    <input type="number" id="editQtd" min="1" oninput="calcularModalPorTotal()" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                </div>
-
-                <div>
-                    <label class="block text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase mb-1">Valor Total (R$) 🔄</label>
-                    <input type="number" step="0.01" id="editTotal" oninput="calcularModalPorTotal()" class="w-full p-2 bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-700 rounded-xl font-black text-emerald-600 dark:text-emerald-400 outline-none">
-                </div>
-
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Unitário Calculado (R$)</label>
-                    <input type="number" step="0.01" id="editUnit" oninput="calcularModalPorUnitario()" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                </div>
-
-                <div class="sm:col-span-2 bg-slate-100 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
-                    <div class="flex items-center justify-between">
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" id="editEntregue" onchange="toggleDataEntregaModal(this.checked)" class="w-4 h-4 text-indigo-600 rounded">
-                            <span class="font-bold text-slate-800 dark:text-slate-200 uppercase">📦 Produto Entregue?</span>
-                        </label>
-                        <button type="button" onclick="preencherDataHojeModal()" class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline">📆 Marcar Hoje</button>
-                    </div>
-                    <div id="containerDataEntrega" class="hidden pt-1">
-                        <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Dia da Entrega:</label>
-                        <input type="date" id="editDataEntrega" class="w-full p-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg dark:text-white font-bold">
-                    </div>
-                </div>
-
-                <div class="sm:col-span-2">
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Link do Produto (Opcional)</label>
-                    <input type="text" id="editLink" placeholder="https://..." class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none">
-                </div>
-            </div>
-
-            <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-700">
-                <button type="button" onclick="fecharModalEdicao()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">
-                    Cancelar
-                </button>
-                <button type="button" onclick="guardarEdicaoModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-xl text-xs font-black transition shadow-md flex items-center gap-1.5">
-                    <span>💾</span> Salvar Alterações
                 </button>
             </div>
         </div>
@@ -575,7 +321,6 @@
 
         let listaCategorias = [];
         let compras = [];
-        let itensPendentesAprovacao = [];
         let supabaseClient = null;
         let solicitanteFiltroAtual = "";
 
@@ -590,10 +335,10 @@
             const solManual = document.getElementById('manualSolicitante');
             if (solManual) solManual.classList.add('piscar-solicitante-forte');
 
-            // 1. Carrega localmente
+            // 1. Carrega o que está salvo localmente
             carregarDoLocalStorage();
 
-            // 2. Conecta ao Supabase sem sobrescrever se vier vazio
+            // 2. Conecta ao Supabase
             if (window.supabase) {
                 try {
                     supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -603,20 +348,6 @@
                 }
             }
         });
-
-        function mudarAbaEntrada(aba) {
-            ['manual', 'link', 'foto', 'texto'].forEach(id => {
-                const elAba = document.getElementById(`aba-${id}`);
-                const elBtn = document.getElementById(`tabBtn-${id}`);
-                if (id === aba) {
-                    elAba.classList.remove('hidden');
-                    elBtn.className = "flex-1 min-w-[110px] py-2.5 px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-700";
-                } else {
-                    elAba.classList.add('hidden');
-                    elBtn.className = "flex-1 min-w-[110px] py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200";
-                }
-            });
-        }
 
         function carregarCategorias() {
             const salvas = localStorage.getItem('compras_categorias_lista');
@@ -635,18 +366,6 @@
             const selManual = document.getElementById('manualCategoria');
             const valManual = selManual ? selManual.value : "";
             preencherOpcoesCategoria(selManual, valManual || "OUTROS");
-
-            const selEdit = document.getElementById('editCategoria');
-            const valEdit = selEdit ? selEdit.value : "";
-            preencherOpcoesCategoria(selEdit, valEdit || "OUTROS");
-
-            itensPendentesAprovacao.forEach(item => {
-                const selCard = document.getElementById(`categoria-${item.tempId}`);
-                if (selCard) {
-                    const valCard = selCard.value;
-                    preencherOpcoesCategoria(selCard, valCard || item.categoria || "OUTROS");
-                }
-            });
         }
 
         function adicionarNovaCategoriaPrompt(selectId = null) {
@@ -657,16 +376,12 @@
                     listaCategorias.push(categoriaFormatada);
                     salvarCategorias();
                 }
-                
                 atualizarTodosOsSelectsCategorias();
-                renderizarCardsPendentes();
-
                 if (selectId) {
                     const sel = document.getElementById(selectId);
                     if (sel) sel.value = categoriaFormatada;
                 }
-
-                mostrarAviso(`Categoria "${categoriaFormatada}" adicionada com sucesso!`);
+                mostrarAviso(`Categoria "${categoriaFormatada}" adicionada!`);
             }
         }
 
@@ -691,14 +406,10 @@
         function mostrarAviso(msg, tipo = "sucesso") {
             const el = document.getElementById('alertaSistema');
             el.innerText = msg;
-            el.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800', 'bg-amber-100', 'text-amber-800');
-            if (tipo === "sucesso") {
-                el.classList.add('bg-emerald-100', 'text-emerald-800');
-            } else if (tipo === "aviso") {
-                el.classList.add('bg-amber-100', 'text-amber-800');
-            } else {
-                el.classList.add('bg-rose-100', 'text-rose-800');
-            }
+            el.className = `p-3 rounded-xl text-xs font-bold text-center transition-all ${
+                tipo === 'sucesso' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
+            }`;
+            el.classList.remove('hidden');
             setTimeout(() => el.classList.add('hidden'), 5000);
         }
 
@@ -733,7 +444,6 @@
             const dataCompraEl = document.getElementById('manualData');
             const dataEntregaEl = document.getElementById('manualDataEntrega');
             if (!dataCompraEl || !dataEntregaEl) return;
-            
             let d = new Date(dataCompraEl.value + 'T00:00:00');
             d.setDate(d.getDate() + 10);
             dataEntregaEl.value = d.toISOString().split('T')[0];
@@ -758,7 +468,7 @@
             if (!solicitante || solicitante === "NÃO INFORMADO" || solicitante === "NAO INFORMADO") {
                 inputSol.classList.add('piscar-solicitante-forte');
                 inputSol.focus();
-                alert("⚠️ ATENÇÃO: Por favor, preencha quem é o SOLICITANTE desta compra!");
+                alert("Por favor, preencha o Solicitante!");
                 return;
             }
 
@@ -766,7 +476,7 @@
             const produto = document.getElementById('manualProduto').value.trim().toUpperCase();
 
             if (!produto) {
-                alert("⚠️ Por favor, digite o nome do produto ou serviço!");
+                alert("Por favor, digite o nome do produto!");
                 document.getElementById('manualProduto').focus();
                 return;
             }
@@ -778,12 +488,6 @@
             const unit = parseFloat(document.getElementById('manualUnit').value) || (total / qtd);
             const entregue = document.getElementById('manualEntregue').checked;
             const dataEntrega = entregue ? document.getElementById('manualDataEntrega').value : "";
-
-            if (total <= 0 && unit <= 0) {
-                alert("⚠️ Por favor, informe o Valor Total ou o Valor Unitário da compra!");
-                document.getElementById('manualTotal').focus();
-                return;
-            }
 
             const novoItem = {
                 id: Date.now(),
@@ -804,7 +508,7 @@
             salvarNoLocalStorage();
             atualizarListaSelectSolicitantes();
             renderizarTabela();
-            mostrarAviso("✅ Compra manual salva com sucesso!");
+            mostrarAviso("✅ Compra salva com sucesso!");
 
             inserirNoSupabase(novoItem);
 
@@ -817,36 +521,32 @@
             document.getElementById('manualDataEntrega').classList.add('hidden');
         }
 
-        // ================= FUNÇÃO DE RECUPERAÇÃO VIA PLANILHA / CSV =================
+        // ================= IMPORTAÇÃO DA PLANILHA BAIXADA =================
         function importarCSVRecuperacao(files) {
             if (!files || files.length === 0) return;
             const file = files[0];
 
             const reader = new FileReader();
             reader.onload = function(e) {
-                const texto = e.target.result;
-                processarTextoCSVRecuperado(texto);
+                processarTextoCSV(e.target.result);
             };
             reader.readAsText(file, "UTF-8");
         }
 
-        function processarTextoCSVRecuperado(textoCSV) {
+        function processarTextoCSV(textoCSV) {
             try {
                 const linhas = textoCSV.split(/\r?\n/).filter(l => l.trim().length > 0);
                 if (linhas.length <= 1) {
-                    alert("O arquivo selecionado parece estar vazio.");
+                    alert("Arquivo sem dados para importar.");
                     return;
                 }
 
-                // Detecta delimitador (; ou ,)
-                const delimitador = linhas[0].includes(';') ? ';' : ',';
+                const delim = linhas[0].includes(';') ? ';' : ',';
                 let novosItens = [];
 
                 for (let i = 1; i < linhas.length; i++) {
                     const linha = linhas[i];
-                    
-                    // Regex para separar respeitando aspas
-                    const regex = new RegExp(`(?:^|${delimitador})(?:"([^"]*)"|([^"${delimitador}]*))`, 'g');
+                    const regex = new RegExp(`(?:^|${delim})(?:"([^"]*)"|([^"${delim}]*))`, 'g');
                     let matches = [];
                     let match;
                     while ((match = regex.exec(linha)) !== null) {
@@ -854,7 +554,7 @@
                     }
 
                     if (matches.length >= 8) {
-                        const dataFormatada = converterDataParaISO(matches[0]);
+                        const dataVal = converterDataParaISO(matches[0]);
                         const solicitante = (matches[1] || "").trim().toUpperCase();
                         const produto = (matches[2] || "").trim().toUpperCase();
                         const local = (matches[3] || "MERCADO LIVRE").trim().toUpperCase();
@@ -874,7 +574,7 @@
                         if (produto) {
                             novosItens.push({
                                 id: Date.now() + i,
-                                data: dataFormatada || new Date().toISOString().split('T')[0],
+                                data: dataVal || new Date().toISOString().split('T')[0],
                                 solicitante: solicitante || "NÃO INFORMADO",
                                 produto: produto,
                                 local: local,
@@ -895,23 +595,19 @@
                     salvarNoLocalStorage();
                     atualizarListaSelectSolicitantes();
                     renderizarTabela();
-                    mostrarAviso(`🎉 SUCESSO! ${novosItens.length} itens foram restaurados da planilha!`);
-
-                    // Envia também para a nuvem
-                    novosItens.forEach(item => inserirNoSupabase(item));
+                    mostrarAviso(`🎉 SUCESSO! ${novosItens.length} itens recuperados da sua planilha! Agora clique no botão "Salvar na Nuvem".`);
                 } else {
-                    alert("Não foi possível identificar o formato da planilha. Verifique se o arquivo é o exportado pelo sistema.");
+                    alert("Não foi possível ler as colunas. Verifique se o arquivo é a planilha exportada do sistema.");
                 }
 
             } catch (err) {
-                console.error(err);
-                alert("Erro ao ler o arquivo CSV. Detalhes: " + err.message);
+                alert("Erro ao processar arquivo: " + err.message);
             }
         }
 
         function converterDataParaISO(dataBR) {
             if (!dataBR) return "";
-            if (dataBR.includes('-')) return dataBR; // já é ISO
+            if (dataBR.includes('-')) return dataBR;
             const p = dataBR.split('/');
             if (p.length === 3) {
                 return `${p[2]}-${p[1].padStart(2, '0')}-${p[0].padStart(2, '0')}`;
@@ -919,7 +615,49 @@
             return dataBR;
         }
 
-        // ================= SUPABASE =================
+        // ================= BOTÃO: SALVAR TUDO NA NUVEM =================
+        async function salvarTudoNaNuvem() {
+            if (!supabaseClient) {
+                alert("Conexão com a nuvem não inicializada.");
+                return;
+            }
+
+            if (compras.length === 0) {
+                alert("Não há itens na tabela para enviar à nuvem.");
+                return;
+            }
+
+            mostrarAviso("Enviando todos os registros para a nuvem...", "sucesso");
+
+            try {
+                const dadosParaEnviar = compras.map(item => ({
+                    data: item.data,
+                    solicitante: item.solicitante,
+                    produto: item.produto,
+                    local: item.local || '',
+                    categoria: item.categoria || 'OUTROS',
+                    qtd: item.qtd || 1,
+                    unit: item.unit || 0,
+                    total: item.total || 0,
+                    link: item.link || '',
+                    entregue: !!item.entregue,
+                    data_entrega: item.data_entrega || ''
+                }));
+
+                const { error } = await supabaseClient.from('compras_corporativas').insert(dadosParaEnviar);
+                
+                if (error) {
+                    throw error;
+                }
+
+                mostrarAviso(`✅ Sucesso! Todos os ${compras.length} itens foram gravados na nuvem!`);
+            } catch (err) {
+                console.error(err);
+                mostrarAviso("Erro ao salvar na nuvem: " + err.message, "erro");
+            }
+        }
+
+        // ================= SINCRONIZAR BLINDADO =================
         async function carregarDoSupabase() {
             if (!supabaseClient) return;
 
@@ -931,13 +669,14 @@
 
                 if (error) throw error;
 
-                // Só sobrescreve se a nuvem tiver itens
                 if (data && data.length > 0) {
                     compras = data;
                     salvarNoLocalStorage();
                     atualizarListaSelectSolicitantes();
                     renderizarTabela();
-                    mostrarAviso("✅ Sincronizado com a nuvem!");
+                    mostrarAviso(`✅ Sincronizado! ${data.length} itens carregados da nuvem.`);
+                } else {
+                    mostrarAviso("Nuvem vazia no momento. Os dados do seu computador foram preservados intactos!");
                 }
             } catch (err) {
                 console.warn("Aviso nuvem:", err.message);
@@ -945,7 +684,7 @@
         }
 
         async function inserirNoSupabase(item) {
-            if (!supabaseClient) return null;
+            if (!supabaseClient) return;
             try {
                 const payload = {
                     data: item.data,
@@ -961,27 +700,7 @@
                     data_entrega: item.data_entrega || ''
                 };
                 await supabaseClient.from('compras_corporativas').insert([payload]);
-            } catch (err) {
-                console.warn("Aviso Insert:", err.message);
-            }
-        }
-
-        async function atualizarNoSupabase(item) {
-            if (!supabaseClient || !item.id) return;
-            try {
-                await supabaseClient.from('compras_corporativas').update(item).eq('id', item.id);
-            } catch (err) {
-                console.warn("Aviso Update:", err.message);
-            }
-        }
-
-        async function removerDoSupabase(id) {
-            if (!supabaseClient) return;
-            try {
-                await supabaseClient.from('compras_corporativas').delete().eq('id', id);
-            } catch (err) {
-                console.warn("Aviso Delete:", err.message);
-            }
+            } catch (err) {}
         }
 
         function salvarNoLocalStorage() {
@@ -1063,13 +782,13 @@
                 const glowClass = classesGlow[idx % classesGlow.length];
 
                 const card = document.createElement('div');
-                card.className = `bg-white dark:bg-slate-800 p-3 rounded-2xl shadow-sm ${glowClass} cursor-pointer hover:scale-[1.02] transition`;
+                card.className = `bg-white dark:bg-slate-800 p-2.5 rounded-xl shadow-sm ${glowClass} cursor-pointer hover:scale-[1.02] transition`;
                 card.onclick = () => aplicarFiltroPorSelect(nome);
                 card.innerHTML = `
-                    <span class="text-[10px] font-black uppercase text-slate-700 dark:text-slate-200 block truncate">👤 ${nome}</span>
+                    <span class="text-[9px] font-black uppercase text-slate-700 dark:text-slate-200 block truncate">👤 ${nome}</span>
                     <div class="flex justify-between items-baseline mt-1">
-                        <span class="text-xs font-black text-indigo-600 dark:text-indigo-400">${dados.count} un</span>
-                        <span class="text-xs font-black text-emerald-600 dark:text-emerald-400">R$ ${dados.valor.toFixed(2)}</span>
+                        <span class="text-[11px] font-bold text-indigo-600">${dados.count} un</span>
+                        <span class="text-[11px] font-black text-emerald-600">R$ ${dados.valor.toFixed(2)}</span>
                     </div>
                 `;
                 container.appendChild(card);
@@ -1085,21 +804,12 @@
             let listaExibicao = [...compras];
 
             if (solicitanteFiltroAtual) {
-                listaExibicao = listaExibicao.filter(i => {
-                    const s = (i.solicitante || "").toUpperCase();
-                    return s.includes(solicitanteFiltroAtual);
-                });
+                listaExibicao = listaExibicao.filter(i => (i.solicitante || "").toUpperCase().includes(solicitanteFiltroAtual));
             }
 
             const termoPesquisa = document.getElementById('inputPesquisaProduto') ? document.getElementById('inputPesquisaProduto').value.trim().toUpperCase() : "";
             if (termoPesquisa) {
-                listaExibicao = listaExibicao.filter(i => {
-                    const prod = (i.produto || "").toUpperCase();
-                    const loc = (i.local || "").toUpperCase();
-                    const sol = (i.solicitante || "").toUpperCase();
-                    const cat = (i.categoria || "").toUpperCase();
-                    return prod.includes(termoPesquisa) || loc.includes(termoPesquisa) || sol.includes(termoPesquisa) || cat.includes(termoPesquisa);
-                });
+                listaExibicao = listaExibicao.filter(i => (i.produto || "").toUpperCase().includes(termoPesquisa));
             }
 
             const filtroValor = document.getElementById('inputFiltroValor') ? parseFloat(document.getElementById('inputFiltroValor').value) : NaN;
@@ -1113,10 +823,9 @@
             });
 
             if (listaExibicao.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="11" class="text-center py-6 text-slate-400 italic">NENHUMA COMPRA REGISTRADA. CLIQUE EM "📂 RECUPERAR PLANILHA" PARA RESTAURAR!</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="10" class="text-center py-6 text-slate-400 italic">NENHUMA COMPRA REGISTRADA. CLIQUE EM "📂 RECUPERAR PLANILHA" PARA CARREGAR O ARQUIVO SALVO!</td></tr>`;
             } else {
                 listaExibicao.forEach((item) => {
-                    const originalIndex = compras.findIndex(c => String(c.id) === String(item.id));
                     totalGastoGeral += Number(item.total || 0);
                     solicitantesContador[item.solicitante] = (solicitantesContador[item.solicitante] || 0) + 1;
 
@@ -1127,19 +836,16 @@
                     const tr = document.createElement('tr');
                     tr.className = `${linhaOpacidade} transition uppercase`;
                     tr.innerHTML = `
-                        <td class="py-2.5 px-3 font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap">${formatarDataBR(item.data)}</td>
-                        <td class="py-2.5 px-3 font-bold text-slate-800 dark:text-slate-200 whitespace-nowrap">${item.solicitante}</td>
+                        <td class="py-2.5 px-3 font-semibold whitespace-nowrap">${formatarDataBR(item.data)}</td>
+                        <td class="py-2.5 px-3 font-bold whitespace-nowrap">${item.solicitante}</td>
                         <td class="py-2.5 px-3 max-w-xs truncate ${estiloRiscado}">${item.produto}</td>
-                        <td class="py-2.5 px-3 font-semibold text-indigo-700 dark:text-indigo-300 whitespace-nowrap">${item.local || 'MERCADO LIVRE'}</td>
-                        <td class="py-2.5 px-3 whitespace-nowrap"><span class="text-[10px] bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 px-2 py-0.5 rounded-full font-bold">${item.categoria}</span></td>
-                        <td class="py-2.5 px-3 text-center font-bold text-slate-700 dark:text-slate-300">${item.qtd}</td>
+                        <td class="py-2.5 px-3 font-semibold text-indigo-700 whitespace-nowrap">${item.local}</td>
+                        <td class="py-2.5 px-3 whitespace-nowrap"><span class="text-[10px] bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded-full font-bold">${item.categoria}</span></td>
+                        <td class="py-2.5 px-3 text-center font-bold">${item.qtd}</td>
                         <td class="py-2.5 px-3 text-right text-slate-500 whitespace-nowrap">R$ ${Number(item.unit || 0).toFixed(2)}</td>
                         <td class="py-2.5 px-3 text-right font-black text-emerald-600 dark:text-emerald-400 whitespace-nowrap">R$ ${Number(item.total || 0).toFixed(2)}</td>
                         <td class="py-2.5 px-3 text-center whitespace-nowrap">
                             <input type="checkbox" id="chk-entregue-${item.id}" ${entregueChecked} onchange="salvarAlteracaoEntrega(${item.id})" class="w-4 h-4 text-emerald-600 rounded cursor-pointer">
-                        </td>
-                        <td class="py-2.5 px-3 text-center whitespace-nowrap">
-                            ${item.link && item.link.startsWith('http') ? `<a href="${item.link}" target="_blank" class="text-blue-600 font-bold hover:underline normal-case">Link ↗</a>` : '<span class="text-slate-400">-</span>'}
                         </td>
                         <td class="py-2.5 px-3 text-center whitespace-nowrap">
                             <button onclick="removerItem(${item.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1 cursor-pointer">✕</button>
@@ -1178,7 +884,6 @@
             item.entregue = chk ? chk.checked : false;
             salvarNoLocalStorage();
             renderizarTabela();
-            await atualizarNoSupabase(item);
         }
 
         async function removerItem(id) {
@@ -1187,7 +892,6 @@
                 salvarNoLocalStorage();
                 atualizarListaSelectSolicitantes();
                 renderizarTabela();
-                await removerDoSupabase(id);
                 mostrarAviso("Item apagado com sucesso!");
             }
         }
@@ -1227,22 +931,47 @@
         }
 
         function abrirModalUsuarios() {
-            document.getElementById('modalUsuarios').classList.remove('hidden');
+            const modal = document.getElementById('modalUsuarios');
+            const tbody = document.getElementById('tabelaUsuariosCorpo');
+            tbody.innerHTML = '';
+
+            let totaisPorPessoa = {};
+            compras.forEach(item => {
+                const s = (item.solicitante || "NÃO INFORMADO").toUpperCase();
+                if (!totaisPorPessoa[s]) totaisPorPessoa[s] = { count: 0, valor: 0 };
+                totaisPorPessoa[s].count += Number(item.qtd || 1);
+                totaisPorPessoa[s].valor += Number(item.total || 0);
+            });
+
+            const listaNomes = Object.keys(totaisPorPessoa).sort((a,b) => totaisPorPessoa[b].valor - totaisPorPessoa[a].valor);
+
+            listaNomes.forEach(nome => {
+                const dados = totaisPorPessoa[nome];
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="py-2 px-3 font-bold">${nome}</td>
+                    <td class="py-2 px-3 text-center">${dados.count} un</td>
+                    <td class="py-2 px-3 text-right font-black text-emerald-600">R$ ${dados.valor.toFixed(2)}</td>
+                    <td class="py-2 px-3 text-center">
+                        <button onclick="selecionarPessoaPeloModal('${nome}')" class="bg-indigo-50 text-indigo-700 px-2 py-0.5 rounded text-[10px] font-bold">
+                            🔍 Ver
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('resumoGeralUsuarios').innerText = `Total: ${listaNomes.length} Solicitante(s)`;
+            modal.classList.remove('hidden');
         }
+
         function fecharModalUsuarios() {
             document.getElementById('modalUsuarios').classList.add('hidden');
         }
-        function abrirModalChaveIa() {
-            document.getElementById('modalChaveIa').classList.remove('hidden');
-        }
-        function fecharModalChaveIa() {
-            document.getElementById('modalChaveIa').classList.add('hidden');
-        }
-        function salvarChaveIaModal() {
-            const key = document.getElementById('modalInputGeminiKey').value.trim();
-            localStorage.setItem('gemini_api_key', key);
-            fecharModalChaveIa();
-            mostrarAviso("Chave da IA salva com sucesso!");
+
+        function selecionarPessoaPeloModal(nome) {
+            fecharModalUsuarios();
+            aplicarFiltroPorSelect(nome);
         }
     </script>
 </body>
