@@ -204,17 +204,17 @@
                 </button>
             </div>
 
-            <!-- CONTEÚDO 1: DIGITAÇÃO MANUAL (COM MÚLTIPLAS LINHAS) -->
+            <!-- CONTEÚDO 1: DIGITAÇÃO MANUAL (MÚLTIPLAS LINHAS DUPLICADAS) -->
             <div id="aba-manual" class="p-6 space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                     <span class="text-xs font-black text-indigo-900 dark:text-indigo-300 uppercase flex items-center gap-1.5">
-                        <span>✍️</span> Novo Lançamento Manual
+                        <span>✍️</span> Novo Lançamento Manual (Várias Linhas)
                     </span>
-                    <span class="text-[10px] font-bold text-slate-400">Preencha os campos abaixo</span>
+                    <span class="text-[10px] font-bold text-slate-400">Adicione quantos itens precisar</span>
                 </div>
 
                 <div id="containerLinhasManuais" class="space-y-3">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end linha-manual-item bg-slate-50 dark:bg-slate-900/40 p-3 rounded-2xl border border-slate-200 dark:border-slate-700">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end linha-manual-item bg-slate-50 dark:bg-slate-900/40 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 relative">
                         <div class="md:col-span-2">
                             <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Data Compra</label>
                             <input type="date" class="manualData neon-pulsante w-full text-xs p-2.5 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white" onchange="atualizarDataEntregaManualDefault(this)">
@@ -279,7 +279,7 @@
                 </div>
             </div>
 
-            <!-- CONTEÚDO 2: NOTA FISCAL (COM UPLOAD DE ARQUIVO OU COLA DE TEXTO) -->
+            <!-- CONTEÚDO 2: NOTA FISCAL / VÁRIOS ITENS -->
             <div id="aba-bloco" class="p-6 space-y-4 hidden">
                 <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                     <span class="text-xs font-black text-purple-900 dark:text-purple-300 uppercase flex items-center gap-1.5">
@@ -309,8 +309,11 @@
                         <input type="date" id="blocoData" class="w-full text-xs p-2.5 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 font-bold">
                     </div>
                     <div>
-                        <label class="block text-[10px] font-black text-rose-600 uppercase mb-1">Solicitante (*)</label>
-                        <input type="text" id="blocoSolicitante" placeholder="QUEM PEDIU?" class="uppercase-input w-full text-xs p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 dark:text-white font-bold outline-none">
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-[10px] font-black text-rose-600 uppercase">Solicitante (*)</label>
+                            <span id="avisoBlocoSolicitante" class="text-[9px] font-black text-rose-600 animate-pulse hidden">OBRIGATÓRIO!</span>
+                        </div>
+                        <input type="text" id="blocoSolicitante" placeholder="QUEM PEDIU?" oninput="validarInputBlocoSolicitante(this)" class="uppercase-input w-full text-xs p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 dark:text-white font-bold outline-none piscar-solicitante-forte">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Local / Fornecedor</label>
@@ -335,7 +338,7 @@
                 </div>
             </div>
 
-            <!-- CONTEÚDO 3: LINK WEB (COM MÚLTIPLAS LINHAS) -->
+            <!-- CONTEÚDO 3: LINK WEB (MÚLTIPLAS LINHAS DE LINKS) -->
             <div id="aba-link" class="p-6 space-y-3 hidden">
                 <div class="flex justify-between items-center">
                     <label class="block text-xs font-black text-blue-950 dark:text-blue-200 uppercase flex items-center gap-2">
@@ -349,7 +352,7 @@
                 </div>
                 
                 <div id="containerLinhasLinks" class="space-y-3">
-                    <div class="flex flex-col sm:flex-row gap-2 linha-link-item">
+                    <div class="flex flex-col sm:flex-row gap-2 linha-link-item relative">
                         <div class="relative flex-1">
                             <input type="text" placeholder="Cole o link aqui..." class="inputLinkDireto neon-pulsante w-full text-xs px-3 py-3 pr-8 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white">
                             <button type="button" onclick="this.previousElementSibling.value=''" class="absolute right-2.5 top-3 text-slate-400 hover:text-rose-500 font-bold text-xs">✕</button>
@@ -525,7 +528,7 @@
         </div>
     </div>
 
-    <!-- MODAL DA CHAVE DA IA (ENGRENAGEM ⚙️) -->
+    <!-- MODAL DA CHAVE DA IA (ENGRENAGEM ⚙️️) -->
     <div id="modalChaveIa" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 w-full max-w-md rounded-2xl p-5 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
@@ -688,7 +691,7 @@
             setTimeout(() => el.classList.add('hidden'), 4000);
         }
 
-        // FUNÇÕES DE MÚLTIPLAS LINHAS MANUAIS (HERDANDO O SOLICITANTE ANTERIOR)
+        // DUPLICAR LINHAS COMPLETAS NA DIGITAÇÃO MANUAL
         function adicionarLinhaManual() {
             const container = document.getElementById('containerLinhasManuais');
             const linhas = container.querySelectorAll('.linha-manual-item');
@@ -702,6 +705,7 @@
 
             const hoje = new Date().toISOString().split('T')[0];
             novaLinha.querySelector('.manualData').value = ultimaData || hoje;
+            
             const inputSol = novaLinha.querySelector('.manualSolicitante');
             inputSol.value = ultimoSolicitante;
             validarInputManualSolicitante(inputSol);
@@ -722,7 +726,6 @@
                 btnRemover.className = 'btnRemoverLinha absolute top-2 right-2 bg-rose-100 text-rose-600 hover:bg-rose-200 text-[10px] font-black px-2 py-1 rounded-lg';
                 btnRemover.innerHTML = '✕ Remover';
                 btnRemover.onclick = () => novaLinha.remove();
-                novaLinha.style.position = 'relative';
                 novaLinha.appendChild(btnRemover);
             }
 
@@ -751,6 +754,19 @@
             const val = input.value.trim();
             const linha = input.closest('.linha-manual-item');
             const aviso = linha ? linha.querySelector('.avisoManualSolicitante') : null;
+            if (val === "" || val === "NÃO INFORMADO" || val === "NAO INFORMADO") {
+                input.classList.add('piscar-solicitante-forte');
+                if (aviso) aviso.classList.remove('hidden');
+            } else {
+                input.classList.remove('piscar-solicitante-forte');
+                if (aviso) aviso.classList.add('hidden');
+            }
+        }
+
+        function validarInputBlocoSolicitante(input) {
+            input.value = input.value.toUpperCase();
+            const val = input.value.trim();
+            const aviso = document.getElementById('avisoBlocoSolicitante');
             if (val === "" || val === "NÃO INFORMADO" || val === "NAO INFORMADO") {
                 input.classList.add('piscar-solicitante-forte');
                 if (aviso) aviso.classList.remove('hidden');
@@ -800,7 +816,7 @@
 
                 const produto = linha.querySelector('.manualProduto').value.trim().toUpperCase();
                 if (!produto) {
-                    alert("⚠️ Por favor, digite o nome do produto ou serviço em todas as linhas!");
+                    alert("⚠️️ Por favor, digite o nome do produto ou serviço em todas as linhas!");
                     linha.querySelector('.manualProduto').focus();
                     return;
                 }
@@ -863,10 +879,13 @@
         }
 
         function processarBlocoItens() {
-            const solicitante = document.getElementById('blocoSolicitante').value.trim().toUpperCase();
-            if (!solicitante) {
-                alert("⚠️️ Por favor, informe o SOLICITANTE!");
-                document.getElementById('blocoSolicitante').focus();
+            const inputSol = document.getElementById('blocoSolicitante');
+            const solicitante = inputSol.value.trim().toUpperCase();
+            if (!solicitante || solicitante === "NÃO INFORMADO" || solicitante === "NAO INFORMADO") {
+                inputSol.classList.add('piscar-solicitante-forte');
+                document.getElementById('avisoBlocoSolicitante').classList.remove('hidden');
+                alert("⚠️ Por favor, informe o SOLICITANTE!");
+                inputSol.focus();
                 return;
             }
 
@@ -1002,6 +1021,7 @@
             document.getElementById('blocoLocal').value = '';
             document.getElementById('blocoProjeto').value = '';
             document.getElementById('blocoSolicitante').value = '';
+            document.getElementById('avisoBlocoSolicitante').classList.add('hidden');
         }
 
         function toggleExpandirSubItens(id) {
@@ -1485,12 +1505,36 @@
             return "LOJA WEB / INTERNET";
         }
 
-        // FUNÇÕES DE MÚLTIPLAS LINHAS DE LINKS
+        // ADICIONAR MÚLTIPLAS LINHAS DE LINKS WEB
         function adicionarLinhaLink() {
             const container = document.getElementById('containerLinhasLinks');
             const primeiraLinha = container.querySelector('.linha-link-item');
             const novaLinha = primeiraLinha.cloneNode(true);
             novaLinha.querySelector('.inputLinkDireto').value = '';
+
+            if (!novaLinha.querySelector('.btnRemoverLink')) {
+                const btnRemover = document.createElement('button');
+                btnRemover.type = 'button';
+                btnRemover.className = 'absolute right-2.5 top-3 text-slate-400 hover:text-rose-500 font-bold text-xs';
+                btnRemover.innerHTML = '✕';
+                btnRemover.onclick = () => novaLinha.remove();
+                
+                const inputEl = novaLinha.querySelector('.inputLinkDireto');
+                inputEl.classList.remove('pr-8');
+                inputEl.classList.add('pr-16');
+                
+                const divWrapper = novaLinha.querySelector('.relative');
+                const btnX = divWrapper.querySelector('button');
+                if(btnX) btnX.remove();
+
+                const btnRemoveNew = document.createElement('button');
+                btnRemoveNew.type = 'button';
+                btnRemoveNew.className = 'absolute right-2.5 top-2.5 bg-rose-100 text-rose-600 hover:bg-rose-200 text-[10px] font-black px-2 py-1 rounded-lg';
+                btnRemoveNew.innerHTML = 'Remover';
+                btnRemoveNew.onclick = () => novaLinha.remove();
+                divWrapper.appendChild(btnRemoveNew);
+            }
+
             container.appendChild(novaLinha);
         }
 
@@ -1745,7 +1789,7 @@
             renderizarCardsPendentes();
         }
 
-        // ================= EDIÇÃO (INCLUINDO SUB-ITENS DE NOTAS FISCAIS) =================
+        // ================= EDIÇÃO (SUB-ITENS DE NOTAS FISCAIS) =================
         function abrirModalEdicao(index, subIndex = null) {
             const item = compras[index];
             if (!item) return;
@@ -1757,7 +1801,6 @@
             const isSubItem = subIndex !== null;
             const alvo = isSubItem ? item.sub_itens[subIndex] : item;
 
-            // Ajusta visibilidade de campos específicos caso seja edição de um sub-item da nota
             document.getElementById('campoDataEditContainer').style.display = isSubItem ? 'none' : 'block';
             document.getElementById('campoLocalEditContainer').style.display = isSubItem ? 'none' : 'block';
             document.getElementById('campoProjetoEditContainer').style.display = isSubItem ? 'none' : 'block';
@@ -1837,7 +1880,6 @@
                 };
                 itemPrincipal.solicitante = solicitante;
 
-                // Recalcula totais do item principal baseado nos sub-itens
                 let somaSubTotal = 0;
                 let somaSubQtd = 0;
                 itemPrincipal.sub_itens.forEach(sub => {
@@ -1967,7 +2009,7 @@
                                 <td class="py-2 px-3 text-right text-slate-500">R$ ${Number(sub.unit || 0).toFixed(2)}</td>
                                 <td class="py-2 px-3 text-right font-bold text-emerald-600">R$ ${Number(sub.total || 0).toFixed(2)}</td>
                                 <td colspan="2" class="text-center">
-                                    <button onclick="abrirModalEdicao(${originalIndex}, ${idxSub})" class="text-indigo-600 font-bold p-1 text-[10px] bg-indigo-100 dark:bg-indigo-900/70 px-2 py-0.5 rounded cursor-pointer">✏️ Editar Item</button>
+                                    <button onclick="abrirModalEdicao(${originalIndex}, ${idxSub})" class="text-indigo-600 font-bold p-1 text-[10px] bg-indigo-100 dark:bg-indigo-900/70 px-2 py-0.5 rounded cursor-pointer">✏️️ Editar Item</button>
                                 </td>
                                 <td></td>
                             `;
