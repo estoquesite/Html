@@ -274,13 +274,13 @@
                 </div>
             </div>
 
-            <!-- CONTEÚDO NOVO: COLAR NOTA OU VÁRIOS ITENS (QUADRADÃO) -->
+            <!-- CONTEÚDO NOVO: COLAR NOTA FISCAL (SAP / ERP) -->
             <div id="aba-bloco" class="p-6 space-y-4 hidden">
                 <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                     <span class="text-xs font-black text-purple-900 dark:text-purple-300 uppercase flex items-center gap-1.5">
-                        <span>📋</span> Colar Nota Fiscal / Vários Itens de uma Vez (Agrupados)
+                        <span>📋</span> Colar Copiado do Sistema / Nota Fiscal (Agrupados)
                     </span>
-                    <span class="text-[10px] font-bold text-slate-400">Insira as informações gerais e cole o texto abaixo</span>
+                    <span class="text-[10px] font-bold text-slate-400">Informe a data e solicitante, depois cole o texto copiado</span>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
@@ -294,7 +294,7 @@
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Local / Fornecedor</label>
-                        <input type="text" id="blocoLocal" placeholder="EX: LOJA..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                        <input type="text" id="blocoLocal" placeholder="EX: FORNECEDOR..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Projeto</label>
@@ -303,14 +303,14 @@
                 </div>
 
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Cole aqui a lista de produtos (uma linha por item, ex: "2x Ventilador - R$ 150,00" ou apenas os nomes e valores):</label>
-                    <textarea id="blocoTextoItens" rows="5" placeholder="Ex:&#10;1x Chumbador 3/8 - 45,00&#10;2x Broca de aço rápida - 30,00&#10;1x Extensão 10m - 120,00" class="w-full text-xs p-3 bg-slate-50 dark:bg-slate-900 border border-purple-300 dark:border-purple-800 rounded-xl outline-none dark:text-white font-mono leading-relaxed"></textarea>
+                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Cole o bloco copiado (descrição, códigos e valores):</label>
+                    <textarea id="blocoTextoItens" rows="6" placeholder="Cole aqui o texto do sistema exatamente como copiou..." class="w-full text-xs p-3 bg-slate-50 dark:bg-slate-900 border border-purple-300 dark:border-purple-800 rounded-xl outline-none dark:text-white font-mono leading-relaxed"></textarea>
                 </div>
 
                 <div class="flex justify-end pt-1">
                     <button type="button" onclick="processarBlocoItens()" class="bg-purple-600 hover:bg-purple-700 text-white font-black py-3 px-8 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer">
                         <span>⚡</span>
-                        <span>Processar e Agrupar Compra Inteira</span>
+                        <span>Processar e Agrupar Itens da Nota</span>
                     </button>
                 </div>
             </div>
@@ -609,7 +609,7 @@
         let itensPendentesAprovacao = [];
         let supabaseClient = null;
         let solicitanteFiltroAtual = "";
-        let itensExpandidos = {}; // Controla quais linhas estão expandidas (ver sub-itens)
+        let itensExpandidos = {};
 
         window.addEventListener('DOMContentLoaded', () => {
             const hoje = new Date().toISOString().split('T')[0];
@@ -707,7 +707,7 @@
             }
         }
 
-        // ================= PROCESSAR BLOCO DE VÁRIOS ITENS (NOTA FISCAL) =================
+        // ================= LEITOR INTELIGENTE DE NOTAS/SISTEMA (SAP) =================
         function processarBlocoItens() {
             const solicitante = document.getElementById('blocoSolicitante').value.trim().toUpperCase();
             if (!solicitante) {
@@ -718,53 +718,110 @@
 
             const textoBruto = document.getElementById('blocoTextoItens').value.trim();
             if (!textoBruto) {
-                alert("⚠️ Cole a lista de itens no quadradão!");
+                alert("⚠️ Cole o texto copiado do sistema no quadradão!");
                 document.getElementById('blocoTextoItens').focus();
                 return;
             }
 
-            const linhas = textoBruto.split('\n');
+            const linhasBrutas = textoBruto.split('\n');
             let subItens = [];
+            let nomeProdutoAtual = "";
             let somaTotalGeral = 0;
             let somaQtdGeral = 0;
 
-            linhas.forEach(linha => {
-                linha = linha.trim();
-                if (!linha) return;
+            for (let i = 0; i < linhasBrutas.length; i++) {
+                let linha = linhasBrutas[i].trim();
+                if (!linha) continue;
 
-                // Tenta extrair quantidade e valor do formato ex.: "2x Item - R$ 50,00" ou "Item - 50.00"
-                let qtd = 1;
-                let valorUnit = 0;
-                let nomeItem = linha;
+                // Verifica se a linha tem números decimais no final (típico de notas fiscais/SAP: quantidade, valor unitário, total)
+                // Exemplo: "24.07.01.082 540SUN 1 585,28 585,28 0,00..."
+                const regexValoresFim = /(\d+[\.,]?\d*)\s+(\d+[\.,]\d{2})\s+(\d+[\.,]\d{2})/g;
+                let match = regexValoresFim.exec(linha);
 
-                // Extrai valor monetário no final ou meio
-                const matchValor = linha.match(/(?:R\$)?\s*(\d+[\.,]?\d*)$/i) || linha.match(/(?:r\$)?\s*(\d+[\.,]\d{2})/i);
-                if (matchValor) {
-                    valorUnit = parseFloat(matchValor[1].replace(',', '.')) || 0;
-                    nomeItem = linha.replace(matchValor[0], '').replace(/[-–—]/g, '').trim();
+                if (match || (linha.includes(',') && /\d/.test(linha) && linha.length < 60)) {
+                    // Esta linha contém números de valores/quantidades
+                    let partes = linha.split(/\s+/);
+                    // Procura o valor em reais (com vírgula) de trás para frente na linha
+                    let valorTotalItem = 0;
+                    let qtdItem = 1;
+
+                    for (let p = partes.length - 1; p >= 0; p--) {
+                        let token = partes[p].replace(',', '.');
+                        if (token.includes('.') && !isNaN(token)) {
+                            valorTotalItem = parseFloat(token) || 0;
+                            // O número imediatamente anterior costuma ser a quantidade ou unitário
+                            if (p > 0 && !isNaN(partes[p-1].replace(',', '.'))) {
+                                let potentialQtd = parseFloat(partes[p-1].replace(',', '.')) || 1;
+                                if (potentialQtd < 1000) qtdItem = potentialQtd;
+                            }
+                            break;
+                        }
+                    }
+
+                    // Se encontrou um valor válido, consolida o item atual com a descrição acumulada
+                    if (valorTotalItem > 0) {
+                        let nomeFinal = nomeProdutoAtual ? `${nomeProdutoAtual} - ${linha}` : linha;
+                        // Limpa códigos longos iniciais se houver
+                        nomeFinal = nomeFinal.replace(/^[\d\.\-\/]+\s+/, '').trim();
+
+                        somaTotalGeral += valorTotalItem;
+                        somaQtdGeral += qtdItem;
+
+                        subItens.push({
+                            produto: nomeFinal.toUpperCase() || "ITEM",
+                            qtd: qtdItem,
+                            unit: qtdItem > 0 ? (valorTotalItem / qtdItem) : valorTotalItem,
+                            total: valorTotalItem
+                        });
+
+                        nomeProdutoAtual = ""; // Reseta para o próximo item
+                        continue;
+                    }
                 }
 
-                // Extrai quantidade no início (ex: "2x" ou "2 -")
-                const matchQtd = nomeItem.match(/^(\d+)\s*(?:x|un|-|\b)/i);
-                if (matchQtd) {
-                    qtd = parseInt(matchQtd[1], 10) || 1;
-                    nomeItem = nomeItem.replace(matchQtd[0], '').trim();
+                // Se não é linha de valores, acumula como descrição do produto (ex: "VENTILADOR 200X200X60MM 220VCA")
+                if (nomeProdutoAtual) {
+                    nomeProdutoAtual += " " + linha;
+                } else {
+                    nomeProdutoAtual = linha;
                 }
+            }
 
-                const totalItem = valorUnit > 0 ? (qtd * valorUnit) : 0;
-                somaTotalGeral += totalItem;
-                somaQtdGeral += qtd;
+            // Fallback caso venha em linhas simples estilo lista comum (ex: "1x Produto - R$ 50,00")
+            if (subItens.length === 0) {
+                linhasBrutas.forEach(linha => {
+                    linha = linha.trim();
+                    if (!linha) return;
+                    let qtd = 1;
+                    let valorUnit = 0;
+                    let nomeItem = linha;
 
-                subItens.push({
-                    produto: nomeItem.toUpperCase() || "ITEM",
-                    qtd: qtd,
-                    unit: valorUnit,
-                    total: totalItem
+                    const matchValor = linha.match(/(?:R\$)?\s*(\d+[\.,]?\d*)$/i) || linha.match(/(?:r\$)?\s*(\d+[\.,]\d{2})/i);
+                    if (matchValor) {
+                        valorUnit = parseFloat(matchValor[1].replace(',', '.')) || 0;
+                        nomeItem = linha.replace(matchValor[0], '').replace(/[-–—]/g, '').trim();
+                    }
+                    const matchQtd = nomeItem.match(/^(\d+)\s*(?:x|un|-|\b)/i);
+                    if (matchQtd) {
+                        qtd = parseInt(matchQtd[1], 10) || 1;
+                        nomeItem = nomeItem.replace(matchQtd[0], '').trim();
+                    }
+
+                    const totalItem = valorUnit > 0 ? (qtd * valorUnit) : 0;
+                    somaTotalGeral += totalItem;
+                    somaQtdGeral += qtd;
+
+                    subItens.push({
+                        produto: nomeItem.toUpperCase() || "ITEM",
+                        qtd: qtd,
+                        unit: valorUnit,
+                        total: totalItem
+                    });
                 });
-            });
+            }
 
             if (subItens.length === 0) {
-                alert("Não foi possível identificar itens válidos no texto.");
+                alert("Não foi possível identificar itens ou valores válidos no texto colado.");
                 return;
             }
 
@@ -785,14 +842,14 @@
                 link: "",
                 entregue: false,
                 data_entrega: "",
-                sub_itens: subItens // Guarda os sub-itens para o botão expandir (+)
+                sub_itens: subItens
             };
 
             compras.unshift(novoItem);
             salvarNoLocalStorage();
             atualizarListaSelectSolicitantes();
             renderizarTabela();
-            mostrarAviso(`✅ Compra agrupada com ${subItens.length} itens salva com sucesso!`);
+            mostrarAviso(`✅ Compra agrupada com ${subItens.length} itens processada com sucesso!`);
 
             inserirNoSupabase(novoItem);
 
@@ -1762,7 +1819,6 @@
                     `;
                     tbody.appendChild(tr);
 
-                    // Se estiver expandido, renderiza as linhas dos sub-itens logo abaixo
                     if (temSubItens && expandido) {
                         item.sub_itens.forEach((sub, idxSub) => {
                             const trSub = document.createElement('tr');
