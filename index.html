@@ -3,347 +3,524 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRO - Fluxo de Materiais e Procedimentos (Almoxarifado CTSS)</title>
+    <title>Portal Operacional - Vale (Menu Mestre)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        vale: {
+                            DEFAULT: '#007e7a',
+                            dark: '#005a57',
+                            light: '#e6f4f4',
+                            amber: '#f59e0b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            font-size: 14px;
-            color: #333;
-            line-height: 1.5;
-            margin: 0;
-            padding: 20px;
-            background-color: #f8fafc;
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            background: #f0f4f8; 
+            color: #1e293b; 
+            min-height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            padding: 20px 16px; 
         }
-
-        /* CONTAINER ESTILO FOLHA A4 / WORD */
-        .documento-container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: #ffffff;
-            padding: 40px;
-            border: 1px solid #cbd5e1;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        .container-menu { max-width: 1100px; width: 100%; }
+        
+        /* CARD DOS MÓDULOS */
+        .card-modulo { 
+            background: #fff; 
+            border-radius: 12px; 
+            border: 1px solid #e2e8f0; 
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03); 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-between; 
+            text-decoration: none; 
+            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); 
+            position: relative; 
+            overflow: hidden; 
+            min-height: 180px; 
         }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 15px;
-            font-size: 13px;
+        .card-modulo::before { 
+            content: ''; 
+            position: absolute; 
+            top: 0; 
+            left: 0; 
+            right: 0; 
+            height: 4px; 
         }
-        table, th, td {
-            border: 1px solid #000;
+        
+        .card-modulo.m1::before, .card-modulo.m2::before { background: #007e7a; }
+        .card-modulo.m3::before, .card-modulo.m4::before, .card-modulo.m5::before { background: #db2777; }
+        .card-modulo.m6::before { background: #059669; }
+        .card-modulo.m7::before { background: #6366f1; }
+        .card-modulo.m8::before { background: #0891b2; }
+        .card-modulo.m9::before { background: #f59e0b; }
+        .card-modulo.m10::before { background: #475569; }
+        .card-modulo.m11::before { background: #0d9488; }
+        
+        .card-modulo:hover { 
+            transform: translateY(-5px); 
+            box-shadow: 0 14px 25px -4px rgba(0, 0, 0, 0.08); 
+            border-color: #cbd5e1;
         }
-        th, td {
-            padding: 8px;
-            text-align: left;
-            vertical-align: top;
+        
+        .card-icone { 
+            width: 42px; 
+            height: 42px; 
+            border-radius: 10px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 20px; 
         }
-        th {
-            background-color: #f2f2f2;
-        }
-        .header-table td {
-            background-color: #f9f9f9;
-        }
-        h2 {
-            background-color: #003366;
-            color: #fff;
-            padding: 6px 10px;
-            font-size: 14px;
-            margin-top: 25px;
-            margin-bottom: 10px;
-            text-transform: uppercase;
-        }
-        h3 {
-            font-size: 13px;
-            color: #003366;
-            margin-top: 15px;
-            margin-bottom: 5px;
-        }
-        ul {
-            margin: 0 0 15px 0;
-            padding-left: 20px;
-        }
-        li {
-            margin-bottom: 4px;
-        }
-        p {
-            margin-bottom: 10px;
-        }
-        .link-box {
+        
+        .m1 .card-icone, .m2 .card-icone { background: #e6f4f4; color: #007e7a; }
+        .m3 .card-icone, .m4 .card-icone, .m5 .card-icone { background: #fce7f3; color: #db2777; }
+        .m6 .card-icone { background: #ecfdf5; color: #059669; }
+        .m7 .card-icone { background: #eef2ff; color: #6366f1; }
+        .m8 .card-icone { background: #ecfeff; color: #0891b2; }
+        .m9 .card-icone { background: #fef3c7; color: #d97706; }
+        .m10 .card-icone { background: #f1f5f9; color: #475569; }
+        .m11 .card-icone { background: #ccfbf1; color: #0d9488; }
+        
+        .tecla-atalho {
+            font-size: 10px;
+            font-weight: 800;
             background: #f1f5f9;
-            padding: 8px;
-            border-left: 4px solid #003366;
-            word-break: break-all;
-            font-size: 12px;
-            margin-top: 5px;
-        }
-
-        /* BOTÃO DE IMPRESSÃO FLUTUANTE */
-        .barra-topo {
-            max-width: 900px;
-            margin: 0 auto 15px auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .btn-voltar {
-            background: #64748b;
-            color: white;
-            padding: 10px 16px;
-            border-radius: 8px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 13px;
-        }
-        .btn-voltar:hover {
-            background: #475569;
-        }
-        .btn-imprimir {
-            background: #007e7a;
-            color: white;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            font-size: 14px;
-            cursor: pointer;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-        }
-        .btn-imprimir:hover {
-            background: #005a57;
-        }
-
-        /* REGRAS DE IMPRESSÃO */
-        @media print {
-            body {
-                background: white;
-                padding: 0;
-            }
-            .documento-container {
-                border: none;
-                box-shadow: none;
-                padding: 0;
-                max-width: 100%;
-            }
-            .barra-topo {
-                display: none;
-            }
+            color: #64748b;
+            padding: 2px 6px;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
         }
     </style>
 </head>
-<body>
+<body class="select-none">
 
-    <!-- BARRA DE CONTROLE NA TELA -->
-    <div class="barra-topo">
-        <a href="index.html" class="btn-voltar">← Voltar ao Menu Mestre</a>
-        <button onclick="window.print()" class="btn-imprimir">🖨️ Imprimir PRO Oficial</button>
+    <!-- CAPA DE BLOQUEIO DE SEGURANÇA MOBILE -->
+    <div id="tela-bloqueio-mobile" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 md:hidden">
+        <div class="bg-white p-7 rounded-3xl shadow-2xl max-w-xs w-full text-center space-y-4 border border-slate-100">
+            <div class="w-16 h-16 bg-teal-50 text-teal-700 rounded-3xl mx-auto flex items-center justify-center text-3xl font-black shadow-inner">
+                🔒
+            </div>
+            
+            <div>
+                <h2 class="text-base font-black text-slate-900">Portal Vale Operacional</h2>
+                <p class="text-slate-500 mt-1 text-[11px] leading-relaxed">Autentique sua identidade para liberar o acesso móvel.</p>
+            </div>
+
+            <button type="button" id="btnBiometria" onclick="desbloquearPorBiometria()" class="w-full bg-[#007e7a] hover:bg-[#005a57] active:scale-95 text-white font-bold py-3 rounded-2xl transition shadow-md text-xs flex items-center justify-center gap-2 cursor-pointer">
+                <span>👆</span>
+                <span>Validar Digital / Face ID</span>
+            </button>
+
+            <div id="area-pin" class="space-y-2 pt-2 border-t border-slate-100">
+                <label class="block text-[10px] font-bold text-slate-400 uppercase">Ou digite o PIN de Segurança:</label>
+                <div class="flex gap-2 justify-center">
+                    <input type="password" id="pinInput" maxlength="4" placeholder="••••" class="w-28 text-center text-lg font-black tracking-widest py-1.5 border border-slate-300 rounded-xl bg-slate-50 outline-none focus:border-teal-600">
+                    <button type="button" onclick="verificarPIN()" class="bg-slate-800 text-white font-bold px-3 py-1.5 rounded-xl text-xs">Entrar</button>
+                </div>
+            </div>
+
+            <p id="erro-auth" class="text-rose-500 font-bold text-[11px] hidden"></p>
+        </div>
     </div>
 
-    <!-- DOCUMENTO FORMATO PRO / WORD -->
-    <div class="documento-container">
-
-        <!-- CABEÇALHO DO PRO -->
-        <table class="header-table">
-            <tr>
-                <td><strong>Responsável Técnico:</strong> Mariana Pereira Cruz[cite: 1]</td>
-                <td><strong>Matrícula:</strong> 81025364[cite: 1]</td>
-                <td><strong>Área:</strong> GER INDUSTR PROCESSO MINERAL[cite: 1]</td>
-            </tr>
-            <tr>
-                <td colspan="3"><strong>Público-alvo:</strong> Almoxarifado do CTSS – Centro Tecnológico de Soluções Sustentáveis da Gerência Industrial Processo Mineral (Diretoria Processamento Mineral)[cite: 1].</td>
-            </tr>
-            <tr>
-                <td colspan="3">
-                    <strong>Necessidade de Treinamento:</strong> ( ) SIM (&nbsp;X&nbsp;) NÃO &nbsp;&nbsp;&nbsp;&nbsp; 
-                    <strong>Tarefa prioritária:</strong> (&nbsp;X&nbsp;) SIM ( ) NÃO[cite: 1]
-                </td>
-            </tr>
-        </table>
-
-        <p><strong>Resultados Esperados:</strong><br>
-        Realizar as atividades de recebimento, estoque, salvaguarda, movimentação e expedição no almoxarifado do CTSS, conforme as diretrizes estabelecidas neste procedimento, priorizando a aplicação de normas de SSMAC, visando à preservação da saúde e integridade físicas dos empregados e patrimônio da empresa[cite: 1].</p>
-
-        <!-- CONTEXTUALIZAÇÃO -->
-        <h2>Contextualização</h2>
-        <p><strong>Quais RACs estão associadas a estas atividades descritas no PRO?</strong></p>
-        <table>
-            <tr>
-                <td>RAC 1</td><td>RAC 2</td><td>RAC 3</td><td>RAC 4</td><td>RAC 5</td><td>RAC 6</td><td>RAC 7</td><td>RAC 8</td><td>RAC 9</td><td>RAC 10</td><td>RAC 11</td><td>N/A</td>
-            </tr>
-            <tr>
-                <td>X</td><td>x</td><td></td><td>x</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-            </tr>
-        </table>
-
-        <p><strong>A elaboração/revisão deste PRO foi feita a partir de desdobramento de evento N1 ou N2?</strong><br>
-        ( ) NÃO &nbsp;&nbsp;&nbsp;&nbsp; (&nbsp;X&nbsp;) SIM[cite: 1]</p>
-
-        <p><strong>Caso o procedimento esteja relacionado a uma Tarefa Prioritária, qual a dimensão envolvida?</strong><br>
-        ( ) Custos &nbsp;&nbsp; (&nbsp;X&nbsp;) Meio Ambiente &nbsp;&nbsp; ( ) Produtividade &nbsp;&nbsp; ( ) Qualidade &nbsp;&nbsp; ( ) Riscos &nbsp;&nbsp; ( ) Saúde e Segurança[cite: 1]</p>
-
-        <!-- REFERÊNCIA E DEFINIÇÕES -->
-        <h2>Referência</h2>
-        <p>Este procedimento se aplica ao Almoxarifado da GER INDUSTR PROCESSO MINERAL[cite: 1].</p>
-
-        <h2>Definições</h2>
-        <p><strong>FDS (Ficha com Dados de Segurança):</strong> Documento que fornece informações a respeito de vários aspectos de produtos químicos (substâncias ou preparados) quanto à proteção, à segurança e ao meio ambiente[cite: 1].</p>
-        <p><strong>Reserva:</strong> Pedido de material de um item em estoque, realizado via SAP pela transação MB21, a ser atendido pelo almoxarifado[cite: 1].</p>
+    <!-- CONTEÚDO PRINCIPAL DO MENU MESTRE -->
+    <div id="conteudo-portal" class="container-menu">
         
-        <p><strong>APP Sistema de (gestão de materiais) DI Processamento Mineral:</strong> APP para solicitações com as seguintes funções[cite: 1]:</p>
-        <ul>
-            <li><strong>Gestão de Estoque:</strong> Acompanhamento de materiais em estoque[cite: 1].</li>
-            <li><strong>Cadastro de materiais:</strong> Solicite o cadastro de novos materiais[cite: 1].</li>
-            <li><strong>Requisições de compras:</strong> Solicite requisições de compras de materiais[cite: 1].</li>
-            <li><strong>Retirada de materiais não estocáveis:</strong> Solicite a retirada de materiais do estoque[cite: 1].</li>
-            <li><strong>Solicitar NF e/ou Coleta:</strong> Solicite a Nota fiscal e/ou Coleta[cite: 1].</li>
-            <li><strong>Status da solicitação:</strong> Acompanhe a solicitação para confirmar se foi aprovada[cite: 1].</li>
-            <li><strong>Verificar materiais:</strong> Scaneie materiais em estoque para obter mais informações[cite: 1].</li>
-            <li><strong>Gestão de ferramentas:</strong> Uso exclusivo para almoxarifado: acesse a ferramenta do V-TOOLING[cite: 1].</li>
-        </ul>
-        <div class="link-box"><strong>LINK APP:</strong> https://apps.powerapps.com/play/e/c06a757f-f8de-45e1-8170-f613f20739f5/a/cfc020af-97dc-4d8c-9b1c-ac31228d7d9e?tenantId=7893571b-6c2c-4cef-b4da-7d4b266a0626&hint=da5815fe-aa76-4265-a806-d776714e948b&sourcetime=1723492153963[cite: 1]</div>
+        <!-- CABEÇALHO CORPORATIVO VALE -->
+        <header class="bg-gradient-to-r from-[#007e7a] to-[#005a57] text-white p-6 sm:p-7 rounded-2xl shadow-lg shadow-teal-900/10 mb-6">
+            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+                <div class="text-center sm:text-left">
+                    <div class="flex items-center justify-center sm:justify-start gap-3">
+                        <span class="text-2xl font-black tracking-widest text-teal-100">VALE</span>
+                        <div class="h-5 w-px bg-teal-300/40"></div>
+                        <span class="text-lg font-extrabold tracking-wide">Portal Operacional</span>
+                        <span class="bg-amber-500 text-white font-black text-[10px] px-2 py-0.5 rounded shadow-sm">v05</span>
+                    </div>
+                    <p class="text-xs text-teal-100/90 mt-1 font-medium">Suíte integrada de gestão diária, segurança, equipamentos, equipes e FMDS</p>
+                </div>
 
-        <p><strong>Material Estocável:</strong> Refere-se a itens, produtos ou materiais mantidos em estoque de forma contínua ou periódica para atender às necessidades regulares da organização[cite: 1].</p>
-        <p><strong>Material Não Estocável:</strong> Itens adquiridos sob demanda, sempre que há uma necessidade específica, não sendo mantidos em estoque de longo prazo[cite: 1].</p>
+                <div class="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-3.5 py-1.5 rounded-xl text-xs font-semibold border border-white/10">
+                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span id="relogioTopo">--:--:--</span>
+                    <span class="text-teal-200">|</span>
+                    <span id="dataTopo">--/--/----</span>
+                </div>
+            </div>
+        </header>
 
-        <!-- RECURSOS MÍNIMOS -->
-        <h2>Recursos Mínimos para Realizar a Atividade</h2>
-        <table>
-            <tr>
-                <th>Nº</th>
-                <th>Item</th>
-                <th>Descrição</th>
-            </tr>
-            <tr>
-                <td>1</td>
-                <td>EPI’S</td>
-                <td>Botina de Segurança (com palmilha autoperfurante), capacete com jugular e óculos de segurança, e outros conforme placa de sinalização no local, colete refletivo, luvas conforme a atividade[cite: 1].</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>FERRAMENTAS DE SAÚDE E SEGURANÇA</td>
-                <td>Portar a ART da atividade e garantir que todos os executantes tenham conhecimento de seu conteúdo e sejam treinados; Desenvolver ART LOCAL em campo[cite: 1].</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>EQUIPAMENTOS E/OU FERRAMENTAS</td>
-                <td>Rádio De Comunicação; empilhadeira, paleteira, transpaleteira elétrica, varredeira, Munck; Pick up[cite: 1].</td>
-            </tr>
-        </table>
+        <!-- GRADE COM OS MÓDULOS -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-left">
+            
+            <!-- MÓDULO 1 -->
+            <a href="modulo1.html" class="card-modulo m1" title="Pressione [1] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">📋</div>
+                        <span class="tecla-atalho">Tecla 1</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">DDS & Emociograma</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Controle semanal com carinhas de emociograma, registro de rubricas e impressão A4 paisagem.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#007e7a]">
+                    <span>Abrir Módulo 1</span><span>➔</span>
+                </div>
+            </a>
 
-        <!-- MÓDULO 11: FLUXO DE MATERIAIS -->
-        <h2>Módulo 11: Fluxo de Materiais e Procedimentos</h2>
+            <!-- MÓDULO 2 -->
+            <a href="modulo2.html" class="card-modulo m2" title="Pressione [2] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">📅</div>
+                        <span class="tecla-atalho">Tecla 2</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Matriz Anual de DDS</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Grelha anual completa (12 meses) com visibilidade dinâmica por semestre/trimestre e autoajuste.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#007e7a]">
+                    <span>Abrir Módulo 2</span><span>➔</span>
+                </div>
+            </a>
 
-        <h3>1. Fluxo para Envio de Material Vale x Vale (Transferência entre Unidades CTSS x G4)</h3>
-        <p><strong>Solicitação de Transferência (Responsável: Solicitante):[cite: 2]</strong></p>
-        <ul>
-            <li>Identificar o material que será transferido[cite: 2].</li>
-            <li>Enviar e-mail solicitando a transferência do material, anexando registros fotográficos, descrição e quantidade para <code>almoxarifado@ctss.com</code>[cite: 2].</li>
-            <li>Preencher o formulário no Sistema de Gestão de Materiais para emissão da Nota Fiscal (NF)[cite: 2].</li>
-            <li>Acompanhar o status da solicitação na aba "NF e Frete" (Aguardando Validação, Aguardando Aprovação, NF-e Emitida, Concluído, Cancelado)[cite: 2].</li>
-            <li>Preencher o formulário online de envio do material (Romaneio Online) e aguardar a aprovação do Coordenador da área[cite: 2].</li>
-            <li>Após a aprovação, solicitar a impressão da Nota Fiscal e do Romaneio Online, avisando a patrimonial para conferência[cite: 2].</li>
-        </ul>
+            <!-- MÓDULO 3 -->
+            <a href="modulo3.html" class="card-modulo m3" title="Pressione [3] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">🏖️</div>
+                        <span class="tecla-atalho">Tecla 3</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Cronograma de Férias</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Planejamento anual de início e término das férias da equipe com controle de saldo de dias.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#db2777]">
+                    <span>Abrir Módulo 3</span><span>➔</span>
+                </div>
+            </a>
 
-        <p><strong>Validação Patrimonial (Responsáveis: Solicitante / Patrimonial):[cite: 2]</strong></p>
-        <ul>
-            <li>Conferir e validar os materiais relacionados na Nota Fiscal e no Romaneio Online antes de embalar[cite: 2].</li>
-            <li>O setor Patrimonial poderá aprovar ou recusar a transferência em caso de divergências. Se recusado, o solicitante deve corrigir as inconsistências[cite: 2].</li>
-        </ul>
+            <!-- MÓDULO 4 -->
+            <a href="modulo4.html" class="card-modulo m4" title="Pressione [4] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">🎂</div>
+                        <span class="tecla-atalho">Tecla 4</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Aniversariantes do Ano</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Grade vertical dos 12 meses preenchendo a folha A4 com ordenação cronológica por dia.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#db2777]">
+                    <span>Abrir Módulo 4</span><span>➔</span>
+                </div>
+            </a>
 
-        <p><strong>Preparação e Expedição do Material (Responsável: Almoxarifado):[cite: 2]</strong></p>
-        <ul>
-            <li>Receber a liberação, conferir o material físico com a NF e o Romaneio Online, embalar adequadamente e garantir a legibilidade das etiquetas[cite: 2].</li>
-            <li>Carregar os materiais no veículo de transporte, conferir a carga e entregar uma cópia da documentação ao segurança Patrimonial da unidade de origem[cite: 2].</li>
-        </ul>
+            <!-- MÓDULO 5 -->
+            <a href="modulo5.html" class="card-modulo m5" title="Pressione [5] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">📊</div>
+                        <span class="tecla-atalho">Tecla 5</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Absenteísmo & Justificativas</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Registro padronizado de ocorrências (AT, FA, CO, FO) com resumo e lançamento rápido.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#db2777]">
+                    <span>Abrir Módulo 5</span><span>➔</span>
+                </div>
+            </a>
 
-        <p><strong>Recebimento na Unidade de Destino (Responsável: Almoxarifado / Patrimonial da Unidade de Destino):[cite: 2]</strong></p>
-        <ul>
-            <li>Conferir os materiais recebidos na unidade G4, entregar a NF e o romaneio à portaria, realizar o endereçamento físico e registrar a movimentação no Sistema de Gestão de Materiais[cite: 2].</li>
-        </ul>
+            <!-- MÓDULO 6 -->
+            <a href="modulo6.html" class="card-modulo m6" title="Pressione [6] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">🎓</div>
+                        <span class="tecla-atalho">Tecla 6</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Gestão de Treinamentos</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Capacitações com suporte à turma em lote, sincronização em nuvem e exportação em Excel.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#059669]">
+                    <span>Abrir Módulo 6</span><span>➔</span>
+                </div>
+            </a>
 
-        <h3>2. Fluxo para Retirada de Materiais Vale x Vale - Transferência G4 x CTSS</h3>
-        <ul>
-            <li><strong>Solicitação de Transferência (Responsável: Solicitante):</strong> Solicitar pelo aplicativo de Gestão de Materiais ("Retirada de Materiais Não Estocáveis") informando Site, Material, Quantidade e Data de necessidade[cite: 2].</li>
-            <li><strong>Preparação e Expedição (Responsável: Almoxarifado):</strong> Verificar diariamente as solicitações, programar caminhão se necessário na reunião de programação, localizar, separar e carregar os materiais, emitir o Romaneio Online e encaminhar à portaria[cite: 2].</li>
-            <li><strong>Conferência e Liberação (Responsável: Portaria / Almoxarifado):</strong> Validar os materiais no romaneio, autorizar a saída e realizar registro fotográfico para rastreabilidade[cite: 2].</li>
-            <li><strong>Entrega do Material:</strong> Transporte até o destino, liberação de acesso pelo Patrimonial, descarregamento com registro fotográfico e baixa da solicitação no aplicativo[cite: 2].</li>
-        </ul>
+            <!-- MÓDULO 7 -->
+            <a href="modulo7.html" class="card-modulo m7" title="Pressione [7] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">💳</div>
+                        <span class="tecla-atalho">Tecla 7</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Compras Cartão Corporativo</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Lançamento e controle de compras no cartão corporativo, extração via links e exportação para planilha.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#6366f1]">
+                    <span>Abrir Módulo 7</span><span>➔</span>
+                </div>
+            </a>
 
-        <h3>3. Fluxo de Envio e Retirada de Materiais de Empresas Terceirizadas (CTSS x G4 / G4 x CTSS)</h3>
-        <ul>
-            <li><strong>Envio (CTSS x G4):</strong> Informar na reunião de programação, enviar e-mail ao almoxarifado (com descrição, quantidade, data e fotos), preencher o Romaneio Online e acionar a Patrimonial para conferência e liberação do transporte[cite: 2].</li>
-            <li><strong>Retirada (G4 x CTSS):</strong> Solicitar via e-mail e na reunião de programação, preencher o Romaneio Online, entregar cópia ao almoxarifado, acionar a Portaria para conferência e realizar o transporte de retorno ao CTSS com validação patrimonial[cite: 2].</li>
-        </ul>
+            <!-- MÓDULO 8 -->
+            <a href="modulo8.html" class="card-modulo m8" title="Pressione [8] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">📄</div>
+                        <span class="tecla-atalho">Tecla 8</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Procura e Gestão de FDS / FISPQ</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Consulta rápida de Fichas de Dados de Segurança com miniaturas visuais, fotos e links diretos.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#0891b2]">
+                    <span>Abrir Módulo 8</span><span>➔</span>
+                </div>
+            </a>
 
-        <h3>4. Fluxo de Retirada de Material Funcionário x Residência</h3>
-        <ul>
-            <li><strong>Responsável: Solicitante:</strong> Preencher o Romaneio Online de Saída de Material (nome, matrícula, descrição detalhada, quantidade, data prevista de devolução, justificativa, endereço de destino, aprovação do gestor e aceite do Termo de Responsabilidade)[cite: 2].</li>
-            <li><strong>Retirada:</strong> O almoxarifado realiza a separação e conferência; o colaborador confere os itens e a saída é registrada no controle de estoque[cite: 2].</li>
-            <li><strong>Devolução/Incidentes:</strong> O material é inspecionado na devolução. Em caso de perda, avaria ou furto, comunicar imediatamente a segurança patrimonial[cite: 2].</li>
-        </ul>
+            <!-- MÓDULO 9 -->
+            <a href="modulo9.html" class="card-modulo m9" title="Pressione [9] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">💻</div>
+                        <span class="tecla-atalho">Tecla 9</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Controle de Notebooks</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Gestão de entrega e recebimento, patrimônio, termos de responsabilidade e status operacional.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#d97706]">
+                    <span>Abrir Módulo 9</span><span>➔</span>
+                </div>
+            </a>
 
-        <!-- ANEXOS -->
-        <h2>Anexos</h2>
-        <table>
-            <tr>
-                <th>#</th>
-                <th>Descrição</th>
-                <th>Endereço / Referência</th>
-            </tr>
-            <tr>
-                <td>1</td>
-                <td>Reserva MB21</td>
-                <td>Passo a Passo RC Reserva.pdf[cite: 1]</td>
-            </tr>
-            <tr>
-                <td>2</td>
-                <td>V-tooling</td>
-                <td>https://app.vtooling.valeglobal.net/selecao-area-usuaria[cite: 1]</td>
-            </tr>
-            <tr>
-                <td>3</td>
-                <td>Autorização de Saída de materiais</td>
-                <td>N/A[cite: 1]</td>
-            </tr>
-            <tr>
-                <td>4</td>
-                <td>Retiradas de Ferramentas</td>
-                <td>retirada de ferramentas.xlsx[cite: 1]</td>
-            </tr>
-        </table>
+            <!-- MÓDULO 10 -->
+            <a href="modulo10.html" class="card-modulo m10" title="Pressione [0] no teclado">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">👥</div>
+                        <span class="tecla-atalho">Tecla 0</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Troca dos Participantes FMDS</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Matriz de controle e rotação de participantes por temas (DSS, SSMA, Produtividade, Qualidade).
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#475569]">
+                    <span>Abrir Módulo 10</span><span>➔</span>
+                </div>
+            </a>
 
-        <!-- ASSINATURAS / RESPONSÁVEIS -->
-        <h2>Elaboradores e Aprovadores</h2>
-        <table>
-            <tr>
-                <th>Nome</th>
-                <th>Matrícula</th>
-                <th>Gerência</th>
-            </tr>
-            <tr>
-                <td>Alfredo Augusto Ramos Neto[cite: 1]</td>
-                <td>81021893[cite: 1]</td>
-                <td>GER INDUSTR PROCESSO MINERAL[cite: 1]</td>
-            </tr>
-            <tr>
-                <td>Allan Souza De Carvalho[cite: 1]</td>
-                <td>10900407[cite: 1]</td>
-                <td>GER INDUSTR PROCESSO MINERAL[cite: 1]</td>
-            </tr>
-            <tr>
-                <td>Atmisto Silva[cite: 1]</td>
-                <td>C0625384[cite: 1]</td>
-                <td>GER INDUSTR PROCESSO MINERAL[cite: 1]</td>
-            </tr>
-            <tr>
-                <td>Mariana Pereira Cruz[cite: 1]</td>
-                <td>81025364[cite: 1]</td>
-                <td>GER INDUSTR PROCESSO MINERAL[cite: 1]</td>
-            </tr>
-        </table>
+            <!-- MÓDULO 11: FLUXO DE MATERIAIS E PRO -->
+            <a href="modulo11.html" class="card-modulo m11">
+                <div>
+                    <div class="flex justify-between items-center mb-3">
+                        <div class="card-icone">📦</div>
+                        <span class="tecla-atalho">Módulo 11</span>
+                    </div>
+                    <div class="text-sm font-bold text-slate-800 mb-1">Fluxo de Materiais & PRO</div>
+                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
+                        Procedimento padrão (PRO) integrado com os fluxos operacionais de envio, recebimento e transferências.
+                    </div>
+                </div>
+                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#0d9488]">
+                    <span>Abrir Módulo 11</span><span>➔</span>
+                </div>
+            </a>
 
+        </div>
+
+        <!-- RODAPÉ -->
+        <footer class="mt-8 text-center text-xs text-slate-400 font-medium space-y-1">
+            <p>Sistema Operacional Integrado • Portal Vale Corporativo</p>
+            <p class="text-[10px] text-slate-400/80">Dica: Utilize os números de 1 a 9 e 0 no teclado para navegação rápida entre os módulos.</p>
+        </footer>
     </div>
 
+    <!-- SCRIPT DE ATALHOS E SEGURANÇA -->
+    <script>
+        const PIN_CORRETO = "1234";
+
+        function atualizarRelogio() {
+            const agora = new Date();
+            const relogioEl = document.getElementById('relogioTopo');
+            const dataEl = document.getElementById('dataTopo');
+            if (relogioEl) relogioEl.innerText = agora.toLocaleTimeString('pt-BR');
+            if (dataEl) dataEl.innerText = agora.toLocaleDateString('pt-BR');
+        }
+        setInterval(atualizarRelogio, 1000);
+        atualizarRelogio();
+
+        document.addEventListener('keydown', (e) => {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+            const rotas = {
+                '1': 'modulo1.html',
+                '2': 'modulo2.html',
+                '3': 'modulo3.html',
+                '4': 'modulo4.html',
+                '5': 'modulo5.html',
+                '6': 'modulo6.html',
+                '7': 'modulo7.html',
+                '8': 'modulo8.html',
+                '9': 'modulo9.html',
+                '0': 'modulo10.html'
+            };
+
+            if (rotas[e.key]) {
+                window.location.href = rotas[e.key];
+            }
+        });
+
+        function ehDispositivoMovel() {
+            return window.innerWidth < 768;
+        }
+
+        function liberarAcesso() {
+            const tela = document.getElementById('tela-bloqueio-mobile');
+            if (tela) {
+                tela.classList.add('transition-opacity', 'duration-300', 'opacity-0');
+                setTimeout(() => {
+                    tela.style.display = 'none';
+                    tela.classList.remove('opacity-0');
+                }, 300);
+            }
+        }
+
+        function bloquearAcesso() {
+            if (!ehDispositivoMovel()) return;
+            sessionStorage.removeItem('vale_sessao_biometria');
+            const tela = document.getElementById('tela-bloqueio-mobile');
+            if (tela) {
+                document.getElementById('erro-auth').classList.add('hidden');
+                document.getElementById('pinInput').value = '';
+                tela.style.display = 'flex';
+            }
+        }
+
+        function verificarPIN() {
+            const input = document.getElementById('pinInput');
+            const erroEl = document.getElementById('erro-auth');
+
+            if (input.value === PIN_CORRETO) {
+                sessionStorage.setItem('vale_sessao_biometria', 'true');
+                liberarAcesso();
+            } else {
+                erroEl.innerText = "PIN incorreto. Tente novamente.";
+                erroEl.classList.remove('hidden');
+                input.value = '';
+                input.focus();
+            }
+        }
+
+        document.getElementById('pinInput')?.addEventListener('keyup', (e) => {
+            if (e.key === 'Enter') verificarPIN();
+        });
+
+        async function desbloquearPorBiometria() {
+            const erroEl = document.getElementById('erro-auth');
+            erroEl.classList.add('hidden');
+
+            if (!window.isSecureContext || !window.PublicKeyCredential) {
+                erroEl.innerText = "Biometria indisponível. Utilize o PIN de segurança.";
+                erroEl.classList.remove('hidden');
+                document.getElementById('pinInput').focus();
+                return;
+            }
+
+            try {
+                const disponivel = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
+                if (!disponivel) {
+                    erroEl.innerText = "Nenhuma biometria ativa no aparelho. Utilize o PIN.";
+                    erroEl.classList.remove('hidden');
+                    document.getElementById('pinInput').focus();
+                    return;
+                }
+
+                const challenge = new Uint8Array(32);
+                window.crypto.getRandomValues(challenge);
+
+                const options = {
+                    publicKey: {
+                        challenge: challenge,
+                        rp: { name: "Portal Vale" },
+                        user: {
+                            id: new Uint8Array([1, 2, 3, 4]),
+                            name: "operacional@vale",
+                            displayName: "Operador Vale"
+                        },
+                        pubKeyCredParams: [{ type: "public-key", alg: -7 }],
+                        authenticatorSelection: {
+                            authenticatorAttachment: "platform",
+                            userVerification: "required"
+                        },
+                        timeout: 30000
+                    }
+                };
+
+                const cred = await navigator.credentials.create(options);
+                if (cred) {
+                    sessionStorage.setItem('vale_sessao_biometria', 'true');
+                    liberarAcesso();
+                }
+            } catch (err) {
+                if (err.name !== "NotAllowedError") {
+                    erroEl.innerText = "Validação não concluída. Digite o PIN de 4 dígitos.";
+                    erroEl.classList.remove('hidden');
+                    document.getElementById('pinInput').focus();
+                }
+            }
+        }
+
+        document.addEventListener('visibilitychange', () => {
+            if (document.hidden) {
+                bloquearAcesso();
+            } else if (ehDispositivoMovel() && sessionStorage.getItem('vale_sessao_biometria') !== 'true') {
+                setTimeout(desbloquearPorBiometria, 350);
+            }
+        });
+
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!ehDispositivoMovel()) {
+                sessionStorage.setItem('vale_sessao_biometria', 'true');
+                const tela = document.getElementById('tela-bloqueio-mobile');
+                if (tela) tela.style.display = 'none';
+                return;
+            }
+
+            if (sessionStorage.getItem('vale_sessao_biometria') === 'true') {
+                liberarAcesso();
+            } else {
+                bloquearAcesso();
+                setTimeout(desbloquearPorBiometria, 400);
+            }
+        });
+    </script>
 </body>
 </html>
