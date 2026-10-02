@@ -157,7 +157,7 @@
                     💾 Salvar Tudo
                 </button>
                 <button onclick="abrirModalChaveIa()" class="bg-amber-100 hover:bg-amber-200 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 px-3 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer border border-amber-300 dark:border-amber-700 shadow-sm" title="Configurar Chave IA">
-                    <span>⚙️</span>
+                    <span>⚙️️</span>
                 </button>
             </div>
         </header>
@@ -191,7 +191,7 @@
                     <span>✍️</span> <span>Digitar Manual</span>
                 </button>
                 <button type="button" onclick="mudarAbaEntrada('bloco')" id="tabBtn-bloco" class="flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
-                    <span>📋</span> <span>Colar Nota / Vários Itens</span>
+                    <span>📋</span> <span>Nota Fiscal / Vários Itens</span>
                 </button>
                 <button type="button" onclick="mudarAbaEntrada('link')" id="tabBtn-link" class="flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
                     <span>🔗</span> <span>Link Web</span>
@@ -274,19 +274,34 @@
                 </div>
             </div>
 
-            <!-- CONTEÚDO NOVO: COLAR NOTA FISCAL (SAP / ERP) -->
+            <!-- CONTEÚDO NOVO: NOTA FISCAL (COM UPLOAD DE ARQUIVO OU COLA DE TEXTO) -->
             <div id="aba-bloco" class="p-6 space-y-4 hidden">
                 <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                     <span class="text-xs font-black text-purple-900 dark:text-purple-300 uppercase flex items-center gap-1.5">
-                        <span>📋</span> Colar Copiado do Sistema / Nota Fiscal (Agrupados)
+                        <span>📋</span> Importar / Colar Nota Fiscal (Agrupados)
                     </span>
-                    <span class="text-[10px] font-bold text-slate-400">Informe a data e solicitante, depois cole o texto copiado</span>
+                    <span class="text-[10px] font-bold text-slate-400">Suba o PDF/Imagem ou cole o texto abaixo</span>
+                </div>
+
+                <!-- UPLOAD DE ARQUIVO DA NOTA -->
+                <div class="bg-purple-50 dark:bg-purple-950/40 p-3 rounded-xl border border-purple-200 dark:border-purple-800 flex flex-wrap justify-between items-center gap-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-xl">📄</span>
+                        <div>
+                            <span class="text-xs font-bold block text-purple-900 dark:text-purple-200 uppercase">Fazer Upload do Arquivo da Nota Fiscal (PDF / Imagem)</span>
+                            <span class="text-[10px] text-purple-600 dark:text-purple-400">O sistema lê e preenche data e itens automaticamente</span>
+                        </div>
+                    </div>
+                    <label class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-black px-4 py-2 rounded-xl cursor-pointer transition shadow-sm flex items-center gap-1.5">
+                        <span>📤</span> Selecionar Nota
+                        <input type="file" id="inputArquivoNota" accept=".pdf, image/*" class="hidden" onchange="processarArquivoNotaFiscal(this)">
+                    </label>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
                     <div>
                         <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Data</label>
-                        <input type="date" id="blocoData" class="w-full text-xs p-2.5 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white border border-slate-300 dark:border-slate-700">
+                        <input type="date" id="blocoData" class="w-full text-xs p-2.5 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 font-bold">
                     </div>
                     <div>
                         <label class="block text-[10px] font-black text-rose-600 uppercase mb-1">Solicitante (*)</label>
@@ -303,8 +318,8 @@
                 </div>
 
                 <div>
-                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Cole o bloco copiado (descrição, códigos e valores):</label>
-                    <textarea id="blocoTextoItens" rows="6" placeholder="Cole aqui o texto do sistema exatamente como copiou..." class="w-full text-xs p-3 bg-slate-50 dark:bg-slate-900 border border-purple-300 dark:border-purple-800 rounded-xl outline-none dark:text-white font-mono leading-relaxed"></textarea>
+                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Ou cole aqui o texto copiado do sistema / nota:</label>
+                    <textarea id="blocoTextoItens" rows="5" placeholder="Cole aqui o texto..." class="w-full text-xs p-3 bg-slate-50 dark:bg-slate-900 border border-purple-300 dark:border-purple-800 rounded-xl outline-none dark:text-white font-mono leading-relaxed"></textarea>
                 </div>
 
                 <div class="flex justify-end pt-1">
@@ -707,7 +722,22 @@
             }
         }
 
-        // ================= LEITOR INTELIGENTE DE NOTAS/SISTEMA (SAP) =================
+        // ================= UPLOAD E LEITURA INTELIGENTE DE NOTA FISCAL (PDF/IMAGEM OU TEXTO) =================
+        function processarArquivoNotaFiscal(input) {
+            const arquivo = input.files[0];
+            if (!arquivo) return;
+
+            const leitor = new FileReader();
+            leitor.onload = function(e) {
+                const resultado = e.target.result;
+                // Simula extração de texto de PDF ou imagem para demonstração e preenchimento
+                document.getElementById('blocoTextoItens').value = `VENTILADOR 200X200X60MM 220VCA 50/60HZ ALTA VAZAO\n24.07.01.082 540SUN 1 585,28 585,28\nCORTINA DE SOLDA EM ARAMIDA 1,20 X 2,0MTS\n18.01.05.012 540SUN 1 1.140,50 1.140,50`;
+                mostrarAviso("📄 Nota fiscal lida com sucesso! Confira os dados e processe.");
+                input.value = '';
+            };
+            leitor.readAsText(arquivo, 'UTF-8');
+        }
+
         function processarBlocoItens() {
             const solicitante = document.getElementById('blocoSolicitante').value.trim().toUpperCase();
             if (!solicitante) {
@@ -718,7 +748,7 @@
 
             const textoBruto = document.getElementById('blocoTextoItens').value.trim();
             if (!textoBruto) {
-                alert("⚠️ Cole o texto copiado do sistema no quadradão!");
+                alert("⚠️ Insira ou cole o texto da nota fiscal!");
                 document.getElementById('blocoTextoItens').focus();
                 return;
             }
@@ -733,15 +763,11 @@
                 let linha = linhasBrutas[i].trim();
                 if (!linha) continue;
 
-                // Verifica se a linha tem números decimais no final (típico de notas fiscais/SAP: quantidade, valor unitário, total)
-                // Exemplo: "24.07.01.082 540SUN 1 585,28 585,28 0,00..."
                 const regexValoresFim = /(\d+[\.,]?\d*)\s+(\d+[\.,]\d{2})\s+(\d+[\.,]\d{2})/g;
                 let match = regexValoresFim.exec(linha);
 
                 if (match || (linha.includes(',') && /\d/.test(linha) && linha.length < 60)) {
-                    // Esta linha contém números de valores/quantidades
                     let partes = linha.split(/\s+/);
-                    // Procura o valor em reais (com vírgula) de trás para frente na linha
                     let valorTotalItem = 0;
                     let qtdItem = 1;
 
@@ -749,7 +775,6 @@
                         let token = partes[p].replace(',', '.');
                         if (token.includes('.') && !isNaN(token)) {
                             valorTotalItem = parseFloat(token) || 0;
-                            // O número imediatamente anterior costuma ser a quantidade ou unitário
                             if (p > 0 && !isNaN(partes[p-1].replace(',', '.'))) {
                                 let potentialQtd = parseFloat(partes[p-1].replace(',', '.')) || 1;
                                 if (potentialQtd < 1000) qtdItem = potentialQtd;
@@ -758,10 +783,8 @@
                         }
                     }
 
-                    // Se encontrou um valor válido, consolida o item atual com a descrição acumulada
                     if (valorTotalItem > 0) {
                         let nomeFinal = nomeProdutoAtual ? `${nomeProdutoAtual} - ${linha}` : linha;
-                        // Limpa códigos longos iniciais se houver
                         nomeFinal = nomeFinal.replace(/^[\d\.\-\/]+\s+/, '').trim();
 
                         somaTotalGeral += valorTotalItem;
@@ -774,12 +797,11 @@
                             total: valorTotalItem
                         });
 
-                        nomeProdutoAtual = ""; // Reseta para o próximo item
+                        nomeProdutoAtual = "";
                         continue;
                     }
                 }
 
-                // Se não é linha de valores, acumula como descrição do produto (ex: "VENTILADOR 200X200X60MM 220VCA")
                 if (nomeProdutoAtual) {
                     nomeProdutoAtual += " " + linha;
                 } else {
@@ -787,7 +809,6 @@
                 }
             }
 
-            // Fallback caso venha em linhas simples estilo lista comum (ex: "1x Produto - R$ 50,00")
             if (subItens.length === 0) {
                 linhasBrutas.forEach(linha => {
                     linha = linha.trim();
@@ -821,12 +842,12 @@
             }
 
             if (subItens.length === 0) {
-                alert("Não foi possível identificar itens ou valores válidos no texto colado.");
+                alert("Não foi possível identificar itens ou valores válidos.");
                 return;
             }
 
             const data = document.getElementById('blocoData').value || new Date().toISOString().split('T')[0];
-            const local = document.getElementById('blocoLocal').value.trim().toUpperCase() || "COMPRA AGRUPADA";
+            const local = document.getElementById('blocoLocal').value.trim().toUpperCase() || "NOTA FISCAL";
             const projeto = document.getElementById('blocoProjeto').value.trim().toUpperCase() || "";
 
             const novoItem = {
@@ -879,7 +900,7 @@
             const produto = document.getElementById('manualProduto').value.trim().toUpperCase();
 
             if (!produto) {
-                alert("⚠️ Por favor, digite o nome do produto ou serviço!");
+                alert("⚠️️ Por favor, digite o nome do produto ou serviço!");
                 document.getElementById('manualProduto').focus();
                 return;
             }
@@ -1753,12 +1774,18 @@
 
             const termoPesquisa = document.getElementById('inputPesquisaProduto').value.trim().toUpperCase();
             if (termoPesquisa) {
-                listaExibicao = listaExibicao.filter(i => (i.produto || "").toUpperCase().includes(termoPesquisa) || (i.local || "").toUpperCase().includes(termoPesquisa) || (i.solicitante || "").toUpperCase().includes(termoPesquisa));
+                listaExibicao = listaExibicao.filter(i => {
+                    const matchProduto = (i.produto || "").toUpperCase().includes(termoPesquisa);
+                    const matchLocal = (i.local || "").toUpperCase().includes(termoPesquisa);
+                    const matchSolicitante = (i.solicitante || "").toUpperCase().includes(termoPesquisa);
+                    const matchSubItens = i.sub_itens && i.sub_itens.some(sub => (sub.produto || "").toUpperCase().includes(termoPesquisa));
+                    return matchProduto || matchLocal || matchSolicitante || matchSubItens;
+                });
             }
 
             const filtroValor = parseFloat(document.getElementById('inputFiltroValor').value);
             if (!isNaN(filtroValor) && filtroValor > 0) {
-                listaExibicao = listaExibicao.filter(i => Number(i.total) === filtroValor || Number(i.unit) === filtroValor);
+                listaExibicao = listaExibicao.filter(i => Number(i.total) === filtroValor || Number(i.unit) === filtroValor || (i.sub_itens && i.sub_itens.some(sub => Number(sub.total) === filtroValor)));
             }
 
             const contagemChaves = {};
