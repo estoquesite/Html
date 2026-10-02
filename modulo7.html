@@ -204,77 +204,82 @@
                 </button>
             </div>
 
-            <!-- CONTEÚDO 1: DIGITAÇÃO MANUAL (MÚLTIPLAS LINHAS DUPLICADAS) -->
+            <!-- CONTEÚDO 1: DIGITAÇÃO MANUAL (CABEÇALHO ÚNICO E ITENS MÚLTIPLOS) -->
             <div id="aba-manual" class="p-6 space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                     <span class="text-xs font-black text-indigo-900 dark:text-indigo-300 uppercase flex items-center gap-1.5">
-                        <span>✍️</span> Novo Lançamento Manual (Várias Linhas)
+                        <span>✍️</span> Novo Lançamento Manual (Mesmo Solicitante / Vários Itens)
                     </span>
-                    <span class="text-[10px] font-bold text-slate-400">Adicione quantos itens precisar</span>
+                    <span class="text-[10px] font-bold text-slate-400">Preencha o cabeçalho e adicione os itens abaixo</span>
                 </div>
 
-                <div id="containerLinhasManuais" class="space-y-3">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end linha-manual-item bg-slate-50 dark:bg-slate-900/40 p-3 rounded-2xl border border-slate-200 dark:border-slate-700 relative">
-                        <div class="md:col-span-2">
-                            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Data Compra</label>
-                            <input type="date" class="manualData neon-pulsante w-full text-xs p-2.5 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white" onchange="atualizarDataEntregaManualDefault(this)">
+                <!-- CABEÇALHO DA COMPRA MANUAL -->
+                <div class="bg-indigo-50/60 dark:bg-slate-900/60 p-4 rounded-2xl border border-indigo-200 dark:border-indigo-800 grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Data da Compra</label>
+                        <input type="date" id="manualData" class="neon-pulsante w-full text-xs p-2.5 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white font-bold" onchange="atualizarDataEntregaManualDefaultGeral(this.value)">
+                    </div>
+                    <div>
+                        <div class="flex justify-between items-center mb-1">
+                            <label class="block text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase">Solicitante (*)</label>
+                            <span id="avisoManualSolicitante" class="text-[9px] font-black text-rose-600 animate-pulse">OBRIGATÓRIO!</span>
                         </div>
+                        <input type="text" id="manualSolicitante" oninput="validarInputManualSolicitante(this)" placeholder="QUEM PEDIU?" class="uppercase-input w-full text-xs p-2.5 rounded-xl outline-none transition-all piscar-solicitante-forte">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Local / Fornecedor</label>
+                        <input type="text" id="manualLocalGeral" oninput="this.value = this.value.toUpperCase()" placeholder="EX: MERCADO LIVRE..." class="uppercase-input w-full text-xs p-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                    </div>
+                </div>
 
-                        <div class="md:col-span-3">
-                            <div class="flex justify-between items-center mb-1">
-                                <label class="block text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase">Solicitante (*)</label>
-                                <span class="avisoManualSolicitante text-[9px] font-black text-rose-600 animate-pulse">OBRIGATÓRIO!</span>
+                <!-- LISTA DE ITENS DA COMPRA MANUAL -->
+                <div class="space-y-3 pt-2">
+                    <div class="text-[11px] font-black uppercase text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                        <span>📦 Itens da Compra:</span>
+                        <button type="button" onclick="adicionarSubLinhaManual()" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300 font-bold py-1.5 px-3 rounded-lg text-[10px] transition flex items-center gap-1 cursor-pointer">
+                            <span>➕</span> Adicionar mais um item nesta compra
+                        </button>
+                    </div>
+
+                    <div id="containerSubLinhasManuais" class="space-y-2.5">
+                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-end sub-linha-manual bg-slate-50 dark:bg-slate-900/40 p-3 rounded-xl border border-slate-200 dark:border-slate-700 relative">
+                            <div class="sm:col-span-4">
+                                <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Produto / Serviço</label>
+                                <input type="text" oninput="this.value = this.value.toUpperCase()" placeholder="EX: CHUMBADOR..." class="subProduto uppercase-input w-full text-xs p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold outline-none">
                             </div>
-                            <input type="text" oninput="validarInputManualSolicitante(this)" placeholder="QUEM PEDIU?" class="manualSolicitante uppercase-input w-full text-xs p-2.5 rounded-xl outline-none transition-all piscar-solicitante-forte">
-                        </div>
-
-                        <div class="md:col-span-4">
-                            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Produto / Serviço</label>
-                            <input type="text" oninput="this.value = this.value.toUpperCase()" placeholder="EX: CHUMBADOR..." class="manualProduto uppercase-input w-full text-xs p-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                        </div>
-
-                        <div class="md:col-span-3">
-                            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Local / Fornecedor</label>
-                            <input type="text" oninput="this.value = this.value.toUpperCase()" placeholder="EX: MERCADO LIVRE..." class="manualLocal uppercase-input w-full text-xs p-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                        </div>
-
-                        <div class="md:col-span-3">
-                            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Projeto</label>
-                            <input type="text" oninput="this.value = this.value.toUpperCase()" placeholder="NOME DO PROJETO..." class="manualProjeto uppercase-input w-full text-xs p-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                        </div>
-
-                        <div class="md:col-span-2">
-                            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Qtd</label>
-                            <input type="number" value="1" min="1" oninput="calcularManualPorTotal(this)" class="manualQtd w-full text-xs p-2.5 text-center font-bold bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white outline-none">
-                        </div>
-
-                        <div class="md:col-span-2">
-                            <label class="block text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase mb-1">Total (R$) 🔄</label>
-                            <input type="number" step="0.01" placeholder="0,00" oninput="calcularManualPorTotal(this)" class="manualTotal w-full text-xs p-2.5 bg-emerald-50/70 border border-emerald-400 rounded-xl font-black text-emerald-600 outline-none">
-                        </div>
-
-                        <div class="md:col-span-2">
-                            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Unitário (R$)</label>
-                            <input type="number" step="0.01" placeholder="0,00" oninput="calcularManualPorUnitario(this)" class="manualUnit w-full text-xs p-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                        </div>
-
-                        <div class="md:col-span-3 bg-white dark:bg-slate-900/60 p-2.5 rounded-xl border border-indigo-200 dark:border-indigo-800">
-                            <label class="flex items-center gap-1.5 cursor-pointer mb-1">
-                                <input type="checkbox" onchange="toggleManualDataEntrega(this)" class="manualEntregue pulso-delicado w-4 h-4 text-indigo-600 rounded cursor-pointer">
-                                <span class="text-[10px] font-bold uppercase text-indigo-700 dark:text-indigo-300">📦 Entregue? (+10d)</span>
-                            </label>
-                            <input type="date" class="manualDataEntrega neon-pulsante w-full text-[10px] p-1.5 rounded font-bold hidden bg-white dark:bg-slate-800 dark:text-white">
+                            <div class="sm:col-span-3">
+                                <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Projeto</label>
+                                <input type="text" oninput="this.value = this.value.toUpperCase()" placeholder="PROJETO..." class="subProjeto uppercase-input w-full text-xs p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold outline-none">
+                            </div>
+                            <div class="sm:col-span-1">
+                                <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Qtd</label>
+                                <input type="number" value="1" min="1" oninput="calcularSubManualPorTotal(this)" class="subQtd w-full text-xs p-2 text-center font-bold bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white outline-none">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-[9px] font-black text-emerald-600 uppercase mb-1">Total (R$) 🔄</label>
+                                <input type="number" step="0.01" placeholder="0,00" oninput="calcularSubManualPorTotal(this)" class="subTotal w-full text-xs p-2 bg-emerald-50/70 border border-emerald-400 rounded-lg font-black text-emerald-600 outline-none">
+                            </div>
+                            <div class="sm:col-span-2">
+                                <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Unitário</label>
+                                <input type="number" step="0.01" placeholder="0,00" oninput="calcularSubManualPorUnitario(this)" class="subUnit w-full text-xs p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold outline-none">
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                <div class="flex flex-wrap justify-between items-center pt-2 gap-2">
-                    <button type="button" onclick="adicionarLinhaManual()" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-800 dark:bg-indigo-950/80 dark:text-indigo-300 font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer">
-                        <span>➕</span> Adicionar Mais um Item
-                    </button>
-                    <button type="button" onclick="lancarComprasManuaisEmLote()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 px-8 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer">
+                <!-- CONTROLE DE ENTREGA GERAL -->
+                <div class="bg-slate-100 dark:bg-slate-900/60 p-3 rounded-xl border border-indigo-200 dark:border-indigo-800 space-y-2">
+                    <label class="flex items-center gap-1.5 cursor-pointer">
+                        <input type="checkbox" id="manualEntregueGeral" onchange="toggleManualDataEntregaGeral(this.checked)" class="pulso-delicado w-4 h-4 text-indigo-600 rounded cursor-pointer">
+                        <span class="text-[10px] font-bold uppercase text-indigo-700 dark:text-indigo-300">📦 Compra Entregue? (+10d)</span>
+                    </label>
+                    <input type="date" id="manualDataEntregaGeral" class="neon-pulsante w-full sm:w-1/3 text-xs p-2 rounded font-bold hidden bg-white dark:bg-slate-800 dark:text-white">
+                </div>
+
+                <div class="flex justify-end pt-2">
+                    <button type="button" onclick="lancarCompraManualAgrupada()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 px-8 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer">
                         <span>✅</span>
-                        <span>Salvar Todos na Tabela</span>
+                        <span>Salvar Compra com Todos os Itens</span>
                     </button>
                 </div>
             </div>
@@ -338,7 +343,7 @@
                 </div>
             </div>
 
-            <!-- CONTEÚDO 3: LINK WEB (MÚLTIPLAS LINHAS DE LINKS) -->
+            <!-- CONTEÚDO 3: LINK WEB (COM MÚLTIPLAS LINHAS DE LINKS) -->
             <div id="aba-link" class="p-6 space-y-3 hidden">
                 <div class="flex justify-between items-center">
                     <label class="block text-xs font-black text-blue-950 dark:text-blue-200 uppercase flex items-center gap-2">
@@ -528,7 +533,7 @@
         </div>
     </div>
 
-    <!-- MODAL DA CHAVE DA IA (ENGRENAGEM ⚙️️) -->
+    <!-- MODAL DA CHAVE DA IA (ENGRENAGEM ⚙️) -->
     <div id="modalChaveIa" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 w-full max-w-md rounded-2xl p-5 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
@@ -645,12 +650,14 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             const hoje = new Date().toISOString().split('T')[0];
-            const primeiraDataManual = document.querySelector('.manualData');
-            if (primeiraDataManual) primeiraDataManual.value = hoje;
+            const dataManual = document.getElementById('manualData');
+            if (dataManual) {
+                dataManual.value = hoje;
+                atualizarDataEntregaManualDefaultGeral(hoje);
+            }
             document.getElementById('blocoData').value = hoje;
-            if (primeiraDataManual) atualizarDataEntregaManualDefault(primeiraDataManual);
 
-            const solManual = document.querySelector('.manualSolicitante');
+            const solManual = document.getElementById('manualSolicitante');
             if (solManual) solManual.classList.add('piscar-solicitante-forte');
 
             carregarDoLocalStorage();
@@ -691,69 +698,51 @@
             setTimeout(() => el.classList.add('hidden'), 4000);
         }
 
-        // DUPLICAR LINHAS COMPLETAS NA DIGITAÇÃO MANUAL
-        function adicionarLinhaManual() {
-            const container = document.getElementById('containerLinhasManuais');
-            const linhas = container.querySelectorAll('.linha-manual-item');
-            const ultimaLinha = linhas[linhas.length - 1];
-            const novaLinha = ultimaLinha.cloneNode(true);
+        // ADICIONAR SUB-LINHA (ITENS) DENTRO DA MESMA COMPRA MANUAL
+        function adicionarSubLinhaManual() {
+            const container = document.getElementById('containerSubLinhasManuais');
+            const primeiraLinha = container.querySelector('.sub-linha-manual');
+            const novaLinha = primeiraLinha.cloneNode(true);
             
-            const ultimoSolicitante = ultimaLinha.querySelector('.manualSolicitante').value;
-            const ultimaData = ultimaLinha.querySelector('.manualData').value;
-            const ultimoLocal = ultimaLinha.querySelector('.manualLocal').value;
-            const ultimoProjeto = ultimaLinha.querySelector('.manualProjeto').value;
+            novaLinha.querySelector('.subProduto').value = '';
+            novaLinha.querySelector('.subProjeto').value = '';
+            novaLinha.querySelector('.subTotal').value = '';
+            novaLinha.querySelector('.subUnit').value = '';
+            novaLinha.querySelector('.subQtd').value = '1';
 
-            const hoje = new Date().toISOString().split('T')[0];
-            novaLinha.querySelector('.manualData').value = ultimaData || hoje;
-            
-            const inputSol = novaLinha.querySelector('.manualSolicitante');
-            inputSol.value = ultimoSolicitante;
-            validarInputManualSolicitante(inputSol);
-
-            novaLinha.querySelector('.manualProduto').value = '';
-            novaLinha.querySelector('.manualLocal').value = ultimoLocal;
-            novaLinha.querySelector('.manualProjeto').value = ultimoProjeto;
-            novaLinha.querySelector('.manualTotal').value = '';
-            novaLinha.querySelector('.manualUnit').value = '';
-            novaLinha.querySelector('.manualQtd').value = '1';
-            novaLinha.querySelector('.manualEntregue').checked = false;
-            novaLinha.querySelector('.manualDataEntrega').classList.add('hidden');
-            novaLinha.querySelector('.manualDataEntrega').value = '';
-
-            if (!novaLinha.querySelector('.btnRemoverLinha')) {
+            if (!novaLinha.querySelector('.btnRemoverSubLinha')) {
                 const btnRemover = document.createElement('button');
                 btnRemover.type = 'button';
-                btnRemover.className = 'btnRemoverLinha absolute top-2 right-2 bg-rose-100 text-rose-600 hover:bg-rose-200 text-[10px] font-black px-2 py-1 rounded-lg';
-                btnRemover.innerHTML = '✕ Remover';
+                btnRemover.className = 'btnRemoverSubLinha absolute top-2 right-2 bg-rose-100 text-rose-600 hover:bg-rose-200 text-[10px] font-black px-2 py-0.5 rounded';
+                btnRemover.innerHTML = '✕ Remover Item';
                 btnRemover.onclick = () => novaLinha.remove();
                 novaLinha.appendChild(btnRemover);
             }
 
             container.appendChild(novaLinha);
-            novaLinha.querySelector('.manualProduto').focus();
+            novaLinha.querySelector('.subProduto').focus();
         }
 
-        function calcularManualPorTotal(inputElem) {
-            const linha = inputElem.closest('.linha-manual-item');
-            const qtd = parseFloat(linha.querySelector('.manualQtd').value) || 1;
-            const total = parseFloat(linha.querySelector('.manualTotal').value) || 0;
+        function calcularSubManualPorTotal(inputElem) {
+            const linha = inputElem.closest('.sub-linha-manual');
+            const qtd = parseFloat(linha.querySelector('.subQtd').value) || 1;
+            const total = parseFloat(linha.querySelector('.subTotal').value) || 0;
             const unit = (total / qtd).toFixed(2);
-            linha.querySelector('.manualUnit').value = unit > 0 ? unit : '';
+            linha.querySelector('.subUnit').value = unit > 0 ? unit : '';
         }
 
-        function calcularManualPorUnitario(inputElem) {
-            const linha = inputElem.closest('.linha-manual-item');
-            const qtd = parseFloat(linha.querySelector('.manualQtd').value) || 1;
-            const unit = parseFloat(linha.querySelector('.manualUnit').value) || 0;
+        function calcularSubManualPorUnitario(inputElem) {
+            const linha = inputElem.closest('.sub-linha-manual');
+            const qtd = parseFloat(linha.querySelector('.subQtd').value) || 1;
+            const unit = parseFloat(linha.querySelector('.subUnit').value) || 0;
             const total = (qtd * unit).toFixed(2);
-            linha.querySelector('.manualTotal').value = total > 0 ? total : '';
+            linha.querySelector('.subTotal').value = total > 0 ? total : '';
         }
 
         function validarInputManualSolicitante(input) {
             input.value = input.value.toUpperCase();
             const val = input.value.trim();
-            const linha = input.closest('.linha-manual-item');
-            const aviso = linha ? linha.querySelector('.avisoManualSolicitante') : null;
+            const aviso = document.getElementById('avisoManualSolicitante');
             if (val === "" || val === "NÃO INFORMADO" || val === "NAO INFORMADO") {
                 input.classList.add('piscar-solicitante-forte');
                 if (aviso) aviso.classList.remove('hidden');
@@ -776,95 +765,157 @@
             }
         }
 
-        function atualizarDataEntregaManualDefault(inputDataElem) {
-            const linha = inputDataElem.closest('.linha-manual-item');
-            const dataEntregaEl = linha.querySelector('.manualDataEntrega');
-            if (!inputDataElem || !dataEntregaEl) return;
-            
-            let d = new Date(inputDataElem.value + 'T00:00:00');
+        function atualizarDataEntregaManualDefaultGeral(dataCompraStr) {
+            const dataEntregaEl = document.getElementById('manualDataEntregaGeral');
+            if (!dataEntregaEl) return;
+            let d = new Date(dataCompraStr + 'T00:00:00');
             d.setDate(d.getDate() + 10);
             dataEntregaEl.value = d.toISOString().split('T')[0];
         }
 
-        function toggleManualDataEntrega(checkboxElem) {
-            const linha = checkboxElem.closest('.linha-manual-item');
-            const el = linha.querySelector('.manualDataEntrega');
+        function toggleManualDataEntregaGeral(isChecked) {
+            const el = document.getElementById('manualDataEntregaGeral');
             if (!el) return;
-            if (checkboxElem.checked) {
+            if (isChecked) {
                 el.classList.remove('hidden');
-                atualizarDataEntregaManualDefault(linha.querySelector('.manualData'));
+                atualizarDataEntregaManualDefaultGeral(document.getElementById('manualData').value);
             } else {
                 el.classList.add('hidden');
                 el.value = '';
             }
         }
 
-        async function lancarComprasManuaisEmLote() {
-            const linhas = document.querySelectorAll('.linha-manual-item');
-            let novosItens = [];
+        async function lancarCompraManualAgrupada() {
+            const inputSol = document.getElementById('manualSolicitante');
+            const solicitante = inputSol.value.trim().toUpperCase();
 
-            for (let linha of linhas) {
-                const inputSol = linha.querySelector('.manualSolicitante');
-                const solicitante = inputSol.value.trim().toUpperCase();
+            if (!solicitante || solicitante === "NÃO INFORMADO" || solicitante === "NAO INFORMADO") {
+                inputSol.classList.add('piscar-solicitante-forte');
+                inputSol.focus();
+                alert("⚠️ ATENÇÃO: Por favor, preencha quem é o SOLICITANTE!");
+                return;
+            }
 
-                if (!solicitante || solicitante === "NÃO INFORMADO" || solicitante === "NAO INFORMADO") {
-                    inputSol.classList.add('piscar-solicitante-forte');
-                    inputSol.focus();
-                    alert("⚠️ ATENÇÃO: Por favor, preencha quem é o SOLICITANTE em todas as linhas!");
-                    return;
-                }
+            const subLinhas = document.querySelectorAll('.sub-linha-manual');
+            let subItens = [];
+            let somaTotalGeral = 0;
+            let somaQtdGeral = 0;
 
-                const produto = linha.querySelector('.manualProduto').value.trim().toUpperCase();
+            for (let linha of subLinhas) {
+                const produto = linha.querySelector('.subProduto').value.trim().toUpperCase();
                 if (!produto) {
-                    alert("⚠️️ Por favor, digite o nome do produto ou serviço em todas as linhas!");
-                    linha.querySelector('.manualProduto').focus();
+                    alert("⚠️ Por favor, preencha o nome do produto/serviço em todos os itens!");
+                    linha.querySelector('.subProduto').focus();
                     return;
                 }
 
-                const total = parseFloat(linha.querySelector('.manualTotal').value) || 0;
-                const unit = parseFloat(linha.querySelector('.manualUnit').value) || 0;
+                const total = parseFloat(linha.querySelector('.subTotal').value) || 0;
+                const unit = parseFloat(linha.querySelector('.subUnit').value) || 0;
                 if (total <= 0 && unit <= 0) {
-                    alert("⚠️ Por favor, informe o Valor Total ou Unitário em todas as linhas!");
-                    linha.querySelector('.manualTotal').focus();
+                    alert("⚠️ Por favor, informe o Valor Total ou Unitário em todos os itens!");
+                    linha.querySelector('.subTotal').focus();
                     return;
                 }
 
-                const qtd = parseFloat(linha.querySelector('.manualQtd').value) || 1;
-                const entregue = linha.querySelector('.manualEntregue').checked;
+                const qtd = parseFloat(linha.querySelector('.subQtd').value) || 1;
+                const itemTotal = total > 0 ? total : (qtd * unit);
+                const itemUnit = unit > 0 ? unit : (itemTotal / qtd);
 
-                novosItens.push({
-                    id: Date.now() + Math.random(),
-                    data: linha.querySelector('.manualData').value || new Date().toISOString().split('T')[0],
-                    solicitante: solicitante,
+                somaTotalGeral += itemTotal;
+                somaQtdGeral += qtd;
+
+                subItens.push({
                     produto: produto,
-                    local: linha.querySelector('.manualLocal').value.trim().toUpperCase() || "NÃO INFORMADO",
-                    projeto: linha.querySelector('.manualProjeto').value.trim().toUpperCase() || "",
                     qtd: qtd,
-                    unit: unit > 0 ? unit : (total / qtd),
-                    total: total > 0 ? total : (qtd * unit),
-                    link: "",
-                    entregue: entregue,
-                    data_entrega: entregue ? linha.querySelector('.manualDataEntrega').value : "",
-                    sub_itens: []
+                    unit: itemUnit,
+                    total: itemTotal
                 });
             }
 
-            for (let item of novosItens) {
-                compras.unshift(item);
-                inserirNoSupabase(item);
+            if (subItens.length === 0) {
+                alert("⚠️ Adicione pelo menos um item!");
+                return;
             }
 
+            const data = document.getElementById('manualData').value || new Date().toISOString().split('T')[0];
+            const local = document.getElementById('manualLocalGeral').value.trim().toUpperCase() || "NÃO INFORMADO";
+            const entregue = document.getElementById('manualEntregueGeral').checked;
+            const dataEntrega = entregue ? document.getElementById('manualDataEntregaGeral').value : "";
+
+            let novoItem = {};
+            if (subItens.length === 1) {
+                novoItem = {
+                    id: Date.now(),
+                    data: data,
+                    solicitante: solicitante,
+                    produto: subItens[0].produto,
+                    local: local,
+                    projeto: subLinhas[0].querySelector('.subProjeto').value.trim().toUpperCase() || "",
+                    qtd: subItens[0].qtd,
+                    unit: subItens[0].unit,
+                    total: subItens[0].total,
+                    link: "",
+                    entregue: entregue,
+                    data_entrega: dataEntrega,
+                    sub_itens: []
+                };
+            } else {
+                novoItem = {
+                    id: Date.now(),
+                    data: data,
+                    solicitante: solicitante,
+                    produto: `COMPRA AGRUPADA (${subItens.length} ITENS)`,
+                    local: local,
+                    projeto: "",
+                    qtd: somaQtdGeral,
+                    unit: somaQtdGeral > 0 ? (somaTotalGeral / somaQtdGeral) : 0,
+                    total: somaTotalGeral,
+                    link: "",
+                    entregue: entregue,
+                    data_entrega: dataEntrega,
+                    sub_itens: subItens
+                };
+            }
+
+            compras.unshift(novoItem);
             salvarNoLocalStorage();
             atualizarListaSelectSolicitantes();
             renderizarTabela();
-            mostrarAviso(`✅ ${novosItens.length} compra(s) salva(s) com sucesso!`);
+            mostrarAviso(`✅ Compra salva com sucesso (${subItens.length} iten(s))!`);
 
-            const container = document.getElementById('containerLinhasManuais');
-            container.innerHTML = '';
-            adicionarLinhaManual();
+            inserirNoSupabase(novoItem);
+
+            // Reseta form
+            document.getElementById('containerSubLinhasManuais').innerHTML = `
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-end sub-linha-manual bg-slate-50 dark:bg-slate-900/40 p-3 rounded-xl border border-slate-200 dark:border-slate-700 relative">
+                    <div class="sm:col-span-4">
+                        <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Produto / Serviço</label>
+                        <input type="text" oninput="this.value = this.value.toUpperCase()" placeholder="EX: CHUMBADOR..." class="subProduto uppercase-input w-full text-xs p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold outline-none">
+                    </div>
+                    <div class="sm:col-span-3">
+                        <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Projeto</label>
+                        <input type="text" oninput="this.value = this.value.toUpperCase()" placeholder="PROJETO..." class="subProjeto uppercase-input w-full text-xs p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold outline-none">
+                    </div>
+                    <div class="sm:col-span-1">
+                        <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Qtd</label>
+                        <input type="number" value="1" min="1" oninput="calcularSubManualPorTotal(this)" class="subQtd w-full text-xs p-2 text-center font-bold bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white outline-none">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-[9px] font-black text-emerald-600 uppercase mb-1">Total (R$) 🔄</label>
+                        <input type="number" step="0.01" placeholder="0,00" oninput="calcularSubManualPorTotal(this)" class="subTotal w-full text-xs p-2 bg-emerald-50/70 border border-emerald-400 rounded-lg font-black text-emerald-600 outline-none">
+                    </div>
+                    <div class="sm:col-span-2">
+                        <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Unitário</label>
+                        <input type="number" step="0.01" placeholder="0,00" oninput="calcularSubManualPorUnitario(this)" class="subUnit w-full text-xs p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold outline-none">
+                    </div>
+                </div>
+            `;
+            document.getElementById('manualLocalGeral').value = '';
+            document.getElementById('manualEntregueGeral').checked = false;
+            document.getElementById('manualDataEntregaGeral').classList.add('hidden');
         }
 
-        // ================= UPLOAD E LEITURA INTELIGENTE DE NOTA FISCAL (PDF/IMAGEM OU TEXTO) =================
+        // ================= UPLOAD E LEITURA INTELIGENTE DE NOTA FISCAL =================
         function processarArquivoNotaFiscal(input) {
             const arquivo = input.files[0];
             if (!arquivo) return;
@@ -1027,33 +1078,6 @@
         function toggleExpandirSubItens(id) {
             itensExpandidos[id] = !itensExpandidos[id];
             renderizarTabela();
-        }
-
-        function verificarDigitacaoSolicitante(input, tempId) {
-            input.value = input.value.toUpperCase();
-            const val = input.value.trim();
-            const aviso = document.getElementById(`avisoSolicitante-${tempId}`);
-
-            if (val === "" || val === "NÃO INFORMADO" || val === "NAO INFORMADO") {
-                input.classList.add('piscar-solicitante-forte');
-                if (aviso) aviso.classList.remove('hidden');
-            } else {
-                input.classList.remove('piscar-solicitante-forte');
-                if (aviso) aviso.classList.add('hidden');
-            }
-        }
-
-        function validarInputEditSolicitante(input) {
-            input.value = input.value.toUpperCase();
-            const val = input.value.trim();
-            const aviso = document.getElementById('avisoEditSolicitante');
-            if (val === "" || val === "NÃO INFORMADO" || val === "NAO INFORMADO") {
-                input.classList.add('piscar-solicitante-forte');
-                if (aviso) aviso.classList.remove('hidden');
-            } else {
-                input.classList.remove('piscar-solicitante-forte');
-                if (aviso) aviso.classList.add('hidden');
-            }
         }
 
         function atualizarListaSelectSolicitantes() {
@@ -1512,28 +1536,13 @@
             const novaLinha = primeiraLinha.cloneNode(true);
             novaLinha.querySelector('.inputLinkDireto').value = '';
 
-            if (!novaLinha.querySelector('.btnRemoverLink')) {
-                const btnRemover = document.createElement('button');
-                btnRemover.type = 'button';
-                btnRemover.className = 'absolute right-2.5 top-3 text-slate-400 hover:text-rose-500 font-bold text-xs';
-                btnRemover.innerHTML = '✕';
-                btnRemover.onclick = () => novaLinha.remove();
-                
-                const inputEl = novaLinha.querySelector('.inputLinkDireto');
-                inputEl.classList.remove('pr-8');
-                inputEl.classList.add('pr-16');
-                
-                const divWrapper = novaLinha.querySelector('.relative');
-                const btnX = divWrapper.querySelector('button');
-                if(btnX) btnX.remove();
-
-                const btnRemoveNew = document.createElement('button');
-                btnRemoveNew.type = 'button';
-                btnRemoveNew.className = 'absolute right-2.5 top-2.5 bg-rose-100 text-rose-600 hover:bg-rose-200 text-[10px] font-black px-2 py-1 rounded-lg';
-                btnRemoveNew.innerHTML = 'Remover';
-                btnRemoveNew.onclick = () => novaLinha.remove();
-                divWrapper.appendChild(btnRemoveNew);
-            }
+            const divWrapper = novaLinha.querySelector('.relative');
+            const btnRemoveNew = document.createElement('button');
+            btnRemoveNew.type = 'button';
+            btnRemoveNew.className = 'absolute right-2.5 top-2.5 bg-rose-100 text-rose-600 hover:bg-rose-200 text-[10px] font-black px-2 py-1 rounded-lg';
+            btnRemoveNew.innerHTML = 'Remover';
+            btnRemoveNew.onclick = () => novaLinha.remove();
+            divWrapper.appendChild(btnRemoveNew);
 
             container.appendChild(novaLinha);
         }
@@ -1789,6 +1798,20 @@
             renderizarCardsPendentes();
         }
 
+        function verificarDigitacaoSolicitante(input, tempId) {
+            input.value = input.value.toUpperCase();
+            const val = input.value.trim();
+            const aviso = document.getElementById(`avisoSolicitante-${tempId}`);
+
+            if (val === "" || val === "NÃO INFORMADO" || val === "NAO INFORMADO") {
+                input.classList.add('piscar-solicitante-forte');
+                if (aviso) aviso.classList.remove('hidden');
+            } else {
+                input.classList.remove('piscar-solicitante-forte');
+                if (aviso) aviso.classList.add('hidden');
+            }
+        }
+
         // ================= EDIÇÃO (SUB-ITENS DE NOTAS FISCAIS) =================
         function abrirModalEdicao(index, subIndex = null) {
             const item = compras[index];
@@ -2009,7 +2032,7 @@
                                 <td class="py-2 px-3 text-right text-slate-500">R$ ${Number(sub.unit || 0).toFixed(2)}</td>
                                 <td class="py-2 px-3 text-right font-bold text-emerald-600">R$ ${Number(sub.total || 0).toFixed(2)}</td>
                                 <td colspan="2" class="text-center">
-                                    <button onclick="abrirModalEdicao(${originalIndex}, ${idxSub})" class="text-indigo-600 font-bold p-1 text-[10px] bg-indigo-100 dark:bg-indigo-900/70 px-2 py-0.5 rounded cursor-pointer">✏️️ Editar Item</button>
+                                    <button onclick="abrirModalEdicao(${originalIndex}, ${idxSub})" class="text-indigo-600 font-bold p-1 text-[10px] bg-indigo-100 dark:bg-indigo-900/70 px-2 py-0.5 rounded cursor-pointer">✏️ Editar Item</button>
                                 </td>
                                 <td></td>
                             `;
