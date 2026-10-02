@@ -86,7 +86,7 @@
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen p-4 sm:p-6 transition-colors duration-200">
 
-    <div class="max-w-7xl mx-auto space-y-5">
+    <div class="max-w-7xl mx-auto space-y-6">
 
         <!-- CABEÇALHO -->
         <header class="flex flex-wrap justify-between items-center bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 gap-4">
@@ -125,6 +125,12 @@
                     <span>Baixar CSV</span>
                 </button>
 
+                <!-- 🗑️ BOTÃO REMOVER DUPLICADAS -->
+                <button onclick="removerDuplicadasExatas()" class="bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 px-3 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer shadow-sm" title="Remover registros duplicados">
+                    <span>⚡</span>
+                    <span>Limpar Duplicadas</span>
+                </button>
+
                 <button onclick="abrirModalUsuarios()" class="bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 px-3 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer shadow-sm">
                     <span>👥</span>
                     <span>Pessoas</span>
@@ -142,7 +148,7 @@
         <div id="alertaSistema" class="hidden p-3 rounded-xl text-xs font-bold text-center transition-all"></div>
 
         <!-- CARTÕES DE RESUMO -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
                 <span id="labelTotalItens" class="text-[10px] font-bold uppercase text-slate-400">Total de Despesas</span>
                 <h3 id="cardTotalItens" class="text-xl font-black text-indigo-600 dark:text-indigo-400 mt-0.5">0</h3>
@@ -157,53 +163,22 @@
             </div>
         </div>
 
-        <!-- CARDS DINÂMICOS POR PESSOA -->
-        <div id="containerCardsPessoas" class="grid grid-cols-2 sm:grid-cols-4 gap-3"></div>
+        <!-- CARDS DINÂMICOS POR PESSOA (QUADRADOS MENORES) -->
+        <div id="containerCardsPessoas" class="grid grid-cols-2 sm:grid-cols-6 gap-2.5"></div>
 
-        <!-- 🔍 BARRA DE FILTRO, PESQUISA E VALORES -->
-        <div class="bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 p-3.5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div class="flex items-center gap-2 w-full sm:w-auto">
-                <span class="text-base">🔍</span>
-                <span class="text-xs font-black uppercase text-slate-700 dark:text-slate-300 whitespace-nowrap">Filtros:</span>
-            </div>
-            
-            <div class="flex flex-1 flex-col sm:flex-row items-center gap-2 w-full">
-                <div class="relative w-full sm:w-1/3">
-                    <input type="text" id="inputPesquisaProduto" oninput="renderizarTabela()" placeholder="Pesquisar produto..." class="uppercase-input w-full text-xs pl-8 pr-7 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-indigo-600 dark:text-white font-bold">
-                    <span class="absolute left-2.5 top-2 text-slate-400 text-xs">📦</span>
-                </div>
-
-                <div class="relative w-full sm:w-1/3">
-                    <input type="number" step="0.01" id="inputFiltroValor" oninput="renderizarTabela()" placeholder="Filtrar por valor (R$)..." class="w-full text-xs pl-8 pr-7 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-indigo-600 dark:text-white font-bold">
-                    <span class="absolute left-2.5 top-2 text-slate-400 text-xs">💲</span>
-                    <button type="button" onclick="document.getElementById('inputFiltroValor').value=''; renderizarTabela();" class="absolute right-2.5 top-2 text-slate-400 hover:text-rose-500 font-bold text-xs" title="Limpar Valor">✕</button>
-                </div>
-
-                <div class="w-full sm:w-1/3">
-                    <select id="selectFiltroSolicitante" onchange="aplicarFiltroPorSelect(this.value)" class="w-full text-xs py-2 px-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-indigo-600 dark:text-white font-bold">
-                        <option value="">TODOS OS SOLICITANTES</option>
-                    </select>
-                </div>
-            </div>
-
-            <div id="badgeFiltroAtivo" class="hidden text-xs bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 px-3 py-1.5 rounded-xl font-bold border border-indigo-200 dark:border-indigo-800 whitespace-nowrap">
-                Filtro Ativo: <span id="txtFiltroNome" class="font-black"></span>
-            </div>
-        </div>
-
-        <!-- ================= ABAS PARA ENTRADA DE DADOS ================= -->
-        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm overflow-hidden">
+        <!-- ================= ABAS PARA ENTRADA DE DADOS (CENTRALIZADAS) ================= -->
+        <div class="max-w-4xl mx-auto bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl shadow-sm overflow-hidden my-2">
             <div class="flex border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 p-1.5 gap-1 overflow-x-auto">
-                <button type="button" onclick="mudarAbaEntrada('manual')" id="tabBtn-manual" class="flex-1 min-w-[120px] py-2.5 px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-700">
+                <button type="button" onclick="mudarAbaEntrada('manual')" id="tabBtn-manual" class="flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-700">
                     <span>✍️</span> <span>Digitar Manual</span>
                 </button>
-                <button type="button" onclick="mudarAbaEntrada('link')" id="tabBtn-link" class="flex-1 min-w-[110px] py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
+                <button type="button" onclick="mudarAbaEntrada('link')" id="tabBtn-link" class="flex-1 min-w-[110px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
                     <span>🔗</span> <span>Link Web</span>
                 </button>
-                <button type="button" onclick="mudarAbaEntrada('foto')" id="tabBtn-foto" class="flex-1 min-w-[110px] py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
+                <button type="button" onclick="mudarAbaEntrada('foto')" id="tabBtn-foto" class="flex-1 min-w-[110px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
                     <span>📸</span> <span>Foto / Câmera</span>
                 </button>
-                <button type="button" onclick="mudarAbaEntrada('texto')" id="tabBtn-texto" class="flex-1 min-w-[120px] py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
+                <button type="button" onclick="mudarAbaEntrada('texto')" id="tabBtn-texto" class="flex-1 min-w-[120px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
                     <span>💬</span> <span>Colar Teams</span>
                 </button>
             </div>
@@ -242,11 +217,8 @@
                     </div>
 
                     <div class="md:col-span-3">
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase">Categoria</label>
-                            <button type="button" onclick="adicionarNovaCategoriaPrompt('manualCategoria')" class="text-[9px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline">+ Nova</button>
-                        </div>
-                        <select id="manualCategoria" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-semibold outline-none"></select>
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Projeto</label>
+                        <input type="text" id="manualProjeto" oninput="this.value = this.value.toUpperCase()" placeholder="NOME DO PROJETO..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                     </div>
 
                     <div class="md:col-span-2">
@@ -364,6 +336,37 @@
             <div id="listaCardsPendentes" class="space-y-3"></div>
         </div>
 
+        <!-- 🔍 BARRA DE FILTRO, PESQUISA E VALORES (REPOSICIONADA MAIS PERTO DA TABELA) -->
+        <div class="bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 p-3.5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="flex items-center gap-2 w-full sm:w-auto">
+                <span class="text-base">🔍</span>
+                <span class="text-xs font-black uppercase text-slate-700 dark:text-slate-300 whitespace-nowrap">Filtros:</span>
+            </div>
+            
+            <div class="flex flex-1 flex-col sm:flex-row items-center gap-2 w-full">
+                <div class="relative w-full sm:w-1/3">
+                    <input type="text" id="inputPesquisaProduto" oninput="renderizarTabela()" placeholder="Pesquisar produto..." class="uppercase-input w-full text-xs pl-8 pr-7 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-indigo-600 dark:text-white font-bold">
+                    <span class="absolute left-2.5 top-2 text-slate-400 text-xs">📦</span>
+                </div>
+
+                <div class="relative w-full sm:w-1/3">
+                    <input type="number" step="0.01" id="inputFiltroValor" oninput="renderizarTabela()" placeholder="Filtrar por valor (R$)..." class="w-full text-xs pl-8 pr-7 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-indigo-600 dark:text-white font-bold">
+                    <span class="absolute left-2.5 top-2 text-slate-400 text-xs">💲</span>
+                    <button type="button" onclick="document.getElementById('inputFiltroValor').value=''; renderizarTabela();" class="absolute right-2.5 top-2 text-slate-400 hover:text-rose-500 font-bold text-xs" title="Limpar Valor">✕</button>
+                </div>
+
+                <div class="w-full sm:w-1/3">
+                    <select id="selectFiltroSolicitante" onchange="aplicarFiltroPorSelect(this.value)" class="w-full text-xs py-2 px-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-indigo-600 dark:text-white font-bold">
+                        <option value="">TODOS OS SOLICITANTES</option>
+                    </select>
+                </div>
+            </div>
+
+            <div id="badgeFiltroAtivo" class="hidden text-xs bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 px-3 py-1.5 rounded-xl font-bold border border-indigo-200 dark:border-indigo-800 whitespace-nowrap">
+                Filtro Ativo: <span id="txtFiltroNome" class="font-black"></span>
+            </div>
+        </div>
+
         <!-- TABELA DE COMPRAS REGISTRADAS -->
         <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
             <div class="flex justify-between items-center">
@@ -381,7 +384,7 @@
                             <th class="py-2.5 px-3">Solicitante</th>
                             <th class="py-2.5 px-3">Produto / Serviço</th>
                             <th class="py-2.5 px-3">Local / Fornecedor</th>
-                            <th class="py-2.5 px-3">Categoria</th>
+                            <th class="py-2.5 px-3">Projeto</th>
                             <th class="py-2.5 px-3 text-center">Qtd</th>
                             <th class="py-2.5 px-3 text-right">Unitário</th>
                             <th class="py-2.5 px-3 text-right">Total</th>
@@ -490,12 +493,9 @@
                     <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Local / Fornecedor</label>
                     <input type="text" id="editLocal" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
-                <div>
-                    <div class="flex justify-between items-center mb-1">
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase">Categoria</label>
-                        <button type="button" onclick="adicionarNovaCategoriaPrompt('editCategoria')" class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline">+ Nova</button>
-                    </div>
-                    <select id="editCategoria" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-semibold outline-none"></select>
+                <div class="sm:col-span-2">
+                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Projeto</label>
+                    <input type="text" id="editProjeto" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Quantidade de Itens</label>
@@ -543,28 +543,15 @@
         const SUPABASE_URL = "https://gloxtswcksbczinpwtzu.supabase.co";
         const SUPABASE_KEY = "sb_publishable_0kEiqthWKZZwjM120wQIYw_Hba7qeLc";
 
-        const CATEGORIAS_PADRAO = [
-            "INFORMÁTICA / TI",
-            "ESCRITÓRIO",
-            "MANUTENÇÃO",
-            "TREINAMENTO",
-            "ALIMENTAÇÃO / COPA",
-            "OUTROS"
-        ];
-
-        let listaCategorias = [];
         let compras = [];
         let itensPendentesAprovacao = [];
         let supabaseClient = null;
         let solicitanteFiltroAtual = "";
 
         window.addEventListener('DOMContentLoaded', () => {
-            carregarCategorias();
-            
             const hoje = new Date().toISOString().split('T')[0];
             document.getElementById('manualData').value = hoje;
             atualizarDataEntregaManualDefault();
-            atualizarTodosOsSelectsCategorias();
 
             const solManual = document.getElementById('manualSolicitante');
             solManual.classList.add('piscar-solicitante-forte');
@@ -587,82 +574,12 @@
                 const elBtn = document.getElementById(`tabBtn-${id}`);
                 if (id === aba) {
                     elAba.classList.remove('hidden');
-                    elBtn.className = "flex-1 min-w-[110px] py-2.5 px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-700";
+                    elBtn.className = "flex-1 min-w-[110px] py-2 px-3 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-700";
                 } else {
                     elAba.classList.add('hidden');
-                    elBtn.className = "flex-1 min-w-[110px] py-2.5 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200";
+                    elBtn.className = "flex-1 min-w-[110px] py-2 px-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200";
                 }
             });
-        }
-
-        function carregarCategorias() {
-            const salvas = localStorage.getItem('compras_categorias_lista');
-            if (salvas) {
-                try { listaCategorias = JSON.parse(salvas); } catch(e) { listaCategorias = [...CATEGORIAS_PADRAO]; }
-            } else {
-                listaCategorias = [...CATEGORIAS_PADRAO];
-            }
-        }
-
-        function salvarCategorias() {
-            localStorage.setItem('compras_categorias_lista', JSON.stringify(listaCategorias));
-        }
-
-        function atualizarTodosOsSelectsCategorias() {
-            const selManual = document.getElementById('manualCategoria');
-            const valManual = selManual ? selManual.value : "";
-            preencherOpcoesCategoria(selManual, valManual || "OUTROS");
-
-            const selEdit = document.getElementById('editCategoria');
-            const valEdit = selEdit ? selEdit.value : "";
-            preencherOpcoesCategoria(selEdit, valEdit || "OUTROS");
-
-            itensPendentesAprovacao.forEach(item => {
-                const selCard = document.getElementById(`categoria-${item.tempId}`);
-                if (selCard) {
-                    const valCard = selCard.value;
-                    preencherOpcoesCategoria(selCard, valCard || item.categoria || "OUTROS");
-                }
-            });
-        }
-
-        function adicionarNovaCategoriaPrompt(selectId = null) {
-            const nova = prompt("Digite o nome da NOVA CATEGORIA:");
-            if (nova && nova.trim()) {
-                const categoriaFormatada = nova.trim().toUpperCase();
-                if (!listaCategorias.includes(categoriaFormatada)) {
-                    listaCategorias.push(categoriaFormatada);
-                    salvarCategorias();
-                }
-                
-                atualizarTodosOsSelectsCategorias();
-                renderizarCardsPendentes();
-
-                if (selectId) {
-                    const sel = document.getElementById(selectId);
-                    if (sel) sel.value = categoriaFormatada;
-                }
-
-                mostrarAviso(`Categoria "${categoriaFormatada}" adicionada com sucesso!`);
-            }
-        }
-
-        function preencherOpcoesCategoria(selectElement, valorSelecionado = "") {
-            if (!selectElement) return;
-            selectElement.innerHTML = '';
-            if (!listaCategorias || listaCategorias.length === 0) {
-                listaCategorias = [...CATEGORIAS_PADRAO];
-            }
-            listaCategorias.forEach(cat => {
-                const opt = document.createElement('option');
-                opt.value = cat;
-                opt.innerText = cat;
-                if (String(cat).toUpperCase() === String(valorSelecionado).toUpperCase()) opt.selected = true;
-                selectElement.appendChild(opt);
-            });
-            if (!selectElement.value && selectElement.options.length > 0) {
-                selectElement.selectedIndex = 0;
-            }
         }
 
         function mostrarAviso(msg, tipo = "sucesso") {
@@ -747,7 +664,7 @@
             }
 
             const local = document.getElementById('manualLocal').value.trim().toUpperCase();
-            const categoria = document.getElementById('manualCategoria').value;
+            const projeto = document.getElementById('manualProjeto').value.trim().toUpperCase();
             const qtd = parseFloat(document.getElementById('manualQtd').value) || 1;
             const total = parseFloat(document.getElementById('manualTotal').value) || 0;
             const unit = parseFloat(document.getElementById('manualUnit').value) || (total / qtd);
@@ -766,7 +683,7 @@
                 solicitante: solicitante,
                 produto: produto,
                 local: local || "NÃO INFORMADO",
-                categoria: categoria || "OUTROS",
+                projeto: projeto || "",
                 qtd: qtd,
                 unit: unit,
                 total: total || (qtd * unit),
@@ -785,6 +702,7 @@
 
             document.getElementById('manualProduto').value = '';
             document.getElementById('manualLocal').value = '';
+            document.getElementById('manualProjeto').value = '';
             document.getElementById('manualTotal').value = '';
             document.getElementById('manualUnit').value = '';
             document.getElementById('manualQtd').value = '1';
@@ -887,13 +805,13 @@
                 const glowClass = classesGlow[idx % classesGlow.length];
 
                 const card = document.createElement('div');
-                card.className = `bg-white dark:bg-slate-800 p-3 rounded-2xl shadow-sm ${glowClass} cursor-pointer hover:scale-[1.02] transition`;
+                card.className = `bg-white dark:bg-slate-800 p-2.5 rounded-xl shadow-sm ${glowClass} cursor-pointer hover:scale-[1.02] transition`;
                 card.onclick = () => aplicarFiltroPorSelect(nome);
                 card.innerHTML = `
-                    <span class="text-[10px] font-black uppercase text-slate-700 dark:text-slate-200 block truncate">👤 ${nome}</span>
+                    <span class="text-[9px] font-black uppercase text-slate-700 dark:text-slate-200 block truncate">👤 ${nome}</span>
                     <div class="flex justify-between items-baseline mt-1">
-                        <span class="text-xs font-black text-indigo-600 dark:text-indigo-400">${dados.count} un</span>
-                        <span class="text-xs font-black text-emerald-600 dark:text-emerald-400">R$ ${dados.valor.toFixed(2)}</span>
+                        <span class="text-[11px] font-black text-indigo-600 dark:text-indigo-400">${dados.count} un</span>
+                        <span class="text-[11px] font-black text-emerald-600 dark:text-emerald-400">R$ ${dados.valor.toFixed(2)}</span>
                     </div>
                 `;
                 container.appendChild(card);
@@ -996,7 +914,7 @@
                     solicitante: item.solicitante,
                     produto: item.produto,
                     local: item.local || '',
-                    categoria: item.categoria,
+                    projeto: item.projeto || '',
                     qtd: item.qtd,
                     unit: item.unit,
                     total: item.total,
@@ -1021,7 +939,7 @@
                     solicitante: item.solicitante,
                     produto: item.produto,
                     local: item.local || '',
-                    categoria: item.categoria,
+                    projeto: item.projeto || '',
                     qtd: item.qtd,
                     unit: item.unit,
                     total: item.total,
@@ -1066,7 +984,6 @@
                             alert("O arquivo JSON não está no formato de lista esperado.");
                         }
                     } else if (arquivo.name.endsWith('.csv')) {
-                        // Leitor simples de CSV
                         const linhas = conteudo.split('\n');
                         let novosItens = [];
                         for (let i = 1; i < linhas.length; i++) {
@@ -1075,13 +992,13 @@
                             let cols = linha.split(';');
                             if (cols.length >= 8) {
                                 let dataIn = cols[0].split('/').reverse().join('-');
-                                novositens.push({
+                                novosItens.push({
                                     id: Date.now() + i,
                                     data: dataIn || new Date().toISOString().split('T')[0],
                                     solicitante: (cols[1] || '').replace(/"/g, ''),
                                     produto: (cols[2] || '').replace(/"/g, ''),
                                     local: (cols[3] || '').replace(/"/g, ''),
-                                    categoria: (cols[4] || 'OUTROS').replace(/"/g, ''),
+                                    projeto: (cols[4] || '').replace(/"/g, ''),
                                     qtd: parseFloat(cols[5]) || 1,
                                     unit: parseFloat((cols[6] || '0').replace(',', '.')) || 0,
                                     total: parseFloat((cols[7] || '0').replace(',', '.')) || 0,
@@ -1091,12 +1008,12 @@
                                 });
                             }
                         }
-                        if (novositens.length > 0) {
-                            compras = [...novositens, ...compras];
+                        if (novosItens.length > 0) {
+                            compras = [...novosItens, ...compras];
                             salvarNoLocalStorage();
                             atualizarListaSelectSolicitantes();
                             renderizarTabela();
-                            mostrarAviso(`✅ ${novositens.length} itens importados do CSV com sucesso!`);
+                            mostrarAviso(`✅ ${novosItens.length} itens importados do CSV com sucesso!`);
                         } else {
                             alert("Não foi possível ler os registros do CSV.");
                         }
@@ -1104,7 +1021,7 @@
                 } catch (err) {
                     alert("Erro ao ler o arquivo: " + err.message);
                 }
-                input.value = ''; // Limpa input
+                input.value = '';
             };
             leitor.readAsText(arquivo, 'UTF-8');
         }
@@ -1117,7 +1034,7 @@
             }
 
             let csv = "\uFEFF";
-            csv += "DATA;SOLICITANTE;PRODUTO/SERVIÇO;LOCAL/FORNECEDOR;CATEGORIA;QUANTIDADE;VALOR UNITÁRIO (R$);TOTAL (R$);ENTREGUE;DATA ENTREGA;LINK DO PRODUTO\n";
+            csv += "DATA;SOLICITANTE;PRODUTO/SERVIÇO;LOCAL/FORNECEDOR;PROJETO;QUANTIDADE;VALOR UNITÁRIO (R$);TOTAL (R$);ENTREGUE;DATA ENTREGA;LINK DO PRODUTO\n";
 
             compras.forEach(item => {
                 const linha = [
@@ -1125,7 +1042,7 @@
                     `"${(item.solicitante || '').replace(/"/g, '""')}"`,
                     `"${(item.produto || '').replace(/"/g, '""')}"`,
                     `"${(item.local || '').replace(/"/g, '""')}"`,
-                    `"${item.categoria || ''}"`,
+                    `"${(item.projeto || '').replace(/"/g, '""')}"`,
                     item.qtd,
                     Number(item.unit || 0).toFixed(2).replace('.', ','),
                     Number(item.total || 0).toFixed(2).replace('.', ','),
@@ -1146,7 +1063,32 @@
             mostrarAviso("📥 Arquivo CSV baixado com sucesso!");
         }
 
-        // ================= CONTROLO DE ENTREGA NA TABELA =================
+        // ================= LIMPAR DUPLICADAS EXATAS =================
+        function removerDuplicadasExatas() {
+            const mapUnico = new Map();
+            let duplicadosRemovidos = 0;
+
+            compras.forEach(item => {
+                const chave = `${(item.solicitante||'').trim().toUpperCase()}_${(item.produto||'').trim().toUpperCase()}_${Number(item.total||0).toFixed(2)}_${Number(item.qtd||1)}`;
+                if (!mapUnico.has(chave)) {
+                    mapUnico.set(chave, item);
+                } else {
+                    duplicadosRemovidos++;
+                }
+            });
+
+            if (duplicadosRemovidos > 0) {
+                compras = Array.from(mapUnico.values());
+                salvarNoLocalStorage();
+                atualizarListaSelectSolicitantes();
+                renderizarTabela();
+                mostrarAviso(`⚡ ${duplicadosRemovidos} registro(s) duplicado(s) removido(s)!`);
+            } else {
+                mostrarAviso("Nenhuma duplicidade encontrada.");
+            }
+        }
+
+        // ================= CONTROLE DE ENTREGA NA TABELA =================
         async function salvarAlteracaoEntrega(id) {
             const item = compras.find(c => String(c.id) === String(id));
             if (!item) return;
@@ -1245,7 +1187,7 @@
                 solicitante: "",
                 produto: produto.toUpperCase(),
                 local: localDetectado,
-                categoria: adivinharCategoria(produto),
+                projeto: "",
                 qtd: 1,
                 unit: 0,
                 total: 0,
@@ -1305,7 +1247,7 @@
                 solicitante: solicitanteDetectado,
                 produto: produtoLimpo || "PRODUTO",
                 local: "MERCADO LIVRE",
-                categoria: adivinharCategoria(produtoLimpo),
+                projeto: "",
                 qtd: 1,
                 unit: 0,
                 total: 0,
@@ -1316,16 +1258,6 @@
 
             renderizarCardsPendentes();
             document.getElementById('inputTextoTeams').value = '';
-        }
-
-        function adivinharCategoria(texto) {
-            const t = (texto || "").toLowerCase();
-            if (t.includes('teclado') || t.includes('mouse') || t.includes('cabo') || t.includes('monitor') || t.includes('ssd')) return "INFORMÁTICA / TI";
-            if (t.includes('papel') || t.includes('caneta') || t.includes('pasta')) return "ESCRITÓRIO";
-            if (t.includes('ferramenta') || t.includes('broca') || t.includes('parafuso') || t.includes('chumbador')) return "MANUTENÇÃO";
-            if (t.includes('curso') || t.includes('treinamento')) return "TREINAMENTO";
-            if (t.includes('cafe') || t.includes('café') || t.includes('copo')) return "ALIMENTAÇÃO / COPA";
-            return "OUTROS";
         }
 
         function renderizarCardsPendentes() {
@@ -1380,8 +1312,8 @@
                         </div>
 
                         <div class="md:col-span-3">
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Categoria</label>
-                            <select id="categoria-${item.tempId}" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-semibold"></select>
+                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Projeto</label>
+                            <input type="text" id="projeto-${item.tempId}" value="${item.projeto || ''}" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold">
                         </div>
 
                         <div class="md:col-span-2">
@@ -1408,7 +1340,6 @@
                     </div>
                 `;
                 lista.appendChild(card);
-                preencherOpcoesCategoria(card.querySelector(`#categoria-${item.tempId}`), item.categoria || "OUTROS");
             });
         }
 
@@ -1441,7 +1372,7 @@
                 solicitante,
                 produto: document.getElementById(`produto-${tempId}`).value.trim().toUpperCase(),
                 local: document.getElementById(`local-${tempId}`).value.trim().toUpperCase(),
-                categoria: document.getElementById(`categoria-${tempId}`).value,
+                projeto: document.getElementById(`projeto-${tempId}`).value.trim().toUpperCase(),
                 qtd: parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1,
                 unit: parseFloat(document.getElementById(`unit-${tempId}`).value) || 0,
                 total: parseFloat(document.getElementById(`total-${tempId}`).value) || 0,
@@ -1474,9 +1405,7 @@
             document.getElementById('editSolicitante').value = item.solicitante || '';
             document.getElementById('editProduto').value = item.produto || '';
             document.getElementById('editLocal').value = item.local || '';
-            
-            atualizarTodosOsSelectsCategorias();
-            document.getElementById('editCategoria').value = item.categoria || 'OUTROS';
+            document.getElementById('editProjeto').value = item.projeto || '';
             document.getElementById('editQtd').value = item.qtd || 1;
             document.getElementById('editTotal').value = Number(item.total || 0).toFixed(2);
             document.getElementById('editUnit').value = Number(item.unit || 0).toFixed(2);
@@ -1535,7 +1464,7 @@
                 solicitante,
                 produto: document.getElementById('editProduto').value.trim().toUpperCase(),
                 local: document.getElementById('editLocal').value.trim().toUpperCase(),
-                categoria: document.getElementById('editCategoria').value,
+                projeto: document.getElementById('editProjeto').value.trim().toUpperCase(),
                 qtd: parseFloat(document.getElementById('editQtd').value) || 1,
                 unit: parseFloat(document.getElementById('editUnit').value) || 0,
                 total: parseFloat(document.getElementById('editTotal').value) || 0,
@@ -1574,6 +1503,13 @@
                 listaExibicao = listaExibicao.filter(i => Number(i.total) === filtroValor || Number(i.unit) === filtroValor);
             }
 
+            // Mapeamento de duplicadas para alerta fluorescente
+            const contagemChaves = {};
+            compras.forEach(item => {
+                const chave = `${(item.solicitante||'').trim().toUpperCase()}_${(item.produto||'').trim().toUpperCase()}_${Number(item.total||0).toFixed(2)}_${Number(item.qtd||1)}`;
+                contagemChaves[chave] = (contagemChaves[chave] || 0) + 1;
+            });
+
             listaExibicao.sort((a, b) => (a.entregue === b.entregue) ? new Date(b.data) - new Date(a.data) : a.entregue ? 1 : -1);
 
             if (listaExibicao.length === 0) {
@@ -1584,14 +1520,17 @@
                     totalGastoGeral += Number(item.total || 0);
                     solicitantesContador[item.solicitante] = (solicitantesContador[item.solicitante] || 0) + 1;
 
+                    const chave = `${(item.solicitante||'').trim().toUpperCase()}_${(item.produto||'').trim().toUpperCase()}_${Number(item.total||0).toFixed(2)}_${Number(item.qtd||1)}`;
+                    const isDuplicado = contagemChaves[chave] > 1;
+
                     const tr = document.createElement('tr');
-                    tr.className = `${item.entregue ? 'bg-slate-100/70 dark:bg-slate-800/40 opacity-75 line-through' : 'hover:bg-slate-50'} transition uppercase`;
+                    tr.className = `${item.entregue ? 'bg-slate-100/70 dark:bg-slate-800/40 opacity-75 line-through' : isDuplicado ? 'alerta-duplicado-fluorescente' : 'hover:bg-slate-50'} transition uppercase`;
                     tr.innerHTML = `
                         <td class="py-2.5 px-3 font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap">${formatarDataBR(item.data)}</td>
                         <td class="py-2.5 px-3 font-bold text-slate-800 dark:text-slate-200 whitespace-nowrap">${item.solicitante}</td>
                         <td class="py-2.5 px-3 max-w-xs truncate">${item.produto}</td>
                         <td class="py-2.5 px-3 font-semibold text-indigo-700 whitespace-nowrap">${item.local || 'MERCADO LIVRE'}</td>
-                        <td class="py-2.5 px-3 whitespace-nowrap"><span class="text-[10px] bg-slate-100 dark:bg-slate-700 px-2 py-0.5 rounded-full font-bold">${item.categoria}</span></td>
+                        <td class="py-2.5 px-3 font-semibold text-slate-500 whitespace-nowrap">${item.projeto || '-'}</td>
                         <td class="py-2.5 px-3 text-center font-bold">${item.qtd}</td>
                         <td class="py-2.5 px-3 text-right text-slate-500 whitespace-nowrap">R$ ${Number(item.unit || 0).toFixed(2)}</td>
                         <td class="py-2.5 px-3 text-right font-black text-emerald-600 whitespace-nowrap">R$ ${Number(item.total || 0).toFixed(2)}</td>
