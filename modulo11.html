@@ -2,203 +2,480 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Procedimento Operacional Padrão - PRO & Fluxo de Materiais</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRO - Fluxo de Materiais e Procedimentos</title>
     <style>
+        /* NORMAS ABNT E PADRÃO CORPORATIVO VALE */
         body {
-            font-family: Arial, sans-serif;
-            font-size: 14px;
-            color: #333;
-            line-height: 1.4;
-            margin: 20px;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12pt;
+            color: #000000;
+            line-height: 1.5;
+            margin: 0;
+            padding: 20px;
+            background-color: #f8fafc;
         }
+
+        .documento-container {
+            max-width: 21cm;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 3cm 2cm 2cm 3cm; /* Margens ABNT: Superior 3cm, Esquerda 3cm, Direita 2cm, Inferior 2cm */
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
         table {
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 15px;
+            font-size: 11pt;
+            font-family: 'Times New Roman', Times, serif;
         }
         table, th, td {
-            border: 1px solid #000;
+            border: 1px solid #000000;
         }
         th, td {
-            padding: 8px;
+            padding: 6px 8px;
             text-align: left;
             vertical-align: top;
         }
         th {
             background-color: #f2f2f2;
+            text-align: center;
         }
         .header-table td {
-            background-color: #f9f9f9;
+            background-color: #ffffff;
         }
+
+        /* CABEÇALHO OFICIAL COM IDENTIDADE VALE (COR VERDE INSTITUCIONAL #007e7a) */
+        .cabecalho-pro {
+            border: 2px solid #007e7a;
+            margin-bottom: 20px;
+        }
+        .cabecalho-pro td {
+            border: 1px solid #007e7a;
+            padding: 10px;
+        }
+        .logo-vale-txt {
+            font-size: 16pt;
+            font-weight: bold;
+            color: #007e7a;
+            text-align: center;
+            letter-spacing: 2px;
+        }
+        .titulo-pro {
+            font-size: 13pt;
+            font-weight: bold;
+            color: #007e7a;
+            text-align: center;
+        }
+
         h2 {
-            background-color: #003366;
+            font-family: 'Times New Roman', Times, serif;
+            background-color: #007e7a;
             color: #fff;
             padding: 6px 10px;
-            font-size: 15px;
+            font-size: 12pt;
             margin-top: 20px;
+            margin-bottom: 10px;
+            text-transform: uppercase;
         }
         h3 {
-            font-size: 14px;
-            color: #003366;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12pt;
+            color: #007e7a;
             margin-top: 15px;
-        }
-        .warning-box {
-            border: 2px solid #ffcc00;
-            background-color: #fffbe6;
-            padding: 10px;
-            margin: 15px 0;
+            margin-bottom: 5px;
         }
         ul {
-            margin: 0;
+            margin: 0 0 15px 0;
             padding-left: 20px;
+            text-align: justify;
+        }
+        li {
+            margin-bottom: 4px;
+        }
+        p {
+            margin-bottom: 10px;
+            text-align: justify;
+        }
+        .link-box {
+            background: #f8fafc;
+            padding: 8px;
+            border-left: 4px solid #007e7a;
+            word-break: break-all;
+            font-size: 10pt;
+            margin-top: 5px;
+            font-family: monospace;
+        }
+
+        /* CAIXA DE ALERTA OFICIAL */
+        .alerta-box {
+            border: 2px solid #d97706;
+            background-color: #fef3c7;
+            padding: 12px;
+            margin: 15px 0;
+            display: flex;
+            gap: 12px;
+            align-items: flex-start;
+        }
+        .alerta-icone {
+            font-size: 20px;
+        }
+
+        /* PAINEL DE LEITURA EM VOZ ALTA (CANTINHO) */
+        .painel-voz {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #ffffff;
+            border: 2px solid #007e7a;
+            padding: 12px 16px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            z-index: 1000;
+            font-family: Arial, sans-serif;
+            font-size: 11pt;
+        }
+        .btn-voz {
+            background: #007e7a;
+            color: white;
+            border: none;
+            padding: 8px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 10pt;
+        }
+        .btn-voz:hover {
+            background: #005a57;
+        }
+
+        /* BARRA DE TOPO PARA CONTROLE */
+        .barra-topo {
+            max-width: 21cm;
+            margin: 0 auto 15px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-family: Arial, sans-serif;
+        }
+        .btn-voltar {
+            background: #64748b;
+            color: white;
+            padding: 10px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 11pt;
+        }
+        .btn-imprimir {
+            background: #007e7a;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 11pt;
+            cursor: pointer;
+        }
+
+        @media print {
+            body {
+                background: white;
+                padding: 0;
+            }
+            .documento-container {
+                border: none;
+                box-shadow: none;
+                padding: 0;
+                max-width: 100%;
+            }
+            .barra-topo, .painel-voz {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
 
-    <!-- CABEÇALHO DO PRO -->
-    <table class="header-table">
-        <tr>
-            <td><strong>Responsável Técnico:</strong> Mariana Pereira Cruz</td>
-            <td><strong>Matrícula:</strong> 81025364</td>
-            <td><strong>Área:</strong> GER INDUSTR PROCESSO MINERAL</td>
-        </tr>
-        <tr>
-            <td colspan="3"><strong>Público-alvo:</strong> Almoxarifado do CTSS – Centro Tecnológico de Soluções Sustentáveis da Gerência Industrial Processo Mineral (Diretoria Processamento Mineral).</td>
-        </tr>
-        <tr>
-            <td colspan="3">
-                <strong>Necessidade de Treinamento:</strong> ( ) SIM (&nbsp;X&nbsp;) NÃO &nbsp;&nbsp;&nbsp;&nbsp; 
-                <strong>Tarefa prioritária:</strong> (&nbsp;X&nbsp;) SIM ( ) NÃO
-            </td>
-        </tr>
-    </table>
+    <!-- BARRA DE CONTROLE NA TELA -->
+    <div class="barra-topo">
+        <a href="index.html" class="btn-voltar">← Voltar ao Menu Mestre</a>
+        <button onclick="window.print()" class="btn-imprimir">🖨️ Imprimir PRO Oficial</button>
+    </div>
 
-    <p><strong>Resultados Esperados:</strong><br>
-    Realizar as atividades de recebimento, estoque, salvaguarda, movimentação e expedição no almoxarifado do CTSS, conforme as diretrizes estabelecidas neste procedimento, priorizando a aplicação de normas de SSMAC, visando à preservação da saúde e integridade físicas dos empregados e patrimônio da empresa.</p>
+    <!-- LEITOR DE VOZ ALTA NO CANTINHO -->
+    <div class="painel-voz">
+        <span>🔊 Leitor de Voz:</span>
+        <button onclick="lerTexto()" class="btn-voz" id="btnPlay">Ouvir Texto</button>
+        <button onclick="pararLeitura()" class="btn-voz" style="background: #dc2626;" id="btnStop">Parar</button>
+    </div>
 
-    <!-- CONTEXTUALIZAÇÃO -->
-    <h2>CONTEXTUALIZAÇÃO</h2>
-    <p><strong>Quais RACs estão associadas a estas atividades descritas no PRO?</strong></p>
-    <table>
-        <tr>
-            <td>RAC 1</td><td>RAC 2</td><td>RAC 3</td><td>RAC 4</td><td>RAC 5</td><td>RAC 6</td><td>RAC 7</td><td>RAC 8</td><td>RAC 9</td><td>RAC 10</td><td>RAC 11</td><td>N/A</td>
-        </tr>
-        <tr>
-            <td>X</td><td>x</td><td></td><td>x</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-        </tr>
-    </table>
+    <!-- DOCUMENTO FORMATO PRO (ABNT + VERDE VALE) -->
+    <div class="documento-container" id="conteudoTexto">
 
-    <p><strong>A elaboração/revisão deste PRO foi feita a partir de desdobramento de evento N1 ou N2?</strong><br>
-    ( ) NÃO &nbsp;&nbsp;&nbsp;&nbsp; (&nbsp;X&nbsp;) SIM</p>
+        <!-- CABEÇALHO OFICIAL DO PRO (PÁGINA 1 / CONTINUAÇÃO) -->
+        <table class="cabecalho-pro">
+            <tr>
+                <td rowspan="2" style="width: 25%; vertical-align: middle;">
+                    <div class="logo-vale-txt">VALE</div>
+                </td>
+                <td style="width: 50%;">
+                    <div class="titulo-pro">PROCEDIMENTO OPERACIONAL PADRÃO - PRO</div>
+                </td>
+                <td style="width: 25%; font-size: 10pt;">
+                    <strong>Código:</strong> PRO-CTSS-010<br>
+                    <strong>Versão:</strong> 05<br>
+                    <strong>Data:</strong> 02/10/2026
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <strong>Gestão de Estoque do CTSS – Centro Tecnológico de Soluções Sustentáveis</strong>
+                </td>
+            </tr>
+        </table>
 
-    <p><strong>Caso o procedimento esteja relacionado a uma Tarefa Prioritária, qual a dimensão envolvida?</strong><br>
-    ( ) Custos &nbsp;&nbsp; (&nbsp;X&nbsp;) Meio Ambiente &nbsp;&nbsp; ( ) Produtividade &nbsp;&nbsp; ( ) Qualidade &nbsp;&nbsp; ( ) Riscos &nbsp;&nbsp; ( ) Saúde e Segurança</p>
+        <table class="header-table">
+            <tr>
+                <td><strong>Responsável Técnico:</strong> Mariana Pereira Cruz[cite: 1]</td>
+                <td><strong>Matrícula:</strong> 81025364[cite: 1]</td>
+                <td><strong>Área:</strong> GER INDUSTR PROCESSO MINERAL[cite: 1]</td>
+            </tr>
+            <tr>
+                <td colspan="3"><strong>Público-alvo:</strong> Almoxarifado do CTSS – Centro Tecnológico de Soluções Sustentáveis da Gerência Industrial Processo Mineral (Diretoria Processamento Mineral)[cite: 1].</td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <strong>Necessidade de Treinamento:</strong> ( ) SIM (&nbsp;X&nbsp;) NÃO &nbsp;&nbsp;&nbsp;&nbsp; 
+                    <strong>Tarefa prioritária:</strong> (&nbsp;X&nbsp;) SIM ( ) NÃO[cite: 1]
+                </td>
+            </tr>
+        </table>
 
-    <!-- REFERÊNCIA E DEFINIÇÕES -->
-    <h2>REFERÊNCIA</h2>
-    <p>Este procedimento se aplica ao Almoxarifado da GER INDUSTR PROCESSO MINERAL[cite: 1].</p>
+        <p><strong>Resultados Esperados:</strong><br>
+        Realizar as atividades de recebimento, estoque, salvaguarda, movimentação e expedição no almoxarifado do CTSS, conforme as diretrizes estabelecidas neste procedimento, priorizando a aplicação de normas de SSMAC, visando à preservação da saúde e integridade físicas dos empregados e patrimônio da empresa[cite: 1].</p>
 
-    <h2>DEFINIÇÕES</h2>
-    <p><strong>FDS (Ficha com Dados de Segurança):</strong> Documento que fornece informações a respeito de vários aspectos de produtos químicos quanto à proteção, à segurança e ao meio ambiente[cite: 1].</p>
-    <p><strong>Reserva:</strong> Pedido de material de um item em estoque, realizado via SAP pela transação MB21[cite: 1].</p>
+        <!-- CONTEXTUALIZAÇÃO -->
+        <h2>Contextualização</h2>
+        <p><strong>Quais RACs estão associadas a estas atividades descritas no PRO?</strong></p>
+        <table>
+            <tr>
+                <td>RAC 1</td><td>RAC 2</td><td>RAC 3</td><td>RAC 4</td><td>RAC 5</td><td>RAC 6</td><td>RAC 7</td><td>RAC 8</td><td>RAC 9</td><td>RAC 10</td><td>RAC 11</td><td>N/A</td>
+            </tr>
+            <tr>
+                <td>X</td><td>x</td><td></td><td>x</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+            </tr>
+        </table>
 
-    <!-- RECURSOS MÍNIMOS -->
-    <h2>RECURSOS MÍNIMOS PARA REALIZAR A ATIVIDADE</h2>
-    <table>
-        <tr>
-            <th>Nº</th>
-            <th>Item</th>
-            <th>Descrição</th>
-        </tr>
-        <tr>
-            <td>1</td>
-            <td>EPI’S</td>
-            <td>Botina de Segurança, capacete com jugular, óculos de segurança, colete refletivo e luvas[cite: 1].</td>
-        </tr>
-        <tr>
-            <td>2</td>
-            <td>FERRAMENTAS DE SAÚDE E SEGURANÇA</td>
-            <td>Portar a ART da atividade e desenvolver ART LOCAL em campo[cite: 1].</td>
-        </tr>
-        <tr>
-            <td>3</td>
-            <td>EQUIPAMENTOS / FERRAMENTAS</td>
-            <td>Rádio de Comunicação, empilhadeira, paleteira, transpaleteira elétrica, varredeira, Munck, Pick up[cite: 1].</td>
-        </tr>
-    </table>
+        <p><strong>A elaboração/revisão deste PRO foi feita a partir de desdobramento de evento N1 ou N2?</strong><br>
+        ( ) NÃO &nbsp;&nbsp;&nbsp;&nbsp; (&nbsp;X&nbsp;) SIM[cite: 1]</p>
 
-    <!-- MÓDULO 11: FLUXO DE MATERIAIS E PROCEDIMENTOS -->
-    <h2>MÓDULO 11: FLUXO DE MATERIAIS E PROCEDIMENTOS</h2>
+        <p><strong>Caso o procedimento esteja relacionado a uma Tarefa Prioritária, qual a dimensão envolvida?</strong><br>
+        ( ) Custos &nbsp;&nbsp; (&nbsp;X&nbsp;) Meio Ambiente &nbsp;&nbsp; ( ) Produtividade &nbsp;&nbsp; ( ) Qualidade &nbsp;&nbsp; ( ) Riscos &nbsp;&nbsp; ( ) Saúde e Segurança[cite: 1]</p>
 
-    <h3>1. Fluxo para Envio de Material Vale x Vale (Transferência entre Unidades CTSS x G4)</h3>
-    <p><strong>Solicitação de Transferência (Responsável: Solicitante):</strong>[cite: 2]</p>
-    <ul>
-        <li>Identificar o material que será transferido[cite: 2].</li>
-        <li>Enviar e-mail solicitando a transferência do material, anexando registros fotográficos, descrição e quantidade para <code>almoxarifado@ctss.com</code>[cite: 2].</li>
-        <li>Preencher o formulário no Sistema de Gestão de Materiais para emissão da Nota Fiscal (NF)[cite: 2].</li>
-        <li>Acompanhar o status da solicitação na aba "NF e Frete" (Aguardando Validação, Aguardando Aprovação, NF-e Emitida, Concluído, Cancelado)[cite: 2].</li>
-        <li>Preencher o formulário online de envio do material (Romaneio Online)[cite: 2] e aguardar a aprovação do Coordenador da área[cite: 2].</li>
-        <li>Após a aprovação, solicitar a impressão da Nota Fiscal e do Romaneio Online, avisando a patrimonial para conferência[cite: 2].</li>
-    </ul>
+        <!-- REFERÊNCIA E DEFINIÇÕES -->
+        <h2>Referência</h2>
+        <p>Este procedimento se aplica ao Almoxarifado da GER INDUSTR PROCESSO MINERAL[cite: 1].</p>
 
-    <p><strong>Validação Patrimonial (Responsáveis: Solicitante / Patrimonial):</strong>[cite: 2]</p>
-    <ul>
-        <li>Conferir e validar os materiais relacionados na Nota Fiscal e no Romaneio Online antes de embalar[cite: 2].</li>
-        <li>O setor Patrimonial poderá aprovar ou recusar a transferência em caso de divergências. Se recusado, o solicitante deve corrigir as inconsistências[cite: 2].</li>
-    </ul>
+        <h2>Definições</h2>
+        <p><strong>FDS (Ficha com Dados de Segurança):</strong> Documento que fornece informações a respeito de vários aspectos de produtos químicos (substâncias ou preparados) quanto à proteção, à segurança e ao meio ambiente[cite: 1].</p>
+        <p><strong>Reserva:</strong> Pedido de material de um item em estoque, realizado via SAP pela transação MB21, a ser atendido pelo almoxarifado[cite: 1].</p>
+        
+        <p><strong>APP Sistema de (gestão de materiais) DI Processamento Mineral:</strong> APP para solicitações com as seguintes funções[cite: 1]:</p>
+        <ul>
+            <li><strong>Gestão de Estoque:</strong> Acompanhamento de materiais em estoque[cite: 1].</li>
+            <li><strong>Cadastro de materiais:</strong> Solicite o cadastro de novos materiais[cite: 1].</li>
+            <li><strong>Requisições de compras:</strong> Solicite requisições de compras de materiais[cite: 1].</li>
+            <li><strong>Retirada de materiais não estocáveis:</strong> Solicite a retirada de materiais do estoque[cite: 1].</li>
+            <li><strong>Solicitar NF e/ou Coleta:</strong> Solicite a Nota fiscal e/ou Coleta[cite: 1].</li>
+            <li><strong>Status da solicitação:</strong> Acompanhe a solicitação para confirmar se foi aprovada[cite: 1].</li>
+            <li><strong>Verificar materiais:</strong> Scaneie materiais em estoque para obter mais informações[cite: 1].</li>
+            <li><strong>Gestão de ferramentas:</strong> Uso exclusivo para almoxarifado: acesse a ferramenta do V-TOOLING[cite: 1].</li>
+        </ul>
+        <div class="link-box"><strong>LINK APP:</strong> https://apps.powerapps.com/play/e/c06a757f-f8de-45e1-8170-f613f20739f5/a/cfc020af-97dc-4d8c-9b1c-ac31228d7d9e?tenantId=7893571b-6c2c-4cef-b4da-7d4b266a0626&hint=da5815fe-aa76-4265-a806-d776714e948b&sourcetime=1723492153963[cite: 1]</div>
 
-    <p><strong>Preparação e Expedição do Material (Responsável: Almoxarifado):</strong>[cite: 2]</p>
-    <ul>
-        <li>Receber a liberação, conferir o material físico com a NF e o Romaneio Online, embalar adequadamente e garantir a legibilidade das etiquetas[cite: 2].</li>
-        <li>Carregar os materiais no veículo de transporte, conferir a carga e entregar uma cópia da documentação ao segurança Patrimonial da unidade de origem[cite: 2].</li>
-    </ul>
+        <p><strong>Material Estocável:</strong> Refere-se a itens, produtos ou materiais mantidos em estoque de forma contínua ou periódica para atender às necessidades regulares da organização[cite: 1].</p>
+        <p><strong>Material Não Estocável:</strong> Itens adquiridos sob demanda, sempre que há uma necessidade específica, não sendo mantidos em estoque de longo prazo[cite: 1].</p>
 
-    <p><strong>Recebimento na Unidade de Destino (Responsável: Almoxarifado / Patrimonial da Unidade de Destino):</strong>[cite: 2]</p>
-    <ul>
-        <li>Conferir os materiais recebidos na unidade G4, entregar a NF e o romaneio à portaria, realizar o endereçamento físico e registrar a movimentação no Sistema de Gestão de Materiais[cite: 2].</li>
-    </ul>
+        <!-- RECURSOS MÍNIMOS -->
+        <h2>Recursos Mínimos para Realizar a Atividade</h2>
+        <table>
+            <tr>
+                <th>Nº</th>
+                <th>Item</th>
+                <th>Descrição</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>EPI’S</td>
+                <td>Botina de Segurança (com palmilha autoperfurante), capacete com jugular e óculos de segurança, e outros conforme placa de sinalização no local, colete refletivo, luvas conforme a atividade[cite: 1].</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>FERRAMENTAS DE SAÚDE E SEGURANÇA</td>
+                <td>Portar a ART da atividade e garantir que todos os executantes tenham conhecimento de seu conteúdo e sejam treinados; Desenvolver ART LOCAL em campo[cite: 1].</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>EQUIPAMENTOS E/OU FERRAMENTAS</td>
+                <td>Rádio De Comunicação; empilhadeira, paleteira, transpaleteira elétrica, varredeira, Munck; Pick up[cite: 1].</td>
+            </tr>
+        </table>
 
-    <h3>2. Fluxo para Retirada de Materiais Vale x Vale - Transferência G4 x CTSS</h3>
-    <ul>
-        <li><strong>Solicitação de Transferência (Responsável: Solicitante):</strong> Solicitar pelo aplicativo de Gestão de Materiais ("Retirada de Materiais Não Estocáveis") informando Site, Material, Quantidade e Data de necessidade[cite: 2].</li>
-        <li><strong>Preparação e Expedição (Responsável: Almoxarifado):</strong> Verificar diariamente as solicitações, programar caminhão se necessário na reunião de programação, localizar, separar e carregar os materiais, emitir o Romaneio Online e encaminhar à portaria[cite: 2].</li>
-        <li><strong>Conferência e Liberação (Responsável: Portaria / Almoxarifado):</strong> Validar os materiais no romaneio, autorizar a saída e realizar registro fotográfico para rastreabilidade[cite: 2].</li>
-        <li><strong>Entrega do Material:</strong> Transporte até o destino, liberação de acesso pelo Patrimonial, descarregamento com registro fotográfico e baixa da solicitação no aplicativo[cite: 2].</li>
-    </ul>
+        <!-- CUIDADOS ESPECIAIS E ALERTA -->
+        <h2>Cuidados Especiais</h2>
+        <p>Preparar todo material necessário antes de iniciar a tarefa, não faça improviso. Respeitar os sinais sonoros e visuais do Armazém, mantendo distância segura dos veículos e equipamentos[cite: 1].</p>
+        
+        <div class="alerta-box">
+            <div class="alerta-icone">⚠️</div>
+            <div>
+                <strong>ATENÇÃO!</strong><br>
+                Para atividades em áreas abertas, deve-se: Consultar o boletim meteorológico. Não realizar atividades em caso de previsão de descarga atmosférica[cite: 1].
+            </div>
+        </div>
 
-    <h3>3. Fluxo de Envio e Retirada de Materiais de Empresas Terceirizadas (CTSS x G4 / G4 x CTSS)</h3>
-    <ul>
-        <li><strong>Envio (CTSS x G4):</strong> Informar na reunião de programação, enviar e-mail ao almoxarifado (com descrição, quantidade, data e fotos), preencher o Romaneio Online e acionar a Patrimonial para conferência e liberação do transporte[cite: 2].</li>
-        <li><strong>Retirada (G4 x CTSS):</strong> Solicitar via e-mail e na reunião de programação, preencher o Romaneio Online, entregar cópia ao almoxarifado, acionar a Portaria para conferência e realizar o transporte de retorno ao CTSS com validação patrimonial[cite: 2].</li>
-    </ul>
+        <!-- MÓDULO 11: FLUXO DE MATERIAIS -->
+        <h2>Módulo 11: Fluxo de Materiais e Procedimentos</h2>
 
-    <h3>4. Fluxo de Retirada de Material Funcionário x Residência</h3>
-    <ul>
-        <li><strong>Responsável: Solicitante:</strong> Preencher o Romaneio Online de Saída de Material (nome, matrícula, descrição detalhada, quantidade, data prevista de devolução, justificativa, endereço de destino, aprovação do gestor e aceite do Termo de Responsabilidade)[cite: 2].</li>
-        <li><strong>Retirada:</strong> O almoxarifado realiza a separação e conferência; o colaborador confere os itens e a saída é registrada no controle de estoque[cite: 2].</li>
-        <li><strong>Devolução/Incidentes:</strong> O material é inspecionado na devolução. Em caso de perda, avaria ou furto, comunicar imediatamente a segurança patrimonial[cite: 2].</li>
-    </ul>
+        <h3>1. Fluxo para Envio de Material Vale x Vale (Transferência entre Unidades CTSS x G4)</h3>
+        <p><strong>Solicitação de Transferência (Responsável: Solicitante):</strong>[cite: 2]</p>
+        <ul>
+            <li>Identificar o material que será transferido[cite: 2].</li>
+            <li>Enviar e-mail solicitando a transferência do material, anexando registros fotográficos, descrição e quantidade para <code>almoxarifado@ctss.com</code>[cite: 2].</li>
+            <li>Preencher o formulário no Sistema de Gestão de Materiais para emissão da Nota Fiscal (NF)[cite: 2].</li>
+            <li>Acompanhar o status da solicitação na aba "NF e Frete" (Aguardando Validação, Aguardando Aprovação, NF-e Emitida, Concluído, Cancelado)[cite: 2].</li>
+            <li>Preencher o formulário online de envio do material (Romaneio Online) e aguardar a aprovação do Coordenador da área[cite: 2].</li>
+            <li>Após a aprovação, solicitar a impressão da Nota Fiscal e do Romaneio Online, avisando a patrimonial para conferência[cite: 2].</li>
+        </ul>
 
-    <!-- ANEXOS -->
-    <h2>ANEXOS</h2>
-    <table>
-        <tr>
-            <th>#</th>
-            <th>Descrição</th>
-            <th>Endereço / Referência</th>
-        </tr>
-        <tr>
-            <td>1</td>
-            <td>Reserva MB21</td>
-            <td>Passo a Passo RC Reserva.pdf[cite: 1]</td>
-        </tr>
-        <tr>
-            <td>2</td>
-            <td>V-tooling</td>
-            <td>https://app.vtooling.valeglobal.net/selecao-area-usuaria[cite: 1]</td>
-        </tr>
-    </table>
+        <p><strong>Validação Patrimonial (Responsáveis: Solicitante / Patrimonial):</strong>[cite: 2]</p>
+        <ul>
+            <li>Conferir e validar os materiais relacionados na Nota Fiscal e no Romaneio Online antes de embalar[cite: 2].</li>
+            <li>O setor Patrimonial poderá aprovar ou recusar a transferência em caso de divergências. Se recusado, o solicitante deve corrigir as inconsistências[cite: 2].</li>
+        </ul>
+
+        <p><strong>Preparação e Expedição do Material (Responsável: Almoxarifado):</strong>[cite: 2]</p>
+        <ul>
+            <li>Receber a liberação, conferir o material físico com a NF e o Romaneio Online, embalar adequadamente e garantir a legibilidade das etiquetas[cite: 2].</li>
+            <li>Carregar os materiais no veículo de transporte, conferir a carga e entregar uma cópia da documentação ao segurança Patrimonial da unidade de origem[cite: 2].</li>
+        </ul>
+
+        <p><strong>Recebimento na Unidade de Destino (Responsável: Almoxarifado / Patrimonial da Unidade de Destino):</strong>[cite: 2]</p>
+        <ul>
+            <li>Conferir os materiais recebidos na unidade G4, entregar a NF e o romaneio à portaria, realizar o endereçamento físico e registrar a movimentação no Sistema de Gestão de Materiais[cite: 2].</li>
+        </ul>
+
+        <h3>2. Fluxo para Retirada de Materiais Vale x Vale - Transferência G4 x CTSS</h3>
+        <ul>
+            <li><strong>Solicitação de Transferência (Responsável: Solicitante):</strong> Solicitar pelo aplicativo de Gestão de Materiais ("Retirada de Materiais Não Estocáveis") informando Site, Material, Quantidade e Data de necessidade[cite: 2].</li>
+            <li><strong>Preparação e Expedição (Responsável: Almoxarifado):</strong> Verificar diariamente as solicitações, programar caminhão se necessário na reunião de programação, localizar, separar e carregar os materiais, emitir o Romaneio Online e encaminhar à portaria[cite: 2].</li>
+            <li><strong>Conferência e Liberação (Responsável: Portaria / Almoxarifado):</strong> Validar os materiais no romaneio, autorizar a saída e realizar registro fotográfico para rastreabilidade[cite: 2].</li>
+            <li><strong>Entrega do Material:</strong> Transporte até o destino, liberação de acesso pelo Patrimonial, descarregamento com registro fotográfico e baixa da solicitação no aplicativo[cite: 2].</li>
+        </ul>
+
+        <h3>3. Fluxo de Envio e Retirada de Materiais de Empresas Terceirizadas (CTSS x G4 / G4 x CTSS)</h3>
+        <ul>
+            <li><strong>Envio (CTSS x G4):</strong> Informar na reunião de programação, enviar e-mail ao almoxarifado (com descrição, quantidade, data e fotos), preencher o Romaneio Online e acionar a Patrimonial para conferência e liberação do transporte[cite: 2].</li>
+            <li><strong>Retirada (G4 x CTSS):</strong> Solicitar via e-mail e na reunião de programação, preencher o Romaneio Online, entregar cópia ao almoxarifado, acionar a Portaria para conferência e realizar o transporte de retorno ao CTSS com validação patrimonial[cite: 2].</li>
+        </ul>
+
+        <h3>4. Fluxo de Retirada de Material Funcionário x Residência</h3>
+        <ul>
+            <li><strong>Responsável: Solicitante:</strong> Preencher o Romaneio Online de Saída de Material (nome, matrícula, descrição detalhada, quantidade, data prevista de devolução, justificativa, endereço de destino, aprovação do gestor e aceite do Termo de Responsabilidade)[cite: 2].</li>
+            <li><strong>Retirada:</strong> O almoxarifado realiza a separação e conferência; o colaborador confere os itens e a saída é registrada no controle de estoque[cite: 2].</li>
+            <li><strong>Devolução/Incidentes:</strong> O material é inspecionado na devolução. Em caso de perda, avaria ou furto, comunicar imediatamente a segurança patrimonial[cite: 2].</li>
+        </ul>
+
+        <!-- ANEXOS -->
+        <h2>Anexos</h2>
+        <table>
+            <tr>
+                <th>#</th>
+                <th>Descrição</th>
+                <th>Endereço / Referência</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>Reserva MB21</td>
+                <td>Passo a Passo RC Reserva.pdf[cite: 1]</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>V-tooling</td>
+                <td>https://app.vtooling.valeglobal.net/selecao-area-usuaria[cite: 1]</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Autorização de Saída de materiais</td>
+                <td>N/A[cite: 1]</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>Retiradas de Ferramentas</td>
+                <td>retirada de ferramentas.xlsx[cite: 1]</td>
+            </tr>
+        </table>
+
+        <!-- ASSINATURAS / RESPONSÁVEIS -->
+        <h2>Elaboradores e Aprovadores</h2>
+        <table>
+            <tr>
+                <th>Nome</th>
+                <th>Matrícula</th>
+                <th>Gerência</th>
+            </tr>
+            <tr>
+                <td>Alfredo Augusto Ramos Neto[cite: 1]</td>
+                <td>81021893[cite: 1]</td>
+                <td>GER INDUSTR PROCESSO MINERAL[cite: 1]</td>
+            </tr>
+            <tr>
+                <td>Allan Souza De Carvalho[cite: 1]</td>
+                <td>10900407[cite: 1]</td>
+                <td>GER INDUSTR PROCESSO MINERAL[cite: 1]</td>
+            </tr>
+            <tr>
+                <td>Atmisto Silva[cite: 1]</td>
+                <td>C0625384[cite: 1]</td>
+                <td>GER INDUSTR PROCESSO MINERAL[cite: 1]</td>
+            </tr>
+            <tr>
+                <td>Mariana Pereira Cruz[cite: 1]</td>
+                <td>81025364[cite: 1]</td>
+                <td>GER INDUSTR PROCESSO MINERAL[cite: 1]</td>
+            </tr>
+        </table>
+
+    </div>
+
+    <!-- SCRIPT DO LEITOR DE VOZ ALTA -->
+    <script>
+        let synth = window.speechSynthesis;
+        let utterance = null;
+
+        function lerTexto() {
+            if (synth.speaking) {
+                synth.cancel();
+            }
+            const texto = document.getElementById('conteudoTexto').innerText;
+            utterance = new SpeechSynthesisUtterance(texto);
+            utterance.lang = 'pt-BR';
+            utterance.rate = 1.0;
+            synth.speak(utterance);
+        }
+
+        function pararLeitura() {
+            if (synth.speaking) {
+                synth.cancel();
+            }
+        }
+    </script>
 
 </body>
 </html>
