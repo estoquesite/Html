@@ -190,6 +190,9 @@
                 <button type="button" onclick="mudarAbaEntrada('manual')" id="tabBtn-manual" class="flex-1 min-w-[120px] py-2.5 px-4 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-700">
                     <span>✍️</span> <span>Digitar Manual</span>
                 </button>
+                <button type="button" onclick="mudarAbaEntrada('bloco')" id="tabBtn-bloco" class="flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
+                    <span>📋</span> <span>Colar Nota / Vários Itens</span>
+                </button>
                 <button type="button" onclick="mudarAbaEntrada('link')" id="tabBtn-link" class="flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
                     <span>🔗</span> <span>Link Web</span>
                 </button>
@@ -268,6 +271,47 @@
                             <span>Salvar Compra na Tabela</span>
                         </button>
                     </div>
+                </div>
+            </div>
+
+            <!-- CONTEÚDO NOVO: COLAR NOTA OU VÁRIOS ITENS (QUADRADÃO) -->
+            <div id="aba-bloco" class="p-6 space-y-4 hidden">
+                <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
+                    <span class="text-xs font-black text-purple-900 dark:text-purple-300 uppercase flex items-center gap-1.5">
+                        <span>📋</span> Colar Nota Fiscal / Vários Itens de uma Vez (Agrupados)
+                    </span>
+                    <span class="text-[10px] font-bold text-slate-400">Insira as informações gerais e cole o texto abaixo</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Data</label>
+                        <input type="date" id="blocoData" class="w-full text-xs p-2.5 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white border border-slate-300 dark:border-slate-700">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-black text-rose-600 uppercase mb-1">Solicitante (*)</label>
+                        <input type="text" id="blocoSolicitante" placeholder="QUEM PEDIU?" class="uppercase-input w-full text-xs p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 dark:text-white font-bold outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Local / Fornecedor</label>
+                        <input type="text" id="blocoLocal" placeholder="EX: LOJA..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Projeto</label>
+                        <input type="text" id="blocoProjeto" placeholder="PROJETO..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Cole aqui a lista de produtos (uma linha por item, ex: "2x Ventilador - R$ 150,00" ou apenas os nomes e valores):</label>
+                    <textarea id="blocoTextoItens" rows="5" placeholder="Ex:&#10;1x Chumbador 3/8 - 45,00&#10;2x Broca de aço rápida - 30,00&#10;1x Extensão 10m - 120,00" class="w-full text-xs p-3 bg-slate-50 dark:bg-slate-900 border border-purple-300 dark:border-purple-800 rounded-xl outline-none dark:text-white font-mono leading-relaxed"></textarea>
+                </div>
+
+                <div class="flex justify-end pt-1">
+                    <button type="button" onclick="processarBlocoItens()" class="bg-purple-600 hover:bg-purple-700 text-white font-black py-3 px-8 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer">
+                        <span>⚡</span>
+                        <span>Processar e Agrupar Compra Inteira</span>
+                    </button>
                 </div>
             </div>
 
@@ -400,7 +444,7 @@
                         <tr class="border-b border-slate-100 dark:border-slate-700 text-slate-400 font-bold uppercase text-[10px]">
                             <th class="py-2.5 px-3">Data</th>
                             <th class="py-2.5 px-3">Solicitante</th>
-                            <th class="py-2.5 px-3">Produto / Serviço</th>
+                            <th class="py-2.5 px-3">Produto / Serviço / Itens Agrupados</th>
                             <th class="py-2.5 px-3">Local / Fornecedor</th>
                             <th class="py-2.5 px-3">Projeto</th>
                             <th class="py-2.5 px-3 text-center">Qtd</th>
@@ -565,10 +609,12 @@
         let itensPendentesAprovacao = [];
         let supabaseClient = null;
         let solicitanteFiltroAtual = "";
+        let itensExpandidos = {}; // Controla quais linhas estão expandidas (ver sub-itens)
 
         window.addEventListener('DOMContentLoaded', () => {
             const hoje = new Date().toISOString().split('T')[0];
             document.getElementById('manualData').value = hoje;
+            document.getElementById('blocoData').value = hoje;
             atualizarDataEntregaManualDefault();
 
             const solManual = document.getElementById('manualSolicitante');
@@ -587,7 +633,7 @@
         });
 
         function mudarAbaEntrada(aba) {
-            ['manual', 'link', 'foto', 'texto'].forEach(id => {
+            ['manual', 'bloco', 'link', 'foto', 'texto'].forEach(id => {
                 const elAba = document.getElementById(`aba-${id}`);
                 const elBtn = document.getElementById(`tabBtn-${id}`);
                 if (id === aba) {
@@ -661,6 +707,106 @@
             }
         }
 
+        // ================= PROCESSAR BLOCO DE VÁRIOS ITENS (NOTA FISCAL) =================
+        function processarBlocoItens() {
+            const solicitante = document.getElementById('blocoSolicitante').value.trim().toUpperCase();
+            if (!solicitante) {
+                alert("⚠️ Por favor, informe o SOLICITANTE!");
+                document.getElementById('blocoSolicitante').focus();
+                return;
+            }
+
+            const textoBruto = document.getElementById('blocoTextoItens').value.trim();
+            if (!textoBruto) {
+                alert("⚠️ Cole a lista de itens no quadradão!");
+                document.getElementById('blocoTextoItens').focus();
+                return;
+            }
+
+            const linhas = textoBruto.split('\n');
+            let subItens = [];
+            let somaTotalGeral = 0;
+            let somaQtdGeral = 0;
+
+            linhas.forEach(linha => {
+                linha = linha.trim();
+                if (!linha) return;
+
+                // Tenta extrair quantidade e valor do formato ex.: "2x Item - R$ 50,00" ou "Item - 50.00"
+                let qtd = 1;
+                let valorUnit = 0;
+                let nomeItem = linha;
+
+                // Extrai valor monetário no final ou meio
+                const matchValor = linha.match(/(?:R\$)?\s*(\d+[\.,]?\d*)$/i) || linha.match(/(?:r\$)?\s*(\d+[\.,]\d{2})/i);
+                if (matchValor) {
+                    valorUnit = parseFloat(matchValor[1].replace(',', '.')) || 0;
+                    nomeItem = linha.replace(matchValor[0], '').replace(/[-–—]/g, '').trim();
+                }
+
+                // Extrai quantidade no início (ex: "2x" ou "2 -")
+                const matchQtd = nomeItem.match(/^(\d+)\s*(?:x|un|-|\b)/i);
+                if (matchQtd) {
+                    qtd = parseInt(matchQtd[1], 10) || 1;
+                    nomeItem = nomeItem.replace(matchQtd[0], '').trim();
+                }
+
+                const totalItem = valorUnit > 0 ? (qtd * valorUnit) : 0;
+                somaTotalGeral += totalItem;
+                somaQtdGeral += qtd;
+
+                subItens.push({
+                    produto: nomeItem.toUpperCase() || "ITEM",
+                    qtd: qtd,
+                    unit: valorUnit,
+                    total: totalItem
+                });
+            });
+
+            if (subItens.length === 0) {
+                alert("Não foi possível identificar itens válidos no texto.");
+                return;
+            }
+
+            const data = document.getElementById('blocoData').value || new Date().toISOString().split('T')[0];
+            const local = document.getElementById('blocoLocal').value.trim().toUpperCase() || "COMPRA AGRUPADA";
+            const projeto = document.getElementById('blocoProjeto').value.trim().toUpperCase() || "";
+
+            const novoItem = {
+                id: Date.now(),
+                data: data,
+                solicitante: solicitante,
+                produto: `COMPRA AGRUPADA (${subItens.length} ITENS)`,
+                local: local,
+                projeto: projeto,
+                qtd: somaQtdGeral,
+                unit: somaQtdGeral > 0 ? (somaTotalGeral / somaQtdGeral) : 0,
+                total: somaTotalGeral,
+                link: "",
+                entregue: false,
+                data_entrega: "",
+                sub_itens: subItens // Guarda os sub-itens para o botão expandir (+)
+            };
+
+            compras.unshift(novoItem);
+            salvarNoLocalStorage();
+            atualizarListaSelectSolicitantes();
+            renderizarTabela();
+            mostrarAviso(`✅ Compra agrupada com ${subItens.length} itens salva com sucesso!`);
+
+            inserirNoSupabase(novoItem);
+
+            document.getElementById('blocoTextoItens').value = '';
+            document.getElementById('blocoLocal').value = '';
+            document.getElementById('blocoProjeto').value = '';
+            document.getElementById('blocoSolicitante').value = '';
+        }
+
+        function toggleExpandirSubItens(id) {
+            itensExpandidos[id] = !itensExpandidos[id];
+            renderizarTabela();
+        }
+
         async function lancarCompraManual() {
             const inputSol = document.getElementById('manualSolicitante');
             const solicitante = inputSol.value.trim().toUpperCase();
@@ -676,7 +822,7 @@
             const produto = document.getElementById('manualProduto').value.trim().toUpperCase();
 
             if (!produto) {
-                alert("⚠️️ Por favor, digite o nome do produto ou serviço!");
+                alert("⚠️ Por favor, digite o nome do produto ou serviço!");
                 document.getElementById('manualProduto').focus();
                 return;
             }
@@ -707,7 +853,8 @@
                 total: total || (qtd * unit),
                 link: "",
                 entregue: entregue,
-                data_entrega: dataEntrega
+                data_entrega: dataEntrega,
+                sub_itens: []
             };
 
             compras.unshift(novoItem);
@@ -938,7 +1085,8 @@
                     total: item.total,
                     link: item.link || '',
                     entregue: !!item.entregue,
-                    data_entrega: item.data_entrega || ''
+                    data_entrega: item.data_entrega || '',
+                    sub_itens: item.sub_itens || []
                 };
 
                 let { data, error } = await supabaseClient.from('compras_corporativas').insert([payload]).select();
@@ -963,7 +1111,8 @@
                     total: item.total,
                     link: item.link || '',
                     entregue: !!item.entregue,
-                    data_entrega: item.data_entrega || ''
+                    data_entrega: item.data_entrega || '',
+                    sub_itens: item.sub_itens || []
                 };
 
                 await supabaseClient.from('compras_corporativas').update(payload).eq('id', item.id);
@@ -986,7 +1135,6 @@
             if (supabaseClient) {
                 try {
                     mostrarAviso("💾 Sincronizando e atualizando dados na nuvem...");
-                    // Limpa a tabela da nuvem e reinseri os dados atuais (limpos de duplicidade)
                     await supabaseClient.from('compras_corporativas').delete().neq('id', 0);
                     if (compras.length > 0) {
                         const payloadLote = compras.map(item => ({
@@ -1000,7 +1148,8 @@
                             total: item.total,
                             link: item.link || '',
                             entregue: !!item.entregue,
-                            data_entrega: item.data_entrega || ''
+                            data_entrega: item.data_entrega || '',
+                            sub_itens: item.sub_itens || []
                         }));
                         await supabaseClient.from('compras_corporativas').insert(payloadLote);
                     }
@@ -1052,7 +1201,8 @@
                                     total: parseFloat((cols[7] || '0').replace(',', '.')) || 0,
                                     entregue: (cols[8] || '').toUpperCase() === 'SIM',
                                     data_entrega: cols[9] ? cols[9].split('/').reverse().join('-') : '',
-                                    link: (cols[10] || '').replace(/"/g, '')
+                                    link: (cols[10] || '').replace(/"/g, ''),
+                                    sub_itens: []
                                 });
                             }
                         }
@@ -1241,7 +1391,8 @@
                 total: 0,
                 link: link,
                 entregue: false,
-                data_entrega: ""
+                data_entrega: "",
+                sub_itens: []
             });
 
             renderizarCardsPendentes();
@@ -1301,7 +1452,8 @@
                 total: 0,
                 link: link,
                 entregue: false,
-                data_entrega: ""
+                data_entrega: "",
+                sub_itens: []
             });
 
             renderizarCardsPendentes();
@@ -1426,7 +1578,8 @@
                 total: parseFloat(document.getElementById(`total-${tempId}`).value) || 0,
                 link: document.getElementById(`link-${tempId}`).value || "",
                 entregue: false,
-                data_entrega: ""
+                data_entrega: "",
+                sub_itens: []
             };
 
             compras.unshift(novoItem);
@@ -1569,13 +1722,20 @@
 
                     const chave = `${(item.solicitante||'').trim().toUpperCase()}_${(item.produto||'').trim().toUpperCase()}_${Number(item.total||0).toFixed(2)}_${Number(item.qtd||1)}`;
                     const isDuplicado = contagemChaves[chave] > 1;
+                    const temSubItens = item.sub_itens && item.sub_itens.length > 0;
+                    const expandido = !!itensExpandidos[item.id];
 
                     const tr = document.createElement('tr');
                     tr.className = `${item.entregue ? 'bg-slate-100/70 dark:bg-slate-800/40 opacity-75 line-through' : isDuplicado ? 'alerta-duplicado-fluorescente' : 'hover:bg-slate-50'} transition uppercase`;
                     tr.innerHTML = `
                         <td class="py-2.5 px-3 font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap">${formatarDataBR(item.data)}</td>
                         <td class="py-2.5 px-3 font-bold text-slate-800 dark:text-slate-200 whitespace-nowrap">${item.solicitante}</td>
-                        <td class="py-2.5 px-3 max-w-xs truncate">${item.produto}</td>
+                        <td class="py-2.5 px-3 max-w-xs">
+                            <div class="flex items-center gap-2">
+                                ${temSubItens ? `<button type="button" onclick="toggleExpandirSubItens(${item.id})" class="bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 px-1.5 py-0.5 rounded text-[10px] font-black cursor-pointer">${expandido ? '➖' : '➕'}</button>` : ''}
+                                <span class="truncate">${item.produto}</span>
+                            </div>
+                        </td>
                         <td class="py-2.5 px-3 font-semibold text-indigo-700 whitespace-nowrap">${item.local || 'MERCADO LIVRE'}</td>
                         <td class="py-2.5 px-3 font-semibold text-slate-500 whitespace-nowrap">${item.projeto || '-'}</td>
                         <td class="py-2.5 px-3 text-center font-bold">${item.qtd}</td>
@@ -1601,6 +1761,24 @@
                         </td>
                     `;
                     tbody.appendChild(tr);
+
+                    // Se estiver expandido, renderiza as linhas dos sub-itens logo abaixo
+                    if (temSubItens && expandido) {
+                        item.sub_itens.forEach((sub, idxSub) => {
+                            const trSub = document.createElement('tr');
+                            trSub.className = "bg-indigo-50/50 dark:bg-slate-900/40 text-[11px]";
+                            trSub.innerHTML = `
+                                <td class="py-2 px-3 text-right text-slate-400">↳</td>
+                                <td colspan="2" class="py-2 px-3 pl-6 font-semibold text-indigo-800 dark:text-indigo-300">📌 ${idxSub + 1}. ${sub.produto}</td>
+                                <td colspan="2" class="py-2 px-3 text-slate-500">-</td>
+                                <td class="py-2 px-3 text-center font-bold text-slate-600 dark:text-slate-300">${sub.qtd} un</td>
+                                <td class="py-2 px-3 text-right text-slate-500">R$ ${Number(sub.unit || 0).toFixed(2)}</td>
+                                <td class="py-2 px-3 text-right font-bold text-emerald-600">R$ ${Number(sub.total || 0).toFixed(2)}</td>
+                                <td colspan="3"></td>
+                            `;
+                            tbody.appendChild(trSub);
+                        });
+                    }
                 });
             }
 
