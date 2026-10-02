@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PRO-043927 - Gestão de Estoque do CTSS</title>
+    <!-- Ícones e Estilos do Editor -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -11,20 +13,71 @@
             color: #333333;
             line-height: 1.5;
             margin: 0;
-            padding: 20px;
-            background-color: #f8fafc;
+            padding: 0;
+            background-color: #e2e8f0;
         }
 
+        /* BARRA DE FERRAMENTAS ESTILO WORD (TOPO FIXO) */
+        .word-ribbon {
+            background: #f3f4f6;
+            border-bottom: 1px solid #cbd5e1;
+            padding: 8px 16px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .ribbon-group {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            border-right: 1px solid #d1d5db;
+            padding-right: 15px;
+        }
+        .ribbon-btn {
+            background: transparent;
+            border: 1px solid transparent;
+            padding: 6px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            color: #374151;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .ribbon-btn:hover {
+            background: #e5e7eb;
+            border-color: #d1d5db;
+        }
+        .ribbon-select {
+            padding: 5px;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            font-size: 12px;
+            background: white;
+        }
+
+        /* ÁREA DA PÁGINA A4 EDITÁVEL */
+        .workspace {
+            padding: 30px 20px;
+            display: flex;
+            justify-content: center;
+        }
         .documento-container {
-            max-width: 21cm;
-            margin: 0 auto;
+            width: 21cm;
+            min-height: 29.7cm;
             background: #ffffff;
             padding: 2.5cm;
-            border: 1px solid #cbd5e1;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            outline: none; /* Remove borda de foco padrão */
         }
 
-        /* CABEÇALHO OFICIAL FLUIDO (EXATO IGUAL À FOTO) */
+        /* CABEÇALHO OFICIAL FLUIDO */
         .topo-header {
             display: flex;
             justify-content: space-between;
@@ -57,7 +110,7 @@
             margin-bottom: 15px;
         }
 
-        /* CAIXA DE DESTAQUE COM BORDA AMARELA (RESULTADOS ESPERADOS) */
+        /* CAIXA DE DESTAQUE COM BORDA AMARELA */
         .caixa-destaque {
             border: 1px solid #eab308;
             background-color: #fffbeb;
@@ -70,7 +123,7 @@
             font-size: 11pt;
         }
 
-        /* TÍTULOS DAS SEÇÕES */
+        /* TÍTULOS E TEXTOS */
         h2 {
             font-size: 12pt;
             color: #007e7a;
@@ -84,7 +137,6 @@
             margin-top: 15px;
             margin-bottom: 5px;
         }
-
         p, li {
             margin-bottom: 8px;
             text-align: justify;
@@ -94,7 +146,7 @@
             padding-left: 20px;
         }
 
-        /* TABELAS SIMPLES E FLUIDAS */
+        /* TABELAS */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -124,7 +176,7 @@
             margin-top: 5px;
         }
 
-        /* PAINEL DE VOZ ALTA (CANTINHO) */
+        /* PAINEL DE VOZ ALTA */
         .painel-voz {
             position: fixed;
             bottom: 20px;
@@ -149,61 +201,67 @@
             cursor: pointer;
             font-weight: bold;
         }
-        .btn-voz:hover {
-            background: #005a57;
-        }
-
-        /* BARRA DE TOPO */
-        .barra-topo {
-            max-width: 21cm;
-            margin: 0 auto 15px auto;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        .btn-voltar {
-            background: #64748b;
-            color: white;
-            padding: 8px 14px;
-            border-radius: 6px;
-            text-decoration: none;
-            font-weight: bold;
-            font-size: 10pt;
-        }
-        .btn-imprimir {
-            background: #007e7a;
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 10pt;
-            cursor: pointer;
-        }
 
         @media print {
+            .word-ribbon, .painel-voz {
+                display: none;
+            }
             body {
                 background: white;
-                padding: 0;
             }
             .documento-container {
-                border: none;
                 box-shadow: none;
                 padding: 0;
-                max-width: 100%;
-            }
-            .barra-topo, .painel-voz {
-                display: none;
+                width: 100%;
             }
         }
     </style>
 </head>
 <body>
 
-    <!-- BARRA DE CONTROLE NA TELA -->
-    <div class="barra-topo">
-        <a href="index.html" class="btn-voltar">← Voltar ao Menu Mestre</a>
-        <button onclick="window.print()" class="btn-imprimir">🖨️ Imprimir PRO Oficial</button>
+    <!-- BARRA DE FERRAMENTAS ESTILO WORD -->
+    <div class="word-ribbon">
+        <a href="index.html" class="ribbon-btn" style="background: #64748b; color: white; text-decoration: none; font-weight: bold;">
+            <i class="fa-solid fa-arrow-left"></i> Menu
+        </a>
+        
+        <div class="ribbon-group">
+            <select class="ribbon-select" onchange="execCmd('fontName', this.value)">
+                <option value="Arial">Arial</option>
+                <option value="Times New Roman">Times New Roman</option>
+                <option value="Calibri">Calibri</option>
+            </select>
+            <select class="ribbon-select" onchange="execCmd('fontSize', this.value)">
+                <option value="3">Tamanho</option>
+                <option value="2">Pequeno (10pt)</option>
+                <option value="3">Normal (11pt)</option>
+                <option value="4">Médio (12pt)</option>
+                <option value="5">Grande (14pt)</option>
+            </select>
+        </div>
+
+        <div class="ribbon-group">
+            <button class="ribbon-btn" onclick="execCmd('bold', null)" title="Negrito"><i class="fa-solid fa-bold"></i></button>
+            <button class="ribbon-btn" onclick="execCmd('italic', null)" title="Itálico"><i class="fa-solid fa-italic"></i></button>
+            <button class="ribbon-btn" onclick="execCmd('underline', null)" title="Sublinhado"><i class="fa-solid fa-underline"></i></button>
+        </div>
+
+        <div class="ribbon-group">
+            <button class="ribbon-btn" onclick="execCmd('justifyLeft', null)" title="Alinhar à Esquerda"><i class="fa-solid fa-align-left"></i></button>
+            <button class="ribbon-btn" onclick="execCmd('justifyCenter', null)" title="Centralizar"><i class="fa-solid fa-align-center"></i></button>
+            <button class="ribbon-btn" onclick="execCmd('justifyFull', null)" title="Justificar"><i class="fa-solid fa-align-justify"></i></button>
+        </div>
+
+        <div class="ribbon-group">
+            <button class="ribbon-btn" onclick="execCmd('insertUnorderedList', null)" title="Lista com Marcadores"><i class="fa-solid fa-list-ul"></i></button>
+            <button class="ribbon-btn" onclick="execCmd('insertOrderedList', null)" title="Lista Numerada"><i class="fa-solid fa-list-ol"></i></button>
+        </div>
+
+        <div class="ribbon-group" style="border: none;">
+            <button class="ribbon-btn" onclick="window.print()" style="background: #007e7a; color: white; font-weight: bold;">
+                <i class="fa-solid fa-print"></i> Imprimir / Salvar PDF
+            </button>
+        </div>
     </div>
 
     <!-- LEITOR DE VOZ ALTA -->
@@ -213,152 +271,158 @@
         <button onclick="pararLeitura()" class="btn-voz" style="background: #dc2626;">Parar</button>
     </div>
 
-    <!-- DOCUMENTO FLUIDO E FIEL -->
-    <div class="documento-container" id="conteudoTexto">
+    <!-- ÁREA DE TRABALHO COM A PÁGINA A4 EDITÁVEL -->
+    <div class="workspace">
+        <div class="documento-container" id="conteudoTexto" contenteditable="true">
 
-        <!-- CABEÇALHO -->
-        <div class="topo-header">
-            <div class="topo-titulo">Gestão de estoque do CTSS</div>
-            <div class="logo-vale">VALE</div>
-        </div>
-        <hr class="linha-verde">
-        <div class="pro-info">PRO-043927, Rev.: 01 – 13/03/2025[cite: 1]</div>
+            <!-- CABEÇALHO -->
+            <div class="topo-header">
+                <div class="topo-titulo">Gestão de estoque do CTSS</div>
+                <div class="logo-vale">VALE</div>
+            </div>
+            <hr class="linha-verde">
+            <div class="pro-info">PRO-043927, Rev.: 01 – 13/03/2025</div>
 
-        <p><strong>Responsável Técnico:</strong> Mariana Pereira Cruz | <strong>Matrícula:</strong> 81025364 | <strong>Área:</strong> GER INDUSTR PROCESSO MINERAL[cite: 1]</p>
-        <p><strong>Público-alvo:</strong> Almoxarifado do CTSS – Centro Tecnológico de Soluções Sustentáveis da Gerência Industrial Processo Mineral (Diretoria Processamento Mineral)[cite: 1].</p>
-        <p><strong>Necessidade de Treinamento:</strong> ( _ ) SIM (&nbsp;x&nbsp;) NÃO &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>Tarefa prioritária:</strong> (&nbsp;X&nbsp;) SIM ( _ ) NÃO[cite: 1]</p>
+            <p><strong>Responsável Técnico:</strong> Mariana Pereira Cruz | <strong>Matrícula:</strong> 81025364 | <strong>Área:</strong> GER INDUSTR PROCESSO MINERAL</p>
+            <p><strong>Público-alvo:</strong> Almoxarifado do CTSS – Centro Tecnológico de Soluções Sustentáveis da Gerência Industrial Processo Mineral (Diretoria Processamento Mineral).</p>
+            <p><strong>Necessidade de Treinamento:</strong> ( _ ) SIM (&nbsp;x&nbsp;) NÃO &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>Tarefa prioritária:</strong> (&nbsp;X&nbsp;) SIM ( _ ) NÃO</p>
 
-        <!-- CAIXA DE RESULTADOS ESPERADOS -->
-        <div class="caixa-destaque">
-            <h3>Resultados Esperados:</h3>
+            <!-- CAIXA DE RESULTADOS ESPERADOS -->
+            <div class="caixa-destaque">
+                <h3>Resultados Esperados:</h3>
+                <ul>
+                    <li>Realizar as atividades de recebimento, estoque, salvaguarda, movimentação e expedição no almoxarifado do CTSS, conforme as diretrizes estabelecidas neste procedimento, priorizando a aplicação de normas de SSMAC, visando à preservação da saúde e integridade físicas dos empregados e patrimônio da empresa.</li>
+                </ul>
+            </div>
+
+            <!-- CONTEXTUALIZAÇÃO -->
+            <h2>1 Contextualização</h2>
+            <p><strong>Quais RACs estão associadas a estas atividades descritas no PRO?</strong></p>
+            <table>
+                <tr>
+                    <td>RAC 1</td><td>RAC 2</td><td>RAC 3</td><td>RAC 4</td><td>RAC 5</td><td>RAC 6</td><td>RAC 7</td><td>RAC 8</td><td>RAC 9</td><td>RAC 10</td><td>RAC 11</td><td>N/A</td>
+                </tr>
+                <tr>
+                    <td>X</td><td>x</td><td></td><td>x</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
+                </tr>
+            </table>
+
+            <p><strong>A elaboração/revisão deste PRO foi feita a partir de desdobramento de evento N1 ou N2?</strong><br>
+            ( _ ) NÃO &nbsp;&nbsp;&nbsp;&nbsp; (&nbsp;X&nbsp;) SIM</p>
+
+            <p><strong>Caso o procedimento esteja relacionado a uma Tarefa Prioritária, qual a dimensão envolvida?</strong><br>
+            ( _ ) Custos &nbsp;&nbsp; (&nbsp;X&nbsp;) Meio Ambiente &nbsp;&nbsp; ( _ ) Produtividade &nbsp;&nbsp; ( _ ) Qualidade &nbsp;&nbsp; ( _ ) Riscos &nbsp;&nbsp; ( _ ) Saúde e Segurança</p>
+
+            <!-- REFERÊNCIA E DEFINIÇÕES -->
+            <h2>2 Referência</h2>
+            <p>Este procedimento se aplica ao Almoxarifado da GER INDUSTR PROCESSO MINERAL.</p>
+
+            <h2>3 Definições</h2>
+            <p><strong>FDS (Ficha com Dados de Segurança):</strong> Documento que fornece informações a respeito de vários aspectos de produtos químicos quanto à proteção, à segurança e ao meio ambiente.</p>
+            <p><strong>Reserva:</strong> Pedido de material de um item em estoque, realizado via SAP pela transação MB21.</p>
+            
+            <p><strong>APP Sistema de (gestão de materiais) DI Processamento Mineral:</strong> APP para solicitações:</p>
             <ul>
-                <li>Realizar as atividades de recebimento, estoque, salvaguarda, movimentação e expedição no almoxarifado do CTSS, conforme as diretrizes estabelecidas neste procedimento, priorizando a aplicação de normas de SSMAC, visando à preservação da saúde e integridade físicas dos empregados e patrimônio da empresa[cite: 1].</li>
+                <li><strong>Gestão de Estoque:</strong> Acompanhamento de materiais em estoque.</li>
+                <li><strong>Cadastro de materiais:</strong> Solicite o cadastro de novos materiais.</li>
+                <li><strong>Requisições de compras:</strong> Solicite requisições de compras.</li>
+                <li><strong>Retirada de materiais não estocáveis:</strong> Solicite a retirada de materiais.</li>
+                <li><strong>Solicitar NF e/ou Coleta:</strong> Solicite a Nota fiscal e/ou Coleta.</li>
+                <li><strong>Status da solicitação:</strong> Acompanhe a solicitação.</li>
+                <li><strong>Verificar materiais:</strong> Scaneie materiais em estoque.</li>
+                <li><strong>Gestão de ferramentas:</strong> Uso exclusivo para almoxarifado no V-TOOLING.</li>
             </ul>
+            <div class="link-box">https://apps.powerapps.com/play/e/c06a757f-f8de-45e1-8170-f613f20739f5/a/cfc020af-97dc-4d8c-9b1c-ac31228d7d9e?tenantId=7893571b-6c2c-4cef-b4da-7d4b266a0626&hint=da5815fe-aa76-4265-a806-d776714e948b&sourcetime=1723492153963</div>
+
+            <p><strong>Material Estocável:</strong> Itens mantidos em estoque de forma contínua ou periódica.</p>
+            <p><strong>Material Não Estocável:</strong> Itens adquiridos sob demanda, sem armazenamento de longo prazo.</p>
+
+            <!-- RECURSOS MÍNIMOS -->
+            <h2>4 Recursos Mínimos para Realizar a Atividade</h2>
+            <table>
+                <tr>
+                    <th>Nº</th>
+                    <th>Item</th>
+                    <th>Descrição</th>
+                </tr>
+                <tr>
+                    <td>1</td>
+                    <td>EPI’S</td>
+                    <td>Botina de Segurança (com palmilha autoperfurante), capacete com jugular e óculos de segurança, colete refletivo, luvas conforme atividade.</td>
+                </tr>
+                <tr>
+                    <td>2</td>
+                    <td>FERRAMENTAS DE SAÚDE E SEGURANÇA</td>
+                    <td>Portar a ART da atividade e desenvolver ART LOCAL em campo.</td>
+                </tr>
+                <tr>
+                    <td>3</td>
+                    <td>EQUIPAMENTOS E/OU FERRAMENTAS</td>
+                    <td>Rádio De Comunicação; empilhadeira, paleteira, transpaleteira elétrica, varredeira, Munck; Pick up.</td>
+                </tr>
+            </table>
+
+            <!-- MÓDULO 11: FLUXO DE MATERIAIS -->
+            <h2>5 Módulo 11: Fluxo de Materiais e Procedimentos</h2>
+
+            <h3>5.1 Fluxo para Envio de Material Vale x Vale (CTSS x G4)</h3>
+            <ul>
+                <li>Identificar o material e enviar e-mail com fotos, descrição e quantidade para <code>almoxarifado@ctss.com</code>.</li>
+                <li>Preencher formulário no Sistema de Gestão de Materiais para emissão da Nota Fiscal e acompanhar a aba "NF e Frete".</li>
+                <li>Preencher o Romaneio Online e aguardar aprovação do Coordenador.</li>
+                <li>Validação patrimonial prévia antes de embalar e liberação do transporte pelo almoxarifado.</li>
+            </ul>
+
+            <h3>5.2 Fluxo para Retirada de Materiais Vale x Vale (G4 x CTSS)</h3>
+            <ul>
+                <li>Solicitar no app de Gestão de Materiais ("Retirada de Materiais Não Estocáveis") informando site, material e quantidade.</li>
+                <li>Almoxarifado verifica diariamente, separa, carrega e emite o Romaneio Online.</li>
+                <li>Portaria valida e autoriza a saída com registro fotográfico para rastreabilidade.</li>
+            </ul>
+
+            <h3>5.3 Fluxo de Envio e Retirada de Terceirizadas e Funcionário x Residência</h3>
+            <ul>
+                <li>Informar na reunião de programação, enviar e-mail ao almoxarifado com evidência fotográfica e preencher o Romaneio Online.</li>
+                <li>Para retirada residencial, o colaborador preenche o Romaneio Online informando justificativa, data de devolução e obtém aprovação do gestor.</li>
+            </ul>
+
+            <!-- ANEXOS -->
+            <h2>6 Anexos</h2>
+            <table>
+                <tr>
+                    <th>#</th>
+                    <th>Descrição</th>
+                    <th>Endereço / Referência</th>
+                </tr>
+                <tr><td>1</td><td>Reserva MB21</td><td>Passo a Passo RC Reserva.pdf</td></tr>
+                <tr><td>2</td><td>V-tooling</td><td>https://app.vtooling.valeglobal.net/selecao-area-usuaria</td></tr>
+                <tr><td>3</td><td>Autorização de Saída de materiais</td><td>N/A</td></tr>
+                <tr><td>4</td><td>Retiradas de Ferramentas</td><td>retirada de ferramentas.xlsx</td></tr>
+            </table>
+
+            <!-- ASSINATURAS -->
+            <h2>7 Elaboradores e Aprovadores</h2>
+            <table>
+                <tr>
+                    <th>Nome</th>
+                    <th>Matrícula</th>
+                    <th>Gerência</th>
+                </tr>
+                <tr><td>Alfredo Augusto Ramos Neto</td><td>81021893</td><td>GER INDUSTR PROCESSO MINERAL</td></tr>
+                <tr><td>Allan Souza De Carvalho</td><td>10900407</td><td>GER INDUSTR PROCESSO MINERAL</td></tr>
+                <tr><td>Atmisto Silva</td><td>C0625384</td><td>GER INDUSTR PROCESSO MINERAL</td></tr>
+                <tr><td>Mariana Pereira Cruz</td><td>81025364</td><td>GER INDUSTR PROCESSO MINERAL</td></tr>
+            </table>
+
         </div>
-
-        <!-- CONTEXTUALIZAÇÃO -->
-        <h2>1 Contextualização</h2>
-        <p><strong>Quais RACs estão associadas a estas atividades descritas no PRO?[cite: 1]</strong></p>
-        <table>
-            <tr>
-                <td>RAC 1[cite: 1]</td><td>RAC 2[cite: 1]</td><td>RAC 3</td><td>RAC 4[cite: 1]</td><td>RAC 5</td><td>RAC 6</td><td>RAC 7</td><td>RAC 8</td><td>RAC 9</td><td>RAC 10</td><td>RAC 11</td><td>N/A</td>
-            </tr>
-            <tr>
-                <td>X[cite: 1]</td><td>x[cite: 1]</td><td></td><td>x[cite: 1]</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-            </tr>
-        </table>
-
-        <p><strong>A elaboração/revisão deste PRO foi feita a partir de desdobramento de evento N1 ou N2?[cite: 1]</strong><br>
-        ( _ ) NÃO &nbsp;&nbsp;&nbsp;&nbsp; (&nbsp;X&nbsp;) SIM[cite: 1]</p>
-
-        <p><strong>Caso o procedimento esteja relacionado a uma Tarefa Prioritária, qual a dimensão envolvida?[cite: 1]</strong><br>
-        ( _ ) Custos &nbsp;&nbsp; (&nbsp;X&nbsp;) Meio Ambiente &nbsp;&nbsp; ( _ ) Produtividade &nbsp;&nbsp; ( _ ) Qualidade &nbsp;&nbsp; ( _ ) Riscos &nbsp;&nbsp; ( _ ) Saúde e Segurança[cite: 1]</p>
-
-        <!-- REFERÊNCIA E DEFINIÇÕES -->
-        <h2>2 Referência</h2>
-        <p>Este procedimento se aplica ao Almoxarifado da GER INDUSTR PROCESSO MINERAL[cite: 1].</p>
-
-        <h2>3 Definições</h2>
-        <p><strong>FDS (Ficha com Dados de Segurança):</strong> Documento que fornece informações a respeito de vários aspectos de produtos químicos quanto à proteção, à segurança e ao meio ambiente[cite: 1].</p>
-        <p><strong>Reserva:</strong> Pedido de material de um item em estoque, realizado via SAP pela transação MB21[cite: 1].</p>
-        
-        <p><strong>APP Sistema de (gestão de materiais) DI Processamento Mineral:</strong> APP para solicitações[cite: 1]:</p>
-        <ul>
-            <li><strong>Gestão de Estoque:</strong> Acompanhamento de materiais em estoque[cite: 1].</li>
-            <li><strong>Cadastro de materiais:</strong> Solicite o cadastro de novos materiais[cite: 1].</li>
-            <li><strong>Requisições de compras:</strong> Solicite requisições de compras[cite: 1].</li>
-            <li><strong>Retirada de materiais não estocáveis:</strong> Solicite a retirada de materiais[cite: 1].</li>
-            <li><strong>Solicitar NF e/ou Coleta:</strong> Solicite a Nota fiscal e/ou Coleta[cite: 1].</li>
-            <li><strong>Status da solicitação:</strong> Acompanhe a solicitação[cite: 1].</li>
-            <li><strong>Verificar materiais:</strong> Scaneie materiais em estoque[cite: 1].</li>
-            <li><strong>Gestão de ferramentas:</strong> Uso exclusivo para almoxarifado no V-TOOLING[cite: 1].</li>
-        </ul>
-        <div class="link-box">https://apps.powerapps.com/play/e/c06a757f-f8de-45e1-8170-f613f20739f5/a/cfc020af-97dc-4d8c-9b1c-ac31228d7d9e?tenantId=7893571b-6c2c-4cef-b4da-7d4b266a0626&hint=da5815fe-aa76-4265-a806-d776714e948b&sourcetime=1723492153963[cite: 1]</div>
-
-        <p><strong>Material Estocável:</strong> Itens mantidos em estoque de forma contínua ou periódica[cite: 1].</p>
-        <p><strong>Material Não Estocável:</strong> Itens adquiridos sob demanda, sem armazenamento de longo prazo[cite: 1].</p>
-
-        <!-- RECURSOS MÍNIMOS -->
-        <h2>4 Recursos Mínimos para Realizar a Atividade</h2>
-        <table>
-            <tr>
-                <th>Nº[cite: 1]</th>
-                <th>Item[cite: 1]</th>
-                <th>Descrição[cite: 1]</th>
-            </tr>
-            <tr>
-                <td>1[cite: 1]</td>
-                <td>EPI’S[cite: 1]</td>
-                <td>Botina de Segurança (com palmilha autoperfurante), capacete com jugular e óculos de segurança, colete refletivo, luvas conforme atividade[cite: 1].</td>
-            </tr>
-            <tr>
-                <td>2[cite: 1]</td>
-                <td>FERRAMENTAS DE SAÚDE E SEGURANÇA[cite: 1]</td>
-                <td>Portar a ART da atividade e desenvolver ART LOCAL em campo[cite: 1].</td>
-            </tr>
-            <tr>
-                <td>3[cite: 1]</td>
-                <td>EQUIPAMENTOS E/OU FERRAMENTAS[cite: 1]</td>
-                <td>Rádio De Comunicação; empilhadeira, paleteira, transpaleteira elétrica, varredeira, Munck; Pick up[cite: 1].</td>
-            </tr>
-        </table>
-
-        <!-- MÓDULO 11: FLUXO DE MATERIAIS -->
-        <h2>5 Módulo 11: Fluxo de Materiais e Procedimentos</h2>
-
-        <h3>5.1 Fluxo para Envio de Material Vale x Vale (CTSS x G4)</h3>
-        <ul>
-            <li>Identificar o material e enviar e-mail com fotos, descrição e quantidade para <code>almoxarifado@ctss.com</code>[cite: 2].</li>
-            <li>Preencher formulário no Sistema de Gestão de Materiais para emissão da Nota Fiscal e acompanhar a aba "NF e Frete"[cite: 2].</li>
-            <li>Preencher o Romaneio Online e aguardar aprovação do Coordenador[cite: 2].</li>
-            <li>Validação patrimonial prévia antes de embalar e liberação do transporte pelo almoxarifado[cite: 2].</li>
-        </ul>
-
-        <h3>5.2 Fluxo para Retirada de Materiais Vale x Vale (G4 x CTSS)</h3>
-        <ul>
-            <li>Solicitar no app de Gestão de Materiais ("Retirada de Materiais Não Estocáveis") informando site, material e quantidade[cite: 2].</li>
-            <li>Almoxarifado verifica diariamente, separa, carrega e emite o Romaneio Online[cite: 2].</li>
-            <li>Portaria valida e autoriza a saída com registro fotográfico para rastreabilidade[cite: 2].</li>
-        </ul>
-
-        <h3>5.3 Fluxo de Envio e Retirada de Terceirizadas e Funcionário x Residência</h3>
-        <ul>
-            <li>Informar na reunião de programação, enviar e-mail ao almoxarifado com evidência fotográfica e preencher o Romaneio Online[cite: 2].</li>
-            <li>Para retirada residencial, o colaborador preenche o Romaneio Online informando justificativa, data de devolução e obtém aprovação do gestor[cite: 2].</li>
-        </ul>
-
-        <!-- ANEXOS -->
-        <h2>6 Anexos</h2>
-        <table>
-            <tr>
-                <th>#[cite: 1]</th>
-                <th>Descrição[cite: 1]</th>
-                <th>Endereço / Referência[cite: 1]</th>
-            </tr>
-            <tr><td>1[cite: 1]</td><td>Reserva MB21[cite: 1]</td><td>Passo a Passo RC Reserva.pdf[cite: 1]</td></tr>
-            <tr><td>2[cite: 1]</td><td>V-tooling[cite: 1]</td><td>https://app.vtooling.valeglobal.net/selecao-area-usuaria[cite: 1]</td></tr>
-            <tr><td>3[cite: 1]</td><td>Autorização de Saída de materiais[cite: 1]</td><td>N/A[cite: 1]</td></tr>
-            <tr><td>4[cite: 1]</td><td>Retiradas de Ferramentas[cite: 1]</td><td>retirada de ferramentas.xlsx[cite: 1]</td></tr>
-        </table>
-
-        <!-- ASSINATURAS -->
-        <h2>7 Elaboradores e Aprovadores</h2>
-        <table>
-            <tr>
-                <th>Nome[cite: 1]</th>
-                <th>Matrícula[cite: 1]</th>
-                <th>Gerência[cite: 1]</th>
-            </tr>
-            <tr><td>Alfredo Augusto Ramos Neto[cite: 1]</td><td>81021893[cite: 1]</td><td>GER INDUSTR PROCESSO MINERAL[cite: 1]</td></tr>
-            <tr><td>Allan Souza De Carvalho[cite: 1]</td><td>10900407[cite: 1]</td><td>GER INDUSTR PROCESSO MINERAL[cite: 1]</td></tr>
-            <tr><td>Atmisto Silva[cite: 1]</td><td>C0625384[cite: 1]</td><td>GER INDUSTR PROCESSO MINERAL[cite: 1]</td></tr>
-            <tr><td>Mariana Pereira Cruz[cite: 1]</td><td>81025364[cite: 1]</td><td>GER INDUSTR PROCESSO MINERAL[cite: 1]</td></tr>
-        </table>
-
     </div>
 
-    <!-- SCRIPT DO LEITOR DE VOZ -->
+    <!-- SCRIPTS DE FORMATAÇÃO E VOZ -->
     <script>
+        function execCmd(command, value = null) {
+            document.execCommand(command, false, value);
+        }
+
         let synth = window.speechSynthesis;
         function lerTexto() {
             if (synth.speaking) synth.cancel();
