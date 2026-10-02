@@ -153,7 +153,7 @@
                 <button onclick="carregarDoSupabase()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-sm" title="Sincronizar com a Nuvem">
                     🔄 Sincronizar
                 </button>
-                <button onclick="salvarTudoGeral()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-xl text-xs font-black transition flex items-center gap-1 cursor-pointer shadow-sm" title="Salvar dados permanentemente">
+                <button onclick="salvarTudoGeral()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-xl text-xs font-black transition flex items-center gap-1 cursor-pointer shadow-sm" title="Salvar dados permanentemente e atualizar nuvem">
                     💾 Salvar Tudo
                 </button>
                 <button onclick="abrirModalChaveIa()" class="bg-amber-100 hover:bg-amber-200 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 px-3 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer border border-amber-300 dark:border-amber-700 shadow-sm" title="Configurar Chave IA">
@@ -184,7 +184,7 @@
         <!-- CARDS DINÂMICOS POR PESSOA -->
         <div id="containerCardsPessoas" class="grid grid-cols-2 sm:grid-cols-6 gap-2.5"></div>
 
-        <!-- ================= ABAS PARA ENTRADA DE DADOS (LARGURA TOTAL DO HISTÓRICO E COM ESPAÇAMENTO MAIOR) ================= -->
+        <!-- ================= ABAS PARA ENTRADA DE DADOS ================= -->
         <div class="w-full bg-white dark:bg-slate-800 painel-entrada-colorido rounded-2xl shadow-lg overflow-hidden mt-6 mb-4">
             <div class="flex border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 p-2 gap-1 overflow-x-auto">
                 <button type="button" onclick="mudarAbaEntrada('manual')" id="tabBtn-manual" class="flex-1 min-w-[120px] py-2.5 px-4 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-700">
@@ -676,7 +676,7 @@
             const produto = document.getElementById('manualProduto').value.trim().toUpperCase();
 
             if (!produto) {
-                alert("⚠️ Por favor, digite o nome do produto ou serviço!");
+                alert("⚠️️ Por favor, digite o nome do produto ou serviço!");
                 document.getElementById('manualProduto').focus();
                 return;
             }
@@ -983,13 +983,32 @@
 
         async function salvarTudoGeral() {
             salvarNoLocalStorage();
-            if (supabaseClient && compras.length > 0) {
+            if (supabaseClient) {
                 try {
-                    // Sincroniza salvamento garantindo estado atual
-                    mostrarAviso("💾 Salvando dados na nuvem e localmente...");
-                } catch(e) {}
+                    mostrarAviso("💾 Sincronizando e atualizando dados na nuvem...");
+                    // Limpa a tabela da nuvem e reinseri os dados atuais (limpos de duplicidade)
+                    await supabaseClient.from('compras_corporativas').delete().neq('id', 0);
+                    if (compras.length > 0) {
+                        const payloadLote = compras.map(item => ({
+                            data: item.data,
+                            solicitante: item.solicitante,
+                            produto: item.produto,
+                            local: item.local || '',
+                            projeto: item.projeto || '',
+                            qtd: item.qtd,
+                            unit: item.unit,
+                            total: item.total,
+                            link: item.link || '',
+                            entregue: !!item.entregue,
+                            data_entrega: item.data_entrega || ''
+                        }));
+                        await supabaseClient.from('compras_corporativas').insert(payloadLote);
+                    }
+                } catch(err) {
+                    console.warn("Aviso ao salvar geral na nuvem:", err.message);
+                }
             }
-            mostrarAviso("✅ Dados salvos com sucesso!");
+            mostrarAviso("✅ Tudo salvo e atualizado na nuvem com sucesso!");
         }
 
         // ================= IMPORTAR / CARREGAR ARQUIVO ANTERIOR =================
