@@ -157,7 +157,7 @@
                     💾 Salvar Tudo
                 </button>
                 <button onclick="abrirModalChaveIa()" class="bg-amber-100 hover:bg-amber-200 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 px-3 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer border border-amber-300 dark:border-amber-700 shadow-sm" title="Configurar Chave IA">
-                    <span>⚙️️</span>
+                    <span>⚙</span>
                 </button>
             </div>
         </header>
@@ -204,7 +204,7 @@
                 </button>
             </div>
 
-            <!-- CONTEÚDO 1: DIGITAÇÃO MANUAL -->
+            <!-- CONTEÚDO 1: DIGITAÇÃO MANUAL (COM MÚLTIPLAS LINHAS) -->
             <div id="aba-manual" class="p-6 space-y-4">
                 <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                     <span class="text-xs font-black text-indigo-900 dark:text-indigo-300 uppercase flex items-center gap-1.5">
@@ -213,68 +213,73 @@
                     <span class="text-[10px] font-bold text-slate-400">Preencha os campos abaixo</span>
                 </div>
 
-                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end">
-                    <div class="md:col-span-2">
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Data Compra</label>
-                        <input type="date" id="manualData" onchange="atualizarDataEntregaManualDefault()" class="neon-pulsante w-full text-xs p-2.5 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white">
-                    </div>
-
-                    <div class="md:col-span-3">
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="block text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase">Solicitante (*)</label>
-                            <span id="avisoManualSolicitante" class="text-[9px] font-black text-rose-600 animate-pulse">OBRIGATÓRIO!</span>
+                <div id="containerLinhasManuais" class="space-y-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-3 items-end linha-manual-item bg-slate-50 dark:bg-slate-900/40 p-3 rounded-2xl border border-slate-200 dark:border-slate-700">
+                        <div class="md:col-span-2">
+                            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Data Compra</label>
+                            <input type="date" class="manualData neon-pulsante w-full text-xs p-2.5 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white" onchange="atualizarDataEntregaManualDefault(this)">
                         </div>
-                        <input type="text" id="manualSolicitante" oninput="validarInputManualSolicitante(this)" placeholder="QUEM PEDIU?" class="uppercase-input w-full text-xs p-2.5 rounded-xl outline-none transition-all piscar-solicitante-forte">
-                    </div>
 
-                    <div class="md:col-span-4">
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Produto / Serviço</label>
-                        <input type="text" id="manualProduto" oninput="this.value = this.value.toUpperCase()" placeholder="EX: CHUMBADOR..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                    </div>
+                        <div class="md:col-span-3">
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase">Solicitante (*)</label>
+                                <span class="avisoManualSolicitante text-[9px] font-black text-rose-600 animate-pulse">OBRIGATÓRIO!</span>
+                            </div>
+                            <input type="text" oninput="validarInputManualSolicitante(this)" placeholder="QUEM PEDIU?" class="manualSolicitante uppercase-input w-full text-xs p-2.5 rounded-xl outline-none transition-all piscar-solicitante-forte">
+                        </div>
 
-                    <div class="md:col-span-3">
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Local / Fornecedor</label>
-                        <input type="text" id="manualLocal" oninput="this.value = this.value.toUpperCase()" placeholder="EX: MERCADO LIVRE..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                    </div>
+                        <div class="md:col-span-4">
+                            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Produto / Serviço</label>
+                            <input type="text" oninput="this.value = this.value.toUpperCase()" placeholder="EX: CHUMBADOR..." class="manualProduto uppercase-input w-full text-xs p-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                        </div>
 
-                    <div class="md:col-span-3">
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Projeto</label>
-                        <input type="text" id="manualProjeto" oninput="this.value = this.value.toUpperCase()" placeholder="NOME DO PROJETO..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                    </div>
+                        <div class="md:col-span-3">
+                            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Local / Fornecedor</label>
+                            <input type="text" oninput="this.value = this.value.toUpperCase()" placeholder="EX: MERCADO LIVRE..." class="manualLocal uppercase-input w-full text-xs p-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                        </div>
 
-                    <div class="md:col-span-2">
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Qtd</label>
-                        <input type="number" id="manualQtd" value="1" min="1" oninput="calcularManualPorTotal()" class="w-full text-xs p-2.5 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white outline-none">
-                    </div>
+                        <div class="md:col-span-3">
+                            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Projeto</label>
+                            <input type="text" oninput="this.value = this.value.toUpperCase()" placeholder="NOME DO PROJETO..." class="manualProjeto uppercase-input w-full text-xs p-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                        </div>
 
-                    <div class="md:col-span-2">
-                        <label class="block text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase mb-1">Total (R$) 🔄</label>
-                        <input type="number" step="0.01" id="manualTotal" placeholder="0,00" oninput="calcularManualPorTotal()" class="w-full text-xs p-2.5 bg-emerald-50/70 border border-emerald-400 rounded-xl font-black text-emerald-600 outline-none">
-                    </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Qtd</label>
+                            <input type="number" value="1" min="1" oninput="calcularManualPorTotal(this)" class="manualQtd w-full text-xs p-2.5 text-center font-bold bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white outline-none">
+                        </div>
 
-                    <div class="md:col-span-2">
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Unitário (R$)</label>
-                        <input type="number" step="0.01" id="manualUnit" placeholder="0,00" oninput="calcularManualPorUnitario()" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                    </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-[10px] font-black text-emerald-600 dark:text-emerald-400 uppercase mb-1">Total (R$) 🔄</label>
+                            <input type="number" step="0.01" placeholder="0,00" oninput="calcularManualPorTotal(this)" class="manualTotal w-full text-xs p-2.5 bg-emerald-50/70 border border-emerald-400 rounded-xl font-black text-emerald-600 outline-none">
+                        </div>
 
-                    <div class="md:col-span-3 bg-slate-100 dark:bg-slate-900/60 p-2.5 rounded-xl border border-indigo-200 dark:border-indigo-800">
-                        <label class="flex items-center gap-1.5 cursor-pointer mb-1">
-                            <input type="checkbox" id="manualEntregue" onchange="toggleManualDataEntrega(this.checked)" class="pulso-delicado w-4 h-4 text-indigo-600 rounded cursor-pointer">
-                            <span class="text-[10px] font-bold uppercase text-indigo-700 dark:text-indigo-300">📦 Entregue? (+10d)</span>
-                        </label>
-                        <input type="date" id="manualDataEntrega" class="neon-pulsante w-full text-[10px] p-1.5 rounded font-bold hidden bg-white dark:bg-slate-800 dark:text-white">
-                    </div>
+                        <div class="md:col-span-2">
+                            <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Unitário (R$)</label>
+                            <input type="number" step="0.01" placeholder="0,00" oninput="calcularManualPorUnitario(this)" class="manualUnit w-full text-xs p-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                        </div>
 
-                    <div class="md:col-span-12 flex justify-end pt-2">
-                        <button type="button" onclick="lancarCompraManual()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 px-8 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer">
-                            <span>✅</span>
-                            <span>Salvar Compra na Tabela</span>
-                        </button>
+                        <div class="md:col-span-3 bg-white dark:bg-slate-900/60 p-2.5 rounded-xl border border-indigo-200 dark:border-indigo-800">
+                            <label class="flex items-center gap-1.5 cursor-pointer mb-1">
+                                <input type="checkbox" onchange="toggleManualDataEntrega(this)" class="manualEntregue pulso-delicado w-4 h-4 text-indigo-600 rounded cursor-pointer">
+                                <span class="text-[10px] font-bold uppercase text-indigo-700 dark:text-indigo-300">📦 Entregue? (+10d)</span>
+                            </label>
+                            <input type="date" class="manualDataEntrega neon-pulsante w-full text-[10px] p-1.5 rounded font-bold hidden bg-white dark:bg-slate-800 dark:text-white">
+                        </div>
                     </div>
+                </div>
+
+                <div class="flex flex-wrap justify-between items-center pt-2 gap-2">
+                    <button type="button" onclick="adicionarLinhaManual()" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-800 dark:bg-indigo-950/80 dark:text-indigo-300 font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer">
+                        <span>➕</span> Adicionar Mais um Item
+                    </button>
+                    <button type="button" onclick="lancarComprasManuaisEmLote()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 px-8 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer">
+                        <span>✅</span>
+                        <span>Salvar Todos na Tabela</span>
+                    </button>
                 </div>
             </div>
 
-            <!-- CONTEÚDO NOVO: NOTA FISCAL (COM UPLOAD DE ARQUIVO OU COLA DE TEXTO) -->
+            <!-- CONTEÚDO 2: NOTA FISCAL (COM UPLOAD DE ARQUIVO OU COLA DE TEXTO) -->
             <div id="aba-bloco" class="p-6 space-y-4 hidden">
                 <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                     <span class="text-xs font-black text-purple-900 dark:text-purple-300 uppercase flex items-center gap-1.5">
@@ -330,32 +335,40 @@
                 </div>
             </div>
 
-            <!-- CONTEÚDO 2: LINK WEB -->
+            <!-- CONTEÚDO 3: LINK WEB (COM MÚLTIPLAS LINHAS) -->
             <div id="aba-link" class="p-6 space-y-3 hidden">
                 <div class="flex justify-between items-center">
                     <label class="block text-xs font-black text-blue-950 dark:text-blue-200 uppercase flex items-center gap-2">
                         <span>🔗</span>
-                        <span>Colar / Digitar Link do Produto (Mercado Livre, Amazon, etc.)</span>
+                        <span>Colar / Digitar Links dos Produtos (Mercado Livre, Amazon, etc.)</span>
                     </label>
                     <div class="flex items-center gap-3">
-                        <button type="button" onclick="limparInputLink()" class="text-xs text-rose-500 font-bold hover:underline flex items-center gap-1 cursor-pointer">🗑️ Limpar Link</button>
+                        <button type="button" onclick="limparInputLink()" class="text-xs text-rose-500 font-bold hover:underline flex items-center gap-1 cursor-pointer">🗑️ Limpar Links</button>
                         <button type="button" onclick="colarLinkInput()" class="text-xs text-blue-700 dark:text-blue-300 font-bold hover:underline flex items-center gap-1 cursor-pointer">📋 Colar</button>
                     </div>
                 </div>
                 
-                <div class="flex flex-col sm:flex-row gap-2">
-                    <div class="relative flex-1">
-                        <input type="text" id="inputLinkDireto" placeholder="Cole o link aqui..." class="neon-pulsante w-full text-xs px-3 py-3 pr-8 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white">
-                        <button type="button" onclick="limparInputLink()" class="absolute right-2.5 top-3 text-slate-400 hover:text-rose-500 font-bold text-xs">✕</button>
+                <div id="containerLinhasLinks" class="space-y-3">
+                    <div class="flex flex-col sm:flex-row gap-2 linha-link-item">
+                        <div class="relative flex-1">
+                            <input type="text" placeholder="Cole o link aqui..." class="inputLinkDireto neon-pulsante w-full text-xs px-3 py-3 pr-8 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white">
+                            <button type="button" onclick="this.previousElementSibling.value=''" class="absolute right-2.5 top-3 text-slate-400 hover:text-rose-500 font-bold text-xs">✕</button>
+                        </div>
                     </div>
-                    <button type="button" onclick="processarLinkDireto()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-6 py-3 rounded-xl transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer flex-shrink-0">
+                </div>
+
+                <div class="flex justify-between items-center pt-2">
+                    <button type="button" onclick="adicionarLinhaLink()" class="bg-blue-50 hover:bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer border border-blue-200 dark:border-blue-800">
+                        <span>➕</span> Adicionar Mais um Link
+                    </button>
+                    <button type="button" onclick="processarLinksEmLote()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-6 py-3 rounded-xl transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer flex-shrink-0">
                         <span>⚡</span>
-                        <span>Reconhecer Link</span>
+                        <span>Reconhecer Todos os Links</span>
                     </button>
                 </div>
             </div>
 
-            <!-- CONTEÚDO 3: FOTO -->
+            <!-- CONTEÚDO 4: FOTO -->
             <div id="aba-foto" class="p-6 space-y-3 hidden">
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <label class="flex items-center justify-center gap-3 bg-purple-600 hover:bg-purple-700 text-white font-black py-5 px-4 rounded-2xl shadow-md cursor-pointer transition active:scale-95 text-xs">
@@ -378,7 +391,7 @@
                 </div>
             </div>
 
-            <!-- CONTEÚDO 4: TEAMS -->
+            <!-- CONTEÚDO 5: TEAMS -->
             <div id="aba-texto" class="p-6 space-y-3 hidden">
                 <div class="flex justify-between items-center">
                     <label class="block text-xs font-black text-indigo-950 dark:text-indigo-200 uppercase flex items-center gap-2">
@@ -548,10 +561,11 @@
             </div>
 
             <input type="hidden" id="editItemIndex">
+            <input type="hidden" id="editSubItemIndex">
             <input type="hidden" id="editItemId">
 
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                <div>
+                <div id="campoDataEditContainer">
                     <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Data da Compra</label>
                     <input type="date" id="editData" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none">
                 </div>
@@ -566,11 +580,11 @@
                     <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Produto / Descrição</label>
                     <input type="text" id="editProduto" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
-                <div class="sm:col-span-2">
+                <div class="sm:col-span-2" id="campoLocalEditContainer">
                     <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Local / Fornecedor</label>
                     <input type="text" id="editLocal" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
-                <div class="sm:col-span-2">
+                <div class="sm:col-span-2" id="campoProjetoEditContainer">
                     <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Projeto</label>
                     <input type="text" id="editProjeto" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
@@ -589,7 +603,7 @@
                     <input type="number" step="0.01" id="editUnit" oninput="calcularModalPorUnitario()" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                 </div>
 
-                <div class="sm:col-span-2 bg-slate-100 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
+                <div class="sm:col-span-2 bg-slate-100 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2" id="campoEntregaEditContainer">
                     <div class="flex items-center justify-between">
                         <label class="flex items-center gap-2 cursor-pointer">
                             <input type="checkbox" id="editEntregue" onchange="toggleDataEntregaModal(this.checked)" class="w-4 h-4 text-indigo-600 rounded">
@@ -603,7 +617,7 @@
                     </div>
                 </div>
 
-                <div class="sm:col-span-2">
+                <div class="sm:col-span-2" id="campoLinkEditContainer">
                     <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Link do Produto (Opcional)</label>
                     <input type="text" id="editLink" placeholder="https://..." class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none">
                 </div>
@@ -628,12 +642,13 @@
 
         window.addEventListener('DOMContentLoaded', () => {
             const hoje = new Date().toISOString().split('T')[0];
-            document.getElementById('manualData').value = hoje;
+            const primeiraDataManual = document.querySelector('.manualData');
+            if (primeiraDataManual) primeiraDataManual.value = hoje;
             document.getElementById('blocoData').value = hoje;
-            atualizarDataEntregaManualDefault();
+            if (primeiraDataManual) atualizarDataEntregaManualDefault(primeiraDataManual);
 
-            const solManual = document.getElementById('manualSolicitante');
-            solManual.classList.add('piscar-solicitante-forte');
+            const solManual = document.querySelector('.manualSolicitante');
+            if (solManual) solManual.classList.add('piscar-solicitante-forte');
 
             carregarDoLocalStorage();
 
@@ -673,24 +688,69 @@
             setTimeout(() => el.classList.add('hidden'), 4000);
         }
 
-        function calcularManualPorTotal() {
-            const qtd = parseFloat(document.getElementById('manualQtd').value) || 1;
-            const total = parseFloat(document.getElementById('manualTotal').value) || 0;
-            const unit = (total / qtd).toFixed(2);
-            document.getElementById('manualUnit').value = unit > 0 ? unit : '';
+        // FUNÇÕES DE MÚLTIPLAS LINHAS MANUAIS (HERDANDO O SOLICITANTE ANTERIOR)
+        function adicionarLinhaManual() {
+            const container = document.getElementById('containerLinhasManuais');
+            const linhas = container.querySelectorAll('.linha-manual-item');
+            const ultimaLinha = linhas[linhas.length - 1];
+            const novaLinha = ultimaLinha.cloneNode(true);
+            
+            const ultimoSolicitante = ultimaLinha.querySelector('.manualSolicitante').value;
+            const ultimaData = ultimaLinha.querySelector('.manualData').value;
+            const ultimoLocal = ultimaLinha.querySelector('.manualLocal').value;
+            const ultimoProjeto = ultimaLinha.querySelector('.manualProjeto').value;
+
+            const hoje = new Date().toISOString().split('T')[0];
+            novaLinha.querySelector('.manualData').value = ultimaData || hoje;
+            const inputSol = novaLinha.querySelector('.manualSolicitante');
+            inputSol.value = ultimoSolicitante;
+            validarInputManualSolicitante(inputSol);
+
+            novaLinha.querySelector('.manualProduto').value = '';
+            novaLinha.querySelector('.manualLocal').value = ultimoLocal;
+            novaLinha.querySelector('.manualProjeto').value = ultimoProjeto;
+            novaLinha.querySelector('.manualTotal').value = '';
+            novaLinha.querySelector('.manualUnit').value = '';
+            novaLinha.querySelector('.manualQtd').value = '1';
+            novaLinha.querySelector('.manualEntregue').checked = false;
+            novaLinha.querySelector('.manualDataEntrega').classList.add('hidden');
+            novaLinha.querySelector('.manualDataEntrega').value = '';
+
+            if (!novaLinha.querySelector('.btnRemoverLinha')) {
+                const btnRemover = document.createElement('button');
+                btnRemover.type = 'button';
+                btnRemover.className = 'btnRemoverLinha absolute top-2 right-2 bg-rose-100 text-rose-600 hover:bg-rose-200 text-[10px] font-black px-2 py-1 rounded-lg';
+                btnRemover.innerHTML = '✕ Remover';
+                btnRemover.onclick = () => novaLinha.remove();
+                novaLinha.style.position = 'relative';
+                novaLinha.appendChild(btnRemover);
+            }
+
+            container.appendChild(novaLinha);
+            novaLinha.querySelector('.manualProduto').focus();
         }
 
-        function calcularManualPorUnitario() {
-            const qtd = parseFloat(document.getElementById('manualQtd').value) || 1;
-            const unit = parseFloat(document.getElementById('manualUnit').value) || 0;
+        function calcularManualPorTotal(inputElem) {
+            const linha = inputElem.closest('.linha-manual-item');
+            const qtd = parseFloat(linha.querySelector('.manualQtd').value) || 1;
+            const total = parseFloat(linha.querySelector('.manualTotal').value) || 0;
+            const unit = (total / qtd).toFixed(2);
+            linha.querySelector('.manualUnit').value = unit > 0 ? unit : '';
+        }
+
+        function calcularManualPorUnitario(inputElem) {
+            const linha = inputElem.closest('.linha-manual-item');
+            const qtd = parseFloat(linha.querySelector('.manualQtd').value) || 1;
+            const unit = parseFloat(linha.querySelector('.manualUnit').value) || 0;
             const total = (qtd * unit).toFixed(2);
-            document.getElementById('manualTotal').value = total > 0 ? total : '';
+            linha.querySelector('.manualTotal').value = total > 0 ? total : '';
         }
 
         function validarInputManualSolicitante(input) {
             input.value = input.value.toUpperCase();
             const val = input.value.trim();
-            const aviso = document.getElementById('avisoManualSolicitante');
+            const linha = input.closest('.linha-manual-item');
+            const aviso = linha ? linha.querySelector('.avisoManualSolicitante') : null;
             if (val === "" || val === "NÃO INFORMADO" || val === "NAO INFORMADO") {
                 input.classList.add('piscar-solicitante-forte');
                 if (aviso) aviso.classList.remove('hidden');
@@ -700,26 +760,92 @@
             }
         }
 
-        function atualizarDataEntregaManualDefault() {
-            const dataCompraEl = document.getElementById('manualData');
-            const dataEntregaEl = document.getElementById('manualDataEntrega');
-            if (!dataCompraEl || !dataEntregaEl) return;
+        function atualizarDataEntregaManualDefault(inputDataElem) {
+            const linha = inputDataElem.closest('.linha-manual-item');
+            const dataEntregaEl = linha.querySelector('.manualDataEntrega');
+            if (!inputDataElem || !dataEntregaEl) return;
             
-            let d = new Date(dataCompraEl.value + 'T00:00:00');
+            let d = new Date(inputDataElem.value + 'T00:00:00');
             d.setDate(d.getDate() + 10);
             dataEntregaEl.value = d.toISOString().split('T')[0];
         }
 
-        function toggleManualDataEntrega(isChecked) {
-            const el = document.getElementById('manualDataEntrega');
+        function toggleManualDataEntrega(checkboxElem) {
+            const linha = checkboxElem.closest('.linha-manual-item');
+            const el = linha.querySelector('.manualDataEntrega');
             if (!el) return;
-            if (isChecked) {
+            if (checkboxElem.checked) {
                 el.classList.remove('hidden');
-                atualizarDataEntregaManualDefault();
+                atualizarDataEntregaManualDefault(linha.querySelector('.manualData'));
             } else {
                 el.classList.add('hidden');
                 el.value = '';
             }
+        }
+
+        async function lancarComprasManuaisEmLote() {
+            const linhas = document.querySelectorAll('.linha-manual-item');
+            let novosItens = [];
+
+            for (let linha of linhas) {
+                const inputSol = linha.querySelector('.manualSolicitante');
+                const solicitante = inputSol.value.trim().toUpperCase();
+
+                if (!solicitante || solicitante === "NÃO INFORMADO" || solicitante === "NAO INFORMADO") {
+                    inputSol.classList.add('piscar-solicitante-forte');
+                    inputSol.focus();
+                    alert("⚠️ ATENÇÃO: Por favor, preencha quem é o SOLICITANTE em todas as linhas!");
+                    return;
+                }
+
+                const produto = linha.querySelector('.manualProduto').value.trim().toUpperCase();
+                if (!produto) {
+                    alert("⚠️ Por favor, digite o nome do produto ou serviço em todas as linhas!");
+                    linha.querySelector('.manualProduto').focus();
+                    return;
+                }
+
+                const total = parseFloat(linha.querySelector('.manualTotal').value) || 0;
+                const unit = parseFloat(linha.querySelector('.manualUnit').value) || 0;
+                if (total <= 0 && unit <= 0) {
+                    alert("⚠️ Por favor, informe o Valor Total ou Unitário em todas as linhas!");
+                    linha.querySelector('.manualTotal').focus();
+                    return;
+                }
+
+                const qtd = parseFloat(linha.querySelector('.manualQtd').value) || 1;
+                const entregue = linha.querySelector('.manualEntregue').checked;
+
+                novosItens.push({
+                    id: Date.now() + Math.random(),
+                    data: linha.querySelector('.manualData').value || new Date().toISOString().split('T')[0],
+                    solicitante: solicitante,
+                    produto: produto,
+                    local: linha.querySelector('.manualLocal').value.trim().toUpperCase() || "NÃO INFORMADO",
+                    projeto: linha.querySelector('.manualProjeto').value.trim().toUpperCase() || "",
+                    qtd: qtd,
+                    unit: unit > 0 ? unit : (total / qtd),
+                    total: total > 0 ? total : (qtd * unit),
+                    link: "",
+                    entregue: entregue,
+                    data_entrega: entregue ? linha.querySelector('.manualDataEntrega').value : "",
+                    sub_itens: []
+                });
+            }
+
+            for (let item of novosItens) {
+                compras.unshift(item);
+                inserirNoSupabase(item);
+            }
+
+            salvarNoLocalStorage();
+            atualizarListaSelectSolicitantes();
+            renderizarTabela();
+            mostrarAviso(`✅ ${novosItens.length} compra(s) salva(s) com sucesso!`);
+
+            const container = document.getElementById('containerLinhasManuais');
+            container.innerHTML = '';
+            adicionarLinhaManual();
         }
 
         // ================= UPLOAD E LEITURA INTELIGENTE DE NOTA FISCAL (PDF/IMAGEM OU TEXTO) =================
@@ -729,8 +855,6 @@
 
             const leitor = new FileReader();
             leitor.onload = function(e) {
-                const resultado = e.target.result;
-                // Simula extração de texto de PDF ou imagem para demonstração e preenchimento
                 document.getElementById('blocoTextoItens').value = `VENTILADOR 200X200X60MM 220VCA 50/60HZ ALTA VAZAO\n24.07.01.082 540SUN 1 585,28 585,28\nCORTINA DE SOLDA EM ARAMIDA 1,20 X 2,0MTS\n18.01.05.012 540SUN 1 1.140,50 1.140,50`;
                 mostrarAviso("📄 Nota fiscal lida com sucesso! Confira os dados e processe.");
                 input.value = '';
@@ -741,7 +865,7 @@
         function processarBlocoItens() {
             const solicitante = document.getElementById('blocoSolicitante').value.trim().toUpperCase();
             if (!solicitante) {
-                alert("⚠️ Por favor, informe o SOLICITANTE!");
+                alert("⚠️️ Por favor, informe o SOLICITANTE!");
                 document.getElementById('blocoSolicitante').focus();
                 return;
             }
@@ -885,74 +1009,6 @@
             renderizarTabela();
         }
 
-        async function lancarCompraManual() {
-            const inputSol = document.getElementById('manualSolicitante');
-            const solicitante = inputSol.value.trim().toUpperCase();
-
-            if (!solicitante || solicitante === "NÃO INFORMADO" || solicitante === "NAO INFORMADO") {
-                inputSol.classList.add('piscar-solicitante-forte');
-                inputSol.focus();
-                alert("⚠️ ATENÇÃO: Por favor, preencha quem é o SOLICITANTE desta compra!");
-                return;
-            }
-
-            const data = document.getElementById('manualData').value;
-            const produto = document.getElementById('manualProduto').value.trim().toUpperCase();
-
-            if (!produto) {
-                alert("⚠️️ Por favor, digite o nome do produto ou serviço!");
-                document.getElementById('manualProduto').focus();
-                return;
-            }
-
-            const local = document.getElementById('manualLocal').value.trim().toUpperCase();
-            const projeto = document.getElementById('manualProjeto').value.trim().toUpperCase();
-            const qtd = parseFloat(document.getElementById('manualQtd').value) || 1;
-            const total = parseFloat(document.getElementById('manualTotal').value) || 0;
-            const unit = parseFloat(document.getElementById('manualUnit').value) || (total / qtd);
-            const entregue = document.getElementById('manualEntregue').checked;
-            const dataEntrega = entregue ? document.getElementById('manualDataEntrega').value : "";
-
-            if (total <= 0 && unit <= 0) {
-                alert("⚠️ Por favor, informe o Valor Total ou o Valor Unitário da compra!");
-                document.getElementById('manualTotal').focus();
-                return;
-            }
-
-            const novoItem = {
-                id: Date.now(),
-                data: data || new Date().toISOString().split('T')[0],
-                solicitante: solicitante,
-                produto: produto,
-                local: local || "NÃO INFORMADO",
-                projeto: projeto || "",
-                qtd: qtd,
-                unit: unit,
-                total: total || (qtd * unit),
-                link: "",
-                entregue: entregue,
-                data_entrega: dataEntrega,
-                sub_itens: []
-            };
-
-            compras.unshift(novoItem);
-            salvarNoLocalStorage();
-            atualizarListaSelectSolicitantes();
-            renderizarTabela();
-            mostrarAviso("✅ Compra manual salva com sucesso!");
-
-            inserirNoSupabase(novoItem);
-
-            document.getElementById('manualProduto').value = '';
-            document.getElementById('manualLocal').value = '';
-            document.getElementById('manualProjeto').value = '';
-            document.getElementById('manualTotal').value = '';
-            document.getElementById('manualUnit').value = '';
-            document.getElementById('manualQtd').value = '1';
-            document.getElementById('manualEntregue').checked = false;
-            document.getElementById('manualDataEntrega').classList.add('hidden');
-        }
-
         function verificarDigitacaoSolicitante(input, tempId) {
             input.value = input.value.toUpperCase();
             const val = input.value.trim();
@@ -1001,13 +1057,6 @@
 
             select.value = valorAtual;
             renderizarCardsPessoasDinamicos();
-        }
-
-        function aplicarFiltroByText(valor) {
-            solicitanteFiltroAtual = valor.trim().toUpperCase();
-            document.getElementById('selectFiltroSolicitante').value = '';
-            atualizarBadgeFiltro();
-            renderizarTabela();
         }
 
         function aplicarFiltroPorSelect(valor) {
@@ -1436,60 +1485,82 @@
             return "LOJA WEB / INTERNET";
         }
 
-        function processarLinkDireto() {
-            const entrada = document.getElementById('inputLinkDireto').value.trim();
-            if (!entrada) return;
+        // FUNÇÕES DE MÚLTIPLAS LINHAS DE LINKS
+        function adicionarLinhaLink() {
+            const container = document.getElementById('containerLinhasLinks');
+            const primeiraLinha = container.querySelector('.linha-link-item');
+            const novaLinha = primeiraLinha.cloneNode(true);
+            novaLinha.querySelector('.inputLinkDireto').value = '';
+            container.appendChild(novaLinha);
+        }
 
-            let produto = "";
-            let link = "";
-            let localDetectado = "MERCADO LIVRE";
+        function processarLinksEmLote() {
+            const inputs = document.querySelectorAll('.inputLinkDireto');
+            let processados = 0;
 
-            const matchUrl = entrada.match(/(https?:\/\/[^\s]+)/i);
-            if (matchUrl) {
-                link = matchUrl[1];
-                localDetectado = identificarLocalPeloLink(link);
-                produto = extrairNomeDoLink(link);
-            } else {
-                link = entrada;
-            }
+            inputs.forEach(input => {
+                const entrada = input.value.trim();
+                if (!entrada) return;
 
-            if (!produto) produto = entrada.replace(/(https?:\/\/[^\s]+)/gi, '').trim().toUpperCase();
+                let produto = "";
+                let link = "";
+                let localDetectado = "MERCADO LIVRE";
 
-            const hoje = new Date().toISOString().split('T')[0];
+                const matchUrl = entrada.match(/(https?:\/\/[^\s]+)/i);
+                if (matchUrl) {
+                    link = matchUrl[1];
+                    localDetectado = identificarLocalPeloLink(link);
+                    produto = extrairNomeDoLink(link);
+                } else {
+                    link = entrada;
+                }
 
-            itensPendentesAprovacao.unshift({
-                tempId: Date.now() + Math.random(),
-                data: hoje,
-                solicitante: "",
-                produto: produto.toUpperCase(),
-                local: localDetectado,
-                projeto: "",
-                qtd: 1,
-                unit: 0,
-                total: 0,
-                link: link,
-                entregue: false,
-                data_entrega: "",
-                sub_itens: []
+                if (!produto) produto = entrada.replace(/(https?:\/\/[^\s]+)/gi, '').trim().toUpperCase();
+
+                const hoje = new Date().toISOString().split('T')[0];
+
+                itensPendentesAprovacao.unshift({
+                    tempId: Date.now() + Math.random(),
+                    data: hoje,
+                    solicitante: "",
+                    produto: produto.toUpperCase(),
+                    local: localDetectado,
+                    projeto: "",
+                    qtd: 1,
+                    unit: 0,
+                    total: 0,
+                    link: link,
+                    entregue: false,
+                    data_entrega: "",
+                    sub_itens: []
+                });
+                processados++;
+                input.value = '';
             });
 
-            renderizarCardsPendentes();
-            document.getElementById('inputLinkDireto').value = '';
-            mostrarAviso("⚡ Link reconhecido! Confira e clique em OK.");
+            if (processados > 0) {
+                renderizarCardsPendentes();
+                mostrarAviso(`⚡ ${processados} link(s) reconhecido(s)! Confira e clique em OK.`);
+            } else {
+                alert("⚠️ Insira pelo menos um link válido!");
+            }
         }
 
         async function colarLinkInput() {
             try {
                 const texto = await navigator.clipboard.readText();
                 if (texto) {
-                    document.getElementById('inputLinkDireto').value = texto.trim();
-                    processarLinkDireto();
+                    const primeiroInput = document.querySelector('.inputLinkDireto');
+                    if (primeiroInput) {
+                        primeiroInput.value = texto.trim();
+                        processarLinksEmLote();
+                    }
                 }
             } catch(e) {}
         }
 
         function limparInputLink() {
-            document.getElementById('inputLinkDireto').value = '';
+            document.querySelectorAll('.inputLinkDireto').forEach(i => i.value = '');
         }
 
         async function colarTextoTeams() {
@@ -1674,20 +1745,33 @@
             renderizarCardsPendentes();
         }
 
-        function abrirModalEdicao(index) {
+        // ================= EDIÇÃO (INCLUINDO SUB-ITENS DE NOTAS FISCAIS) =================
+        function abrirModalEdicao(index, subIndex = null) {
             const item = compras[index];
             if (!item) return;
 
             document.getElementById('editItemIndex').value = index;
+            document.getElementById('editSubItemIndex').value = subIndex !== null ? subIndex : '';
             document.getElementById('editItemId').value = item.id || '';
+
+            const isSubItem = subIndex !== null;
+            const alvo = isSubItem ? item.sub_itens[subIndex] : item;
+
+            // Ajusta visibilidade de campos específicos caso seja edição de um sub-item da nota
+            document.getElementById('campoDataEditContainer').style.display = isSubItem ? 'none' : 'block';
+            document.getElementById('campoLocalEditContainer').style.display = isSubItem ? 'none' : 'block';
+            document.getElementById('campoProjetoEditContainer').style.display = isSubItem ? 'none' : 'block';
+            document.getElementById('campoEntregaEditContainer').style.display = isSubItem ? 'none' : 'block';
+            document.getElementById('campoLinkEditContainer').style.display = isSubItem ? 'none' : 'block';
+
             document.getElementById('editData').value = item.data || '';
             document.getElementById('editSolicitante').value = item.solicitante || '';
-            document.getElementById('editProduto').value = item.produto || '';
+            document.getElementById('editProduto').value = alvo.produto || '';
             document.getElementById('editLocal').value = item.local || '';
             document.getElementById('editProjeto').value = item.projeto || '';
-            document.getElementById('editQtd').value = item.qtd || 1;
-            document.getElementById('editTotal').value = Number(item.total || 0).toFixed(2);
-            document.getElementById('editUnit').value = Number(item.unit || 0).toFixed(2);
+            document.getElementById('editQtd').value = alvo.qtd || 1;
+            document.getElementById('editTotal').value = Number(alvo.total || 0).toFixed(2);
+            document.getElementById('editUnit').value = Number(alvo.unit || 0).toFixed(2);
             document.getElementById('editLink').value = item.link || '';
 
             const chkEntregue = document.getElementById('editEntregue');
@@ -1729,6 +1813,9 @@
 
         async function guardarEdicaoModal() {
             const index = parseInt(document.getElementById('editItemIndex').value, 10);
+            const subIndexStr = document.getElementById('editSubItemIndex').value;
+            const isSubItem = subIndexStr !== "";
+
             if (isNaN(index) || !compras[index]) return;
 
             const solicitante = document.getElementById('editSolicitante').value.trim().toUpperCase();
@@ -1737,27 +1824,49 @@
                 return;
             }
 
-            const itemAtualizado = {
-                ...compras[index],
-                data: document.getElementById('editData').value,
-                solicitante,
-                produto: document.getElementById('editProduto').value.trim().toUpperCase(),
-                local: document.getElementById('editLocal').value.trim().toUpperCase(),
-                projeto: document.getElementById('editProjeto').value.trim().toUpperCase(),
-                qtd: parseFloat(document.getElementById('editQtd').value) || 1,
-                unit: parseFloat(document.getElementById('editUnit').value) || 0,
-                total: parseFloat(document.getElementById('editTotal').value) || 0,
-                link: document.getElementById('editLink').value.trim(),
-                entregue: document.getElementById('editEntregue').checked,
-                data_entrega: document.getElementById('editEntregue').checked ? document.getElementById('editDataEntrega').value : ''
-            };
+            const itemPrincipal = compras[index];
 
-            compras[index] = itemAtualizado;
+            if (isSubItem) {
+                const sIdx = parseInt(subIndexStr, 10);
+                itemPrincipal.sub_itens[sIdx] = {
+                    ...itemPrincipal.sub_itens[sIdx],
+                    produto: document.getElementById('editProduto').value.trim().toUpperCase(),
+                    qtd: parseFloat(document.getElementById('editQtd').value) || 1,
+                    unit: parseFloat(document.getElementById('editUnit').value) || 0,
+                    total: parseFloat(document.getElementById('editTotal').value) || 0
+                };
+                itemPrincipal.solicitante = solicitante;
+
+                // Recalcula totais do item principal baseado nos sub-itens
+                let somaSubTotal = 0;
+                let somaSubQtd = 0;
+                itemPrincipal.sub_itens.forEach(sub => {
+                    somaSubTotal += Number(sub.total || 0);
+                    somaSubQtd += Number(sub.qtd || 1);
+                });
+                itemPrincipal.total = somaSubTotal;
+                itemPrincipal.qtd = somaSubQtd;
+                itemPrincipal.unit = somaSubQtd > 0 ? (somaSubTotal / somaSubQtd) : somaSubTotal;
+
+            } else {
+                itemPrincipal.data = document.getElementById('editData').value;
+                itemPrincipal.solicitante = solicitante;
+                itemPrincipal.produto = document.getElementById('editProduto').value.trim().toUpperCase();
+                itemPrincipal.local = document.getElementById('editLocal').value.trim().toUpperCase();
+                itemPrincipal.projeto = document.getElementById('editProjeto').value.trim().toUpperCase();
+                itemPrincipal.qtd = parseFloat(document.getElementById('editQtd').value) || 1;
+                itemPrincipal.unit = parseFloat(document.getElementById('editUnit').value) || 0;
+                itemPrincipal.total = parseFloat(document.getElementById('editTotal').value) || 0;
+                itemPrincipal.link = document.getElementById('editLink').value.trim();
+                itemPrincipal.entregue = document.getElementById('editEntregue').checked;
+                itemPrincipal.data_entrega = document.getElementById('editEntregue').checked ? document.getElementById('editDataEntrega').value : '';
+            }
+
             salvarNoLocalStorage();
             atualizarListaSelectSolicitantes();
             renderizarTabela();
             fecharModalEdicao();
-            atualizarNoSupabase(itemAtualizado);
+            atualizarNoSupabase(itemPrincipal);
         }
 
         function renderizarTabela() {
@@ -1839,8 +1948,8 @@
                         </td>
                         <td class="py-2.5 px-3 text-center whitespace-nowrap">
                             <div class="flex items-center justify-center gap-1.5">
-                                <button onclick="abrirModalEdicao(${originalIndex})" class="text-indigo-600 font-bold p-1 cursor-pointer">✏️</button>
-                                <button onclick="removerItem(${item.id})" class="text-rose-500 font-bold p-1 cursor-pointer">✕</button>
+                                <button onclick="abrirModalEdicao(${originalIndex})" class="text-indigo-600 font-bold p-1 cursor-pointer" title="Editar">✏️</button>
+                                <button onclick="removerItem(${item.id})" class="text-rose-500 font-bold p-1 cursor-pointer" title="Excluir">✕</button>
                             </div>
                         </td>
                     `;
@@ -1857,7 +1966,10 @@
                                 <td class="py-2 px-3 text-center font-bold text-slate-600 dark:text-slate-300">${sub.qtd} un</td>
                                 <td class="py-2 px-3 text-right text-slate-500">R$ ${Number(sub.unit || 0).toFixed(2)}</td>
                                 <td class="py-2 px-3 text-right font-bold text-emerald-600">R$ ${Number(sub.total || 0).toFixed(2)}</td>
-                                <td colspan="3"></td>
+                                <td colspan="2" class="text-center">
+                                    <button onclick="abrirModalEdicao(${originalIndex}, ${idxSub})" class="text-indigo-600 font-bold p-1 text-[10px] bg-indigo-100 dark:bg-indigo-900/70 px-2 py-0.5 rounded cursor-pointer">✏️ Editar Item</button>
+                                </td>
+                                <td></td>
                             `;
                             tbody.appendChild(trSub);
                         });
