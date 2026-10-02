@@ -8,9 +8,9 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
-            font-family: Arial, sans-serif;
-            font-size: 11pt;
-            color: #333333;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 12pt;
+            color: #000000;
             line-height: 1.5;
             margin: 0;
             padding: 0;
@@ -30,6 +30,7 @@
             top: 0;
             z-index: 1000;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+            font-family: Arial, sans-serif;
         }
         .ribbon-group {
             display: flex;
@@ -62,7 +63,7 @@
             background: white;
         }
 
-        /* ÁREA DA PÁGINA A4 EDITÁVEL */
+        /* ÁREA DA PÁGINA A4 EDITÁVEL (PADRÃO ABNT) */
         .workspace {
             padding: 30px 20px;
             display: flex;
@@ -72,9 +73,9 @@
             width: 21cm;
             min-height: 29.7cm;
             background: #ffffff;
-            padding: 2.5cm;
+            padding: 3cm 2cm 2cm 3cm; /* Margens ABNT: Superior 3cm, Esquerda 3cm, Direita 2cm, Inferior 2cm */
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            outline: none; /* Remove borda de foco padrão */
+            outline: none;
         }
 
         /* CABEÇALHO OFICIAL FLUIDO */
@@ -85,9 +86,10 @@
             margin-bottom: 5px;
         }
         .topo-titulo {
-            font-size: 18pt;
+            font-size: 16pt;
             font-weight: bold;
             color: #007e7a;
+            font-family: Arial, sans-serif;
         }
         .logo-vale {
             font-size: 14pt;
@@ -95,6 +97,7 @@
             color: #007e7a;
             letter-spacing: 1px;
             text-align: right;
+            font-family: Arial, sans-serif;
         }
         .linha-verde {
             border: none;
@@ -104,10 +107,11 @@
             margin-bottom: 10px;
         }
         .pro-info {
-            font-size: 10pt;
+            font-size: 11pt;
             color: #555555;
             font-weight: bold;
             margin-bottom: 15px;
+            font-family: Arial, sans-serif;
         }
 
         /* CAIXA DE DESTAQUE COM BORDA AMARELA */
@@ -120,7 +124,7 @@
         .caixa-destaque h3 {
             margin-top: 0;
             color: #000;
-            font-size: 11pt;
+            font-size: 12pt;
         }
 
         /* TÍTULOS E TEXTOS */
@@ -130,12 +134,14 @@
             margin-top: 25px;
             margin-bottom: 10px;
             text-transform: uppercase;
+            font-family: Arial, sans-serif;
         }
         h3 {
-            font-size: 11pt;
+            font-size: 12pt;
             color: #007e7a;
             margin-top: 15px;
             margin-bottom: 5px;
+            font-family: Arial, sans-serif;
         }
         p, li {
             margin-bottom: 8px;
@@ -151,10 +157,10 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 15px;
-            font-size: 10pt;
+            font-size: 11pt;
         }
         table, th, td {
-            border: 1px solid #94a3b8;
+            border: 1px solid #000000;
         }
         th, td {
             padding: 6px 8px;
@@ -171,7 +177,7 @@
             padding: 8px;
             border-left: 3px solid #007e7a;
             word-break: break-all;
-            font-size: 9pt;
+            font-size: 10pt;
             font-family: monospace;
             margin-top: 5px;
         }
@@ -191,6 +197,7 @@
             align-items: center;
             z-index: 1000;
             font-size: 10pt;
+            font-family: Arial, sans-serif;
         }
         .btn-voz {
             background: #007e7a;
@@ -227,8 +234,8 @@
         
         <div class="ribbon-group">
             <select class="ribbon-select" onchange="execCmd('fontName', this.value)">
-                <option value="Arial">Arial</option>
                 <option value="Times New Roman">Times New Roman</option>
+                <option value="Arial">Arial</option>
                 <option value="Calibri">Calibri</option>
             </select>
             <select class="ribbon-select" onchange="execCmd('fontSize', this.value)">
