@@ -3,402 +3,233 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Módulo 10 - Troca dos Participantes FMDS | Portal Vale v05</title>
+<title>Módulo 10 - Troca dos Participantes FMDS | Portal Vale v06</title>
 <style>
-:root {
-    --primary: #007e7a;
-    --primary-dark: #005a57;
-    --vale-green: #10b981;
-    --vale-dark-gray: #475569;
-    --vale-orange: #f59e0b;
-    --vale-blue: #3b82f6;
-    --slate-900: #0f172a;
-    --slate-700: #334155;
-    --slate-600: #475569;
-    --slate-300: #cbd5e1;
-    --slate-200: #e2e8f0;
-    --slate-100: #f1f5f9;
-    --slate-50: #f8fafc;
-}
+:root { --primary:#007e7a; --primary-dark:#005a57; --s900:#0f172a; --s700:#334155; --s600:#475569; --s300:#cbd5e1; }
+* { box-sizing:border-box; margin:0; padding:0; }
+body { font-family:'Segoe UI', system-ui, sans-serif; background:#f8fafc; color:#000; min-height:100vh; padding:12px; }
+:focus-visible { outline:2px solid var(--primary); outline-offset:1px; }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { 
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
-    background: #f8fafc; 
-    color: #000; 
-    min-height: 100vh; 
-    padding: 12px; 
-}
+#toast { position:fixed; bottom:24px; right:24px; background:var(--s900); color:#fff; padding:10px 18px; border-radius:6px; font-size:12px; font-weight:600;
+  box-shadow:0 10px 25px -5px rgba(0,0,0,.25); opacity:0; pointer-events:none; transition:opacity .25s, transform .25s; transform:translateY(12px); z-index:9999; }
+#toast.ativo { opacity:1; transform:none; }
 
-/* NOTIFICAÇÃO TOAST */
-#toastNotificacao {
-    position: fixed; 
-    bottom: 24px; 
-    right: 24px; 
-    background: var(--slate-900); 
-    color: #fff;
-    padding: 10px 18px; 
-    border-radius: 6px; 
-    font-size: 11.5px; 
-    font-weight: 600;
-    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.25); 
-    opacity: 0; 
-    pointer-events: none;
-    transition: opacity 0.25s ease, transform 0.25s ease; 
-    transform: translateY(12px); 
-    z-index: 9999;
-}
-#toastNotificacao.ativo { opacity: 1; transform: translateY(0); }
+.painel { background:#fff; padding:16px 20px; margin:0 auto 14px; border-radius:12px; box-shadow:0 4px 15px rgba(0,0,0,.05); border:1px solid var(--s300); max-width:960px; }
+.topo { display:flex; align-items:center; justify-content:space-between; gap:8px; flex-wrap:wrap; margin-bottom:10px; border-bottom:2px solid var(--primary); padding-bottom:6px; }
+.badge { background:linear-gradient(135deg, var(--primary), var(--primary-dark)); color:#fff; font-size:12px; font-weight:800; padding:5px 12px; border-radius:6px; text-transform:uppercase; letter-spacing:.6px; }
+.tag { background:#f59e0b; color:#fff; font-weight:800; font-size:10px; padding:2px 7px; border-radius:4px; margin-left:6px; }
+.salvo { font-size:11px; font-weight:700; color:#059669; }
+.campos { display:grid; gap:10px; margin-bottom:10px; grid-template-columns:1fr 1.5fr; }
+@media (max-width:600px) { .campos { grid-template-columns:1fr; } }
+.grupo label { display:block; font-weight:700; margin-bottom:3px; font-size:10px; color:var(--s700); text-transform:uppercase; }
+.painel input[type=text], .painel textarea { width:100%; font-family:inherit; font-size:12px; padding:7px 10px; border:1px solid var(--s300); border-radius:6px; background:#fff; }
+.painel textarea { height:84px; resize:vertical; text-transform:uppercase; }
+.botoes { display:flex; gap:8px; flex-wrap:wrap; margin-top:8px; }
+.btn { cursor:pointer; padding:8px 14px; font-size:12px; font-weight:700; border:none; border-radius:6px; color:#fff; display:inline-flex; align-items:center; gap:5px; text-decoration:none; }
+.btn:hover { filter:brightness(1.1); }
+.b-verde { background:var(--primary); } .b-azul { background:#2563eb; } .b-cinza { background:var(--s600); } .b-ciano { background:#0891b2; } .b-verm { background:#be123c; }
+.b-print { background:var(--s900); margin-left:auto; }
 
-/* PAINEL DE CONTROLE */
-.painel-controle { 
-    background: #ffffff; 
-    padding: 16px 20px; 
-    margin: 0 auto 14px auto; 
-    border-radius: 12px; 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
-    border: 1px solid var(--slate-300); 
-    max-width: 960px; 
-}
-.topo-modulo-info { 
-    display: flex; 
-    align-items: center; 
-    justify-content: space-between; 
-    margin-bottom: 10px; 
-    border-bottom: 2px solid var(--primary); 
-    padding-bottom: 6px; 
-}
-.badge-modulo { 
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
-    color: #fff; 
-    font-size: 11.5px; 
-    font-weight: 800; 
-    padding: 5px 12px; 
-    border-radius: 6px; 
-    text-transform: uppercase; 
-    letter-spacing: 0.8px; 
-}
-.tag-v05 { 
-    background-color: var(--accent); 
-    color: #fff; 
-    font-weight: 800; 
-    font-size: 10px; 
-    padding: 2px 7px; 
-    border-radius: 4px; 
-    margin-left: 6px; 
-}
+/* FOLHA */
+.folha { width:100%; max-width:960px; background:#fff; padding:12px 16px; margin:0 auto 20px; box-shadow:0 4px 15px rgba(0,0,0,.05); border-radius:8px; border:1.5px solid #000; }
+.folha table { width:100%; border-collapse:collapse; border:2px solid #000; margin-bottom:4px; table-layout:fixed; }
+.cab td, .info td { border:1.5px solid #000; padding:3px 6px; vertical-align:middle; text-align:center; }
+.logo { width:85px; font-weight:900; font-size:15px; color:var(--primary); letter-spacing:1.5px; }
+.titulo { font-size:11px; font-weight:900; text-transform:uppercase; padding:0 8px; }
+.meta { width:120px; font-size:8px; text-align:left !important; line-height:1.3; font-weight:700; }
+.info td { text-align:left; font-size:9px; font-weight:700; }
+.val-area { display:inline-block; min-width:120px; }
+.fmds th, .fmds td { border:1.5px solid #000; text-align:center; vertical-align:middle; font-size:9px; height:29px; padding:2px 4px; }
+.fmds th { color:#fff; font-weight:900; text-transform:uppercase; font-size:8.5px; letter-spacing:.3px; }
+.th-base { background:var(--primary) !important; } .th-ssma { background:#10b981 !important; } .th-pes { background:#475569 !important; } .th-prod { background:#f59e0b !important; } .th-qual { background:#3b82f6 !important; }
+.nome { text-align:left !important; font-weight:700; text-transform:uppercase; padding-left:8px !important; width:260px; }
+.cel { font-weight:600; }
+.fmds td[contenteditable]:focus { background:#ecfeff; outline:none; }
+.acao { width:35px; }
+.acao button { background:#fff; border:1px solid var(--s300); border-radius:3px; cursor:pointer; padding:1px 4px; font-size:9px; opacity:.35; }
+tr:hover .acao button { opacity:1; }
 
-.campos-painel { 
-    display: grid; 
-    gap: 10px; 
-    margin-bottom: 10px; 
-    grid-template-columns: 1fr 1.5fr; 
-}
-.campo-grupo label { 
-    display: block; 
-    font-weight: 700; 
-    margin-bottom: 3px; 
-    font-size: 10px; 
-    color: var(--slate-700); 
-    text-transform: uppercase; 
-}
-.painel-controle input[type="text"] { 
-    width: 100%; 
-    font-family: inherit; 
-    font-size: 11.5px; 
-    padding: 7px 10px; 
-    border: 1px solid var(--slate-300); 
-    border-radius: 6px; 
-    background: #fff; 
-    outline: none; 
-}
-.painel-controle textarea { 
-    width: 100%; 
-    height: 60px; 
-    font-family: inherit; 
-    font-size: 11px; 
-    padding: 7px 10px; 
-    border: 1px solid var(--slate-300); 
-    border-radius: 6px; 
-    resize: vertical; 
-    text-transform: uppercase; 
-    background: #fff; 
-    outline: none; 
-}
-
-.botoes-painel { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
-.btn { 
-    cursor: pointer; 
-    padding: 7px 14px; 
-    font-size: 11px; 
-    font-weight: 700; 
-    border: none; 
-    border-radius: 6px; 
-    color: #fff; 
-    display: inline-flex; 
-    align-items: center; 
-    gap: 5px; 
-}
-.btn:hover { filter: brightness(1.08); }
-
-.btn-verde { background-color: var(--primary); } 
-.btn-salvar { background-color: #2563eb; } 
-.btn-carregar { background-color: #0891b2; } 
-.btn-voltar { background-color: var(--slate-600); text-decoration: none; } 
-.btn-imprimir { background-color: var(--slate-900); margin-left: auto; }
-
-/* FOLHA A4 RETRATO PREENCHENDO DE PONTA A PONTA */
-.folha-a4 { 
-    width: 100%; 
-    max-width: 960px; 
-    background: #fff; 
-    padding: 12px 16px; 
-    margin: 0 auto 20px auto; 
-    box-shadow: 0 4px 15px rgba(0,0,0,0.05); 
-    border-radius: 8px; 
-    border: 1.5px solid #000; 
-}
-
-/* CABEÇALHO PADRÃO VALE */
-.cabecalho-container, .info-bar, table.tabela-fmds { 
-    width: 100%; 
-    border-collapse: collapse; 
-    border: 2px solid #000; 
-    margin-bottom: 4px; 
-    table-layout: fixed; 
-}
-.cabecalho-container td, .info-bar td { 
-    border: 1.5px solid #000; 
-    padding: 3px 6px; 
-    vertical-align: middle; 
-    text-align: center; 
-}
-.logo-box { 
-    width: 85px; 
-    font-weight: 900; 
-    font-size: 15px; 
-    color: #007e7a; 
-    letter-spacing: 1.5px; 
-}
-.titulo-box { 
-    font-size: 11px; 
-    font-weight: 900; 
-    text-transform: uppercase; 
-    color: #000; 
-    padding: 0 8px; 
-}
-.meta-box { 
-    width: 120px; 
-    font-size: 8px; 
-    text-align: left !important; 
-    padding-left: 6px !important; 
-    line-height: 1.3; 
-    font-weight: 700;
-}
-
-.info-bar { font-size: 8px; font-weight: 700; }
-.info-bar td { text-align: left; padding: 2px 6px; }
-
-/* TABELA FMDS SEM A COLUNA DSS */
-table.tabela-fmds th, table.tabela-fmds td { 
-    border: 1.5px solid #000; 
-    text-align: center; 
-    vertical-align: middle; 
-    font-size: 9px; 
-    height: 29px; 
-    padding: 2px 4px; 
-}
-table.tabela-fmds th { 
-    color: #fff; 
-    font-weight: 900; 
-    text-transform: uppercase; 
-    font-size: 8.5px; 
-    letter-spacing: 0.3px;
-}
-
-/* CORES DOS PILARES */
-.th-header-base { background-color: var(--primary) !important; }
-.th-ssma { background-color: #10b981 !important; } /* Verde */
-.th-pessoas { background-color: #475569 !important; } /* Cinza Escuro */
-.th-prod { background-color: #f59e0b !important; } /* Laranja / Âmbar */
-.th-qual { background-color: #3b82f6 !important; } /* Azul */
-
-table.tabela-fmds tbody tr { background-color: #fff; }
-
-.col-nome-part { text-align: left !important; font-weight: 700; text-transform: uppercase; padding-left: 8px !important; width: 260px; outline: none; }
-.col-celula-fmds { outline: none; font-weight: 600; }
-.col-acoes { width: 35px; }
-
-.botoes-acoes { display: flex; align-items: center; justify-content: center; gap: 2px; opacity: 0.3; }
-tr:hover .botoes-acoes { opacity: 1; }
-.btn-acao { background: #fff; border: 1px solid #cbd5e1; border-radius: 3px; cursor: pointer; padding: 1px 3px; font-size: 8px; }
-
-/* IMPRESSÃO A4 RETRATO */
 @media print {
-    @page { size: A4 portrait; margin: 3mm 4mm !important; }
-    body { background: #fff !important; margin: 0 !important; padding: 0 !important; -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
-    .painel-controle, .botoes-acoes, .barra-controle-folha, .col-acoes, th.th-acoes, #toastNotificacao { display: none !important; }
-    .folha-a4 { box-shadow: none !important; border: none !important; width: 100% !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; }
-    table.tabela-fmds th.th-header-base { background-color: var(--primary) !important; color: #fff !important; }
-    table.tabela-fmds th.th-ssma { background-color: #10b981 !important; color: #fff !important; }
-    table.tabela-fmds th.th-pessoas { background-color: #475569 !important; color: #fff !important; }
-    table.tabela-fmds th.th-prod { background-color: #f59e0b !important; color: #fff !important; }
-    table.tabela-fmds th.th-qual { background-color: #3b82f6 !important; color: #fff !important; }
+  @page { size:A4 portrait; margin:3mm 4mm; }
+  body { background:#fff; padding:0; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  .painel, .acao, #toast { display:none !important; }
+  .folha { box-shadow:none; border:none; max-width:100%; padding:0; margin:0; page-break-after:always; break-after:page; border-radius:0; }
+  .folha:last-child { page-break-after:auto; break-after:auto; }
+  .fmds tr { page-break-inside:avoid; }
+  .fmds td[contenteditable]:focus { background:none; }
 }
 </style>
 </head>
 <body>
+<div id="toast" role="status" aria-live="polite"></div>
 
-    <div id="toastNotificacao">Mensagem</div>
+<div class="painel">
+  <div class="topo">
+    <span class="badge">Módulo 10: Troca dos Participantes FMDS <span class="tag">v06</span></span>
+    <span><span id="salvo" class="salvo"></span> <a href="index.html" class="btn b-cinza">⬅ Voltar ao menu</a></span>
+  </div>
+  <div class="campos">
+    <div class="grupo"><label for="ano">Ano</label><input type="text" id="ano" inputmode="numeric" maxlength="4"></div>
+    <div class="grupo"><label for="area">Área / setor</label><input type="text" id="area" placeholder="Operação / Manutenção"></div>
+  </div>
+  <div class="grupo">
+    <label for="nomes">Lista de participantes (um por linha, 24 por folha)</label>
+    <textarea id="nomes" placeholder="COLE OS NOMES AQUI"></textarea>
+  </div>
+  <div class="botoes">
+    <button class="btn b-verde" id="bAplicar">⚡ Aplicar lista</button>
+    <button class="btn b-ciano" id="bOrdenar">🔤 Ordenar A–Z</button>
+    <button class="btn b-azul" id="bLinha">➕ Linha</button>
+    <button class="btn b-azul" id="bCompletar">📄 Completar folha</button>
+    <button class="btn b-cinza" id="bExp">📤 Exportar backup</button>
+    <label class="btn b-cinza">📥 Importar backup<input type="file" id="fImp" accept=".json" hidden></label>
+    <button class="btn b-verm" id="bLimpar">🧹 Limpar marcações</button>
+    <button class="btn b-cinza" id="bPadrao">↩ Lista padrão</button>
+    <button class="btn b-print" id="bPrint">🖨️ Imprimir</button>
+  </div>
+</div>
 
-    <div class="painel-controle">
-        <div class="topo-modulo-info">
-            <span class="badge-modulo">Módulo 10: Troca dos Participantes FMDS <span class="tag-v05">v05</span></span>
-            <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
-        </div>
-        <div class="campos-painel">
-            <div class="campo-grupo">
-                <label>Ano:</label>
-                <input type="text" id="anoInputFmds" value="2026" oninput="sincronizarCabecalhosFmds()">
-            </div>
-            <div class="campo-grupo">
-                <label>Área / Setor:</label>
-                <input type="text" id="areaInputFmds" placeholder="Operação / Manutenção" oninput="sincronizarCabecalhosFmds()">
-            </div>
-        </div>
-        <div class="campo-grupo">
-            <label>Lista de Participantes (Um por linha - exatos 24 preenchem a folha inteira):</label>
-            <textarea id="nomesInputFmds" placeholder="COLE OS NOMES AQUI..." oninput="atualizarNomesFmds()"></textarea>
-        </div>
-        <div class="botoes-painel">
-            <button type="button" class="btn btn-verde" onclick="atualizarNomesFmds()">⚡ Gerar / Atualizar Tabela</button>
-            <button type="button" class="btn btn-salvar" onclick="salvarTudoFmds()">💾 Salvar</button>
-            <button type="button" class="btn btn-carregar" onclick="carregarTudoFmds()">📂 Carregar</button>
-            <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
-        </div>
-    </div>
+<div id="folhas"></div>
 
-    <div id="contentorFolhaFmds"></div>
+<script>
+const K = 'valefmds_v06', K_ANTIGA = 'valefmds_v05', POR_FOLHA = 24;
+const PADRAO = ["ALFREDO AUGUSTO RAMOS NETO","ALLAN SOUZA DE CARVALHO","ATMISTO SILVA","ANDRÉ","BIANCA MEDEIROS","BRUNO GOMES FIDELIS","BRUNO RICARDO","CAIO FELIX",
+  "CAIO HENRIQUE","DAVID MARCELO DELGADO DOS SANTOS","DOMINIQUE SILVA","EDUARDO SILVA","EMERSON RIBEIRO DOS SANTOS","GABRIEL CARNEIRO","GLEIVSTON SILVA MENDES",
+  "HUMBERTO EXALTACAO DA SILVA","MARCOS AURELIO CAVALLARES MATTOS","MARIANA PEREIRA CRUZ","PABLO MESQUITA","PAULO HENRIQUE","RICHARD SILVA",
+  "RICARDO GONCALVES DE MELLO LEITE","ROBSON DE SOUZA MENDONCA","TITO DACAL"];
+const novaLinha = nome => ({ nome: nome || '', c: ['', '', '', ''] });
+let st = { ano: String(new Date().getFullYear()), area: '', linhas: PADRAO.map(novaLinha) };
 
-    <script>
-        function mostrarToast(msg) {
-            const toast = document.getElementById('toastNotificacao');
-            toast.innerText = msg;
-            toast.classList.add('ativo');
-            setTimeout(() => { toast.classList.remove('ativo'); }, 2600);
-        }
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const limpo = s => String(s || '').replace(/\s*\n\s*/g, ' ').trim();
+function toast(m) { const t = $('toast'); t.textContent = m; t.classList.add('ativo'); clearTimeout(t._h); t._h = setTimeout(() => t.classList.remove('ativo'), 2600); }
 
-        function sincronizarCabecalhosFmds() {
-            const ano = document.getElementById('anoInputFmds').value || '2026';
-            const area = document.getElementById('areaInputFmds').value || '---';
-            const elAno = document.querySelector('.val-ano');
-            const elArea = document.querySelector('.val-area');
-            if(elAno) elAno.innerText = ano;
-            if(elArea) elArea.innerText = area;
-        }
+/* ---------- persistência automática ---------- */
+let _t;
+function salvar() {
+  clearTimeout(_t);
+  _t = setTimeout(() => {
+    try { localStorage.setItem(K, JSON.stringify(st)); $('salvo').textContent = '✓ Salvo automaticamente'; }
+    catch { $('salvo').textContent = '⚠ Não foi possível salvar'; }
+  }, 300);
+}
+function carregar() {
+  try {
+    const s = JSON.parse(localStorage.getItem(K));
+    if (s && Array.isArray(s.linhas)) { st = s; return; }
+    const v5 = JSON.parse(localStorage.getItem(K_ANTIGA));          // migra a versão anterior (só tinha os nomes)
+    if (v5) st = { ano: v5.ano || st.ano, area: v5.area || '', linhas: (v5.nomes || []).map(novaLinha) };
+  } catch {}
+}
 
-        function criarEstruturaFmds(nomesArr) {
-            let linhas = '';
-            const listaPadrao = [
-                "ALFREDO AUGUSTO RAMOS NETO", "ALLAN SOUZA DE CARVALHO", "ATMISTO SILVA", "ANDRÉ", 
-                "BIANCA MEDEIROS", "BRUNO GOMES FIDELIS", "BRUNO RICARDO", "CAIO FELIX", 
-                "CAIO HENRIQUE", "DAVID MARCELO DELGADO DOS SANTOS", "DOMINIQUE SILVA", "EDUARDO SILVA", 
-                "EMERSON RIBEIRO DOS SANTOS", "GABRIEL CARNEIRO", "GLEIVSTON SILVA MENDES", "HUMBERTO EXALTACAO DA SILVA", 
-                "MARCOS AURELIO CAVALLARES MATTOS", "MARIANA PEREIRA CRUZ", "PABLO MESQUITA", "PAULO HENRIQUE", 
-                "RICHARD SILVA", "RICARDO GONCALVES DE MELLO LEITE", "ROBSON DE SOUZA MENDONCA", "TITO DACAL"
-            ];
-            const lista = nomesArr.length > 0 ? nomesArr : listaPadrao;
+/* ---------- renderização ---------- */
+function folhaHTML(linhas, inicio, pagina, total) {
+  const rows = linhas.map((l, i) => `<tr data-r="${inicio + i}">
+    <td class="nome" contenteditable="true" data-c="n" aria-label="Participante">${esc(l.nome)}</td>
+    ${l.c.map((v, k) => `<td class="cel" contenteditable="true" data-c="${k}">${esc(v)}</td>`).join('')}
+    <td class="acao"><button type="button" data-del title="Remover linha" aria-label="Remover linha">✕</button></td></tr>`).join('');
+  return `<div class="folha">
+    <table class="cab"><tr><td class="logo">VALE</td><td class="titulo">CONTROLE / TROCA DOS PARTICIPANTES FMDS</td>
+      <td class="meta"><strong>Ano:</strong> <span class="val-ano">${esc(st.ano)}</span><br><strong>Página:</strong> ${String(pagina).padStart(2, '0')} / ${String(total).padStart(2, '0')}</td></tr></table>
+    <table class="info"><tr><td><strong>Área / setor:</strong> <span class="val-area" contenteditable="true">${esc(st.area)}</span></td></tr></table>
+    <table class="fmds"><thead><tr><th class="th-base" style="width:260px">Participantes</th><th class="th-ssma">SSMA</th><th class="th-pes">Pessoas</th>
+      <th class="th-prod">Produtividade</th><th class="th-qual">Qualidade</th><th class="th-base acao">Ação</th></tr></thead><tbody>${rows}</tbody></table></div>`;
+}
+function render() {
+  const total = Math.max(1, Math.ceil(st.linhas.length / POR_FOLHA));
+  let h = '';
+  for (let p = 0; p < total; p++) h += folhaHTML(st.linhas.slice(p * POR_FOLHA, (p + 1) * POR_FOLHA), p * POR_FOLHA, p + 1, total);
+  $('folhas').innerHTML = h;
+}
+function sincronizarPainel() {
+  $('ano').value = st.ano; $('area').value = st.area;
+  $('nomes').value = st.linhas.map(l => l.nome).filter(Boolean).join('\n');
+}
+const atualizarCab = () => {
+  document.querySelectorAll('.val-ano').forEach(e => e.textContent = st.ano);
+  document.querySelectorAll('.val-area').forEach(e => { if (e !== document.activeElement) e.textContent = st.area; });
+};
 
-            lista.forEach((nome) => {
-                linhas += `<tr>
-                    <td class="col-nome-part" contenteditable="true">${nome.toUpperCase()}</td>
-                    <td class="col-celula-fmds" contenteditable="true"></td>
-                    <td class="col-celula-fmds" contenteditable="true"></td>
-                    <td class="col-celula-fmds" contenteditable="true"></td>
-                    <td class="col-celula-fmds" contenteditable="true"></td>
-                    <td class="col-acoes th-acoes"><div class="botoes-acoes"><button type="button" class="btn-acao" onclick="this.closest('tr').remove()">✕</button></div></td>
-                </tr>`;
-            });
+/* ---------- ações ---------- */
+function aplicarLista() {
+  const nomes = [...new Set($('nomes').value.split('\n').map(n => limpo(n).toUpperCase()).filter(Boolean))];
+  if (!nomes.length) return toast('Cole ao menos um nome.');
+  const antigas = new Map(st.linhas.filter(l => l.nome).map(l => [l.nome.toUpperCase(), l]));   // preserva as marcações de quem continua
+  st.linhas = nomes.map(n => antigas.get(n) || novaLinha(n));
+  render(); salvar(); toast(`Lista aplicada: ${nomes.length} participante(s), ${Math.ceil(nomes.length / POR_FOLHA)} folha(s).`);
+}
+function ordenar() {
+  const vazias = st.linhas.filter(l => !l.nome);
+  st.linhas = [...st.linhas.filter(l => l.nome).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR')), ...vazias];
+  render(); sincronizarPainel(); salvar(); toast('Lista ordenada de A a Z.');
+}
+function completar() {
+  const falta = (POR_FOLHA - st.linhas.length % POR_FOLHA) % POR_FOLHA;
+  if (!falta) return toast('A última folha já está completa.');
+  for (let i = 0; i < falta; i++) st.linhas.push(novaLinha());
+  render(); salvar(); toast(`${falta} linha(s) em branco adicionadas.`);
+}
+function baixar(nome, texto, tipo) {
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([texto], { type: tipo })), download: nome });
+  a.click(); URL.revokeObjectURL(a.href);
+}
 
-            const ano = document.getElementById('anoInputFmds').value || '2026';
-            const area = document.getElementById('areaInputFmds').value || '---';
+/* ---------- eventos ---------- */
+document.addEventListener('DOMContentLoaded', () => {
+  carregar(); sincronizarPainel(); render();
 
-            const div = document.createElement('div');
-            div.className = 'folha-a4';
-            div.innerHTML = `
-                <table class="cabecalho-container">
-                    <tr>
-                        <td class="logo-box">VALE</td>
-                        <td class="titulo-box">CONTROLE / TROCA DOS PARTICIPANTES FMDS</td>
-                        <td class="meta-box">
-                            <strong>Ano:</strong> <span class="val-ano">${ano}</span><br>
-                            <span><strong>Página:</strong> 01 / 01</span>
-                        </td>
-                    </tr>
-                </table>
-                <table class="info-bar">
-                    <tr>
-                        <td><strong>Área / Setor:</strong> <span class="val-area campo-editavel" contenteditable="true">${area}</span></td>
-                    </tr>
-                </table>
-                <table class="tabela-fmds">
-                    <thead>
-                        <tr>
-                            <th style="width:260px;" class="th-header-base">PARTICIPANTES</th>
-                            <th class="th-ssma">SSMA</th>
-                            <th class="th-pessoas">PESSOAS</th>
-                            <th class="th-prod">PRODUTIVIDADE</th>
-                            <th class="th-qual">QUALIDADE</th>
-                            <th class="col-acoes th-acoes th-header-base">AÇÃO</th>
-                        </tr>
-                    </thead>
-                    <tbody>${linhas}</tbody>
-                </table>`;
-            return div;
-        }
+  $('ano').oninput = () => { st.ano = $('ano').value; atualizarCab(); salvar(); };
+  $('area').oninput = () => { st.area = $('area').value; atualizarCab(); salvar(); };
+  $('bAplicar').onclick = aplicarLista; $('bOrdenar').onclick = ordenar; $('bCompletar').onclick = completar;
+  $('bLinha').onclick = () => { st.linhas.push(novaLinha()); render(); salvar(); document.querySelector('.folha:last-child tbody tr:last-child .nome').focus(); };
+  $('bPrint').onclick = () => window.print();
+  $('bLimpar').onclick = () => { if (confirm('Apagar todas as marcações das colunas SSMA, Pessoas, Produtividade e Qualidade? Os nomes serão mantidos.')) { st.linhas.forEach(l => l.c = ['', '', '', '']); render(); salvar(); toast('Marcações limpas.'); } };
+  $('bPadrao').onclick = () => { if (confirm('Voltar para a lista padrão de participantes? As marcações atuais serão perdidas.')) { st.linhas = PADRAO.map(novaLinha); sincronizarPainel(); render(); salvar(); toast('Lista padrão restaurada.'); } };
+  $('bExp').onclick = () => baixar(`fmds_${st.ano}_backup.json`, JSON.stringify(st, null, 1), 'application/json');
+  $('fImp').onchange = e => {
+    const f = e.target.files[0]; if (!f) return;
+    const rd = new FileReader();
+    rd.onload = () => {
+      try {
+        const d = JSON.parse(rd.result);
+        if (!Array.isArray(d.linhas)) throw 0;
+        st = { ano: String(d.ano || st.ano), area: String(d.area || ''), linhas: d.linhas.map(l => ({ nome: limpo(l.nome).toUpperCase(), c: [0, 1, 2, 3].map(k => limpo((l.c || [])[k])) })) };
+        sincronizarPainel(); render(); salvar(); toast('Backup importado.');
+      } catch { toast('Arquivo de backup inválido.'); }
+      e.target.value = '';
+    };
+    rd.readAsText(f);
+  };
 
-        function atualizarNomesFmds() {
-            const txt = document.getElementById('nomesInputFmds').value.trim();
-            const nomes = txt ? txt.split('\n').map(n => n.trim()).filter(n => n.length > 0) : [];
-            const box = document.getElementById('contentorFolhaFmds');
-            box.innerHTML = '';
-            box.appendChild(criarEstruturaFmds(nomes));
-            mostrarToast('Tabela de participantes gerada!');
-        }
-
-        function salvarTudoFmds() {
-            let nomes = [];
-            document.querySelectorAll('.col-nome-part').forEach(td => {
-                if(td.innerText.trim()) nomes.push(td.innerText.trim());
-            });
-            const dados = {
-                ano: document.getElementById('anoInputFmds').value,
-                area: document.getElementById('areaInputFmds').value,
-                nomes: nomes
-            };
-            localStorage.setItem('valefmds_v05', JSON.stringify(dados));
-            mostrarToast('Dados salvos com sucesso!');
-        }
-
-        function carregarTudoFmds() {
-            const s = localStorage.getItem('valefmds_v05');
-            if(s) {
-                const res = JSON.parse(s);
-                if(res.ano) document.getElementById('anoInputFmds').value = res.ano;
-                if(res.area) document.getElementById('areaInputFmds').value = res.area;
-                if(res.nomes) {
-                    document.getElementById('nomesInputFmds').value = res.nomes.join('\n');
-                    atualizarNomesFmds();
-                }
-                mostrarToast('Dados carregados com sucesso!');
-            } else {
-                mostrarToast('Nenhum dado salvo encontrado.');
-            }
-        }
-
-        window.onload = function() {
-            atualizarNomesFmds();
-        };
-    </script>
+  const folhas = $('folhas');
+  folhas.addEventListener('input', e => {                 // edição direta na folha
+    const t = e.target;
+    if (t.classList.contains('val-area')) { st.area = limpo(t.textContent); $('area').value = st.area; atualizarCab(); return salvar(); }
+    const tr = t.closest('tr[data-r]'); if (!tr || !t.dataset.c) return;
+    const l = st.linhas[+tr.dataset.r]; if (!l) return;
+    t.dataset.c === 'n' ? l.nome = limpo(t.textContent).toUpperCase() : l.c[+t.dataset.c] = limpo(t.textContent);
+    salvar();
+  });
+  folhas.addEventListener('keydown', e => {               // Enter desce para a célula de baixo
+    if (e.key !== 'Enter' || !e.target.isContentEditable) return;
+    e.preventDefault();
+    const tr = e.target.closest('tr'), prox = (e.shiftKey ? tr.previousElementSibling : tr.nextElementSibling)
+      || document.querySelector(`tr[data-r="${+tr.dataset.r + (e.shiftKey ? -1 : 1)}"]`);
+    const alvo = prox && prox.querySelector(`[data-c="${e.target.dataset.c}"]`); if (alvo) alvo.focus();
+  });
+  folhas.addEventListener('paste', e => {                 // cola sempre como texto simples
+    if (!e.target.isContentEditable) return;
+    e.preventDefault();
+    document.execCommand('insertText', false, limpo(e.clipboardData.getData('text/plain')));
+  });
+  folhas.addEventListener('click', e => {
+    const b = e.target.closest('[data-del]'); if (!b) return;
+    const r = +b.closest('tr').dataset.r, l = st.linhas[r];
+    if ((l.nome || l.c.some(Boolean)) && !confirm(`Remover a linha de ${l.nome || 'participante em branco'}?`)) return;
+    st.linhas.splice(r, 1); render(); salvar();
+  });
+});
+</script>
 </body>
 </html>
