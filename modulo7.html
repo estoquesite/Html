@@ -1,2093 +1,583 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 7 - Compras Cartão Corporativo | Portal Vale</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = { darkMode: 'class' }
-    </script>
-    <!-- SDK Oficial do Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <style>
-        * { box-sizing: border-box; }
-        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-        .uppercase-input { text-transform: uppercase; }
-
-        @keyframes piscarForte {
-            0%, 100% {
-                background-color: #fef9c3;
-                border-color: #f59e0b;
-                box-shadow: 0 0 8px rgba(245, 158, 11, 0.5);
-                transform: scale(1);
-            }
-            50% {
-                background-color: #ffffff;
-                border-color: #d97706;
-                box-shadow: 0 0 3px rgba(217, 119, 6, 0.3);
-            }
-        }
-        .piscar-solicitante-forte {
-            animation: piscarForte 1.2s infinite alternate ease-in-out;
-            color: #7c2d12 !important;
-            font-weight: 900 !important;
-            border-width: 1.5px !important;
-        }
-
-        @keyframes neonDelicado {
-            0%, 100% {
-                border-color: #38bdf8;
-                box-shadow: 0 0 6px rgba(56, 189, 248, 0.4);
-            }
-            50% {
-                border-color: #818cf8;
-                box-shadow: 0 0 2px rgba(129, 140, 248, 0.2);
-            }
-        }
-        .neon-pulsante {
-            animation: neonDelicado 2s infinite alternate ease-in-out;
-            border-width: 1.5px !important;
-        }
-
-        @keyframes pulsoSuave {
-            0%, 100% { transform: scale(1); opacity: 0.9; }
-            50% { transform: scale(1.03); opacity: 1; }
-        }
-        .pulso-delicado {
-            animation: pulsoSuave 1.5s infinite ease-in-out;
-        }
-
-        @keyframes brilhaFluorescente {
-            0%, 100% {
-                border-color: #22c55e;
-                box-shadow: 0 0 8px rgba(34, 197, 94, 0.7);
-            }
-            50% {
-                border-color: #eab308;
-                box-shadow: 0 0 3px rgba(234, 179, 8, 0.4);
-            }
-        }
-        .alerta-duplicado-fluorescente {
-            animation: brilhaFluorescente 1.2s infinite alternate ease-in-out;
-            border: 2px dashed #22c55e !important;
-            padding: 2px 6px;
-            border-radius: 8px;
-            display: inline-block;
-        }
-
-        @keyframes neonPainelEntrada {
-            0%, 100% {
-                border-color: #c084fc;
-                box-shadow: 0 0 15px rgba(192, 132, 252, 0.3);
-            }
-            50% {
-                border-color: #f472b6;
-                box-shadow: 0 0 15px rgba(244, 114, 182, 0.3);
-            }
-        }
-        .painel-entrada-colorido {
-            animation: neonPainelEntrada 4s infinite alternate ease-in-out;
-            border-width: 2px !important;
-        }
-
-        .glow-azul { border: 2px solid #38bdf8; box-shadow: 0 0 10px rgba(56, 189, 248, 0.5); }
-        .glow-roxo { border: 2px solid #c084fc; box-shadow: 0 0 10px rgba(192, 132, 252, 0.5); }
-        .glow-verde { border: 2px solid #4ade80; box-shadow: 0 0 10px rgba(74, 222, 128, 0.5); }
-        .glow-rosa { border: 2px solid #f472b6; box-shadow: 0 0 10px rgba(244, 114, 182, 0.5); }
-        .glow-amarelo { border: 2px solid #facc15; box-shadow: 0 0 10px rgba(250, 204, 21, 0.5); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Módulo 7 - Compras Cartão Corporativo | Portal Vale v1.1</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { darkMode: 'class' }</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  body { font-family: 'Segoe UI', system-ui, sans-serif; }
+  .lbl { display:block; font-size:10px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:3px; }
+  .inp { width:100%; font-size:12px; padding:8px; border-radius:10px; border:1px solid #cbd5e1; background:#fff; font-weight:700; color:inherit; }
+  .dark .inp { background:#0f172a; border-color:#475569; }
+  .up { text-transform:uppercase; }
+  .btn { font-size:12px; font-weight:700; padding:8px 12px; border-radius:12px; cursor:pointer; white-space:nowrap; }
+  .card { background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:16px; }
+  .dark .card { background:#1e293b; border-color:#334155; }
+  @keyframes pf { from { background:#fef9c3; } to { background:#fff; } }
+  .falta { animation:pf 1.2s infinite alternate; border-color:#f59e0b !important; }
+  :focus-visible { outline:2px solid #6366f1; outline-offset:2px; }
+  @media (prefers-reduced-motion: reduce) { .falta { animation:none; background:#fef9c3; } }
+</style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen p-4 sm:p-6 transition-colors duration-200">
+<body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen p-4 sm:p-6 transition-colors">
+<div id="toast" role="status" aria-live="polite" class="fixed bottom-6 right-6 z-[60] text-xs font-bold px-4 py-2.5 rounded-lg shadow-xl bg-slate-900 text-white opacity-0 pointer-events-none transition-opacity"></div>
 
-    <div class="max-w-7xl mx-auto space-y-6">
+<div class="max-w-7xl mx-auto space-y-5">
+  <header class="card flex flex-wrap justify-between items-center gap-3">
+    <div>
+      <h1 class="text-base sm:text-lg font-black uppercase">💳 Módulo 7 · Compras Cartão Corporativo</h1>
+      <p class="text-xs text-slate-500">Histórico, entregas e arquivos <span id="badgeNuvem" class="font-bold ml-1"></span></p>
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      <a href="index.html" class="btn bg-slate-100 dark:bg-slate-700">⬅ Menu</a>
+      <label class="btn bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800">📁 Carregar arquivo<input type="file" id="fArquivo" accept=".json,.csv" class="hidden"></label>
+      <button id="bCSV" class="btn bg-emerald-600 text-white">📥 Baixar CSV</button>
+      <button id="bDup" class="btn bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950 dark:text-rose-300 dark:border-rose-800">⚡ Limpar duplicadas</button>
+      <button id="bSync" class="btn bg-indigo-600 text-white">🔄 Sincronizar</button>
+      <button id="bSalvar" class="btn bg-purple-600 text-white">💾 Salvar tudo</button>
+      <button id="bTema" class="btn bg-slate-100 dark:bg-slate-700" aria-label="Alternar tema">🌙</button>
+    </div>
+  </header>
 
-        <!-- CABEÇALHO -->
-        <header class="flex flex-wrap justify-between items-center bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 gap-4">
-            <div class="flex items-center gap-3">
-                <div class="w-12 h-12 bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 rounded-2xl flex items-center justify-center text-2xl font-black shadow-inner">
-                    💳
-                </div>
-                <div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300">Módulo 7</span>
-                        <h1 class="text-base sm:text-lg font-black text-slate-900 dark:text-white uppercase tracking-wide">Compras Cartão Corporativo</h1>
-                    </div>
-                    <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500 dark:text-slate-400">Portal Vale + Histórico & Arquivos</p>
-                        <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                        <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600 dark:text-emerald-400">Nuvem Conectada</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="flex flex-wrap items-center gap-2">
-                <a href="index.html" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1">
-                    ⬅ Menu
-                </a>
+  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+    <div class="card"><span class="lbl">Itens exibidos</span><h3 id="cItens" class="text-xl font-black text-indigo-600">0</h3></div>
+    <div class="card"><span class="lbl">Total exibido</span><h3 id="cTotal" class="text-xl font-black text-emerald-600">R$ 0,00</h3></div>
+    <div class="card"><span class="lbl">Principal solicitante</span><h3 id="cTop" class="text-base font-black truncate uppercase">—</h3></div>
+  </div>
+  <div id="cardsPessoas" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2"></div>
 
-                <!-- 📁 BOTÃO DE CARREGAR ARQUIVO ANTERIOR -->
-                <label class="bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300 border border-blue-200 dark:border-blue-800 px-3 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer shadow-sm" title="Carregar arquivo JSON ou CSV anterior">
-                    <span>📁</span>
-                    <span>Carregar Arquivo</span>
-                    <input type="file" id="inputCarregarArquivo" accept=".json, .csv" class="hidden" onchange="importarArquivoAnterior(this)">
-                </label>
-
-                <!-- 📥 BOTÃO DE BAIXAR CSV -->
-                <button onclick="exportarParaCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer" title="Baixar relatório em CSV">
-                    <span>📥</span>
-                    <span>Baixar CSV</span>
-                </button>
-
-                <!-- 🗑️ BOTÃO REMOVER DUPLICADAS -->
-                <button onclick="removerDuplicadasExatas()" class="bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800 px-3 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer shadow-sm" title="Remover registros duplicados">
-                    <span>⚡</span>
-                    <span>Limpar Duplicadas</span>
-                </button>
-
-                <button onclick="abrirModalUsuarios()" class="bg-indigo-50 hover:bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-800 px-3 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer shadow-sm">
-                    <span>👥</span>
-                    <span>Pessoas</span>
-                </button>
-                <button onclick="carregarDoSupabase()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-sm" title="Sincronizar com a Nuvem">
-                    🔄 Sincronizar
-                </button>
-                <button onclick="salvarTudoGeral()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-xl text-xs font-black transition flex items-center gap-1 cursor-pointer shadow-sm" title="Salvar dados permanentemente e atualizar nuvem">
-                    💾 Salvar Tudo
-                </button>
-                <button onclick="abrirModalChaveIa()" class="bg-amber-100 hover:bg-amber-200 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 px-3 py-2 rounded-xl text-xs font-black transition flex items-center gap-1.5 cursor-pointer border border-amber-300 dark:border-amber-700 shadow-sm" title="Configurar Chave IA">
-                    <span>⚙</span>
-                </button>
-            </div>
-        </header>
-
-        <!-- AVISO DE STATUS -->
-        <div id="alertaSistema" class="hidden p-3 rounded-xl text-xs font-bold text-center transition-all"></div>
-
-        <!-- CARTÕES DE RESUMO -->
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
-                <span id="labelTotalItens" class="text-[10px] font-bold uppercase text-slate-400">Total de Despesas</span>
-                <h3 id="cardTotalItens" class="text-xl font-black text-indigo-600 dark:text-indigo-400 mt-0.5">0</h3>
-            </div>
-            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700">
-                <span id="labelValorTotal" class="text-[10px] font-bold uppercase text-slate-400">Total Faturado no Cartão</span>
-                <h3 id="cardValorTotal" class="text-xl font-black text-emerald-600 dark:text-emerald-400 mt-0.5">R$ 0,00</h3>
-            </div>
-            <div class="bg-white dark:bg-slate-800 p-4 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 cursor-pointer hover:border-indigo-400 transition" onclick="abrirModalUsuarios()" title="Clique para ver lista completa">
-                <span id="labelPessoaCard" class="text-[10px] font-bold uppercase text-slate-400">Principal Solicitante (Ver Todos 👥)</span>
-                <h3 id="cardTopSolicitante" class="text-base font-black text-slate-700 dark:text-slate-200 truncate mt-0.5 uppercase">Nenhum</h3>
-            </div>
-        </div>
-
-        <!-- CARDS DINÂMICOS POR PESSOA -->
-        <div id="containerCardsPessoas" class="grid grid-cols-2 sm:grid-cols-6 gap-2.5"></div>
-
-        <!-- ================= ABAS PARA ENTRADA DE DADOS ================= -->
-        <div class="w-full bg-white dark:bg-slate-800 painel-entrada-colorido rounded-2xl shadow-lg overflow-hidden mt-6 mb-4">
-            <div class="flex border-b border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 p-2 gap-1 overflow-x-auto">
-                <button type="button" onclick="mudarAbaEntrada('manual')" id="tabBtn-manual" class="flex-1 min-w-[120px] py-2.5 px-4 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-700">
-                    <span>✍️</span> <span>Digitar Manual</span>
-                </button>
-                <button type="button" onclick="mudarAbaEntrada('bloco')" id="tabBtn-bloco" class="flex-1 min-w-[140px] py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
-                    <span>📋</span> <span>Nota Fiscal / Vários Itens</span>
-                </button>
-                <button type="button" onclick="mudarAbaEntrada('link')" id="tabBtn-link" class="flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
-                    <span>🔗</span> <span>Link Web</span>
-                </button>
-                <button type="button" onclick="mudarAbaEntrada('foto')" id="tabBtn-foto" class="flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
-                    <span>📸</span> <span>Foto / Câmera</span>
-                </button>
-                <button type="button" onclick="mudarAbaEntrada('texto')" id="tabBtn-texto" class="flex-1 min-w-[120px] py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200">
-                    <span>💬</span> <span>Colar Teams</span>
-                </button>
-            </div>
-
-            <!-- CONTEÚDO 1: DIGITAÇÃO MANUAL (CABEÇALHO ÚNICO E ITENS MÚLTIPLOS) -->
-            <div id="aba-manual" class="p-6 space-y-4">
-                <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
-                    <span class="text-xs font-black text-indigo-900 dark:text-indigo-300 uppercase flex items-center gap-1.5">
-                        <span>✍️</span> Novo Lançamento Manual (Mesmo Solicitante / Vários Itens)
-                    </span>
-                    <span class="text-[10px] font-bold text-slate-400">Preencha o cabeçalho e adicione os itens abaixo</span>
-                </div>
-
-                <!-- CABEÇALHO DA COMPRA MANUAL -->
-                <div class="bg-indigo-50/60 dark:bg-slate-900/60 p-4 rounded-2xl border border-indigo-200 dark:border-indigo-800 grid grid-cols-1 sm:grid-cols-3 gap-3">
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Data da Compra</label>
-                        <input type="date" id="manualData" class="neon-pulsante w-full text-xs p-2.5 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white font-bold" onchange="atualizarDataEntregaManualDefaultGeral(this.value)">
-                    </div>
-                    <div>
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="block text-[10px] font-black text-rose-600 dark:text-rose-400 uppercase">Solicitante (*)</label>
-                            <span id="avisoManualSolicitante" class="text-[9px] font-black text-rose-600 animate-pulse">OBRIGATÓRIO!</span>
-                        </div>
-                        <input type="text" id="manualSolicitante" oninput="validarInputManualSolicitante(this)" placeholder="QUEM PEDIU?" class="uppercase-input w-full text-xs p-2.5 rounded-xl outline-none transition-all piscar-solicitante-forte">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Local / Fornecedor</label>
-                        <input type="text" id="manualLocalGeral" oninput="this.value = this.value.toUpperCase()" placeholder="EX: MERCADO LIVRE..." class="uppercase-input w-full text-xs p-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                    </div>
-                </div>
-
-                <!-- LISTA DE ITENS DA COMPRA MANUAL -->
-                <div class="space-y-3 pt-2">
-                    <div class="text-[11px] font-black uppercase text-slate-500 dark:text-slate-400 flex items-center justify-between">
-                        <span>📦 Itens da Compra:</span>
-                        <button type="button" onclick="adicionarSubLinhaManual()" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300 font-bold py-1.5 px-3 rounded-lg text-[10px] transition flex items-center gap-1 cursor-pointer">
-                            <span>➕</span> Adicionar mais um item nesta compra
-                        </button>
-                    </div>
-
-                    <div id="containerSubLinhasManuais" class="space-y-2.5">
-                        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-end sub-linha-manual bg-slate-50 dark:bg-slate-900/40 p-3 rounded-xl border border-slate-200 dark:border-slate-700 relative">
-                            <div class="sm:col-span-4">
-                                <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Produto / Serviço</label>
-                                <input type="text" oninput="this.value = this.value.toUpperCase()" placeholder="EX: CHUMBADOR..." class="subProduto uppercase-input w-full text-xs p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold outline-none">
-                            </div>
-                            <div class="sm:col-span-3">
-                                <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Projeto</label>
-                                <input type="text" oninput="this.value = this.value.toUpperCase()" placeholder="PROJETO..." class="subProjeto uppercase-input w-full text-xs p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold outline-none">
-                            </div>
-                            <div class="sm:col-span-1">
-                                <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Qtd</label>
-                                <input type="number" value="1" min="1" oninput="calcularSubManualPorTotal(this)" class="subQtd w-full text-xs p-2 text-center font-bold bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white outline-none">
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label class="block text-[9px] font-black text-emerald-600 uppercase mb-1">Total (R$) 🔄</label>
-                                <input type="number" step="0.01" placeholder="0,00" oninput="calcularSubManualPorTotal(this)" class="subTotal w-full text-xs p-2 bg-emerald-50/70 border border-emerald-400 rounded-lg font-black text-emerald-600 outline-none">
-                            </div>
-                            <div class="sm:col-span-2">
-                                <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Unitário</label>
-                                <input type="number" step="0.01" placeholder="0,00" oninput="calcularSubManualPorUnitario(this)" class="subUnit w-full text-xs p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold outline-none">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- CONTROLE DE ENTREGA GERAL -->
-                <div class="bg-slate-100 dark:bg-slate-900/60 p-3 rounded-xl border border-indigo-200 dark:border-indigo-800 space-y-2">
-                    <label class="flex items-center gap-1.5 cursor-pointer">
-                        <input type="checkbox" id="manualEntregueGeral" onchange="toggleManualDataEntregaGeral(this.checked)" class="pulso-delicado w-4 h-4 text-indigo-600 rounded cursor-pointer">
-                        <span class="text-[10px] font-bold uppercase text-indigo-700 dark:text-indigo-300">📦 Compra Entregue? (+10d)</span>
-                    </label>
-                    <input type="date" id="manualDataEntregaGeral" class="neon-pulsante w-full sm:w-1/3 text-xs p-2 rounded font-bold hidden bg-white dark:bg-slate-800 dark:text-white">
-                </div>
-
-                <div class="flex justify-end pt-2">
-                    <button type="button" onclick="lancarCompraManualAgrupada()" class="bg-emerald-600 hover:bg-emerald-700 text-white font-black py-3 px-8 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer">
-                        <span>✅</span>
-                        <span>Salvar Compra com Todos os Itens</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- CONTEÚDO 2: NOTA FISCAL / VÁRIOS ITENS -->
-            <div id="aba-bloco" class="p-6 space-y-4 hidden">
-                <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
-                    <span class="text-xs font-black text-purple-900 dark:text-purple-300 uppercase flex items-center gap-1.5">
-                        <span>📋</span> Importar / Colar Nota Fiscal (Agrupados)
-                    </span>
-                    <span class="text-[10px] font-bold text-slate-400">Suba o PDF/Imagem ou cole o texto abaixo</span>
-                </div>
-
-                <!-- UPLOAD DE ARQUIVO DA NOTA -->
-                <div class="bg-purple-50 dark:bg-purple-950/40 p-3 rounded-xl border border-purple-200 dark:border-purple-800 flex flex-wrap justify-between items-center gap-3">
-                    <div class="flex items-center gap-2">
-                        <span class="text-xl">📄</span>
-                        <div>
-                            <span class="text-xs font-bold block text-purple-900 dark:text-purple-200 uppercase">Fazer Upload do Arquivo da Nota Fiscal (PDF / Imagem)</span>
-                            <span class="text-[10px] text-purple-600 dark:text-purple-400">O sistema lê e preenche data e itens automaticamente</span>
-                        </div>
-                    </div>
-                    <label class="bg-purple-600 hover:bg-purple-700 text-white text-xs font-black px-4 py-2 rounded-xl cursor-pointer transition shadow-sm flex items-center gap-1.5">
-                        <span>📤</span> Selecionar Nota
-                        <input type="file" id="inputArquivoNota" accept=".pdf, image/*" class="hidden" onchange="processarArquivoNotaFiscal(this)">
-                    </label>
-                </div>
-
-                <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Data</label>
-                        <input type="date" id="blocoData" class="w-full text-xs p-2.5 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white border border-slate-300 dark:border-slate-700 font-bold">
-                    </div>
-                    <div>
-                        <div class="flex justify-between items-center mb-1">
-                            <label class="block text-[10px] font-black text-rose-600 uppercase">Solicitante (*)</label>
-                            <span id="avisoBlocoSolicitante" class="text-[9px] font-black text-rose-600 animate-pulse hidden">OBRIGATÓRIO!</span>
-                        </div>
-                        <input type="text" id="blocoSolicitante" placeholder="QUEM PEDIU?" oninput="validarInputBlocoSolicitante(this)" class="uppercase-input w-full text-xs p-2.5 rounded-xl border border-slate-300 dark:border-slate-700 dark:text-white font-bold outline-none piscar-solicitante-forte">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Local / Fornecedor</label>
-                        <input type="text" id="blocoLocal" placeholder="EX: FORNECEDOR..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Projeto</label>
-                        <input type="text" id="blocoProjeto" placeholder="PROJETO..." class="uppercase-input w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                    </div>
-                </div>
-
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-500 dark:text-slate-400 uppercase mb-1">Ou cole aqui o texto copiado do sistema / nota:</label>
-                    <textarea id="blocoTextoItens" rows="5" placeholder="Cole aqui o texto..." class="w-full text-xs p-3 bg-slate-50 dark:bg-slate-900 border border-purple-300 dark:border-purple-800 rounded-xl outline-none dark:text-white font-mono leading-relaxed"></textarea>
-                </div>
-
-                <div class="flex justify-end pt-1">
-                    <button type="button" onclick="processarBlocoItens()" class="bg-purple-600 hover:bg-purple-700 text-white font-black py-3 px-8 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer">
-                        <span>⚡</span>
-                        <span>Processar e Agrupar Itens da Nota</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- CONTEÚDO 3: LINK WEB (COM MÚLTIPLAS LINHAS DE LINKS) -->
-            <div id="aba-link" class="p-6 space-y-3 hidden">
-                <div class="flex justify-between items-center">
-                    <label class="block text-xs font-black text-blue-950 dark:text-blue-200 uppercase flex items-center gap-2">
-                        <span>🔗</span>
-                        <span>Colar / Digitar Links dos Produtos (Mercado Livre, Amazon, etc.)</span>
-                    </label>
-                    <div class="flex items-center gap-3">
-                        <button type="button" onclick="limparInputLink()" class="text-xs text-rose-500 font-bold hover:underline flex items-center gap-1 cursor-pointer">🗑️ Limpar Links</button>
-                        <button type="button" onclick="colarLinkInput()" class="text-xs text-blue-700 dark:text-blue-300 font-bold hover:underline flex items-center gap-1 cursor-pointer">📋 Colar</button>
-                    </div>
-                </div>
-                
-                <div id="containerLinhasLinks" class="space-y-3">
-                    <div class="flex flex-col sm:flex-row gap-2 linha-link-item relative">
-                        <div class="relative flex-1">
-                            <input type="text" placeholder="Cole o link aqui..." class="inputLinkDireto neon-pulsante w-full text-xs px-3 py-3 pr-8 rounded-xl outline-none bg-white dark:bg-slate-900 dark:text-white">
-                            <button type="button" onclick="this.previousElementSibling.value=''" class="absolute right-2.5 top-3 text-slate-400 hover:text-rose-500 font-bold text-xs">✕</button>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="flex justify-between items-center pt-2">
-                    <button type="button" onclick="adicionarLinhaLink()" class="bg-blue-50 hover:bg-blue-100 text-blue-800 dark:bg-blue-950/80 dark:text-blue-300 font-bold py-2.5 px-4 rounded-xl text-xs transition flex items-center gap-1.5 cursor-pointer border border-blue-200 dark:border-blue-800">
-                        <span>➕</span> Adicionar Mais um Link
-                    </button>
-                    <button type="button" onclick="processarLinksEmLote()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold px-6 py-3 rounded-xl transition shadow-md flex items-center justify-center gap-1.5 cursor-pointer flex-shrink-0">
-                        <span>⚡</span>
-                        <span>Reconhecer Todos os Links</span>
-                    </button>
-                </div>
-            </div>
-
-            <!-- CONTEÚDO 4: FOTO -->
-            <div id="aba-foto" class="p-6 space-y-3 hidden">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <label class="flex items-center justify-center gap-3 bg-purple-600 hover:bg-purple-700 text-white font-black py-5 px-4 rounded-2xl shadow-md cursor-pointer transition active:scale-95 text-xs">
-                        <span class="text-2xl">📸</span>
-                        <div class="text-left">
-                            <span class="block">TIRAR FOTO AGORA</span>
-                            <span class="block text-[10px] font-normal text-purple-200">Abre a câmera do celular direto</span>
-                        </div>
-                        <input type="file" id="inputCameraDireta" accept="image/*" capture="environment" class="hidden" onchange="processarArquivos(this.files)">
-                    </label>
-
-                    <label class="flex items-center justify-center gap-3 bg-indigo-600 hover:bg-indigo-700 text-white font-black py-5 px-4 rounded-2xl shadow-md cursor-pointer transition active:scale-95 text-xs">
-                        <span class="text-2xl">🖼️</span>
-                        <div class="text-left">
-                            <span class="block">ESCOLHER DA GALERIA</span>
-                            <span class="block text-[10px] font-normal text-indigo-200">Selecione prints salvos ou fotos</span>
-                        </div>
-                        <input type="file" id="inputGaleria" accept="image/*" multiple class="hidden" onchange="processarArquivos(this.files)">
-                    </label>
-                </div>
-            </div>
-
-            <!-- CONTEÚDO 5: TEAMS -->
-            <div id="aba-texto" class="p-6 space-y-3 hidden">
-                <div class="flex justify-between items-center">
-                    <label class="block text-xs font-black text-indigo-950 dark:text-indigo-200 uppercase flex items-center gap-2">
-                        <span>💬</span>
-                        <span>Cole a Mensagem do Teams / WhatsApp</span>
-                    </label>
-                    <button type="button" onclick="colarTextoTeams()" class="text-xs text-indigo-700 dark:text-indigo-300 font-bold hover:underline flex items-center gap-1 cursor-pointer">📋 Colar Texto</button>
-                </div>
-                
-                <textarea id="inputTextoTeams" rows="3" placeholder="Ex: Diogo pediu no Mercado Livre: 3 Itens total R$ 500,00..." class="w-full text-xs p-3 bg-slate-50 dark:bg-slate-900 border border-indigo-200 dark:border-indigo-800 rounded-xl outline-none focus:border-indigo-600 dark:text-white leading-relaxed"></textarea>
-                
-                <div class="flex justify-end pt-1">
-                    <button type="button" onclick="processarTextoBruto(document.getElementById('inputTextoTeams').value)" class="bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold px-5 py-2.5 rounded-xl transition shadow-md flex items-center gap-1.5 cursor-pointer">
-                        <span>⚡</span>
-                        <span>Reconhecer Texto</span>
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- CARDS PRÉ-PREENCHIDOS -->
-        <div id="containerCardsPreenchidos" class="space-y-3 hidden">
-            <div class="flex justify-between items-center px-1">
-                <h3 class="text-xs font-black uppercase text-indigo-700 dark:text-indigo-300 flex items-center gap-1.5">
-                    <span>📦</span>
-                    <span id="tituloItensPendentes">Itens Identificados (Confira e dê OK):</span>
-                </h3>
-                <button type="button" onclick="confirmarTodosOsCards()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-bold px-3 py-1.5 rounded-xl shadow-sm transition cursor-pointer">
-                    ⚡ Confirmar Todos e Salvar
-                </button>
-            </div>
-            <div id="listaCardsPendentes" class="space-y-3"></div>
-        </div>
-
-        <!-- 🔍 BARRA DE FILTRO, PESQUISA E VALORES -->
-        <div class="bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 p-3.5 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-3">
-            <div class="flex items-center gap-2 w-full sm:w-auto">
-                <span class="text-base">🔍</span>
-                <span class="text-xs font-black uppercase text-slate-700 dark:text-slate-300 whitespace-nowrap">Filtros:</span>
-            </div>
-            
-            <div class="flex flex-1 flex-col sm:flex-row items-center gap-2 w-full">
-                <div class="relative w-full sm:w-1/3">
-                    <input type="text" id="inputPesquisaProduto" oninput="renderizarTabela()" placeholder="Pesquisar produto..." class="uppercase-input w-full text-xs pl-8 pr-7 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-indigo-600 dark:text-white font-bold">
-                    <span class="absolute left-2.5 top-2 text-slate-400 text-xs">📦</span>
-                </div>
-
-                <div class="relative w-full sm:w-1/3">
-                    <input type="number" step="0.01" id="inputFiltroValor" oninput="renderizarTabela()" placeholder="Filtrar por valor (R$)..." class="w-full text-xs pl-8 pr-7 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-indigo-600 dark:text-white font-bold">
-                    <span class="absolute left-2.5 top-2 text-slate-400 text-xs">💲</span>
-                    <button type="button" onclick="document.getElementById('inputFiltroValor').value=''; renderizarTabela();" class="absolute right-2.5 top-2 text-slate-400 hover:text-rose-500 font-bold text-xs" title="Limpar Valor">✕</button>
-                </div>
-
-                <div class="w-full sm:w-1/3">
-                    <select id="selectFiltroSolicitante" onchange="aplicarFiltroPorSelect(this.value)" class="w-full text-xs py-2 px-3 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl outline-none focus:border-indigo-600 dark:text-white font-bold">
-                        <option value="">TODOS OS SOLICITANTES</option>
-                    </select>
-                </div>
-            </div>
-
-            <div id="badgeFiltroAtivo" class="hidden text-xs bg-indigo-100 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 px-3 py-1.5 rounded-xl font-bold border border-indigo-200 dark:border-indigo-800 whitespace-nowrap">
-                Filtro Ativo: <span id="txtFiltroNome" class="font-black"></span>
-            </div>
-        </div>
-
-        <!-- TABELA DE COMPRAS REGISTRADAS -->
-        <div class="bg-white dark:bg-slate-800 p-5 rounded-2xl shadow-sm border border-slate-200 dark:border-slate-700 space-y-3">
-            <div class="flex justify-between items-center">
-                <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">
-                    📋 Histórico de Compras no Cartão (Sincronizado na Nuvem)
-                </h3>
-                <span id="labelContador" class="text-[11px] text-slate-400 font-bold">0 ITENS REGISTRADOS</span>
-            </div>
-
-            <div class="overflow-x-auto">
-                <table class="w-full text-left text-xs border-collapse">
-                    <thead>
-                        <tr class="border-b border-slate-100 dark:border-slate-700 text-slate-400 font-bold uppercase text-[10px]">
-                            <th class="py-2.5 px-3">Data</th>
-                            <th class="py-2.5 px-3">Solicitante</th>
-                            <th class="py-2.5 px-3">Produto / Serviço / Itens Agrupados</th>
-                            <th class="py-2.5 px-3">Local / Fornecedor</th>
-                            <th class="py-2.5 px-3">Projeto</th>
-                            <th class="py-2.5 px-3 text-center">Qtd</th>
-                            <th class="py-2.5 px-3 text-right">Unitário</th>
-                            <th class="py-2.5 px-3 text-right">Total</th>
-                            <th class="py-2.5 px-3 text-center">Entrega 📦</th>
-                            <th class="py-2.5 px-3 text-center">Link</th>
-                            <th class="py-2.5 px-3 text-center">Ações</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabelaComprasCorpo" class="divide-y divide-slate-100 dark:divide-slate-700/60 uppercase"></tbody>
-                </table>
-            </div>
-        </div>
-
+  <!-- ENTRADA -->
+  <section class="card !p-0 overflow-hidden">
+    <div class="flex gap-1 p-2 bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700 overflow-x-auto" id="abas">
+      <button class="btn flex-1" data-tab="manual">✍️ Digitar manual</button>
+      <button class="btn flex-1" data-tab="nota">📋 Nota fiscal / vários itens</button>
+      <button class="btn flex-1" data-tab="link">🔗 Links / mensagem</button>
     </div>
 
-    <!-- MODAL DO PAINEL DE SOLICITANTES (👥) -->
-    <div id="modalUsuarios" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 w-full max-w-2xl rounded-2xl p-5 shadow-2xl space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
-                <div class="flex items-center gap-2">
-                    <span class="text-lg">👥</span>
-                    <div>
-                        <h3 class="text-xs sm:text-sm font-black text-indigo-600 dark:text-indigo-400 uppercase">Painel de Solicitantes</h3>
-                        <p class="text-[10px] text-slate-500">Resumo de pedidos e gastos por pessoa (Clique para filtrar)</p>
-                    </div>
-                </div>
-                <button onclick="fecharModalUsuarios()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-black text-sm">✕</button>
-            </div>
-
-            <div class="max-h-96 overflow-y-auto">
-                <table class="w-full text-left text-xs border-collapse">
-                    <thead>
-                        <tr class="border-b border-slate-200 dark:border-slate-700 text-slate-400 font-bold uppercase text-[10px]">
-                            <th class="py-2 px-3">Solicitante</th>
-                            <th class="py-2 px-3 text-center">Itens Pedidos</th>
-                            <th class="py-2 px-3 text-right">Gasto Total</th>
-                            <th class="py-2 px-3 text-center">Ação</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tabelaUsuariosCorpo" class="divide-y divide-slate-100 dark:divide-slate-700/60 uppercase font-semibold"></tbody>
-                </table>
-            </div>
-
-            <div class="flex justify-between items-center pt-2 border-t border-slate-100 dark:border-slate-700 text-xs">
-                <span id="resumoGeralUsuarios" class="font-bold text-slate-500"></span>
-                <button type="button" onclick="fecharModalUsuarios()" class="bg-slate-900 hover:bg-black dark:bg-slate-700 dark:hover:bg-slate-600 text-white px-4 py-1.5 rounded-xl font-bold transition">Fechar</button>
-            </div>
-        </div>
+    <div id="aba-manual" class="p-5 space-y-3">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+        <div><label class="lbl">Data da compra</label><input type="date" id="mData" class="inp"></div>
+        <div><label class="lbl text-rose-600">Solicitante (*)</label><input id="mSol" data-sol class="inp up falta" placeholder="Quem pediu?"></div>
+        <div><label class="lbl">Local / fornecedor</label><input id="mLocal" class="inp up" placeholder="Ex: Mercado Livre"></div>
+      </div>
+      <div id="mRows" class="space-y-2"></div>
+      <button id="bAddRow" class="btn bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300 !text-[11px]">➕ Adicionar item nesta compra</button>
+      <label class="flex items-center gap-2 text-xs font-bold"><input type="checkbox" id="mEntregue"> Já entregue? (data padrão: +10 dias)</label>
+      <div class="flex justify-end"><button id="bManual" class="btn bg-emerald-600 text-white !px-8 !py-3">✅ Salvar compra</button></div>
     </div>
 
-    <!-- MODAL DA CHAVE DA IA (ENGRENAGEM ⚙️) -->
-    <div id="modalChaveIa" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 w-full max-w-md rounded-2xl p-5 shadow-2xl space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
-                <h3 class="text-xs sm:text-sm font-black text-amber-600 dark:text-amber-400 uppercase flex items-center gap-1.5">
-                    <span>⚙️</span> Chave API da IA (Google Gemini)
-                </h3>
-                <button onclick="fecharModalChaveIa()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-black text-sm">✕</button>
-            </div>
-
-            <div class="space-y-2 text-xs">
-                <p class="text-slate-500 dark:text-slate-400 leading-relaxed">Cole abaixo a chave de API gerada no Google AI Studio.</p>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Chave Gemini (AIzaSy...):</label>
-                    <input type="password" id="modalInputGeminiKey" placeholder="Cole aqui sua chave da IA..." class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-mono outline-none focus:border-amber-500">
-                </div>
-            </div>
-
-            <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-700">
-                <button type="button" onclick="fecharModalChaveIa()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Fechar</button>
-                <button type="button" onclick="salvarChaveIaModal()" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2 rounded-xl text-xs font-black transition shadow-md flex items-center gap-1.5"><span>💾</span> Salvar Chave</button>
-            </div>
-        </div>
+    <div id="aba-nota" class="p-5 space-y-3 hidden">
+      <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
+        <div><label class="lbl">Data</label><input type="date" id="nData" class="inp"></div>
+        <div><label class="lbl text-rose-600">Solicitante (*)</label><input id="nSol" data-sol class="inp up falta"></div>
+        <div><label class="lbl">Fornecedor</label><input id="nLocal" class="inp up"></div>
+        <div><label class="lbl">Projeto</label><input id="nProj" class="inp up"></div>
+      </div>
+      <div class="flex flex-wrap items-center justify-between gap-2">
+        <label class="lbl !mb-0">Cole o texto da nota (descrição, depois qtd, unitário e total)</label>
+        <label class="btn bg-purple-600 text-white">📤 Abrir arquivo .txt<input type="file" id="fNota" accept=".txt,.csv" class="hidden"></label>
+      </div>
+      <textarea id="nTexto" rows="6" class="inp font-mono" placeholder="VENTILADOR 200X200&#10;24.07.01.082 540SUN 1 585,28 585,28"></textarea>
+      <p class="text-[11px] text-slate-500">PDF e imagem não são lidos automaticamente: copie o texto da nota e cole acima.</p>
+      <div class="flex justify-end"><button id="bNota" class="btn bg-purple-600 text-white !px-8 !py-3">⚡ Processar e agrupar</button></div>
     </div>
 
-    <!-- MODAL DE EDIÇÃO (CANETA ✏️) -->
-    <div id="modalEdicao" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 w-full max-w-xl rounded-2xl p-5 shadow-2xl space-y-4">
-            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-3">
-                <h3 class="text-xs sm:text-sm font-black text-indigo-600 dark:text-indigo-400 uppercase flex items-center gap-1.5">
-                    <span>✏️</span> Editar Registo de Compra & Entregas
-                </h3>
-                <button onclick="fecharModalEdicao()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 font-black text-sm">✕</button>
-            </div>
-
-            <input type="hidden" id="editItemIndex">
-            <input type="hidden" id="editSubItemIndex">
-            <input type="hidden" id="editItemId">
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-                <div id="campoDataEditContainer">
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Data da Compra</label>
-                    <input type="date" id="editData" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none">
-                </div>
-                <div>
-                    <div class="flex justify-between items-center mb-1">
-                        <label class="block text-[10px] font-bold text-slate-400 uppercase">Solicitante</label>
-                        <span id="avisoEditSolicitante" class="text-[9px] font-black text-rose-500 hidden animate-pulse">OBRIGATÓRIO</span>
-                    </div>
-                    <input type="text" id="editSolicitante" oninput="validarInputEditSolicitante(this)" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                </div>
-                <div class="sm:col-span-2">
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Produto / Descrição</label>
-                    <input type="text" id="editProduto" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                </div>
-                <div class="sm:col-span-2" id="campoLocalEditContainer">
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Local / Fornecedor</label>
-                    <input type="text" id="editLocal" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                </div>
-                <div class="sm:col-span-2" id="campoProjetoEditContainer">
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Projeto</label>
-                    <input type="text" id="editProjeto" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Quantidade de Itens</label>
-                    <input type="number" id="editQtd" min="1" oninput="calcularModalPorTotal()" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                </div>
-
-                <div>
-                    <label class="block text-[10px] font-bold text-emerald-600 dark:text-emerald-400 uppercase mb-1">Valor Total (R$) 🔄</label>
-                    <input type="number" step="0.01" id="editTotal" oninput="calcularModalPorTotal()" class="w-full p-2 bg-emerald-50/50 dark:bg-emerald-950/20 border border-emerald-300 dark:border-emerald-700 rounded-xl font-black text-emerald-600 dark:text-emerald-400 outline-none">
-                </div>
-
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Unitário Calculado (R$)</label>
-                    <input type="number" step="0.01" id="editUnit" oninput="calcularModalPorUnitario()" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                </div>
-
-                <div class="sm:col-span-2 bg-slate-100 dark:bg-slate-900/60 p-3 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2" id="campoEntregaEditContainer">
-                    <div class="flex items-center justify-between">
-                        <label class="flex items-center gap-2 cursor-pointer">
-                            <input type="checkbox" id="editEntregue" onchange="toggleDataEntregaModal(this.checked)" class="w-4 h-4 text-indigo-600 rounded">
-                            <span class="font-bold text-slate-800 dark:text-slate-200 uppercase">📦 Produto Entregue?</span>
-                        </label>
-                        <button type="button" onclick="preencherDataHojeModal()" class="text-[10px] text-indigo-600 dark:text-indigo-400 font-bold hover:underline">📆 Marcar Hoje</button>
-                    </div>
-                    <div id="containerDataEntrega" class="hidden pt-1">
-                        <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Dia da Entrega:</label>
-                        <input type="date" id="editDataEntrega" class="w-full p-1.5 bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-600 rounded-lg dark:text-white font-bold">
-                    </div>
-                </div>
-
-                <div class="sm:col-span-2" id="campoLinkEditContainer">
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Link do Produto (Opcional)</label>
-                    <input type="text" id="editLink" placeholder="https://..." class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none">
-                </div>
-            </div>
-
-            <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-700">
-                <button type="button" onclick="fecharModalEdicao()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 transition">Cancelar</button>
-                <button type="button" onclick="guardarEdicaoModal()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-xl text-xs font-black transition shadow-md flex items-center gap-1.5"><span>💾</span> Salvar Alterações</button>
-            </div>
-        </div>
+    <div id="aba-link" class="p-5 space-y-3 hidden">
+      <label class="lbl">Um link ou mensagem por linha (Mercado Livre, Amazon, Teams, WhatsApp...)</label>
+      <textarea id="lTexto" rows="4" class="inp" placeholder="https://produto.mercadolivre.com.br/..."></textarea>
+      <div class="flex justify-between gap-2">
+        <button id="bColar" class="btn bg-slate-100 dark:bg-slate-700">📋 Colar da área de transferência</button>
+        <button id="bLink" class="btn bg-blue-600 text-white">⚡ Reconhecer</button>
+      </div>
     </div>
+  </section>
 
-    <script>
-        const SUPABASE_URL = "https://gloxtswcksbczinpwtzu.supabase.co";
-        const SUPABASE_KEY = "sb_publishable_0kEiqthWKZZwjM120wQIYw_Hba7qeLc";
+  <!-- PENDENTES -->
+  <section id="boxPend" class="space-y-3 hidden">
+    <div class="flex justify-between items-center">
+      <h3 id="tPend" class="text-xs font-black uppercase text-indigo-700 dark:text-indigo-300"></h3>
+      <button id="bTodos" class="btn bg-emerald-600 text-white !text-[11px]">⚡ Confirmar todos e salvar</button>
+    </div>
+    <div id="listaPend" class="space-y-3"></div>
+  </section>
 
-        let compras = [];
-        let itensPendentesAprovacao = [];
-        let supabaseClient = null;
-        let solicitanteFiltroAtual = "";
-        let itensExpandidos = {};
+  <!-- FILTROS -->
+  <div class="card !p-3 grid grid-cols-1 sm:grid-cols-4 gap-2">
+    <input id="fBusca" class="inp up" placeholder="🔍 Produto, local ou pessoa">
+    <input id="fValor" type="number" step="0.01" class="inp" placeholder="💲 Valor exato (R$)">
+    <select id="fSol" class="inp"><option value="">Todos os solicitantes</option></select>
+    <select id="fEntrega" class="inp"><option value="">Todas as entregas</option><option value="p">Pendentes</option><option value="e">Entregues</option></select>
+  </div>
 
-        window.addEventListener('DOMContentLoaded', () => {
-            const hoje = new Date().toISOString().split('T')[0];
-            const dataManual = document.getElementById('manualData');
-            if (dataManual) {
-                dataManual.value = hoje;
-                atualizarDataEntregaManualDefaultGeral(hoje);
-            }
-            document.getElementById('blocoData').value = hoje;
+  <!-- TABELA -->
+  <section class="card space-y-3">
+    <div class="flex justify-between items-center">
+      <h3 class="text-xs font-bold uppercase">📋 Histórico de compras</h3>
+      <span id="contador" class="text-[11px] text-slate-400 font-bold"></span>
+    </div>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-xs">
+        <thead><tr class="border-b border-slate-100 dark:border-slate-700 text-slate-400 font-bold uppercase text-[10px]">
+          <th class="p-2">Data</th><th class="p-2">Solicitante</th><th class="p-2">Produto</th><th class="p-2">Local</th><th class="p-2">Projeto</th>
+          <th class="p-2 text-center">Qtd</th><th class="p-2 text-right">Unit.</th><th class="p-2 text-right">Total</th><th class="p-2 text-center">Entrega</th><th class="p-2 text-center">Link</th><th class="p-2 text-center">Ações</th>
+        </tr></thead>
+        <tbody id="tbody" class="divide-y divide-slate-100 dark:divide-slate-700/60 uppercase"></tbody>
+      </table>
+    </div>
+  </section>
+</div>
 
-            const solManual = document.getElementById('manualSolicitante');
-            if (solManual) solManual.classList.add('piscar-solicitante-forte');
+<!-- MODAL EDIÇÃO -->
+<div id="modal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 hidden">
+  <div class="card w-full max-w-xl space-y-3 max-h-[92vh] overflow-y-auto">
+    <div class="flex justify-between"><h3 class="text-sm font-black uppercase text-indigo-600">✏️ Editar registro</h3><button id="eFechar" class="font-black" aria-label="Fechar">✕</button></div>
+    <input type="hidden" id="eId"><input type="hidden" id="eSub">
+    <div data-row class="grid grid-cols-2 gap-3">
+      <div id="eWData"><label class="lbl">Data</label><input type="date" id="eData" class="inp"></div>
+      <div><label class="lbl">Solicitante</label><input id="eSol" class="inp up"></div>
+      <div class="col-span-2"><label class="lbl">Produto</label><input id="eProd" class="inp up"></div>
+      <div class="col-span-2 e-main"><label class="lbl">Local</label><input id="eLocal" class="inp up"></div>
+      <div class="col-span-2 e-main"><label class="lbl">Projeto</label><input id="eProj" class="inp up"></div>
+      <div><label class="lbl">Qtd</label><input type="number" min="1" id="eQtd" data-f="qtd" class="inp"></div>
+      <div><label class="lbl">Total (R$)</label><input type="number" step="0.01" id="eTotal" data-f="total" class="inp"></div>
+      <div class="col-span-2"><label class="lbl">Unitário (R$)</label><input type="number" step="0.01" id="eUnit" data-f="unit" class="inp"></div>
+      <div class="col-span-2 e-main flex items-center gap-3">
+        <label class="flex items-center gap-2 text-xs font-bold"><input type="checkbox" id="eEnt"> Entregue</label>
+        <input type="date" id="eEntData" class="inp !w-auto">
+      </div>
+      <div class="col-span-2 e-main"><label class="lbl">Link</label><input id="eLink" class="inp" placeholder="https://..."></div>
+    </div>
+    <div class="flex justify-end gap-2"><button id="eCancel" class="btn bg-slate-100 dark:bg-slate-700">Cancelar</button><button id="eSalvar" class="btn bg-indigo-600 text-white">💾 Salvar alterações</button></div>
+  </div>
+</div>
 
-            carregarDoLocalStorage();
+<script>
+const SB_URL = "https://gloxtswcksbczinpwtzu.supabase.co";
+const SB_KEY = "sb_publishable_0kEiqthWKZZwjM120wQIYw_Hba7qeLc";
+const T = 'compras_corporativas', LS = 'compras_corporativas_base';
+let compras = [], pend = [], sb = null, exp = {};
 
-            if (window.supabase) {
-                try {
-                    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                    carregarDoSupabase();
-                } catch(e) {
-                    console.warn("Modo local ativo");
-                }
-            }
+/* ---------- utilitários ---------- */
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const iso = d => { d = new Date(d); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); };
+const hoje = () => iso(new Date());
+const maisDias = (s, n) => { const d = new Date(s + 'T00:00:00'); d.setDate(d.getDate() + n); return iso(d); };
+const fd = s => { const p = (s || '').split('-'); return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : (s || ''); };
+const brl = n => 'R$ ' + Number(n || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+const pbr = s => parseFloat(String(s).replace(/\./g, '').replace(',', '.')) || 0;
+const up = v => String(v || '').trim().toUpperCase();
+const isLocal = id => Number(id) > 1e12;
+const novoId = () => Date.now() + Math.floor(Math.random() * 1000);
+const urlOk = u => /^https?:\/\//i.test(u || '');
+const chaveDup = i => [up(i.solicitante), up(i.produto), Number(i.total || 0).toFixed(2), Number(i.qtd || 1)].join('_');
+
+function toast(m, erro) {
+  const t = $('toast'); t.textContent = m;
+  t.className = t.className.replace(/bg-\S+/, erro ? 'bg-rose-700' : 'bg-slate-900') + ' opacity-100';
+  clearTimeout(t._h); t._h = setTimeout(() => t.classList.replace('opacity-100', 'opacity-0'), 3500);
+}
+function status(ok) {
+  $('badgeNuvem').textContent = ok ? '● Nuvem conectada' : '⚠️ Offline: dados locais';
+  $('badgeNuvem').className = 'font-bold ml-1 ' + (ok ? 'text-emerald-600' : 'text-amber-600');
+}
+const salvarLocal = () => localStorage.setItem(LS, JSON.stringify(compras));
+
+/* ---------- Supabase ---------- */
+const payload = i => ({ data: i.data, solicitante: i.solicitante, produto: i.produto, local: i.local || '', projeto: i.projeto || '',
+  qtd: i.qtd, unit: i.unit, total: i.total, link: i.link || '', entregue: !!i.entregue, data_entrega: i.data_entrega || '', sub_itens: i.sub_itens || [] });
+
+async function persistir(item) {
+  salvarLocal();
+  if (!sb) return false;
+  try {
+    if (isLocal(item.id)) {
+      const { data, error } = await sb.from(T).insert([payload(item)]).select();
+      if (error) throw error;
+      item.id = data[0].id;                       // adota o ID real da nuvem
+    } else {
+      const { error } = await sb.from(T).update(payload(item)).eq('id', item.id);
+      if (error) throw error;
+    }
+    salvarLocal(); status(true); render(); return true;
+  } catch (e) {
+    console.warn(e); status(false);
+    toast('Salvo só neste aparelho. Use "Salvar tudo" para reenviar.', true); return false;
+  }
+}
+
+async function carregar(silencioso) {
+  if (!sb) return;
+  try {
+    const { data, error } = await sb.from(T).select('*').order('id', { ascending: false });
+    if (error) throw error;
+    compras = [...compras.filter(c => isLocal(c.id)), ...data];   // preserva o que ainda não subiu
+    salvarLocal(); status(true); render();
+    if (!silencioso) toast('✅ Sincronizado com a nuvem!');
+  } catch (e) { console.warn(e); status(false); if (!silencioso) toast('Sem conexão com a nuvem.', true); }
+}
+
+async function salvarTudo() {
+  if (!sb) return toast('Nuvem indisponível.', true);
+  const pendentes = compras.filter(c => isLocal(c.id));
+  let ok = 0;
+  for (const c of pendentes) if (await persistir(c)) ok++;
+  toast(pendentes.length ? `💾 ${ok}/${pendentes.length} registro(s) enviados.` : '✅ Tudo já está na nuvem.');
+}
+
+/* ---------- Linhas de item (manual, pendentes, edição) ---------- */
+const rowHTML = (v = {}, remover = false) => `
+  <div data-row class="grid grid-cols-2 sm:grid-cols-12 gap-2 items-end p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/40">
+    <div class="col-span-2 sm:col-span-4"><label class="lbl">Produto / serviço</label><input data-f="prod" class="inp up" value="${esc(v.produto)}"></div>
+    <div class="col-span-2 sm:col-span-3"><label class="lbl">Projeto</label><input data-f="proj" class="inp up" value="${esc(v.projeto)}"></div>
+    <div class="sm:col-span-1"><label class="lbl">Qtd</label><input data-f="qtd" type="number" min="1" class="inp text-center" value="${v.qtd || 1}"></div>
+    <div class="sm:col-span-2"><label class="lbl text-emerald-600">Total (R$)</label><input data-f="total" type="number" step="0.01" class="inp" value="${v.total || ''}"></div>
+    <div class="sm:col-span-2"><label class="lbl">Unitário</label><input data-f="unit" type="number" step="0.01" class="inp" value="${v.unit || ''}"></div>
+    ${remover ? '<button data-rm class="col-span-2 sm:col-span-12 text-[10px] text-rose-600 font-bold text-right">✕ Remover item</button>' : ''}
+  </div>`;
+
+// Cálculo automático total <-> unitário em qualquer linha [data-row]
+document.addEventListener('input', e => {
+  const f = e.target.dataset.f;
+  if (e.target.hasAttribute('data-sol')) e.target.classList.toggle('falta', !e.target.value.trim());
+  if (!['qtd', 'total', 'unit'].includes(f)) return;
+  const r = e.target.closest('[data-row]'); if (!r) return;
+  const g = k => parseFloat(r.querySelector(`[data-f=${k}]`).value) || 0;
+  const s = (k, v) => r.querySelector(`[data-f=${k}]`).value = v > 0 ? v.toFixed(2) : '';
+  const q = g('qtd') || 1;
+  f === 'unit' ? s('total', q * g('unit')) : s('unit', g('total') / q);
+});
+
+function lerLinhas(cont) {
+  const itens = [];
+  for (const r of cont.querySelectorAll('[data-row]')) {
+    const g = k => r.querySelector(`[data-f=${k}]`).value;
+    const qtd = parseFloat(g('qtd')) || 1;
+    let total = parseFloat(g('total')) || 0, unit = parseFloat(g('unit')) || 0;
+    if (!total) total = qtd * unit; if (!unit) unit = total / qtd;
+    const produto = up(g('prod'));
+    if (!produto || total <= 0) { toast('Informe produto e valor em todos os itens.', true); return null; }
+    itens.push({ produto, projeto: up(g('proj')), qtd, unit, total });
+  }
+  return itens;
+}
+
+function montarCompra(base, subs) {
+  const total = subs.reduce((a, s) => a + s.total, 0), qtd = subs.reduce((a, s) => a + s.qtd, 0);
+  const proj = [...new Set(subs.map(s => s.projeto).filter(Boolean))].join(' / ');
+  const comum = { id: novoId(), link: '', entregue: false, data_entrega: '', ...base, projeto: base.projeto || proj };
+  return subs.length === 1
+    ? { ...comum, produto: subs[0].produto, qtd, unit: subs[0].unit, total, sub_itens: [] }
+    : { ...comum, produto: `COMPRA AGRUPADA (${subs.length} ITENS)`, qtd, unit: qtd ? total / qtd : 0, total, sub_itens: subs };
+}
+
+async function adicionar(compra, msg) {
+  compras.unshift(compra); salvarLocal(); render(); toast(msg);
+  await persistir(compra);
+}
+
+/* ---------- Entrada manual ---------- */
+function resetManual() {
+  $('mRows').innerHTML = rowHTML();
+  $('mLocal').value = ''; $('mEntregue').checked = false;
+}
+async function lancarManual() {
+  const sol = up($('mSol').value);
+  if (!sol) { $('mSol').focus(); return toast('Preencha o solicitante.', true); }
+  const subs = lerLinhas($('mRows')); if (!subs) return;
+  const data = $('mData').value || hoje();
+  const entregue = $('mEntregue').checked;
+  await adicionar(montarCompra({ data, solicitante: sol, local: up($('mLocal').value) || 'NÃO INFORMADO', entregue, data_entrega: entregue ? maisDias(data, 10) : '' }, subs),
+    `✅ Compra salva (${subs.length} item(ns))!`);
+  resetManual();
+}
+
+/* ---------- Nota fiscal ---------- */
+function interpretarNota(texto) {
+  const subs = [], reNota = /(\d+(?:[.,]\d+)?)\s+(\d{1,3}(?:\.\d{3})*,\d{2})\s+(\d{1,3}(?:\.\d{3})*,\d{2})\s*$/;
+  const reSimples = /^(?:(\d+)\s*x?\s+)?(.+?)\s+(?:R\$\s*)?(\d{1,3}(?:\.\d{3})*,\d{2}|\d+\.\d{2})$/i;
+  let nome = '';
+  for (const l of texto.split('\n').map(l => l.trim()).filter(Boolean)) {
+    const m = l.match(reNota);
+    if (m) {
+      const desc = (nome ? nome + ' ' : '') + l.slice(0, m.index).replace(/^[\d.\-\/]+\s+\S*\s*/, '').trim();
+      subs.push({ produto: up(desc || nome || 'ITEM'), projeto: '', qtd: pbr(m[1]) || 1, unit: pbr(m[2]), total: pbr(m[3]) });
+      nome = ''; continue;
+    }
+    const s = l.match(reSimples);
+    if (s && !nome) {
+      const qtd = parseInt(s[1] || '1', 10), unit = s[3].includes(',') ? pbr(s[3]) : parseFloat(s[3]);
+      subs.push({ produto: up(s[2].replace(/[-–—]\s*$/, '')), projeto: '', qtd, unit, total: qtd * unit });
+    } else nome += (nome ? ' ' : '') + l;
+  }
+  return subs;
+}
+async function lancarNota() {
+  const sol = up($('nSol').value);
+  if (!sol) { $('nSol').focus(); return toast('Preencha o solicitante.', true); }
+  const subs = interpretarNota($('nTexto').value);
+  if (!subs.length) return toast('Não foi possível identificar itens e valores.', true);
+  await adicionar(montarCompra({ data: $('nData').value || hoje(), solicitante: sol, local: up($('nLocal').value) || 'NOTA FISCAL', projeto: up($('nProj').value) }, subs),
+    `✅ ${subs.length} item(ns) agrupados!`);
+  ['nTexto', 'nLocal', 'nProj', 'nSol'].forEach(i => $(i).value = ''); $('nSol').classList.add('falta');
+}
+
+/* ---------- Links / mensagens -> pendentes ---------- */
+const lojaPorLink = u => /mercadoli|mercadolv/i.test(u) ? 'MERCADO LIVRE' : /amazon/i.test(u) ? 'AMAZON' : /magazineluiza/i.test(u) ? 'MAGAZINE LUIZA' : /shopee/i.test(u) ? 'SHOPEE' : 'LOJA WEB';
+function nomePorLink(u) {
+  try {
+    const p = u.split(/[?#]/)[0].split('/').filter(Boolean).reverse().find(x => x.includes('-') && !/^MLB/i.test(x) && x.length > 4);
+    return p ? decodeURIComponent(p).replace(/-/g, ' ').toUpperCase() : '';
+  } catch { return ''; }
+}
+function reconhecer() {
+  const linhas = $('lTexto').value.split('\n').map(l => l.trim()).filter(Boolean);
+  if (!linhas.length) return toast('Cole ao menos um link ou mensagem.', true);
+  linhas.reverse().forEach(l => {
+    const u = (l.match(/https?:\/\/\S+/i) || [''])[0];
+    const sol = (l.match(/(?:solicitante|quem pediu|pediu|de|por)[:\s-]+([A-Za-zÀ-ÿ ]{2,25})/i) || [])[1];
+    pend.unshift({ tid: novoId() + Math.random(), data: hoje(), solicitante: up(sol), local: u ? lojaPorLink(u) : 'MERCADO LIVRE',
+      produto: nomePorLink(u) || up(l.replace(/https?:\/\/\S+/gi, '')) || 'PRODUTO', link: u, qtd: 1 });
+  });
+  $('lTexto').value = ''; renderPend(); toast(`⚡ ${linhas.length} item(ns) reconhecido(s). Confira e confirme.`);
+}
+function renderPend() {
+  $('boxPend').classList.toggle('hidden', !pend.length);
+  $('tPend').textContent = `📦 ${pend.length} item(ns) para conferir`;
+  $('listaPend').innerHTML = pend.map(p => `
+    <div class="card !border-purple-400 !border-2 space-y-2" data-tid="${p.tid}">
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+        <div><label class="lbl">Data</label><input type="date" data-h="data" class="inp" value="${esc(p.data)}"></div>
+        <div><label class="lbl text-rose-600">Solicitante (*)</label><input data-h="sol" data-sol class="inp up ${p.solicitante ? '' : 'falta'}" value="${esc(p.solicitante)}"></div>
+        <div><label class="lbl">Local</label><input data-h="local" class="inp up" value="${esc(p.local)}"></div>
+        <div class="flex items-end gap-2"><button data-ok class="btn bg-emerald-600 text-white flex-1">✅ OK</button><button data-del class="btn bg-slate-100 dark:bg-slate-700">✕</button></div>
+      </div>
+      ${rowHTML(p)}
+      <input type="hidden" data-h="link" value="${esc(p.link)}">
+    </div>`).join('');
+}
+async function confirmarPend(card) {
+  const h = k => card.querySelector(`[data-h=${k}]`).value;
+  const sol = up(h('sol'));
+  if (!sol) { card.querySelector('[data-h=sol]').focus(); toast('Preencha o solicitante.', true); return false; }
+  const subs = lerLinhas(card); if (!subs) return false;
+  const c = montarCompra({ data: h('data') || hoje(), solicitante: sol, local: up(h('local')), link: h('link') }, subs);
+  pend = pend.filter(p => String(p.tid) !== card.dataset.tid);
+  compras.unshift(c); salvarLocal(); renderPend(); render();
+  await persistir(c); return true;
+}
+
+/* ---------- Edição ---------- */
+function abrirEdicao(id, sub) {
+  const it = compras.find(c => String(c.id) === String(id)); if (!it) return;
+  const alvo = sub !== '' ? it.sub_itens[sub] : it;
+  $('eId').value = id; $('eSub').value = sub;
+  document.querySelectorAll('.e-main, #eWData').forEach(e => e.style.display = sub !== '' ? 'none' : '');
+  $('eData').value = it.data || ''; $('eSol').value = it.solicitante || ''; $('eProd').value = alvo.produto || '';
+  $('eLocal').value = it.local || ''; $('eProj').value = it.projeto || '';
+  $('eQtd').value = alvo.qtd || 1; $('eTotal').value = Number(alvo.total || 0).toFixed(2); $('eUnit').value = Number(alvo.unit || 0).toFixed(2);
+  $('eEnt').checked = !!it.entregue; $('eEntData').value = it.data_entrega || ''; $('eLink').value = it.link || '';
+  $('modal').classList.remove('hidden');
+}
+async function salvarEdicao() {
+  const it = compras.find(c => String(c.id) === $('eId').value), sub = $('eSub').value;
+  const sol = up($('eSol').value); if (!it || !sol) return toast('Informe o solicitante.', true);
+  const campos = { produto: up($('eProd').value), qtd: parseFloat($('eQtd').value) || 1, unit: parseFloat($('eUnit').value) || 0, total: parseFloat($('eTotal').value) || 0 };
+  it.solicitante = sol;
+  if (sub !== '') {
+    Object.assign(it.sub_itens[sub], campos);
+    it.total = it.sub_itens.reduce((a, s) => a + Number(s.total || 0), 0);
+    it.qtd = it.sub_itens.reduce((a, s) => a + Number(s.qtd || 1), 0);
+    it.unit = it.qtd ? it.total / it.qtd : 0;
+  } else {
+    Object.assign(it, campos, { data: $('eData').value, local: up($('eLocal').value), projeto: up($('eProj').value), link: $('eLink').value.trim(),
+      entregue: $('eEnt').checked, data_entrega: $('eEnt').checked ? ($('eEntData').value || maisDias(it.data, 10)) : '' });
+  }
+  $('modal').classList.add('hidden'); render(); await persistir(it);
+}
+
+/* ---------- Render ---------- */
+function filtrar() {
+  const q = up($('fBusca').value), v = parseFloat($('fValor').value), s = $('fSol').value, e = $('fEntrega').value;
+  return compras.filter(i =>
+    (!s || up(i.solicitante) === s) &&
+    (!e || (e === 'e') === !!i.entregue) &&
+    (!q || [i.produto, i.local, i.solicitante].some(x => up(x).includes(q)) || (i.sub_itens || []).some(x => up(x.produto).includes(q))) &&
+    (!(v > 0) || [i.total, i.unit, ...(i.sub_itens || []).map(x => x.total)].some(x => Number(x) === v))
+  ).sort((a, b) => (!!a.entregue === !!b.entregue) ? new Date(b.data) - new Date(a.data) : a.entregue ? 1 : -1);
+}
+
+function render() {
+  const lista = filtrar(), cont = {}, dups = {};
+  compras.forEach(i => dups[chaveDup(i)] = (dups[chaveDup(i)] || 0) + 1);
+
+  $('tbody').innerHTML = lista.length ? lista.map(i => {
+    const subs = i.sub_itens || [], aberto = !!exp[i.id], dup = dups[chaveDup(i)] > 1;
+    cont[i.solicitante] = (cont[i.solicitante] || 0) + 1;
+    let h = `<tr class="${i.entregue ? 'opacity-60' : ''}" data-id="${esc(i.id)}">
+      <td class="p-2 whitespace-nowrap">${fd(i.data)}</td>
+      <td class="p-2 font-bold whitespace-nowrap">${esc(i.solicitante)}</td>
+      <td class="p-2 max-w-xs"><div class="flex items-center gap-2">${subs.length ? `<button data-a="exp" class="bg-indigo-100 dark:bg-indigo-900 px-1.5 rounded text-[10px] font-black">${aberto ? '➖' : '➕'}</button>` : ''}
+        <span class="truncate ${i.entregue ? 'line-through' : ''}">${esc(i.produto)}</span>${dup ? '<span class="text-[9px] font-black bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded">⚠ POSSÍVEL DUPLICADA</span>' : ''}</div></td>
+      <td class="p-2 text-indigo-700 dark:text-indigo-300 whitespace-nowrap">${esc(i.local || '-')}</td>
+      <td class="p-2 whitespace-nowrap">${esc(i.projeto || '-')}</td>
+      <td class="p-2 text-center font-bold">${esc(i.qtd)}</td>
+      <td class="p-2 text-right whitespace-nowrap">${brl(i.unit)}</td>
+      <td class="p-2 text-right font-black text-emerald-600 whitespace-nowrap">${brl(i.total)}</td>
+      <td class="p-2 text-center"><label class="flex items-center gap-1 justify-center"><input type="checkbox" data-a="ent" ${i.entregue ? 'checked' : ''}><span class="text-[10px] font-bold">Entregue</span></label>
+        <input type="date" data-a="entdata" value="${esc(i.data_entrega || '')}" class="text-[10px] p-1 border rounded dark:bg-slate-900 ${i.entregue ? '' : 'hidden'}"></td>
+      <td class="p-2 text-center">${urlOk(i.link) ? `<a href="${esc(i.link)}" target="_blank" rel="noopener noreferrer" class="text-blue-600 font-bold normal-case">Link ↗</a>` : '-'}</td>
+      <td class="p-2 text-center whitespace-nowrap"><button data-a="edit" title="Editar" class="p-1">✏️</button><button data-a="del" title="Excluir" class="p-1 text-rose-500 font-bold">✕</button></td></tr>`;
+    if (subs.length && aberto) h += subs.map((s, n) => `<tr class="bg-indigo-50/50 dark:bg-slate-900/40 text-[11px]" data-id="${esc(i.id)}">
+      <td class="p-2 text-right text-slate-400">↳</td><td colspan="2" class="p-2 pl-6 font-semibold">📌 ${n + 1}. ${esc(s.produto)}</td><td colspan="2"></td>
+      <td class="p-2 text-center font-bold">${esc(s.qtd)} un</td><td class="p-2 text-right">${brl(s.unit)}</td><td class="p-2 text-right font-bold text-emerald-600">${brl(s.total)}</td>
+      <td colspan="2" class="text-center"><button data-a="edit" data-sub="${n}" class="text-indigo-600 font-bold text-[10px]">✏️ Editar item</button></td><td></td></tr>`).join('');
+    return h;
+  }).join('') : '<tr><td colspan="11" class="text-center py-6 text-slate-400 italic normal-case">Nenhuma compra encontrada. Use as abas acima para lançar a primeira.</td></tr>';
+
+  $('cItens').textContent = lista.length;
+  $('contador').textContent = `${lista.length} DE ${compras.length} REGISTROS`;
+  $('cTotal').textContent = brl(lista.reduce((a, i) => a + Number(i.total || 0), 0));
+  const top = Object.entries(cont).sort((a, b) => b[1] - a[1])[0];
+  $('cTop').textContent = top ? `${top[0]} (${top[1]})` : '—';
+
+  const pessoas = {};
+  compras.forEach(i => { const n = up(i.solicitante) || 'OUTROS'; (pessoas[n] ??= { q: 0, v: 0 }); pessoas[n].q += Number(i.qtd || 1); pessoas[n].v += Number(i.total || 0); });
+  const nomes = Object.keys(pessoas).sort(), sel = $('fSol'), atual = sel.value;
+  sel.innerHTML = '<option value="">Todos os solicitantes</option>' + nomes.map(n => `<option>${esc(n)}</option>`).join('');
+  sel.value = nomes.includes(atual) ? atual : '';
+  $('cardsPessoas').innerHTML = nomes.map(n => `<button data-p="${esc(n)}" class="card !p-2.5 text-left hover:border-indigo-400 ${sel.value === n ? '!border-indigo-500' : ''}">
+    <span class="text-[10px] font-black uppercase block truncate">👤 ${esc(n)}</span>
+    <span class="flex justify-between text-[11px] font-black mt-1"><span class="text-indigo-600">${pessoas[n].q} un</span><span class="text-emerald-600">${brl(pessoas[n].v)}</span></span></button>`).join('');
+}
+
+/* ---------- Arquivos ---------- */
+function csvLinha(l) {
+  const r = []; let c = '', q = false;
+  for (let i = 0; i < l.length; i++) {
+    const ch = l[i];
+    if (ch === '"') { if (q && l[i + 1] === '"') { c += '"'; i++; } else q = !q; }
+    else if (ch === ';' && !q) { r.push(c); c = ''; } else c += ch;
+  }
+  return r.concat(c);
+}
+const csvCel = v => { v = String(v ?? ''); if (/^[=+\-@]/.test(v)) v = "'" + v; return '"' + v.replace(/"/g, '""') + '"'; };
+
+function exportarCSV() {
+  const lista = filtrar(); if (!lista.length) return toast('Nada para exportar.', true);
+  const num = n => Number(n || 0).toFixed(2).replace('.', ',');
+  let csv = "\uFEFFDATA;SOLICITANTE;PRODUTO/SERVIÇO;LOCAL/FORNECEDOR;PROJETO;QUANTIDADE;VALOR UNITÁRIO (R$);TOTAL (R$);ENTREGUE;DATA ENTREGA;LINK\n";
+  lista.forEach(i => csv += [fd(i.data), csvCel(i.solicitante), csvCel(i.produto), csvCel(i.local), csvCel(i.projeto), i.qtd, num(i.unit), num(i.total), i.entregue ? 'SIM' : 'NÃO', fd(i.data_entrega), csvCel(i.link)].join(';') + '\n');
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([csv], { type: 'text/csv;charset=utf-8;' })), download: `Relatorio_Compras_Cartao_${hoje()}.csv` });
+  a.click(); URL.revokeObjectURL(a.href); toast(`📥 CSV com ${lista.length} registro(s).`);
+}
+
+function importar(input) {
+  const arq = input.files[0]; if (!arq) return;
+  const rd = new FileReader();
+  rd.onload = e => {
+    try {
+      let novos = [];
+      if (/\.json$/i.test(arq.name)) {
+        const d = JSON.parse(e.target.result);
+        if (!Array.isArray(d)) throw new Error('O JSON precisa ser uma lista de compras.');
+        novos = d.map(i => ({ ...i, sub_itens: i.sub_itens || [] }));
+      } else {
+        e.target.result.replace(/^\uFEFF/, '').split(/\r?\n/).slice(1).filter(l => l.trim()).forEach(l => {
+          const c = csvLinha(l); if (c.length < 8) return;
+          const dt = c[0].split('/').reverse().join('-');
+          novos.push({ data: dt.length === 10 ? dt : hoje(), solicitante: up(c[1]), produto: up(c[2]), local: up(c[3]), projeto: up(c[4]), qtd: parseFloat(c[5]) || 1,
+            unit: pbr(c[6]), total: pbr(c[7]), entregue: up(c[8]) === 'SIM', data_entrega: c[9] ? c[9].split('/').reverse().join('-') : '', link: c[10] || '', sub_itens: [] });
         });
-
-        function mudarAbaEntrada(aba) {
-            ['manual', 'bloco', 'link', 'foto', 'texto'].forEach(id => {
-                const elAba = document.getElementById(`aba-${id}`);
-                const elBtn = document.getElementById(`tabBtn-${id}`);
-                if (id === aba) {
-                    elAba.classList.remove('hidden');
-                    elBtn.className = "flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs font-black transition flex items-center justify-center gap-1.5 bg-white dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 shadow-sm border border-slate-200 dark:border-slate-700";
-                } else {
-                    elAba.classList.add('hidden');
-                    elBtn.className = "flex-1 min-w-[110px] py-2.5 px-4 rounded-xl text-xs font-bold transition flex items-center justify-center gap-1.5 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200";
-                }
-            });
-        }
-
-        function mostrarAviso(msg, tipo = "sucesso") {
-            const el = document.getElementById('alertaSistema');
-            el.innerText = msg;
-            el.classList.remove('hidden', 'bg-emerald-100', 'text-emerald-800', 'bg-rose-100', 'text-rose-800');
-            if (tipo === "sucesso") {
-                el.classList.add('bg-emerald-100', 'text-emerald-800');
-            } else {
-                el.classList.add('bg-rose-100', 'text-rose-800');
-            }
-            setTimeout(() => el.classList.add('hidden'), 4000);
-        }
-
-        // ADICIONAR SUB-LINHA (ITENS) DENTRO DA MESMA COMPRA MANUAL
-        function adicionarSubLinhaManual() {
-            const container = document.getElementById('containerSubLinhasManuais');
-            const primeiraLinha = container.querySelector('.sub-linha-manual');
-            const novaLinha = primeiraLinha.cloneNode(true);
-            
-            novaLinha.querySelector('.subProduto').value = '';
-            novaLinha.querySelector('.subProjeto').value = '';
-            novaLinha.querySelector('.subTotal').value = '';
-            novaLinha.querySelector('.subUnit').value = '';
-            novaLinha.querySelector('.subQtd').value = '1';
-
-            if (!novaLinha.querySelector('.btnRemoverSubLinha')) {
-                const btnRemover = document.createElement('button');
-                btnRemover.type = 'button';
-                btnRemover.className = 'btnRemoverSubLinha absolute top-2 right-2 bg-rose-100 text-rose-600 hover:bg-rose-200 text-[10px] font-black px-2 py-0.5 rounded';
-                btnRemover.innerHTML = '✕ Remover Item';
-                btnRemover.onclick = () => novaLinha.remove();
-                novaLinha.appendChild(btnRemover);
-            }
-
-            container.appendChild(novaLinha);
-            novaLinha.querySelector('.subProduto').focus();
-        }
-
-        function calcularSubManualPorTotal(inputElem) {
-            const linha = inputElem.closest('.sub-linha-manual');
-            const qtd = parseFloat(linha.querySelector('.subQtd').value) || 1;
-            const total = parseFloat(linha.querySelector('.subTotal').value) || 0;
-            const unit = (total / qtd).toFixed(2);
-            linha.querySelector('.subUnit').value = unit > 0 ? unit : '';
-        }
-
-        function calcularSubManualPorUnitario(inputElem) {
-            const linha = inputElem.closest('.sub-linha-manual');
-            const qtd = parseFloat(linha.querySelector('.subQtd').value) || 1;
-            const unit = parseFloat(linha.querySelector('.subUnit').value) || 0;
-            const total = (qtd * unit).toFixed(2);
-            linha.querySelector('.subTotal').value = total > 0 ? total : '';
-        }
-
-        function validarInputManualSolicitante(input) {
-            input.value = input.value.toUpperCase();
-            const val = input.value.trim();
-            const aviso = document.getElementById('avisoManualSolicitante');
-            if (val === "" || val === "NÃO INFORMADO" || val === "NAO INFORMADO") {
-                input.classList.add('piscar-solicitante-forte');
-                if (aviso) aviso.classList.remove('hidden');
-            } else {
-                input.classList.remove('piscar-solicitante-forte');
-                if (aviso) aviso.classList.add('hidden');
-            }
-        }
-
-        function validarInputBlocoSolicitante(input) {
-            input.value = input.value.toUpperCase();
-            const val = input.value.trim();
-            const aviso = document.getElementById('avisoBlocoSolicitante');
-            if (val === "" || val === "NÃO INFORMADO" || val === "NAO INFORMADO") {
-                input.classList.add('piscar-solicitante-forte');
-                if (aviso) aviso.classList.remove('hidden');
-            } else {
-                input.classList.remove('piscar-solicitante-forte');
-                if (aviso) aviso.classList.add('hidden');
-            }
-        }
-
-        function atualizarDataEntregaManualDefaultGeral(dataCompraStr) {
-            const dataEntregaEl = document.getElementById('manualDataEntregaGeral');
-            if (!dataEntregaEl) return;
-            let d = new Date(dataCompraStr + 'T00:00:00');
-            d.setDate(d.getDate() + 10);
-            dataEntregaEl.value = d.toISOString().split('T')[0];
-        }
-
-        function toggleManualDataEntregaGeral(isChecked) {
-            const el = document.getElementById('manualDataEntregaGeral');
-            if (!el) return;
-            if (isChecked) {
-                el.classList.remove('hidden');
-                atualizarDataEntregaManualDefaultGeral(document.getElementById('manualData').value);
-            } else {
-                el.classList.add('hidden');
-                el.value = '';
-            }
-        }
-
-        async function lancarCompraManualAgrupada() {
-            const inputSol = document.getElementById('manualSolicitante');
-            const solicitante = inputSol.value.trim().toUpperCase();
-
-            if (!solicitante || solicitante === "NÃO INFORMADO" || solicitante === "NAO INFORMADO") {
-                inputSol.classList.add('piscar-solicitante-forte');
-                inputSol.focus();
-                alert("⚠️ ATENÇÃO: Por favor, preencha quem é o SOLICITANTE!");
-                return;
-            }
-
-            const subLinhas = document.querySelectorAll('.sub-linha-manual');
-            let subItens = [];
-            let somaTotalGeral = 0;
-            let somaQtdGeral = 0;
-
-            for (let linha of subLinhas) {
-                const produto = linha.querySelector('.subProduto').value.trim().toUpperCase();
-                if (!produto) {
-                    alert("⚠️ Por favor, preencha o nome do produto/serviço em todos os itens!");
-                    linha.querySelector('.subProduto').focus();
-                    return;
-                }
-
-                const total = parseFloat(linha.querySelector('.subTotal').value) || 0;
-                const unit = parseFloat(linha.querySelector('.subUnit').value) || 0;
-                if (total <= 0 && unit <= 0) {
-                    alert("⚠️ Por favor, informe o Valor Total ou Unitário em todos os itens!");
-                    linha.querySelector('.subTotal').focus();
-                    return;
-                }
-
-                const qtd = parseFloat(linha.querySelector('.subQtd').value) || 1;
-                const itemTotal = total > 0 ? total : (qtd * unit);
-                const itemUnit = unit > 0 ? unit : (itemTotal / qtd);
-
-                somaTotalGeral += itemTotal;
-                somaQtdGeral += qtd;
-
-                subItens.push({
-                    produto: produto,
-                    qtd: qtd,
-                    unit: itemUnit,
-                    total: itemTotal
-                });
-            }
-
-            if (subItens.length === 0) {
-                alert("⚠️ Adicione pelo menos um item!");
-                return;
-            }
-
-            const data = document.getElementById('manualData').value || new Date().toISOString().split('T')[0];
-            const local = document.getElementById('manualLocalGeral').value.trim().toUpperCase() || "NÃO INFORMADO";
-            const entregue = document.getElementById('manualEntregueGeral').checked;
-            const dataEntrega = entregue ? document.getElementById('manualDataEntregaGeral').value : "";
-
-            let novoItem = {};
-            if (subItens.length === 1) {
-                novoItem = {
-                    id: Date.now(),
-                    data: data,
-                    solicitante: solicitante,
-                    produto: subItens[0].produto,
-                    local: local,
-                    projeto: subLinhas[0].querySelector('.subProjeto').value.trim().toUpperCase() || "",
-                    qtd: subItens[0].qtd,
-                    unit: subItens[0].unit,
-                    total: subItens[0].total,
-                    link: "",
-                    entregue: entregue,
-                    data_entrega: dataEntrega,
-                    sub_itens: []
-                };
-            } else {
-                novoItem = {
-                    id: Date.now(),
-                    data: data,
-                    solicitante: solicitante,
-                    produto: `COMPRA AGRUPADA (${subItens.length} ITENS)`,
-                    local: local,
-                    projeto: "",
-                    qtd: somaQtdGeral,
-                    unit: somaQtdGeral > 0 ? (somaTotalGeral / somaQtdGeral) : 0,
-                    total: somaTotalGeral,
-                    link: "",
-                    entregue: entregue,
-                    data_entrega: dataEntrega,
-                    sub_itens: subItens
-                };
-            }
-
-            compras.unshift(novoItem);
-            salvarNoLocalStorage();
-            atualizarListaSelectSolicitantes();
-            renderizarTabela();
-            mostrarAviso(`✅ Compra salva com sucesso (${subItens.length} iten(s))!`);
-
-            inserirNoSupabase(novoItem);
-
-            // Reseta form
-            document.getElementById('containerSubLinhasManuais').innerHTML = `
-                <div class="grid grid-cols-1 sm:grid-cols-12 gap-2.5 items-end sub-linha-manual bg-slate-50 dark:bg-slate-900/40 p-3 rounded-xl border border-slate-200 dark:border-slate-700 relative">
-                    <div class="sm:col-span-4">
-                        <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Produto / Serviço</label>
-                        <input type="text" oninput="this.value = this.value.toUpperCase()" placeholder="EX: CHUMBADOR..." class="subProduto uppercase-input w-full text-xs p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold outline-none">
-                    </div>
-                    <div class="sm:col-span-3">
-                        <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Projeto</label>
-                        <input type="text" oninput="this.value = this.value.toUpperCase()" placeholder="PROJETO..." class="subProjeto uppercase-input w-full text-xs p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold outline-none">
-                    </div>
-                    <div class="sm:col-span-1">
-                        <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Qtd</label>
-                        <input type="number" value="1" min="1" oninput="calcularSubManualPorTotal(this)" class="subQtd w-full text-xs p-2 text-center font-bold bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white outline-none">
-                    </div>
-                    <div class="sm:col-span-2">
-                        <label class="block text-[9px] font-black text-emerald-600 uppercase mb-1">Total (R$) 🔄</label>
-                        <input type="number" step="0.01" placeholder="0,00" oninput="calcularSubManualPorTotal(this)" class="subTotal w-full text-xs p-2 bg-emerald-50/70 border border-emerald-400 rounded-lg font-black text-emerald-600 outline-none">
-                    </div>
-                    <div class="sm:col-span-2">
-                        <label class="block text-[9px] font-bold text-slate-400 uppercase mb-1">Unitário</label>
-                        <input type="number" step="0.01" placeholder="0,00" oninput="calcularSubManualPorUnitario(this)" class="subUnit w-full text-xs p-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold outline-none">
-                    </div>
-                </div>
-            `;
-            document.getElementById('manualLocalGeral').value = '';
-            document.getElementById('manualEntregueGeral').checked = false;
-            document.getElementById('manualDataEntregaGeral').classList.add('hidden');
-        }
-
-        // ================= UPLOAD E LEITURA INTELIGENTE DE NOTA FISCAL =================
-        function processarArquivoNotaFiscal(input) {
-            const arquivo = input.files[0];
-            if (!arquivo) return;
-
-            const leitor = new FileReader();
-            leitor.onload = function(e) {
-                document.getElementById('blocoTextoItens').value = `VENTILADOR 200X200X60MM 220VCA 50/60HZ ALTA VAZAO\n24.07.01.082 540SUN 1 585,28 585,28\nCORTINA DE SOLDA EM ARAMIDA 1,20 X 2,0MTS\n18.01.05.012 540SUN 1 1.140,50 1.140,50`;
-                mostrarAviso("📄 Nota fiscal lida com sucesso! Confira os dados e processe.");
-                input.value = '';
-            };
-            leitor.readAsText(arquivo, 'UTF-8');
-        }
-
-        function processarBlocoItens() {
-            const inputSol = document.getElementById('blocoSolicitante');
-            const solicitante = inputSol.value.trim().toUpperCase();
-            if (!solicitante || solicitante === "NÃO INFORMADO" || solicitante === "NAO INFORMADO") {
-                inputSol.classList.add('piscar-solicitante-forte');
-                document.getElementById('avisoBlocoSolicitante').classList.remove('hidden');
-                alert("⚠️ Por favor, informe o SOLICITANTE!");
-                inputSol.focus();
-                return;
-            }
-
-            const textoBruto = document.getElementById('blocoTextoItens').value.trim();
-            if (!textoBruto) {
-                alert("⚠️ Insira ou cole o texto da nota fiscal!");
-                document.getElementById('blocoTextoItens').focus();
-                return;
-            }
-
-            const linhasBrutas = textoBruto.split('\n');
-            let subItens = [];
-            let nomeProdutoAtual = "";
-            let somaTotalGeral = 0;
-            let somaQtdGeral = 0;
-
-            for (let i = 0; i < linhasBrutas.length; i++) {
-                let linha = linhasBrutas[i].trim();
-                if (!linha) continue;
-
-                const regexValoresFim = /(\d+[\.,]?\d*)\s+(\d+[\.,]\d{2})\s+(\d+[\.,]\d{2})/g;
-                let match = regexValoresFim.exec(linha);
-
-                if (match || (linha.includes(',') && /\d/.test(linha) && linha.length < 60)) {
-                    let partes = linha.split(/\s+/);
-                    let valorTotalItem = 0;
-                    let qtdItem = 1;
-
-                    for (let p = partes.length - 1; p >= 0; p--) {
-                        let token = partes[p].replace(',', '.');
-                        if (token.includes('.') && !isNaN(token)) {
-                            valorTotalItem = parseFloat(token) || 0;
-                            if (p > 0 && !isNaN(partes[p-1].replace(',', '.'))) {
-                                let potentialQtd = parseFloat(partes[p-1].replace(',', '.')) || 1;
-                                if (potentialQtd < 1000) qtdItem = potentialQtd;
-                            }
-                            break;
-                        }
-                    }
-
-                    if (valorTotalItem > 0) {
-                        let nomeFinal = nomeProdutoAtual ? `${nomeProdutoAtual} - ${linha}` : linha;
-                        nomeFinal = nomeFinal.replace(/^[\d\.\-\/]+\s+/, '').trim();
-
-                        somaTotalGeral += valorTotalItem;
-                        somaQtdGeral += qtdItem;
-
-                        subItens.push({
-                            produto: nomeFinal.toUpperCase() || "ITEM",
-                            qtd: qtdItem,
-                            unit: qtdItem > 0 ? (valorTotalItem / qtdItem) : valorTotalItem,
-                            total: valorTotalItem
-                        });
-
-                        nomeProdutoAtual = "";
-                        continue;
-                    }
-                }
-
-                if (nomeProdutoAtual) {
-                    nomeProdutoAtual += " " + linha;
-                } else {
-                    nomeProdutoAtual = linha;
-                }
-            }
-
-            if (subItens.length === 0) {
-                linhasBrutas.forEach(linha => {
-                    linha = linha.trim();
-                    if (!linha) return;
-                    let qtd = 1;
-                    let valorUnit = 0;
-                    let nomeItem = linha;
-
-                    const matchValor = linha.match(/(?:R\$)?\s*(\d+[\.,]?\d*)$/i) || linha.match(/(?:r\$)?\s*(\d+[\.,]\d{2})/i);
-                    if (matchValor) {
-                        valorUnit = parseFloat(matchValor[1].replace(',', '.')) || 0;
-                        nomeItem = linha.replace(matchValor[0], '').replace(/[-–—]/g, '').trim();
-                    }
-                    const matchQtd = nomeItem.match(/^(\d+)\s*(?:x|un|-|\b)/i);
-                    if (matchQtd) {
-                        qtd = parseInt(matchQtd[1], 10) || 1;
-                        nomeItem = nomeItem.replace(matchQtd[0], '').trim();
-                    }
-
-                    const totalItem = valorUnit > 0 ? (qtd * valorUnit) : 0;
-                    somaTotalGeral += totalItem;
-                    somaQtdGeral += qtd;
-
-                    subItens.push({
-                        produto: nomeItem.toUpperCase() || "ITEM",
-                        qtd: qtd,
-                        unit: valorUnit,
-                        total: totalItem
-                    });
-                });
-            }
-
-            if (subItens.length === 0) {
-                alert("Não foi possível identificar itens ou valores válidos.");
-                return;
-            }
-
-            const data = document.getElementById('blocoData').value || new Date().toISOString().split('T')[0];
-            const local = document.getElementById('blocoLocal').value.trim().toUpperCase() || "NOTA FISCAL";
-            const projeto = document.getElementById('blocoProjeto').value.trim().toUpperCase() || "";
-
-            const novoItem = {
-                id: Date.now(),
-                data: data,
-                solicitante: solicitante,
-                produto: `COMPRA AGRUPADA (${subItens.length} ITENS)`,
-                local: local,
-                projeto: projeto,
-                qtd: somaQtdGeral,
-                unit: somaQtdGeral > 0 ? (somaTotalGeral / somaQtdGeral) : 0,
-                total: somaTotalGeral,
-                link: "",
-                entregue: false,
-                data_entrega: "",
-                sub_itens: subItens
-            };
-
-            compras.unshift(novoItem);
-            salvarNoLocalStorage();
-            atualizarListaSelectSolicitantes();
-            renderizarTabela();
-            mostrarAviso(`✅ Compra agrupada com ${subItens.length} itens processada com sucesso!`);
-
-            inserirNoSupabase(novoItem);
-
-            document.getElementById('blocoTextoItens').value = '';
-            document.getElementById('blocoLocal').value = '';
-            document.getElementById('blocoProjeto').value = '';
-            document.getElementById('blocoSolicitante').value = '';
-            document.getElementById('avisoBlocoSolicitante').classList.add('hidden');
-        }
-
-        function toggleExpandirSubItens(id) {
-            itensExpandidos[id] = !itensExpandidos[id];
-            renderizarTabela();
-        }
-
-        function atualizarListaSelectSolicitantes() {
-            const select = document.getElementById('selectFiltroSolicitante');
-            const valorAtual = select.value;
-            
-            const conjuntoNomes = new Set();
-            compras.forEach(c => {
-                if (c.solicitante && c.solicitante.trim()) {
-                    conjuntoNomes.add(c.solicitante.trim().toUpperCase());
-                }
-            });
-
-            select.innerHTML = '<option value="">TODOS OS SOLICITANTES</option>';
-            Array.from(conjuntoNomes).sort().forEach(nome => {
-                const opt = document.createElement('option');
-                opt.value = nome;
-                opt.innerText = nome;
-                select.appendChild(opt);
-            });
-
-            select.value = valorAtual;
-            renderizarCardsPessoasDinamicos();
-        }
-
-        function aplicarFiltroPorSelect(valor) {
-            solicitanteFiltroAtual = valor.trim().toUpperCase();
-            atualizarBadgeFiltro();
-            renderizarTabela();
-        }
-
-        function atualizarBadgeFiltro() {
-            const badge = document.getElementById('badgeFiltroAtivo');
-            const txt = document.getElementById('txtFiltroNome');
-            if (solicitanteFiltroAtual) {
-                txt.innerText = solicitanteFiltroAtual;
-                badge.classList.remove('hidden');
-            } else {
-                badge.classList.add('hidden');
-            }
-        }
-
-        function renderizarCardsPessoasDinamicos() {
-            const container = document.getElementById('containerCardsPessoas');
-            if (!container) return;
-            container.innerHTML = '';
-
-            let totaisPorPessoa = {};
-            compras.forEach(item => {
-                const s = (item.solicitante || "OUTROS").toUpperCase();
-                if (!totaisPorPessoa[s]) totaisPorPessoa[s] = { count: 0, valor: 0 };
-                totaisPorPessoa[s].count += Number(item.qtd || 1);
-                totaisPorPessoa[s].valor += Number(item.total || 0);
-            });
-
-            const nomes = Object.keys(totaisPorPessoa).sort();
-            const classesGlow = ['glow-azul', 'glow-roxo', 'glow-verde', 'glow-rosa', 'glow-amarelo'];
-
-            nomes.forEach((nome, idx) => {
-                const dados = totaisPorPessoa[nome];
-                const glowClass = classesGlow[idx % classesGlow.length];
-
-                const card = document.createElement('div');
-                card.className = `bg-white dark:bg-slate-800 p-2.5 rounded-xl shadow-sm ${glowClass} cursor-pointer hover:scale-[1.02] transition`;
-                card.onclick = () => aplicarFiltroPorSelect(nome);
-                card.innerHTML = `
-                    <span class="text-[9px] font-black uppercase text-slate-700 dark:text-slate-200 block truncate">👤 ${nome}</span>
-                    <div class="flex justify-between items-baseline mt-1">
-                        <span class="text-[11px] font-black text-indigo-600 dark:text-indigo-400">${dados.count} un</span>
-                        <span class="text-[11px] font-black text-emerald-600 dark:text-emerald-400">R$ ${dados.valor.toFixed(2)}</span>
-                    </div>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        function abrirModalUsuarios() {
-            const modal = document.getElementById('modalUsuarios');
-            const tbody = document.getElementById('tabelaUsuariosCorpo');
-            tbody.innerHTML = '';
-
-            let totaisPorPessoa = {};
-            compras.forEach(item => {
-                const s = (item.solicitante || "NÃO INFORMADO").toUpperCase();
-                if (!totaisPorPessoa[s]) totaisPorPessoa[s] = { count: 0, valor: 0 };
-                totaisPorPessoa[s].count += Number(item.qtd || 1);
-                totaisPorPessoa[s].valor += Number(item.total || 0);
-            });
-
-            const listaNomes = Object.keys(totaisPorPessoa).sort((a,b) => totaisPorPessoa[b].valor - totaisPorPessoa[a].valor);
-
-            if (listaNomes.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="4" class="text-center py-5 text-slate-400 italic">Nenhum solicitante cadastrado ainda.</td></tr>`;
-            } else {
-                listaNomes.forEach(nome => {
-                    const dados = totaisPorPessoa[nome];
-                    const tr = document.createElement('tr');
-                    tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/40 transition";
-                    tr.innerHTML = `
-                        <td class="py-2.5 px-3 font-bold text-slate-800 dark:text-slate-100">${nome}</td>
-                        <td class="py-2.5 px-3 text-center text-slate-600 dark:text-slate-300">${dados.count} un</td>
-                        <td class="py-2.5 px-3 text-right font-black text-emerald-600 dark:text-emerald-400">R$ ${dados.valor.toFixed(2)}</td>
-                        <td class="py-2.5 px-3 text-center">
-                            <button onclick="selecionarPessoaPeloModal('${nome}')" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 dark:bg-indigo-900/50 dark:text-indigo-300 px-2 py-1 rounded-lg text-[10px] font-bold">🔍 Ver Compras</button>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-                });
-            }
-
-            document.getElementById('resumoGeralUsuarios').innerText = `Total: ${listaNomes.length} Solicitante(s)`;
-            modal.classList.remove('hidden');
-        }
-
-        function fecharModalUsuarios() {
-            document.getElementById('modalUsuarios').classList.add('hidden');
-        }
-
-        function selecionarPessoaPeloModal(nome) {
-            fecharModalUsuarios();
-            aplicarFiltroPorSelect(nome);
-        }
-
-        function abrirModalChaveIa() {
-            const savedKey = localStorage.getItem('gemini_api_key') || '';
-            document.getElementById('modalInputGeminiKey').value = savedKey;
-            document.getElementById('modalChaveIa').classList.remove('hidden');
-        }
-
-        function fecharModalChaveIa() {
-            document.getElementById('modalChaveIa').classList.add('hidden');
-        }
-
-        function salvarChaveIaModal() {
-            const key = document.getElementById('modalInputGeminiKey').value.trim();
-            localStorage.setItem('gemini_api_key', key);
-            fecharModalChaveIa();
-            mostrarAviso("Chave da IA salva com sucesso!");
-        }
-
-        // ================= SUPABASE =================
-        async function carregarDoSupabase() {
-            if (!supabaseClient) return;
-
-            try {
-                const { data, error } = await supabaseClient
-                    .from('compras_corporativas')
-                    .select('*')
-                    .order('id', { ascending: false });
-
-                if (error) throw error;
-
-                if (data && data.length > 0) {
-                    compras = data;
-                    salvarNoLocalStorage();
-                    atualizarListaSelectSolicitantes();
-                    renderizarTabela();
-                    mostrarAviso("✅ Sincronizado com a nuvem!");
-                }
-            } catch (err) {
-                console.warn("Aviso ao sincronizar nuvem:", err.message);
-            }
-        }
-
-        async function inserirNoSupabase(item) {
-            if (!supabaseClient) return null;
-            try {
-                const payload = {
-                    data: item.data,
-                    solicitante: item.solicitante,
-                    produto: item.produto,
-                    local: item.local || '',
-                    projeto: item.projeto || '',
-                    qtd: item.qtd,
-                    unit: item.unit,
-                    total: item.total,
-                    link: item.link || '',
-                    entregue: !!item.entregue,
-                    data_entrega: item.data_entrega || '',
-                    sub_itens: item.sub_itens || []
-                };
-
-                let { data, error } = await supabaseClient.from('compras_corporativas').insert([payload]).select();
-                if (!error && data && data[0]) return data[0].id;
-            } catch (err) {
-                console.warn("Aviso Supabase Insert:", err.message);
-            }
-            return null;
-        }
-
-        async function atualizarNoSupabase(item) {
-            if (!supabaseClient || !item.id) return;
-            try {
-                const payload = {
-                    data: item.data,
-                    solicitante: item.solicitante,
-                    produto: item.produto,
-                    local: item.local || '',
-                    projeto: item.projeto || '',
-                    qtd: item.qtd,
-                    unit: item.unit,
-                    total: item.total,
-                    link: item.link || '',
-                    entregue: !!item.entregue,
-                    data_entrega: item.data_entrega || '',
-                    sub_itens: item.sub_itens || []
-                };
-
-                await supabaseClient.from('compras_corporativas').update(payload).eq('id', item.id);
-            } catch (err) {
-                console.warn("Aviso Supabase Update:", err.message);
-            }
-        }
-
-        async function removerDoSupabase(id) {
-            if (!supabaseClient) return;
-            try {
-                await supabaseClient.from('compras_corporativas').delete().eq('id', id);
-            } catch (err) {
-                console.warn("Aviso Supabase Delete:", err.message);
-            }
-        }
-
-        async function salvarTudoGeral() {
-            salvarNoLocalStorage();
-            if (supabaseClient) {
-                try {
-                    mostrarAviso("💾 Sincronizando e atualizando dados na nuvem...");
-                    await supabaseClient.from('compras_corporativas').delete().neq('id', 0);
-                    if (compras.length > 0) {
-                        const payloadLote = compras.map(item => ({
-                            data: item.data,
-                            solicitante: item.solicitante,
-                            produto: item.produto,
-                            local: item.local || '',
-                            projeto: item.projeto || '',
-                            qtd: item.qtd,
-                            unit: item.unit,
-                            total: item.total,
-                            link: item.link || '',
-                            entregue: !!item.entregue,
-                            data_entrega: item.data_entrega || '',
-                            sub_itens: item.sub_itens || []
-                        }));
-                        await supabaseClient.from('compras_corporativas').insert(payloadLote);
-                    }
-                } catch(err) {
-                    console.warn("Aviso ao salvar geral na nuvem:", err.message);
-                }
-            }
-            mostrarAviso("✅ Tudo salvo e atualizado na nuvem com sucesso!");
-        }
-
-        // ================= IMPORTAR / CARREGAR ARQUIVO ANTERIOR =================
-        function importarArquivoAnterior(input) {
-            const arquivo = input.files[0];
-            if (!arquivo) return;
-
-            const leitor = new FileReader();
-            leitor.onload = function(e) {
-                const conteudo = e.target.result;
-                try {
-                    if (arquivo.name.endsWith('.json')) {
-                        const dadosImportados = JSON.parse(conteudo);
-                        if (Array.isArray(dadosImportados)) {
-                            compras = dadosImportados;
-                            salvarNoLocalStorage();
-                            atualizarListaSelectSolicitantes();
-                            renderizarTabela();
-                            mostrarAviso(`✅ ${compras.length} itens carregados do arquivo com sucesso!`);
-                        } else {
-                            alert("O arquivo JSON não está no formato de lista esperado.");
-                        }
-                    } else if (arquivo.name.endsWith('.csv')) {
-                        const linhas = conteudo.split('\n');
-                        let novosItens = [];
-                        for (let i = 1; i < linhas.length; i++) {
-                            let linha = linhas[i].trim();
-                            if (!linha) continue;
-                            let cols = linha.split(';');
-                            if (cols.length >= 8) {
-                                let dataIn = cols[0].split('/').reverse().join('-');
-                                novosItens.push({
-                                    id: Date.now() + i,
-                                    data: dataIn || new Date().toISOString().split('T')[0],
-                                    solicitante: (cols[1] || '').replace(/"/g, ''),
-                                    produto: (cols[2] || '').replace(/"/g, ''),
-                                    local: (cols[3] || '').replace(/"/g, ''),
-                                    projeto: (cols[4] || '').replace(/"/g, ''),
-                                    qtd: parseFloat(cols[5]) || 1,
-                                    unit: parseFloat((cols[6] || '0').replace(',', '.')) || 0,
-                                    total: parseFloat((cols[7] || '0').replace(',', '.')) || 0,
-                                    entregue: (cols[8] || '').toUpperCase() === 'SIM',
-                                    data_entrega: cols[9] ? cols[9].split('/').reverse().join('-') : '',
-                                    link: (cols[10] || '').replace(/"/g, ''),
-                                    sub_itens: []
-                                });
-                            }
-                        }
-                        if (novosItens.length > 0) {
-                            compras = [...novosItens, ...compras];
-                            salvarNoLocalStorage();
-                            atualizarListaSelectSolicitantes();
-                            renderizarTabela();
-                            mostrarAviso(`✅ ${novosItens.length} itens importados do CSV com sucesso!`);
-                        } else {
-                            alert("Não foi possível ler os registros do CSV.");
-                        }
-                    }
-                } catch (err) {
-                    alert("Erro ao ler o arquivo: " + err.message);
-                }
-                input.value = '';
-            };
-            leitor.readAsText(arquivo, 'UTF-8');
-        }
-
-        // ================= EXPORTAR / BAIXAR CSV =================
-        function exportarParaCSV() {
-            if (compras.length === 0) {
-                alert("A lista está vazia! Não há dados para exportar.");
-                return;
-            }
-
-            let csv = "\uFEFF";
-            csv += "DATA;SOLICITANTE;PRODUTO/SERVIÇO;LOCAL/FORNECEDOR;PROJETO;QUANTIDADE;VALOR UNITÁRIO (R$);TOTAL (R$);ENTREGUE;DATA ENTREGA;LINK DO PRODUTO\n";
-
-            compras.forEach(item => {
-                const linha = [
-                    formatarDataBR(item.data),
-                    `"${(item.solicitante || '').replace(/"/g, '""')}"`,
-                    `"${(item.produto || '').replace(/"/g, '""')}"`,
-                    `"${(item.local || '').replace(/"/g, '""')}"`,
-                    `"${(item.projeto || '').replace(/"/g, '""')}"`,
-                    item.qtd,
-                    Number(item.unit || 0).toFixed(2).replace('.', ','),
-                    Number(item.total || 0).toFixed(2).replace('.', ','),
-                    item.entregue ? "SIM" : "NÃO",
-                    formatarDataBR(item.data_entrega || ''),
-                    `"${(item.link || '').replace(/"/g, '""')}"`
-                ];
-                csv += linha.join(";") + "\n";
-            });
-
-            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `Relatorio_Compras_Cartao_${new Date().toISOString().split('T')[0]}.csv`;
-            a.click();
-            URL.revokeObjectURL(url);
-            mostrarAviso("📥 Arquivo CSV baixado com sucesso!");
-        }
-
-        // ================= LIMPAR DUPLICADAS EXATAS =================
-        function removerDuplicadasExatas() {
-            const mapUnico = new Map();
-            let duplicadosRemovidos = 0;
-
-            compras.forEach(item => {
-                const chave = `${(item.solicitante||'').trim().toUpperCase()}_${(item.produto||'').trim().toUpperCase()}_${Number(item.total||0).toFixed(2)}_${Number(item.qtd||1)}`;
-                if (!mapUnico.has(chave)) {
-                    mapUnico.set(chave, item);
-                } else {
-                    duplicadosRemovidos++;
-                }
-            });
-
-            if (duplicadosRemovidos > 0) {
-                compras = Array.from(mapUnico.values());
-                salvarNoLocalStorage();
-                atualizarListaSelectSolicitantes();
-                renderizarTabela();
-                mostrarAviso(`⚡ ${duplicadosRemovidos} registro(s) duplicado(s) removido(s)! Clique em "Salvar Tudo" para persistir.`);
-            } else {
-                mostrarAviso("Nenhuma duplicidade encontrada.");
-            }
-        }
-
-        // ================= CONTROLE DE ENTREGA NA TABELA =================
-        async function salvarAlteracaoEntrega(id) {
-            const item = compras.find(c => String(c.id) === String(id));
-            if (!item) return;
-
-            const chk = document.getElementById(`chk-entregue-${id}`);
-            const inputData = document.getElementById(`data-entrega-${id}`);
-
-            item.entregue = chk ? chk.checked : false;
-            
-            if (item.entregue) {
-                if (inputData && inputData.value) {
-                    item.data_entrega = inputData.value;
-                } else if (!item.data_entrega) {
-                    let dCompra = new Date(item.data + 'T00:00:00');
-                    dCompra.setDate(dCompra.getDate() + 10);
-                    item.data_entrega = dCompra.toISOString().split('T')[0];
-                }
-            } else {
-                item.data_entrega = '';
-            }
-
-            salvarNoLocalStorage();
-            renderizarTabela();
-            await atualizarNoSupabase(item);
-        }
-
-        function toggleInputDataEntrega(id, isChecked) {
-            const inputData = document.getElementById(`data-entrega-${id}`);
-            if (isChecked) {
-                if (inputData) {
-                    inputData.classList.remove('hidden');
-                    if (!inputData.value) {
-                        let dCompra = new Date();
-                        const item = compras.find(c => String(c.id) === String(id));
-                        if (item && item.data) dCompra = new Date(item.data + 'T00:00:00');
-                        dCompra.setDate(dCompra.getDate() + 10);
-                        inputData.value = dCompra.toISOString().split('T')[0];
-                    }
-                }
-            } else {
-                if (inputData) {
-                    inputData.classList.add('hidden');
-                    inputData.value = '';
-                }
-            }
-            salvarAlteracaoEntrega(id);
-        }
-
-        function extrairNomeDoLink(url) {
-            try {
-                let limpa = url.split('?')[0].split('#')[0];
-                let partes = limpa.split('/').filter(p => p.length > 0);
-                for (let i = partes.length - 1; i >= 0; i--) {
-                    let p = partes[i];
-                    if (p.includes('-') && !p.startsWith('MLB') && p.length > 4) {
-                        return decodeURIComponent(p).replace(/-/g, ' ').toUpperCase();
-                    }
-                }
-            } catch(e) {}
-            return "";
-        }
-
-        function identificarLocalPeloLink(url) {
-            const u = (url || "").toLowerCase();
-            if (u.includes('mercadolivre') || u.includes('mercadolv')) return "MERCADO LIVRE";
-            if (u.includes('amazon')) return "AMAZON";
-            if (u.includes('magazineluiza')) return "MAGAZINE LUIZA";
-            if (u.includes('shopee')) return "SHOPEE";
-            return "LOJA WEB / INTERNET";
-        }
-
-        // ADICIONAR MÚLTIPLAS LINHAS DE LINKS WEB
-        function adicionarLinhaLink() {
-            const container = document.getElementById('containerLinhasLinks');
-            const primeiraLinha = container.querySelector('.linha-link-item');
-            const novaLinha = primeiraLinha.cloneNode(true);
-            novaLinha.querySelector('.inputLinkDireto').value = '';
-
-            const divWrapper = novaLinha.querySelector('.relative');
-            const btnRemoveNew = document.createElement('button');
-            btnRemoveNew.type = 'button';
-            btnRemoveNew.className = 'absolute right-2.5 top-2.5 bg-rose-100 text-rose-600 hover:bg-rose-200 text-[10px] font-black px-2 py-1 rounded-lg';
-            btnRemoveNew.innerHTML = 'Remover';
-            btnRemoveNew.onclick = () => novaLinha.remove();
-            divWrapper.appendChild(btnRemoveNew);
-
-            container.appendChild(novaLinha);
-        }
-
-        function processarLinksEmLote() {
-            const inputs = document.querySelectorAll('.inputLinkDireto');
-            let processados = 0;
-
-            inputs.forEach(input => {
-                const entrada = input.value.trim();
-                if (!entrada) return;
-
-                let produto = "";
-                let link = "";
-                let localDetectado = "MERCADO LIVRE";
-
-                const matchUrl = entrada.match(/(https?:\/\/[^\s]+)/i);
-                if (matchUrl) {
-                    link = matchUrl[1];
-                    localDetectado = identificarLocalPeloLink(link);
-                    produto = extrairNomeDoLink(link);
-                } else {
-                    link = entrada;
-                }
-
-                if (!produto) produto = entrada.replace(/(https?:\/\/[^\s]+)/gi, '').trim().toUpperCase();
-
-                const hoje = new Date().toISOString().split('T')[0];
-
-                itensPendentesAprovacao.unshift({
-                    tempId: Date.now() + Math.random(),
-                    data: hoje,
-                    solicitante: "",
-                    produto: produto.toUpperCase(),
-                    local: localDetectado,
-                    projeto: "",
-                    qtd: 1,
-                    unit: 0,
-                    total: 0,
-                    link: link,
-                    entregue: false,
-                    data_entrega: "",
-                    sub_itens: []
-                });
-                processados++;
-                input.value = '';
-            });
-
-            if (processados > 0) {
-                renderizarCardsPendentes();
-                mostrarAviso(`⚡ ${processados} link(s) reconhecido(s)! Confira e clique em OK.`);
-            } else {
-                alert("⚠️ Insira pelo menos um link válido!");
-            }
-        }
-
-        async function colarLinkInput() {
-            try {
-                const texto = await navigator.clipboard.readText();
-                if (texto) {
-                    const primeiroInput = document.querySelector('.inputLinkDireto');
-                    if (primeiroInput) {
-                        primeiroInput.value = texto.trim();
-                        processarLinksEmLote();
-                    }
-                }
-            } catch(e) {}
-        }
-
-        function limparInputLink() {
-            document.querySelectorAll('.inputLinkDireto').forEach(i => i.value = '');
-        }
-
-        async function colarTextoTeams() {
-            try {
-                const texto = await navigator.clipboard.readText();
-                if (texto) {
-                    document.getElementById('inputTextoTeams').value = texto.trim();
-                    processarTextoBruto(texto);
-                }
-            } catch(e) {}
-        }
-
-        function processarTextoBruto(textoBruto) {
-            if (!textoBruto || !textoBruto.trim()) return;
-
-            let solicitanteDetectado = "";
-            const matchSolicitante = textoBruto.match(/(?:solicitante|de|por|para|quem pediu|pediu)[:\s-]+([A-Za-zÀ-ÖØ-öø-ÿ\s]{2,25})/i);
-            if (matchSolicitante && matchSolicitante[1]) {
-                solicitanteDetectado = matchSolicitante[1].trim().toUpperCase();
-            }
-
-            const hoje = new Date().toISOString().split('T')[0];
-            const matchUrl = textoBruto.match(/(https?:\/\/[^\s]+)/i);
-            const link = matchUrl ? matchUrl[1] : "";
-            const produtoExtraido = link ? extrairNomeDoLink(link) : "";
-            
-            let produtoLimpo = produtoExtraido || textoBruto.replace(/(https?:\/\/[^\s]+)/gi, '').trim().toUpperCase();
-
-            itensPendentesAprovacao.unshift({
-                tempId: Date.now() + Math.random(),
-                data: hoje,
-                solicitante: solicitanteDetectado,
-                produto: produtoLimpo || "PRODUTO",
-                local: "MERCADO LIVRE",
-                projeto: "",
-                qtd: 1,
-                unit: 0,
-                total: 0,
-                link: link,
-                entregue: false,
-                data_entrega: "",
-                sub_itens: []
-            });
-
-            renderizarCardsPendentes();
-            document.getElementById('inputTextoTeams').value = '';
-        }
-
-        function renderizarCardsPendentes() {
-            const container = document.getElementById('containerCardsPreenchidos');
-            const lista = document.getElementById('listaCardsPendentes');
-            lista.innerHTML = '';
-
-            if (itensPendentesAprovacao.length === 0) {
-                container.classList.add('hidden');
-                return;
-            }
-
-            container.classList.remove('hidden');
-            document.getElementById('tituloItensPendentes').innerText = `${itensPendentesAprovacao.length} ITEM(NS) IDENTIFICADOS:`;
-
-            itensPendentesAprovacao.forEach((item, index) => {
-                const totalCalculado = Number(item.total || (item.qtd * item.unit)).toFixed(2);
-                const unitCalculado = Number(item.unit || (totalCalculado / item.qtd)).toFixed(2);
-                
-                const estaSemSolicitante = !item.solicitante || item.solicitante.trim() === "";
-                const classePiscante = estaSemSolicitante ? "piscar-solicitante-forte" : "";
-
-                const card = document.createElement('div');
-                card.className = "bg-white dark:bg-slate-800 border-2 border-purple-400 p-4 rounded-2xl shadow-sm space-y-3";
-                card.id = `card-pendente-${item.tempId}`;
-
-                card.innerHTML = `
-                    <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
-                        <span class="text-xs font-black text-purple-700 dark:text-purple-400 uppercase">Item #${index + 1}</span>
-                        <button type="button" onclick="descartarCardPendente(${item.tempId})" class="text-slate-400 hover:text-rose-500 font-bold text-xs cursor-pointer">✕ Descartar</button>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-12 gap-2.5 items-end">
-                        <div class="md:col-span-2">
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Data Compra</label>
-                            <input type="date" id="data-${item.tempId}" value="${item.data}" class="neon-pulsante w-full text-xs p-1.5 rounded-lg bg-white dark:bg-slate-900 dark:text-white">
-                        </div>
-
-                        <div class="md:col-span-3">
-                            <label class="block text-[9px] font-black text-rose-600 uppercase mb-0.5">Solicitante (*)</label>
-                            <input type="text" id="solicitante-${item.tempId}" value="${item.solicitante || ''}" placeholder="QUEM PEDIU?" oninput="verificarDigitacaoSolicitante(this, ${item.tempId})" class="uppercase-input w-full text-xs p-1.5 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold outline-none ${classePiscante}">
-                        </div>
-
-                        <div class="md:col-span-4">
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Produto</label>
-                            <input type="text" id="produto-${item.tempId}" value="${item.produto}" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold">
-                        </div>
-
-                        <div class="md:col-span-3">
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Local</label>
-                            <input type="text" id="local-${item.tempId}" value="${item.local || 'MERCADO LIVRE'}" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold">
-                        </div>
-
-                        <div class="md:col-span-3">
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Projeto</label>
-                            <input type="text" id="projeto-${item.tempId}" value="${item.projeto || ''}" oninput="this.value = this.value.toUpperCase()" class="uppercase-input w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold">
-                        </div>
-
-                        <div class="md:col-span-2">
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Qtd</label>
-                            <input type="number" id="qtd-${item.tempId}" value="${item.qtd}" min="1" oninput="calcularCardPorTotal(${item.tempId})" class="w-full text-xs p-1.5 text-center font-bold bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white">
-                        </div>
-
-                        <div class="md:col-span-3">
-                            <label class="block text-[9px] font-bold text-emerald-600 uppercase">Total (R$) 🔄</label>
-                            <input type="number" step="0.01" id="total-${item.tempId}" value="${totalCalculado}" oninput="calcularCardPorTotal(${item.tempId})" class="w-full text-xs p-1.5 bg-emerald-50/50 border border-emerald-300 rounded-lg font-black text-emerald-600 outline-none">
-                        </div>
-
-                        <div class="md:col-span-2">
-                            <label class="block text-[9px] font-bold text-slate-400 uppercase">Unitário</label>
-                            <input type="number" step="0.01" id="unit-${item.tempId}" value="${unitCalculado}" oninput="calcularCardPorUnitario(${item.tempId})" class="w-full text-xs p-1.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg dark:text-white font-bold">
-                        </div>
-
-                        <div class="md:col-span-2 flex">
-                            <input type="hidden" id="link-${item.tempId}" value="${item.link || ''}">
-                            <button type="button" onclick="confirmarCardIndividual('${item.tempId}')" class="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-black py-2 rounded-xl text-xs transition shadow-md flex items-center justify-center gap-1 cursor-pointer">
-                                <span>✅</span> <span>OK</span>
-                            </button>
-                        </div>
-                    </div>
-                `;
-                lista.appendChild(card);
-            });
-        }
-
-        function calcularCardPorTotal(tempId) {
-            const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1;
-            const total = parseFloat(document.getElementById(`total-${tempId}`).value) || 0;
-            document.getElementById(`unit-${tempId}`).value = (total / qtd).toFixed(2);
-        }
-
-        function calcularCardPorUnitario(tempId) {
-            const qtd = parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1;
-            const unit = parseFloat(document.getElementById(`unit-${tempId}`).value) || 0;
-            document.getElementById(`total-${tempId}`).value = (qtd * unit).toFixed(2);
-        }
-
-        async function confirmarCardIndividual(tempId) {
-            const inputSol = document.getElementById(`solicitante-${tempId}`);
-            const solicitante = inputSol.value.trim().toUpperCase();
-
-            if (!solicitante) {
-                inputSol.classList.add('piscar-solicitante-forte');
-                inputSol.focus();
-                alert("⚠️ Preencha o SOLICITANTE!");
-                return;
-            }
-
-            const novoItem = {
-                id: Date.now(),
-                data: document.getElementById(`data-${tempId}`).value,
-                solicitante,
-                produto: document.getElementById(`produto-${tempId}`).value.trim().toUpperCase(),
-                local: document.getElementById(`local-${tempId}`).value.trim().toUpperCase(),
-                projeto: document.getElementById(`projeto-${tempId}`).value.trim().toUpperCase(),
-                qtd: parseFloat(document.getElementById(`qtd-${tempId}`).value) || 1,
-                unit: parseFloat(document.getElementById(`unit-${tempId}`).value) || 0,
-                total: parseFloat(document.getElementById(`total-${tempId}`).value) || 0,
-                link: document.getElementById(`link-${tempId}`).value || "",
-                entregue: false,
-                data_entrega: "",
-                sub_itens: []
-            };
-
-            compras.unshift(novoItem);
-            itensPendentesAprovacao = itensPendentesAprovacao.filter(i => String(i.tempId) !== String(tempId));
-            salvarNoLocalStorage();
-            atualizarListaSelectSolicitantes();
-            renderizarTabela();
-            renderizarCardsPendentes();
-            inserirNoSupabase(novoItem);
-        }
-
-        function descartarCardPendente(tempId) {
-            itensPendentesAprovacao = itensPendentesAprovacao.filter(i => String(i.tempId) !== String(tempId));
-            renderizarCardsPendentes();
-        }
-
-        function verificarDigitacaoSolicitante(input, tempId) {
-            input.value = input.value.toUpperCase();
-            const val = input.value.trim();
-            const aviso = document.getElementById(`avisoSolicitante-${tempId}`);
-
-            if (val === "" || val === "NÃO INFORMADO" || val === "NAO INFORMADO") {
-                input.classList.add('piscar-solicitante-forte');
-                if (aviso) aviso.classList.remove('hidden');
-            } else {
-                input.classList.remove('piscar-solicitante-forte');
-                if (aviso) aviso.classList.add('hidden');
-            }
-        }
-
-        // ================= EDIÇÃO (SUB-ITENS DE NOTAS FISCAIS) =================
-        function abrirModalEdicao(index, subIndex = null) {
-            const item = compras[index];
-            if (!item) return;
-
-            document.getElementById('editItemIndex').value = index;
-            document.getElementById('editSubItemIndex').value = subIndex !== null ? subIndex : '';
-            document.getElementById('editItemId').value = item.id || '';
-
-            const isSubItem = subIndex !== null;
-            const alvo = isSubItem ? item.sub_itens[subIndex] : item;
-
-            document.getElementById('campoDataEditContainer').style.display = isSubItem ? 'none' : 'block';
-            document.getElementById('campoLocalEditContainer').style.display = isSubItem ? 'none' : 'block';
-            document.getElementById('campoProjetoEditContainer').style.display = isSubItem ? 'none' : 'block';
-            document.getElementById('campoEntregaEditContainer').style.display = isSubItem ? 'none' : 'block';
-            document.getElementById('campoLinkEditContainer').style.display = isSubItem ? 'none' : 'block';
-
-            document.getElementById('editData').value = item.data || '';
-            document.getElementById('editSolicitante').value = item.solicitante || '';
-            document.getElementById('editProduto').value = alvo.produto || '';
-            document.getElementById('editLocal').value = item.local || '';
-            document.getElementById('editProjeto').value = item.projeto || '';
-            document.getElementById('editQtd').value = alvo.qtd || 1;
-            document.getElementById('editTotal').value = Number(alvo.total || 0).toFixed(2);
-            document.getElementById('editUnit').value = Number(alvo.unit || 0).toFixed(2);
-            document.getElementById('editLink').value = item.link || '';
-
-            const chkEntregue = document.getElementById('editEntregue');
-            chkEntregue.checked = item.entregue || false;
-            document.getElementById('editDataEntrega').value = item.data_entrega || '';
-            toggleDataEntregaModal(chkEntregue.checked);
-
-            document.getElementById('modalEdicao').classList.remove('hidden');
-        }
-
-        function fecharModalEdicao() {
-            document.getElementById('modalEdicao').classList.add('hidden');
-        }
-
-        function toggleDataEntregaModal(isEntregue) {
-            const container = document.getElementById('containerDataEntrega');
-            if (isEntregue) container.classList.remove('hidden');
-            else container.classList.add('hidden');
-        }
-
-        function preencherDataHojeModal() {
-            document.getElementById('editEntregue').checked = true;
-            document.getElementById('containerDataEntrega').classList.remove('hidden');
-            let d = new Date().toISOString().split('T')[0];
-            document.getElementById('editDataEntrega').value = d;
-        }
-
-        function calcularModalPorTotal() {
-            const q = parseFloat(document.getElementById('editQtd').value) || 1;
-            const tot = parseFloat(document.getElementById('editTotal').value) || 0;
-            document.getElementById('editUnit').value = (tot / q).toFixed(2);
-        }
-
-        function calcularModalPorUnitario() {
-            const q = parseFloat(document.getElementById('editQtd').value) || 1;
-            const u = parseFloat(document.getElementById('editUnit').value) || 0;
-            document.getElementById('editTotal').value = (q * u).toFixed(2);
-        }
-
-        async function guardarEdicaoModal() {
-            const index = parseInt(document.getElementById('editItemIndex').value, 10);
-            const subIndexStr = document.getElementById('editSubItemIndex').value;
-            const isSubItem = subIndexStr !== "";
-
-            if (isNaN(index) || !compras[index]) return;
-
-            const solicitante = document.getElementById('editSolicitante').value.trim().toUpperCase();
-            if (!solicitante) {
-                alert("Informe o Solicitante!");
-                return;
-            }
-
-            const itemPrincipal = compras[index];
-
-            if (isSubItem) {
-                const sIdx = parseInt(subIndexStr, 10);
-                itemPrincipal.sub_itens[sIdx] = {
-                    ...itemPrincipal.sub_itens[sIdx],
-                    produto: document.getElementById('editProduto').value.trim().toUpperCase(),
-                    qtd: parseFloat(document.getElementById('editQtd').value) || 1,
-                    unit: parseFloat(document.getElementById('editUnit').value) || 0,
-                    total: parseFloat(document.getElementById('editTotal').value) || 0
-                };
-                itemPrincipal.solicitante = solicitante;
-
-                let somaSubTotal = 0;
-                let somaSubQtd = 0;
-                itemPrincipal.sub_itens.forEach(sub => {
-                    somaSubTotal += Number(sub.total || 0);
-                    somaSubQtd += Number(sub.qtd || 1);
-                });
-                itemPrincipal.total = somaSubTotal;
-                itemPrincipal.qtd = somaSubQtd;
-                itemPrincipal.unit = somaSubQtd > 0 ? (somaSubTotal / somaSubQtd) : somaSubTotal;
-
-            } else {
-                itemPrincipal.data = document.getElementById('editData').value;
-                itemPrincipal.solicitante = solicitante;
-                itemPrincipal.produto = document.getElementById('editProduto').value.trim().toUpperCase();
-                itemPrincipal.local = document.getElementById('editLocal').value.trim().toUpperCase();
-                itemPrincipal.projeto = document.getElementById('editProjeto').value.trim().toUpperCase();
-                itemPrincipal.qtd = parseFloat(document.getElementById('editQtd').value) || 1;
-                itemPrincipal.unit = parseFloat(document.getElementById('editUnit').value) || 0;
-                itemPrincipal.total = parseFloat(document.getElementById('editTotal').value) || 0;
-                itemPrincipal.link = document.getElementById('editLink').value.trim();
-                itemPrincipal.entregue = document.getElementById('editEntregue').checked;
-                itemPrincipal.data_entrega = document.getElementById('editEntregue').checked ? document.getElementById('editDataEntrega').value : '';
-            }
-
-            salvarNoLocalStorage();
-            atualizarListaSelectSolicitantes();
-            renderizarTabela();
-            fecharModalEdicao();
-            atualizarNoSupabase(itemPrincipal);
-        }
-
-        function renderizarTabela() {
-            const tbody = document.getElementById('tabelaComprasCorpo');
-            tbody.innerHTML = '';
-
-            let totalGastoGeral = 0;
-            let solicitantesContador = {};
-            let listaExibicao = [...compras];
-
-            if (solicitanteFiltroAtual) {
-                listaExibicao = listaExibicao.filter(i => (i.solicitante || "").toUpperCase().includes(solicitanteFiltroAtual));
-            }
-
-            const termoPesquisa = document.getElementById('inputPesquisaProduto').value.trim().toUpperCase();
-            if (termoPesquisa) {
-                listaExibicao = listaExibicao.filter(i => {
-                    const matchProduto = (i.produto || "").toUpperCase().includes(termoPesquisa);
-                    const matchLocal = (i.local || "").toUpperCase().includes(termoPesquisa);
-                    const matchSolicitante = (i.solicitante || "").toUpperCase().includes(termoPesquisa);
-                    const matchSubItens = i.sub_itens && i.sub_itens.some(sub => (sub.produto || "").toUpperCase().includes(termoPesquisa));
-                    return matchProduto || matchLocal || matchSolicitante || matchSubItens;
-                });
-            }
-
-            const filtroValor = parseFloat(document.getElementById('inputFiltroValor').value);
-            if (!isNaN(filtroValor) && filtroValor > 0) {
-                listaExibicao = listaExibicao.filter(i => Number(i.total) === filtroValor || Number(i.unit) === filtroValor || (i.sub_itens && i.sub_itens.some(sub => Number(sub.total) === filtroValor)));
-            }
-
-            const contagemChaves = {};
-            compras.forEach(item => {
-                const chave = `${(item.solicitante||'').trim().toUpperCase()}_${(item.produto||'').trim().toUpperCase()}_${Number(item.total||0).toFixed(2)}_${Number(item.qtd||1)}`;
-                contagemChaves[chave] = (contagemChaves[chave] || 0) + 1;
-            });
-
-            listaExibicao.sort((a, b) => (a.entregue === b.entregue) ? new Date(b.data) - new Date(a.data) : a.entregue ? 1 : -1);
-
-            if (listaExibicao.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="11" class="text-center py-6 text-slate-400 italic">NENHUMA COMPRA ENCONTRADA.</td></tr>`;
-            } else {
-                listaExibicao.forEach((item) => {
-                    const originalIndex = compras.findIndex(c => String(c.id) === String(item.id));
-                    totalGastoGeral += Number(item.total || 0);
-                    solicitantesContador[item.solicitante] = (solicitantesContador[item.solicitante] || 0) + 1;
-
-                    const chave = `${(item.solicitante||'').trim().toUpperCase()}_${(item.produto||'').trim().toUpperCase()}_${Number(item.total||0).toFixed(2)}_${Number(item.qtd||1)}`;
-                    const isDuplicado = contagemChaves[chave] > 1;
-                    const temSubItens = item.sub_itens && item.sub_itens.length > 0;
-                    const expandido = !!itensExpandidos[item.id];
-
-                    const tr = document.createElement('tr');
-                    tr.className = `${item.entregue ? 'bg-slate-100/70 dark:bg-slate-800/40 opacity-75 line-through' : isDuplicado ? 'alerta-duplicado-fluorescente' : 'hover:bg-slate-50'} transition uppercase`;
-                    tr.innerHTML = `
-                        <td class="py-2.5 px-3 font-semibold text-slate-600 dark:text-slate-300 whitespace-nowrap">${formatarDataBR(item.data)}</td>
-                        <td class="py-2.5 px-3 font-bold text-slate-800 dark:text-slate-200 whitespace-nowrap">${item.solicitante}</td>
-                        <td class="py-2.5 px-3 max-w-xs">
-                            <div class="flex items-center gap-2">
-                                ${temSubItens ? `<button type="button" onclick="toggleExpandirSubItens(${item.id})" class="bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-300 px-1.5 py-0.5 rounded text-[10px] font-black cursor-pointer">${expandido ? '➖' : '➕'}</button>` : ''}
-                                <span class="truncate">${item.produto}</span>
-                            </div>
-                        </td>
-                        <td class="py-2.5 px-3 font-semibold text-indigo-700 whitespace-nowrap">${item.local || 'MERCADO LIVRE'}</td>
-                        <td class="py-2.5 px-3 font-semibold text-slate-500 whitespace-nowrap">${item.projeto || '-'}</td>
-                        <td class="py-2.5 px-3 text-center font-bold">${item.qtd}</td>
-                        <td class="py-2.5 px-3 text-right text-slate-500 whitespace-nowrap">R$ ${Number(item.unit || 0).toFixed(2)}</td>
-                        <td class="py-2.5 px-3 text-right font-black text-emerald-600 whitespace-nowrap">R$ ${Number(item.total || 0).toFixed(2)}</td>
-                        <td class="py-2.5 px-3 text-center whitespace-nowrap">
-                            <div class="flex flex-col items-center gap-1">
-                                <label class="flex items-center gap-1 cursor-pointer">
-                                    <input type="checkbox" id="chk-entregue-${item.id}" ${item.entregue ? 'checked' : ''} onchange="toggleInputDataEntrega(${item.id}, this.checked)" class="w-4 h-4 text-emerald-600 rounded cursor-pointer">
-                                    <span class="text-[10px] font-bold">Entregue</span>
-                                </label>
-                                <input type="date" id="data-entrega-${item.id}" value="${item.data_entrega || ''}" onchange="salvarAlteracaoEntrega(${item.id})" class="text-[10px] p-1 bg-slate-50 border rounded dark:text-white font-bold ${item.entregue ? '' : 'hidden'}">
-                            </div>
-                        </td>
-                        <td class="py-2.5 px-3 text-center whitespace-nowrap">
-                            ${item.link && item.link.startsWith('http') ? `<a href="${item.link}" target="_blank" class="text-blue-600 font-bold hover:underline normal-case">Link ↗</a>` : '-'}
-                        </td>
-                        <td class="py-2.5 px-3 text-center whitespace-nowrap">
-                            <div class="flex items-center justify-center gap-1.5">
-                                <button onclick="abrirModalEdicao(${originalIndex})" class="text-indigo-600 font-bold p-1 cursor-pointer" title="Editar">✏️</button>
-                                <button onclick="removerItem(${item.id})" class="text-rose-500 font-bold p-1 cursor-pointer" title="Excluir">✕</button>
-                            </div>
-                        </td>
-                    `;
-                    tbody.appendChild(tr);
-
-                    if (temSubItens && expandido) {
-                        item.sub_itens.forEach((sub, idxSub) => {
-                            const trSub = document.createElement('tr');
-                            trSub.className = "bg-indigo-50/50 dark:bg-slate-900/40 text-[11px]";
-                            trSub.innerHTML = `
-                                <td class="py-2 px-3 text-right text-slate-400">↳</td>
-                                <td colspan="2" class="py-2 px-3 pl-6 font-semibold text-indigo-800 dark:text-indigo-300">📌 ${idxSub + 1}. ${sub.produto}</td>
-                                <td colspan="2" class="py-2 px-3 text-slate-500">-</td>
-                                <td class="py-2 px-3 text-center font-bold text-slate-600 dark:text-slate-300">${sub.qtd} un</td>
-                                <td class="py-2 px-3 text-right text-slate-500">R$ ${Number(sub.unit || 0).toFixed(2)}</td>
-                                <td class="py-2 px-3 text-right font-bold text-emerald-600">R$ ${Number(sub.total || 0).toFixed(2)}</td>
-                                <td colspan="2" class="text-center">
-                                    <button onclick="abrirModalEdicao(${originalIndex}, ${idxSub})" class="text-indigo-600 font-bold p-1 text-[10px] bg-indigo-100 dark:bg-indigo-900/70 px-2 py-0.5 rounded cursor-pointer">✏️ Editar Item</button>
-                                </td>
-                                <td></td>
-                            `;
-                            tbody.appendChild(trSub);
-                        });
-                    }
-                });
-            }
-
-            document.getElementById('cardTotalItens').innerText = listaExibicao.length;
-            document.getElementById('labelContador').innerText = `${listaExibicao.length} ITENS EXIBIDOS`;
-            document.getElementById('cardValorTotal').innerText = `R$ ${totalGastoGeral.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
-
-            let topSolicitante = "NENHUM";
-            let maxCount = 0;
-            Object.keys(solicitantesContador).forEach(s => {
-                if (solicitantesContador[s] > maxCount) {
-                    maxCount = solicitantesContador[s];
-                    topSolicitante = `${s} (${maxCount})`;
-                }
-            });
-            document.getElementById('cardTopSolicitante').innerText = topSolicitante;
-        }
-
-        function formatarDataBR(dataISO) {
-            if (!dataISO) return "";
-            const partes = dataISO.split('-');
-            return partes.length < 3 ? dataISO : `${partes[2]}/${partes[1]}/${partes[0]}`;
-        }
-
-        async function removerItem(id) {
-            if (confirm("Deseja realmente apagar este registro?")) {
-                compras = compras.filter(i => String(i.id) !== String(id));
-                salvarNoLocalStorage();
-                atualizarListaSelectSolicitantes();
-                renderizarTabela();
-                removerDoSupabase(id);
-                mostrarAviso("Item apagado!");
-            }
-        }
-
-        function salvarNoLocalStorage() {
-            localStorage.setItem('compras_corporativas_base', JSON.stringify(compras));
-        }
-
-        function carregarDoLocalStorage() {
-            const salvo = localStorage.getItem('compras_corporativas_base');
-            if (salvo) {
-                try { 
-                    compras = JSON.parse(salvo); 
-                    atualizarListaSelectSolicitantes();
-                } catch(e) { compras = []; }
-            }
-            renderizarTabela();
-        }
-    </script>
+      }
+      if (!novos.length) throw new Error('Nenhum registro válido encontrado.');
+      novos = novos.map(i => ({ ...i, id: novoId() + Math.random() }));
+      if (!confirm(`Adicionar ${novos.length} registro(s) ao histórico? Depois clique em "Salvar tudo" para enviar à nuvem.`)) return;
+      compras = [...novos, ...compras]; salvarLocal(); render(); toast(`✅ ${novos.length} registro(s) importados.`);
+    } catch (err) { toast('Erro ao ler o arquivo: ' + err.message, true); }
+    input.value = '';
+  };
+  rd.readAsText(arq, 'UTF-8');
+}
+
+async function limparDuplicadas() {
+  const vistos = new Set(), remover = [];
+  compras.forEach(i => { const k = chaveDup(i); vistos.has(k) ? remover.push(i) : vistos.add(k); });
+  if (!remover.length) return toast('Nenhuma duplicidade encontrada.');
+  if (!confirm(`Remover ${remover.length} registro(s) duplicado(s)? Itens do mesmo solicitante, produto, valor e quantidade serão considerados iguais.`)) return;
+  const ids = new Set(remover.map(i => i.id));
+  compras = compras.filter(i => !ids.has(i.id)); salvarLocal(); render();
+  if (sb) for (const i of remover) if (!isLocal(i.id)) await sb.from(T).delete().eq('id', i.id);
+  toast(`⚡ ${remover.length} duplicada(s) removida(s).`);
+}
+
+/* ---------- Eventos ---------- */
+function aba(nome) {
+  ['manual', 'nota', 'link'].forEach(n => $('aba-' + n).classList.toggle('hidden', n !== nome));
+  document.querySelectorAll('#abas [data-tab]').forEach(b => b.className = 'btn flex-1 ' + (b.dataset.tab === nome ? 'bg-white dark:bg-slate-800 text-indigo-600 shadow-sm border border-slate-200 dark:border-slate-700' : 'text-slate-500'));
+}
+function tema(escuro) {
+  document.documentElement.classList.toggle('dark', escuro); $('bTema').textContent = escuro ? '☀️' : '🌙';
+  try { localStorage.setItem('tema_portal', escuro ? 'dark' : 'light'); } catch {}
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  let escuro = false;
+  try { const s = localStorage.getItem('tema_portal'); escuro = s ? s === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; } catch {}
+  tema(escuro);
+  $('mData').value = $('nData').value = hoje();
+  resetManual(); aba('manual');
+  try { compras = JSON.parse(localStorage.getItem(LS)) || []; } catch { compras = []; }
+  render(); status(false); $('badgeNuvem').textContent = '';
+
+  $('bTema').onclick = () => tema(!document.documentElement.classList.contains('dark'));
+  $('abas').onclick = e => { const b = e.target.closest('[data-tab]'); if (b) aba(b.dataset.tab); };
+  $('bAddRow').onclick = () => { $('mRows').insertAdjacentHTML('beforeend', rowHTML({}, true)); $('mRows').lastElementChild.querySelector('[data-f=prod]').focus(); };
+  $('mRows').onclick = e => { if (e.target.matches('[data-rm]')) e.target.closest('[data-row]').remove(); };
+  $('mEntregue').onchange = null;
+  $('bManual').onclick = lancarManual; $('bNota').onclick = lancarNota; $('bLink').onclick = reconhecer;
+  $('bColar').onclick = async () => { try { $('lTexto').value = (await navigator.clipboard.readText()).trim(); reconhecer(); } catch { toast('Não foi possível acessar a área de transferência.', true); } };
+  $('fNota').onchange = e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { $('nTexto').value = r.result; toast('Texto carregado. Confira e processe.'); }; r.readAsText(f, 'UTF-8'); e.target.value = ''; };
+  $('fArquivo').onchange = e => importar(e.target);
+  $('bCSV').onclick = exportarCSV; $('bDup').onclick = limparDuplicadas;
+  $('bSync').onclick = () => carregar(false); $('bSalvar').onclick = salvarTudo;
+  ['fBusca', 'fValor'].forEach(i => $(i).oninput = render); ['fSol', 'fEntrega'].forEach(i => $(i).onchange = render);
+  $('cardsPessoas').onclick = e => { const b = e.target.closest('[data-p]'); if (b) { $('fSol').value = $('fSol').value === b.dataset.p ? '' : b.dataset.p; render(); } };
+
+  $('listaPend').onclick = e => {
+    const card = e.target.closest('[data-tid]'); if (!card) return;
+    if (e.target.closest('[data-ok]')) confirmarPend(card);
+    if (e.target.closest('[data-del]')) { pend = pend.filter(p => String(p.tid) !== card.dataset.tid); renderPend(); }
+  };
+  $('bTodos').onclick = async () => { for (const c of [...$('listaPend').querySelectorAll('[data-tid]')]) if (!await confirmarPend(c)) break; };
+
+  $('tbody').onclick = async e => {
+    const b = e.target.closest('[data-a]'); if (!b) return;
+    const id = b.closest('tr').dataset.id, a = b.dataset.a;
+    if (a === 'exp') { exp[id] = !exp[id]; render(); }
+    if (a === 'edit') abrirEdicao(id, b.dataset.sub ?? '');
+    if (a === 'del') {
+      const it = compras.find(c => String(c.id) === id);
+      if (!it || !confirm(`Apagar "${it.produto}" de ${it.solicitante}?`)) return;
+      compras = compras.filter(c => c !== it); salvarLocal(); render(); toast('Item apagado.');
+      if (sb && !isLocal(it.id)) try { await sb.from(T).delete().eq('id', it.id); } catch { toast('Apagado só localmente.', true); }
+    }
+  };
+  $('tbody').onchange = async e => {
+    const a = e.target.dataset.a; if (a !== 'ent' && a !== 'entdata') return;
+    const it = compras.find(c => String(c.id) === e.target.closest('tr').dataset.id); if (!it) return;
+    if (a === 'ent') { it.entregue = e.target.checked; it.data_entrega = it.entregue ? (it.data_entrega || maisDias(it.data, 10)) : ''; }
+    else it.data_entrega = e.target.value;
+    render(); await persistir(it);
+  };
+  $('eFechar').onclick = $('eCancel').onclick = () => $('modal').classList.add('hidden');
+  $('eSalvar').onclick = salvarEdicao;
+
+  try { sb = window.supabase.createClient(SB_URL, SB_KEY); carregar(true); } catch { console.warn('Modo local'); }
+});
+</script>
 </body>
 </html>
