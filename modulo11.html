@@ -87,7 +87,7 @@
                     <span class="text-base">◀</span> Voltar ao Menu
                 </a>
                 <span class="text-slate-300">|</span>
-                <span class="text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200/60 px-2.5 py-1 rounded-lg">Módulo 11 • Separado por Empresa</span>
+                <span class="text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200/60 px-2.5 py-1 rounded-lg">Módulo 11 • Conectado à Nuvem</span>
             </div>
             
             <div class="flex flex-wrap items-center gap-2">
@@ -122,7 +122,7 @@
                         <span class="text-2xl font-black tracking-widest text-teal-100">VALE</span>
                         <div class="h-5 w-px bg-teal-300/40"></div>
                         <h1 class="text-lg font-extrabold tracking-wide">Painel de Ordens de Venda por Empresa</h1>
-                        <span class="bg-emerald-500 text-white font-black text-[10px] px-2 py-0.5 rounded shadow-sm">VISÃO SEGREGADA</span>
+                        <span class="bg-emerald-500 text-white font-black text-[10px] px-2 py-0.5 rounded shadow-sm">SUPABASE ATIVO</span>
                     </div>
                     <p class="text-xs text-teal-100/90 mt-1">OVs agrupadas em seções exclusivas com subtotais de peso e valor por empresa compradora</p>
                 </div>
@@ -181,7 +181,6 @@
                 <button type="button" onclick="filtrarPorEmpresaCard('TODAS')" class="text-[11px] font-bold text-teal-700 hover:underline">Mostrar Todas as Seções</button>
             </div>
             <div id="containerCardsEmpresas" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                <!-- Cards de topo gerados via JS -->
             </div>
         </div>
 
@@ -250,7 +249,6 @@
 
         <!-- CONTAINER DAS SEÇÕES DE EMPRESAS -->
         <div id="containerOVs" class="space-y-8">
-            <!-- As seções das empresas com suas OVs serão inseridas aqui dinamicamente -->
         </div>
 
     </div>
@@ -434,14 +432,21 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE PROCESSAMENTO E AGRUPAMENTO POR EMPRESA -->
+    <!-- SCRIPT DE PROCESSAMENTO E CONEXÃO DEFINITIVA COM SUPABASE -->
     <script>
-        const SUPABASE_URL = "https://SEU-PROJETO.supabase.co";
-        const SUPABASE_ANON_KEY = "SUA-CHAVE-ANONIMA-AQUI";
+        // ========================================================
+        // CONFIGURAÇÕES REAIS DO SEU SUPABASE
+        // ========================================================
+        const SUPABASE_URL = "https://gloxtswcksbczinpwtzu.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_0kEiqthWKZZwjM120wQIYw_Hba7qeLc";
         
         let supabaseClient = null;
-        if (SUPABASE_URL && !SUPABASE_URL.includes("SEU-PROJETO")) {
-            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        try {
+            if (window.supabase && typeof window.supabase.createClient === 'function') {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            }
+        } catch(e) {
+            console.error("Falha ao inicializar o Supabase SDK:", e);
         }
 
         const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v7";
@@ -588,7 +593,7 @@
                     alert("Todas as OVs foram salvas com sucesso no Supabase!");
                 } catch (err) {
                     console.error("Erro ao salvar:", err);
-                    alert("Erro ao gravar na nuvem. Os dados estão salvos localmente.");
+                    alert("Erro ao gravar na nuvem. Verifique a política RLS no Supabase. Os dados estão preservados localmente.");
                     atualizarIndicadorStatus('offline', 'Erro na Gravação');
                 }
             } else {
@@ -651,7 +656,6 @@
             }
         }
 
-        // RENDERIZAÇÃO DOS QUADRADINHOS SEPARADOS POR EMPRESA
         function atualizarOpcoesEmpresas(lista) {
             const select = document.getElementById('filtroEmpresa');
             const containerCards = document.getElementById('containerCardsEmpresas');
@@ -704,7 +708,6 @@
             }
         }
 
-        // RENDERIZAÇÃO PRINCIPAL: AGRUPADA POR SEÇÃO DE CADA EMPRESA
         function renderizar() {
             const lista = cacheRegistros;
             const termo = (document.getElementById('filtroTexto')?.value || '').toLowerCase().trim();
@@ -712,7 +715,6 @@
             const filtroEmpresa = document.getElementById('filtroEmpresa')?.value || 'TODAS';
             const container = document.getElementById('containerOVs');
 
-            // TOTAIS GERAIS MESTRE
             let somaLiberadoKG = 0;
             let somaLiberadoValor = 0;
 
@@ -724,7 +726,6 @@
 
             let contagemOvsAtivas = 0;
 
-            // Filtra primeiro os itens individuais
             const listaFiltrada = lista.filter(item => {
                 const cancelado = item.status === "CANCELADO";
                 const totalGasto = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
@@ -769,7 +770,6 @@
                 return true;
             });
 
-            // ATUALIZA PAINEL DE CONSOLIDAÇÃO TOTAL
             document.getElementById('totalGeralLiberadoKG').innerHTML = `${somaLiberadoKG.toLocaleString('pt-BR')} KG <span class="text-[11px] font-normal text-slate-500">(${(somaLiberadoKG/1000).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} TO)</span>`;
             document.getElementById('totalGeralLiberadoValor').innerText = somaLiberadoValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
@@ -796,9 +796,6 @@
                 return;
             }
 
-            // ========================================================
-            // SEPARAÇÃO E AGRUPAMENTO POR EMPRESA
-            // ========================================================
             const gruposPorEmpresa = {};
             listaFiltrada.forEach(item => {
                 const emp = item.ov.cliente || "OUTROS CLIENTES";
@@ -814,7 +811,6 @@
                 const estilo = PALETA_EMPRESAS[indexEmpresa % PALETA_EMPRESAS.length];
                 const ovsDestaEmpresa = gruposPorEmpresa[nomeEmpresa];
 
-                // CÁLCULO DE SUBTOTAL ESPECÍFICO DESTA EMPRESA
                 let empLiberadoKG = 0;
                 let empLiberadoBRL = 0;
                 let empGastoKG = 0;
@@ -837,7 +833,6 @@
                     }
                 });
 
-                // CARDS DE OVs DA EMPRESA
                 const ovsHtml = ovsDestaEmpresa.map(item => {
                     const cancelado = item.status === "CANCELADO";
                     const totalGasto = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
@@ -983,11 +978,9 @@
                     `;
                 }).join('');
 
-                // BLOCO COMPLETO DEDICADO À EMPRESA COM SEU CABEÇALHO E SEUS SUBTOTAIS
                 return `
                     <div class="rounded-3xl border-2 ${estilo.border} overflow-hidden shadow-sm bg-slate-50/50 space-y-4 p-5">
                         
-                        <!-- CABEÇALHO DO BLOCO DA EMPRESA -->
                         <div class="${estilo.bgHeader} text-white p-4 sm:p-5 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-md">
                             <div>
                                 <div class="flex items-center gap-2">
@@ -997,7 +990,6 @@
                                 <h3 class="text-base sm:text-lg font-black tracking-wide mt-1">${nomeEmpresa}</h3>
                             </div>
 
-                            <!-- SUBTOTAIS DESTA EMPRESA ESPECÍFICA -->
                             <div class="flex flex-wrap gap-2 text-xs">
                                 <div class="bg-black/20 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-white/10">
                                     <span class="block text-[9px] text-white/70 uppercase font-bold">Total Liberado</span>
@@ -1015,7 +1007,6 @@
                             </div>
                         </div>
 
-                        <!-- LISTA DE OVS DA EMPRESA -->
                         <div class="space-y-4">
                             ${ovsHtml}
                         </div>
@@ -1026,7 +1017,7 @@
         }
 
         // ==========================================
-        // OCR VOLÁTIL & CANCELAMENTO
+        // OCR VOLÁTIL & CLIPBOARD
         // ==========================================
         function abrirModalOCR() {
             document.getElementById('modalOCR').classList.remove('hidden');
