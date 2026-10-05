@@ -81,7 +81,7 @@
                     <span class="text-base">◀</span> Voltar ao Menu
                 </a>
                 <span class="text-slate-300">|</span>
-                <span class="text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200/60 px-2.5 py-1 rounded-lg">Módulo 11 • Separação Cromática por Empresa</span>
+                <span class="text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200/60 px-2.5 py-1 rounded-lg">Módulo 11 • Cores por Empresa</span>
             </div>
             
             <div class="flex flex-wrap items-center gap-2">
@@ -116,9 +116,9 @@
                         <span class="text-2xl font-black tracking-widest text-teal-100">VALE</span>
                         <div class="h-5 w-px bg-teal-300/40"></div>
                         <h1 class="text-lg font-extrabold tracking-wide">Painel de OVs por Empresa & Saldos</h1>
-                        <span class="bg-emerald-500 text-white font-black text-[10px] px-2 py-0.5 rounded shadow-sm">PADRÃO CROMÁTICO</span>
+                        <span class="bg-emerald-500 text-white font-black text-[10px] px-2 py-0.5 rounded shadow-sm">GERDAU AZUL</span>
                     </div>
-                    <p class="text-xs text-teal-100/90 mt-1">Cada empresa com sua cor dedicada, somatórios individuais e OVs empilhadas no mesmo tom</p>
+                    <p class="text-xs text-teal-100/90 mt-1">Gerdau padronizada em Azul e demais empresas em cores próprias e exclusivas</p>
                 </div>
 
                 <div class="flex flex-wrap gap-2 text-right">
@@ -245,7 +245,7 @@
             </div>
         </div>
 
-        <!-- CONTAINER DAS SEÇÕES DE EMPRESAS (CADA UMA COM SUA COR E SUAS OVs EMPILHADAS) -->
+        <!-- CONTAINER DAS SEÇÕES DE EMPRESAS -->
         <div id="containerOVs" class="space-y-8">
             <!-- Injetado dinamicamente via JS -->
         </div>
@@ -451,17 +451,19 @@
         const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v8";
         let cacheRegistros = [];
 
-        // PALETA CROMÁTICA EXCLUSIVA: CADA EMPRESA TEM A SUA COR DEDICADA
-        const PALETA_EMPRESAS = [
-            { 
-                nomeTema: "Azul Cobalto",
-                header: "bg-blue-700",
-                bgLight: "bg-blue-50/50",
-                bordaCard: "border-blue-400",
-                texto: "text-blue-900",
-                badge: "bg-blue-800",
-                ovBordaPadrao: "border-blue-300 bg-blue-50/20"
-            },
+        // GERDAU É FIXA NO TEMA AZUL (BLUE)
+        const TEMA_GERDAU_AZUL = {
+            nomeTema: "Gerdau Azul Corporativo",
+            header: "bg-blue-700",
+            bgLight: "bg-blue-50/50",
+            bordaCard: "border-blue-400",
+            texto: "text-blue-900",
+            badge: "bg-blue-800",
+            ovBordaPadrao: "border-blue-300 bg-blue-50/20"
+        };
+
+        // OUTRAS EMPRESAS RECEBEM UMA COR DIFERENTE DA LISTA ABAIXO
+        const OUTRAS_CORES_EMPRESAS = [
             { 
                 nomeTema: "Roxo / Púrpura",
                 header: "bg-purple-700",
@@ -508,7 +510,7 @@
                 ovBordaPadrao: "border-pink-300 bg-pink-50/20"
             },
             { 
-                nomeTema: "Ciano",
+                nomeTema: "Teal Escuro",
                 header: "bg-teal-700",
                 bgLight: "bg-teal-50/50",
                 bordaCard: "border-teal-400",
@@ -517,6 +519,15 @@
                 ovBordaPadrao: "border-teal-300 bg-teal-50/20"
             }
         ];
+
+        // FUNÇÃO QUE GARANTE: GERDAU SEMPRE AZUL, DEMAIS EMPRESAS CADA UMA COM SUA COR
+        function obterTemaDaEmpresa(nomeEmpresa, indiceNaoGerdau = 0) {
+            const nomeFormatado = (nomeEmpresa || '').toUpperCase();
+            if (nomeFormatado.includes("GERDAU")) {
+                return TEMA_GERDAU_AZUL;
+            }
+            return OUTRAS_CORES_EMPRESAS[indiceNaoGerdau % OUTRAS_CORES_EMPRESAS.length];
+        }
 
         const DADOS_DEFAULT = [
             {
@@ -711,7 +722,7 @@
             }
         }
 
-        // MONTAGEM DOS QUADRADINHOS NO TOPO: CADA EMPRESA COM SUA COR E TOTAIS DE VALOR E KG
+        // MONTAGEM DOS QUADRADINHOS NO TOPO: GERDAU AZUL E AS DEMAIS COM CORES PRÓPRIAS
         function atualizarOpcoesEmpresas(lista) {
             const select = document.getElementById('filtroEmpresa');
             const containerCards = document.getElementById('containerCardsEmpresas');
@@ -732,8 +743,11 @@
                 select.value = valorAtual;
             }
 
-            containerCards.innerHTML = empresas.map((emp, idx) => {
-                const tema = PALETA_EMPRESAS[idx % PALETA_EMPRESAS.length];
+            let contadorOutrasCores = 0;
+
+            containerCards.innerHTML = empresas.map((emp) => {
+                const isGerdau = emp.toUpperCase().includes("GERDAU");
+                const tema = isGerdau ? TEMA_GERDAU_AZUL : obterTemaDaEmpresa(emp, contadorOutrasCores++);
                 const ovsEmp = lista.filter(i => i.ov.cliente === emp);
                 
                 let empLiberadoValor = 0;
@@ -748,15 +762,16 @@
 
                         empLiberadoValor += Number(curr.ov.valorBRL || 0);
                         empSaldoKG += saldo;
-                        empSaldoBRL = saldo * valUnit;
-                        empSaldoValor += empSaldoBRL;
+                        empSaldoValor += (saldo * valUnit);
                     }
                 });
 
                 return `
                     <div onclick="filtrarPorEmpresaCard('${emp}')" class="cursor-pointer border-2 ${tema.bordaCard} ${tema.bgLight} rounded-2xl p-3.5 shadow-sm transition transform hover:-translate-y-1">
                         <div class="flex items-center justify-between mb-2">
-                            <span class="${tema.badge} text-white text-[10px] font-black px-2.5 py-0.5 rounded-md uppercase tracking-wider">EMPRESA</span>
+                            <span class="${tema.badge} text-white text-[10px] font-black px-2.5 py-0.5 rounded-md uppercase tracking-wider">
+                                ${isGerdau ? 'GERDAU (AZUL)' : 'EMPRESA'}
+                            </span>
                             <span class="text-[11px] font-bold text-slate-500">${ovsEmp.length} OV(s)</span>
                         </div>
                         <div class="font-black text-sm ${tema.texto} truncate" title="${emp}">${emp}</div>
@@ -788,7 +803,7 @@
             }
         }
 
-        // RENDERIZAÇÃO PRINCIPAL: SEÇÕES SEPARADAS POR EMPRESA (CADA UMA COM SUA COR E SUAS OVs EMPILHADAS)
+        // RENDERIZAÇÃO: SEÇÕES SEPARADAS POR EMPRESA
         function renderizar() {
             const lista = cacheRegistros;
             const termo = (document.getElementById('filtroTexto')?.value || '').toLowerCase().trim();
@@ -889,12 +904,13 @@
             });
 
             const nomesEmpresas = Object.keys(gruposPorEmpresa);
+            let contadorNaoGerdau = 0;
 
-            container.innerHTML = nomesEmpresas.map((nomeEmpresa, indexEmpresa) => {
-                const tema = PALETA_EMPRESAS[indexEmpresa % PALETA_EMPRESAS.length];
+            container.innerHTML = nomesEmpresas.map((nomeEmpresa) => {
+                const isGerdau = nomeEmpresa.toUpperCase().includes("GERDAU");
+                const tema = isGerdau ? TEMA_GERDAU_AZUL : obterTemaDaEmpresa(nomeEmpresa, contadorNaoGerdau++);
                 const ovsDestaEmpresa = gruposPorEmpresa[nomeEmpresa];
 
-                // CÁLCULO DE SUBTOTAIS DA EMPRESA ESPECÍFICA
                 let empLiberadoKG = 0;
                 let empLiberadoBRL = 0;
                 let empGastoKG = 0;
@@ -917,7 +933,7 @@
                     }
                 });
 
-                // CARDS DAS OVs DESTA EMPRESA (TODAS EMPILHADAS COM A MESMA IDENTIDADE VISUAL)
+                // CARDS DAS OVs DESTA EMPRESA (TODAS EMPILHADAS NA MESMA COR)
                 const ovsHtml = ovsDestaEmpresa.map(item => {
                     const cancelado = item.status === "CANCELADO";
                     const totalGasto = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
@@ -1032,78 +1048,79 @@
                                             <table class="w-full text-left text-xs border border-slate-100 rounded-lg">
                                                 <thead>
                                                     <tr class="bg-slate-50 text-slate-500 text-[10px] uppercase font-bold border-b border-slate-100">
-                                                        <th class="py-1.5 px-3">Data</th>
-                                                        <th class="py-1.5 px-3">Ticket / NF</th>
-                                                        <th class="py-1.5 px-3">Placa</th>
-                                                        <th class="py-1.5 px-3 text-right">Peso Gasto</th>
-                                                        <th class="py-1.5 px-3 text-center no-print">Ação</th>
+                                                    <th class="py-1.5 px-3">Data</th>
+                                                    <th class="py-1.5 px-3">Ticket / NF</th>
+                                                    <th class="py-1.5 px-3">Placa</th>
+                                                    <th class="py-1.5 px-3 text-right">Peso Gasto</th>
+                                                    <th class="py-1.5 px-3 text-center no-print">Ação</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-slate-100">
+                                                ${item.gastos.map((g, idx) => `
+                                                    <tr class="hover:bg-slate-50/50">
+                                                        <td class="py-1.5 px-3 text-slate-600">${g.data}</td>
+                                                        <td class="py-1.5 px-3 font-semibold text-slate-800">${g.ticket}</td>
+                                                        <td class="py-1.5 px-3 text-slate-600 font-mono">${g.placa}</td>
+                                                        <td class="py-1.5 px-3 text-right font-bold text-rose-600">-${Number(g.pesoKG).toLocaleString('pt-BR')} KG</td>
+                                                        <td class="py-1.5 px-3 text-center no-print">
+                                                            <button type="button" onclick="removerGasto('${item.id}', ${idx})" ${cancelado ? 'disabled' : ''} class="text-rose-400 hover:text-rose-600 text-xs disabled:opacity-30">✕</button>
+                                                        </td>
                                                     </tr>
-                                                </thead>
-                                                <tbody class="divide-y divide-slate-100">
-                                                    ${item.gastos.map((g, idx) => `
-                                                        <tr class="hover:bg-slate-50/50">
-                                                            <td class="py-1.5 px-3 text-slate-600">${g.data}</td>
-                                                            <td class="py-1.5 px-3 font-semibold text-slate-800">${g.ticket}</td>
-                                                            <td class="py-1.5 px-3 text-slate-600 font-mono">${g.placa}</td>
-                                                            <td class="py-1.5 px-3 text-right font-bold text-rose-600">-${Number(g.pesoKG).toLocaleString('pt-BR')} KG</td>
-                                                            <td class="py-1.5 px-3 text-center no-print">
-                                                                <button type="button" onclick="removerGasto('${item.id}', ${idx})" ${cancelado ? 'disabled' : ''} class="text-rose-400 hover:text-rose-600 text-xs disabled:opacity-30">✕</button>
-                                                            </td>
-                                                        </tr>
-                                                    `).join('')}
-                                                </tbody>
-                                            </table>
-                                        </div>
-                                        `
-                                    }
-                                </div>
-
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-
-                // SEÇÃO DA EMPRESA: CABEÇALHO NA COR DELA + TODAS AS SUAS OVs EMPILHADAS ABAIXO
-                return `
-                    <div class="rounded-3xl border-2 ${tema.bordaCard} overflow-hidden shadow-sm ${tema.bgLight} space-y-4 p-5">
-                        
-                        <!-- CABEÇALHO DA SEÇÃO DA EMPRESA COM SUA COR EXCLUSIVA -->
-                        <div class="${tema.header} text-white p-4 sm:p-5 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-md">
-                            <div>
-                                <div class="flex items-center gap-2">
-                                    <span class="bg-white/20 text-white font-black text-[10px] px-2.5 py-1 rounded-md uppercase tracking-wider">EMPRESA COMPRADORA</span>
-                                    <span class="text-xs text-white/80 font-bold">${ovsDestaEmpresa.length} OV(s) registradas</span>
-                                </div>
-                                <h3 class="text-base sm:text-lg font-black tracking-wide mt-1">${nomeEmpresa}</h3>
+                                                `).join('')}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    `
+                                }
                             </div>
 
-                            <!-- SUBTOTAIS EM R$ E KG DESTA EMPRESA -->
-                            <div class="flex flex-wrap gap-2 text-xs">
-                                <div class="bg-black/20 backdrop-blur-sm px-3.5 py-1.5 rounded-xl border border-white/10">
-                                    <span class="block text-[9px] text-white/70 uppercase font-bold">Valor Total Emitido</span>
-                                    <div class="font-black text-white text-sm">${empLiberadoBRL.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                                    <div class="text-[10px] text-white/80">${empLiberadoKG.toLocaleString('pt-BR')} KG</div>
-                                </div>
-                                <div class="bg-black/20 backdrop-blur-sm px-3.5 py-1.5 rounded-xl border border-white/10">
-                                    <span class="block text-[9px] text-rose-200 uppercase font-bold">Já Expedido / Gasto</span>
-                                    <div class="font-black text-rose-200 text-sm">${empGastoBRL.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                                    <div class="text-[10px] text-rose-200/80">${empGastoKG.toLocaleString('pt-BR')} KG</div>
-                                </div>
-                                <div class="bg-white text-slate-900 px-4 py-1.5 rounded-xl font-bold shadow-sm">
-                                    <span class="block text-[9px] text-slate-500 uppercase font-bold">Saldo Livre Restante</span>
-                                    <div class="font-black text-emerald-700 text-sm">${empSaldoBRL.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                                    <div class="text-[11px] font-extrabold text-emerald-800">${empSaldoKG.toLocaleString('pt-BR')} KG restante</div>
-                                </div>
-                            </div>
                         </div>
-
-                        <!-- TODAS AS OVs DESTA EMPRESA EMPILHADAS UMA EMBAIXO DA OUTRA -->
-                        <div class="space-y-4">
-                            ${ovsHtml}
-                        </div>
-
                     </div>
                 `;
+            }).join('');
+
+            // SEÇÃO DA EMPRESA: GERDAU AZUL OU OUTRA EMPRESA NA SUA COR
+            return `
+                <div class="rounded-3xl border-2 ${tema.bordaCard} overflow-hidden shadow-sm ${tema.bgLight} space-y-4 p-5">
+                    
+                    <div class="${tema.header} text-white p-4 sm:p-5 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-md">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="bg-white/20 text-white font-black text-[10px] px-2.5 py-1 rounded-md uppercase tracking-wider">
+                                    ${isGerdau ? 'EMPRESA PADRÃO (AZUL)' : 'EMPRESA COMPRADORA'}
+                                </span>
+                                <span class="text-xs text-white/80 font-bold">${ovsDestaEmpresa.length} OV(s) registradas</span>
+                            </div>
+                            <h3 class="text-base sm:text-lg font-black tracking-wide mt-1">${nomeEmpresa}</h3>
+                        </div>
+
+                        <!-- SUBTOTAIS DA EMPRESA -->
+                        <div class="flex flex-wrap gap-2 text-xs">
+                            <div class="bg-black/20 backdrop-blur-sm px-3.5 py-1.5 rounded-xl border border-white/10">
+                                <span class="block text-[9px] text-white/70 uppercase font-bold">Valor Total Emitido</span>
+                                <div class="font-black text-white text-sm">${empLiberadoBRL.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                                <div class="text-[10px] text-white/80">${empLiberadoKG.toLocaleString('pt-BR')} KG</div>
+                            </div>
+                            <div class="bg-black/20 backdrop-blur-sm px-3.5 py-1.5 rounded-xl border border-white/10">
+                                <span class="block text-[9px] text-rose-200 uppercase font-bold">Já Expedido / Gasto</span>
+                                <div class="font-black text-rose-200 text-sm">${empGastoBRL.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                                <div class="text-[10px] text-rose-200/80">${empGastoKG.toLocaleString('pt-BR')} KG</div>
+                            </div>
+                            <div class="bg-white text-slate-900 px-4 py-1.5 rounded-xl font-bold shadow-sm">
+                                <span class="block text-[9px] text-slate-500 uppercase font-bold">Saldo Livre Restante</span>
+                                <div class="font-black text-emerald-700 text-sm">${empSaldoBRL.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                                <div class="text-[11px] font-extrabold text-emerald-800">${empSaldoKG.toLocaleString('pt-BR')} KG restante</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TODAS AS OVs DESTA EMPRESA EMPILHADAS UMA EMBAIXO DA OUTRA -->
+                    <div class="space-y-4">
+                        ${ovsHtml}
+                    </div>
+
+                </div>
+            `;
             }).join('');
         }
 
