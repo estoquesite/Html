@@ -3,716 +3,328 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Módulo 3 - Cronograma de Férias | Portal Vale v06</title>
+<title>Módulo 3 - Cronograma de Férias | Portal Vale v07</title>
 <style>
-:root {
-    --primary: #db2777;
-    --primary-dark: #be185d;
-    --primary-light: #fce7f3;
-    --primary-border: #f472b6;
-    --primary-bg: #fff1f2;
-    --accent: #f59e0b;
-    --danger: #ef4444;
-    --success: #10b981;
-    --slate-900: #0f172a;
-    --slate-700: #334155;
-    --slate-600: #475569;
-    --slate-300: #cbd5e1;
-    --slate-200: #e2e8f0;
-    --slate-100: #f1f5f9;
-    --slate-50: #f8fafc;
-}
-
-* { box-sizing: border-box; margin: 0; padding: 0; }
-body { 
-    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
-    background: #fff5f7; 
-    color: var(--slate-900); 
-    min-height: 100vh; 
-    padding: 16px; 
-}
-
-/* NOTIFICAÇÃO TOAST */
-#toastNotificacao {
-    position: fixed; 
-    bottom: 24px; 
-    right: 24px; 
-    background: var(--slate-900); 
-    color: #fff;
-    padding: 10px 18px; 
-    border-radius: 6px; 
-    font-size: 11.5px; 
-    font-weight: 600;
-    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.25); 
-    opacity: 0; 
-    pointer-events: none;
-    transition: opacity 0.25s ease, transform 0.25s ease; 
-    transform: translateY(12px); 
-    z-index: 9999;
-}
-#toastNotificacao.ativo { opacity: 1; transform: translateY(0); }
-
-/* PAINEL DE CONTROLE */
-.painel-controle { 
-    background: #ffffff; 
-    padding: 18px 22px; 
-    margin: 0 auto 16px auto; 
-    border-radius: 12px; 
-    box-shadow: 0 10px 25px -5px rgba(219, 39, 119, 0.08); 
-    border: 1px solid #fbcfe8; 
-    max-width: 1200px; 
-}
-.topo-modulo-info { 
-    display: flex; 
-    align-items: center; 
-    justify-content: space-between; 
-    margin-bottom: 12px; 
-    border-bottom: 2px solid var(--primary); 
-    padding-bottom: 8px; 
-}
-.badge-modulo { 
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark)); 
-    color: #fff; 
-    font-size: 11.5px; 
-    font-weight: 800; 
-    padding: 5px 12px; 
-    border-radius: 6px; 
-    text-transform: uppercase; 
-    letter-spacing: 0.8px; 
-}
-.tag-v06 { 
-    background-color: var(--accent); 
-    color: #fff; 
-    font-weight: 800; 
-    font-size: 10px; 
-    padding: 2px 7px; 
-    border-radius: 4px; 
-    margin-left: 6px; 
-}
-
-.campos-painel { 
-    display: grid; 
-    gap: 12px; 
-    margin-bottom: 12px; 
-    grid-template-columns: 140px 1.5fr 1.5fr; 
-}
-.campo-grupo label { 
-    display: flex;
-    justify-content: space-between;
-    font-weight: 700; 
-    margin-bottom: 4px; 
-    font-size: 10.5px; 
-    color: #9d174d; 
-    text-transform: uppercase; 
-}
-.painel-controle input[type="text"] { 
-    width: 100%; 
-    font-family: inherit; 
-    font-size: 12px; 
-    padding: 8px 10px; 
-    border: 1px solid var(--primary-border); 
-    border-radius: 6px; 
-    background: var(--primary-bg); 
-    outline: none; 
-    transition: border-color 0.2s, background-color 0.2s;
-}
-.painel-controle input[type="text"]:focus, .painel-controle textarea:focus { 
-    border-color: var(--primary); 
-    background: #fff; 
-}
-.painel-controle textarea { 
-    width: 100%; 
-    height: 65px; 
-    font-family: inherit; 
-    font-size: 12px; 
-    padding: 8px 10px; 
-    border: 1px solid var(--primary-border); 
-    border-radius: 6px; 
-    resize: vertical; 
-    text-transform: uppercase; 
-    background: var(--primary-bg); 
-    outline: none; 
-    transition: border-color 0.2s, background-color 0.2s;
-}
-
-.contador-colaboradores {
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--primary);
-    text-transform: none;
-}
-
-.botoes-painel { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; }
-.btn { 
-    cursor: pointer; 
-    padding: 7px 14px; 
-    font-size: 11px; 
-    font-weight: 700; 
-    border: none; 
-    border-radius: 6px; 
-    color: #fff; 
-    display: inline-flex; 
-    align-items: center; 
-    gap: 5px; 
-    transition: filter 0.15s ease, transform 0.05s ease;
-}
-.btn:hover { filter: brightness(1.08); }
-.btn:active { transform: translateY(1px); }
-
-.btn-pink { background-color: var(--primary); } 
-.btn-add-folha { background-color: #7c3aed; }
-.btn-renumerar { background-color: #ea580c; }
-.btn-salvar { background-color: #2563eb; }
-.btn-carregar { background-color: #0891b2; }
-.btn-exportar { background-color: #4f46e5; }
-.btn-limpar { background-color: var(--slate-100); color: var(--slate-600); border: 1px solid var(--slate-300); } 
-.btn-voltar { background-color: var(--slate-600); text-decoration: none; } 
-.btn-imprimir { background-color: var(--slate-900); margin-left: auto; }
-
-/* BARRA DE ZOOM */
-.barra-zoom { 
-    background: var(--primary-light); 
-    padding: 6px 14px; 
-    max-width: 1200px; 
-    margin: 0 auto 10px auto; 
-    border-radius: 6px; 
-    display: flex; 
-    align-items: center; 
-    justify-content: flex-end; 
-    gap: 8px; 
-    font-size: 11px; 
-    font-weight: 700; 
-    color: #9d174d; 
-    border: 1px solid #fbcfe8; 
-}
-.btn-zoom { 
-    background: #fff; 
-    border: 1px solid var(--primary-border); 
-    padding: 3px 10px; 
-    border-radius: 4px; 
-    cursor: pointer; 
-    font-weight: 800; 
-    color: var(--primary); 
-}
-.btn-zoom:hover { background: #fdf2f8; }
-
-/* FOLHA A4 */
-.folha-a4 { 
-    width: 100%; 
-    max-width: 1200px; 
-    background: #fff; 
-    padding: 14px 16px; 
-    margin: 0 auto 20px auto; 
-    box-shadow: 0 10px 30px rgba(219, 39, 119, 0.08); 
-    border-radius: 10px; 
-    border: 1px solid var(--primary-border); 
-    transform-origin: top center; 
-    transition: transform 0.15s ease; 
-    position: relative; 
-}
-
-.barra-controle-folha { 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center; 
-    margin-bottom: 6px; 
-    background: var(--primary-bg); 
-    padding: 5px 10px; 
-    border: 1px solid #fbcfe8; 
-    border-radius: 6px; 
-}
-.grupo-acoes-linhas { display: flex; align-items: center; gap: 6px; }
-.btn-linha-topo { 
-    border: 1px solid var(--primary); 
-    border-radius: 4px; 
-    font-size: 9px; 
-    font-weight: 700; 
-    padding: 3px 8px; 
-    cursor: pointer; 
-    background: #fff; 
-    color: var(--primary); 
-}
-.btn-remover-folha { 
-    background: #fff; 
-    color: var(--danger); 
-    border: 1px solid #fca5a5; 
-    border-radius: 4px; 
-    font-size: 9px; 
-    font-weight: 700; 
-    padding: 3px 8px; 
-    cursor: pointer; 
-}
-
-/* CABEÇALHOS DA FOLHA */
-.cabecalho-container, .info-ferias-bar, table.tabela-ferias { 
-    width: 100%; 
-    border-collapse: collapse; 
-    border: 1.2px solid var(--slate-900); 
-    margin-bottom: 4px; 
-    table-layout: fixed; 
-}
-.cabecalho-container td, .info-ferias-bar td { 
-    border: 1px solid var(--slate-700); 
-    padding: 3px 8px; 
-    vertical-align: middle; 
-    text-align: center; 
-}
-.logo-box { 
-    width: 90px; 
-    font-weight: 900; 
-    font-size: 16px; 
-    color: #007e7a; 
-    letter-spacing: 1.5px;
-    background-color: var(--slate-50); 
-}
-.titulo-box { 
-    font-size: 11px; 
-    font-weight: 800; 
-    text-transform: uppercase; 
-    color: var(--slate-900); 
-    padding: 0 10px; 
-}
-.meta-box { 
-    width: 130px; 
-    font-size: 8.5px; 
-    text-align: left !important; 
-    padding-left: 8px !important; 
-    background-color: var(--slate-50); 
-    line-height: 1.35; 
-}
-
-.info-ferias-bar { 
-    font-size: 8.5px; 
-    font-weight: 700; 
-    background-color: var(--slate-50); 
-}
-.info-ferias-bar td { text-align: left; padding: 2px 8px; }
-.campo-editavel { outline: none; display: inline-block; min-width: 25px; font-weight: 600; color: var(--slate-900); }
-
-/* TABELA DE FÉRIAS */
-table.tabela-ferias { border: 1.5px solid var(--primary); }
-table.tabela-ferias th, table.tabela-ferias td { 
-    border: 1px solid var(--primary-border); 
-    text-align: center; 
-    vertical-align: middle; 
-    font-size: 8.5px; 
-    height: 25px; 
-    padding: 1px; 
-}
-table.tabela-ferias th { 
-    background-color: var(--primary); 
-    color: #fff; 
-    font-weight: 800; 
-    text-transform: uppercase; 
-}
-
-.col-id { width: 38px; background: var(--primary-bg); font-weight: 800; color: #831843; }
-.col-id-texto { outline: none; font-size: 9px; font-weight: 800; color: #831843; display: inline-block; width: 100%; text-align: center; }
-
-.col-nome { background: var(--primary-light) !important; width: 220px; }
-.col-nome-container { display: flex; align-items: center; justify-content: space-between; padding: 0 6px; width: 100%; gap: 4px; }
-.col-nome-texto { flex-grow: 1; text-align: left; outline: none; white-space: nowrap; overflow: hidden; font-size: 9px; font-weight: 700; color: #831843; text-transform: uppercase; }
-
-.celula-ferias { outline: none; font-size: 8px; font-weight: 700; background: #fff; }
-.celula-ferias:focus { background-color: #fdf2f8; box-shadow: inset 0 0 0 1.5px var(--primary); }
-
-.col-saldo { width: 45px; font-weight: 800; background: var(--primary-bg); outline: none; color: #831843; font-size: 9px; }
-.col-saldo:focus { background: #fff; box-shadow: inset 0 0 0 1.5px var(--primary); }
-
-.botoes-acoes { display: flex; align-items: center; gap: 2px; opacity: 0.3; transition: opacity 0.2s; }
-tr:hover .botoes-acoes { opacity: 1; }
-.btn-acao { 
-    background: rgba(219,39,119,0.1); 
-    border: 1px solid rgba(219,39,119,0.3); 
-    border-radius: 3px; 
-    cursor: pointer; 
-    padding: 1px 3px; 
-    font-size: 8px; 
-    color: #831843; 
-}
-.btn-mais-linha { color: var(--success); font-weight: 900; }
-.btn-menos-linha { color: var(--accent); font-weight: 900; }
-.btn-lixeira { color: var(--danger); }
-
-/* REGRAS RÍGIDAS DE IMPRESSÃO A4 PAISAGEM */
-@media print {
-    @page { 
-        size: A4 landscape; 
-        margin: 4mm 5mm; 
-    }
-    body { 
-        background: #ffffff !important; 
-        margin: 0 !important; 
-        padding: 0 !important; 
-        -webkit-print-color-adjust: exact; 
-        print-color-adjust: exact; 
-    }
-    .painel-controle, .barra-zoom, .botoes-acoes, .barra-controle-folha, #toastNotificacao { display: none !important; }
-    .folha-a4 { 
-        box-shadow: none !important; 
-        border: none !important; 
-        width: 100% !important; 
-        max-width: 100% !important; 
-        transform: none !important; 
-        margin: 0 !important; 
-        padding: 0 !important; 
-        page-break-after: always !important; 
-        break-after: page !important; 
-    }
-    .folha-a4:last-child {
-        page-break-after: auto !important;
-        break-after: auto !important;
-    }
-    table.tabela-ferias th { background-color: var(--primary) !important; color: #fff !important; }
-    .col-nome { background-color: var(--primary-light) !important; }
-    .col-id, .col-saldo { background-color: var(--primary-bg) !important; }
+:root{--primary:#db2777;--primary-dark:#be185d;--primary-light:#fce7f3;--primary-border:#f472b6;--primary-bg:#fff1f2;--accent:#f59e0b;--danger:#ef4444;--success:#10b981;--s900:#0f172a;--s700:#334155;--s600:#475569;--s300:#cbd5e1;--s200:#e2e8f0;--s100:#f1f5f9;--s50:#f8fafc}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#fff5f7;color:var(--s900);min-height:100vh;padding:16px}
+#toastNotificacao{position:fixed;bottom:24px;right:24px;background:var(--s900);color:#fff;padding:10px 18px;border-radius:6px;font-size:12px;font-weight:600;box-shadow:0 10px 25px -5px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:.25s;transform:translateY(12px);z-index:9999}
+#toastNotificacao.ativo{opacity:1;transform:none}
+.painel-controle{background:#fff;padding:18px 22px;margin:0 auto 16px;border-radius:12px;box-shadow:0 10px 25px -5px rgba(219,39,119,.08);border:1px solid #fbcfe8;max-width:1200px}
+.topo-modulo-info{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;border-bottom:2px solid var(--primary);padding-bottom:8px;gap:8px;flex-wrap:wrap}
+.badge-modulo{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;font-size:11.5px;font-weight:800;padding:5px 12px;border-radius:6px;text-transform:uppercase;letter-spacing:.8px}
+.tag-v06{background:var(--accent);color:#fff;font-weight:800;font-size:10px;padding:2px 7px;border-radius:4px;margin-left:6px}
+.campos-painel{display:grid;gap:12px;margin-bottom:12px;grid-template-columns:140px 1.5fr 1.5fr}
+.campo-grupo label{display:flex;justify-content:space-between;font-weight:700;margin-bottom:4px;font-size:10.5px;color:#9d174d;text-transform:uppercase}
+.painel-controle input[type=text],.painel-controle textarea{width:100%;font-family:inherit;font-size:12px;padding:8px 10px;border:1px solid var(--primary-border);border-radius:6px;background:var(--primary-bg);outline:none;transition:.2s}
+.painel-controle textarea{height:90px;resize:vertical;text-transform:uppercase}
+.painel-controle input:focus,.painel-controle textarea:focus{border-color:var(--primary);background:#fff;box-shadow:0 0 0 3px rgba(219,39,119,.12)}
+.contador-colaboradores{font-size:10px;font-weight:700;color:var(--primary);text-transform:none}
+.contador-colaboradores.aviso{color:var(--danger)}
+.botoes-painel{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.btn{cursor:pointer;padding:7px 14px;font-size:11px;font-weight:700;border:none;border-radius:6px;color:#fff;display:inline-flex;align-items:center;gap:5px;transition:filter .15s,transform .05s;text-decoration:none}
+.btn:hover{filter:brightness(1.08)}.btn:active{transform:translateY(1px)}
+.btn-pink{background:var(--primary)}.btn-add-folha{background:#7c3aed}.btn-renumerar{background:#ea580c}.btn-salvar{background:#2563eb}.btn-carregar{background:#0891b2}.btn-exportar{background:#4f46e5}
+.btn-limpar{background:var(--s100);color:var(--s600);border:1px solid var(--s300)}
+.btn-voltar{background:var(--s600)}.btn-imprimir{background:var(--s900);margin-left:auto}
+.dica{font-size:10px;color:var(--s600);margin-top:8px}
+.barra-zoom{background:var(--primary-light);padding:6px 14px;max-width:1200px;margin:0 auto 10px;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;gap:8px;font-size:11px;font-weight:700;color:#9d174d;border:1px solid #fbcfe8}
+.btn-zoom{background:#fff;border:1px solid var(--primary-border);padding:3px 10px;border-radius:4px;cursor:pointer;font-weight:800;color:var(--primary)}
+.btn-zoom:hover{background:#fdf2f8}
+.folha-a4{width:100%;max-width:1200px;background:#fff;padding:14px 16px;margin:0 auto 20px;box-shadow:0 10px 30px rgba(219,39,119,.08);border-radius:10px;border:1px solid var(--primary-border)}
+.rolagem{overflow-x:auto}
+.rolagem>table{min-width:1000px}
+.barra-controle-folha{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;background:var(--primary-bg);padding:5px 10px;border:1px solid #fbcfe8;border-radius:6px}
+.btn-linha-topo,.btn-remover-folha{border-radius:4px;font-size:10px;font-weight:700;padding:3px 8px;cursor:pointer;background:#fff}
+.btn-linha-topo{border:1px solid var(--primary);color:var(--primary)}
+.btn-remover-folha{color:var(--danger);border:1px solid #fca5a5}
+.cabecalho-container,.info-ferias-bar,table.tabela-ferias{width:100%;border-collapse:collapse;border:1.2px solid var(--s900);margin-bottom:4px;table-layout:fixed}
+.cabecalho-container td,.info-ferias-bar td{border:1px solid var(--s700);padding:3px 8px;vertical-align:middle;text-align:center}
+.logo-box{width:90px;font-weight:900;font-size:16px;color:#007e7a;letter-spacing:1.5px;background:var(--s50)}
+.titulo-box{font-size:11px;font-weight:800;text-transform:uppercase;padding:0 10px}
+.meta-box{width:130px;font-size:8.5px;text-align:left!important;padding-left:8px!important;background:var(--s50);line-height:1.35}
+.info-ferias-bar{font-size:8.5px;font-weight:700;background:var(--s50)}
+.info-ferias-bar td{text-align:left;padding:2px 8px}
+.campo-editavel{outline:none;display:inline-block;min-width:25px;font-weight:600}
+table.tabela-ferias{border:1.5px solid var(--primary)}
+table.tabela-ferias th,table.tabela-ferias td{border:1px solid var(--primary-border);text-align:center;vertical-align:middle;font-size:8.5px;height:25px;padding:1px}
+table.tabela-ferias th{background:var(--primary);color:#fff;font-weight:800;text-transform:uppercase}
+table.tabela-ferias tbody tr:hover{background:#fff7fa}
+.col-id{width:38px;background:var(--primary-bg);font-weight:800;color:#831843}
+.col-id-texto{outline:none;font-size:9px;font-weight:800;color:#831843;display:inline-block;width:100%;text-align:center}
+.col-nome{background:var(--primary-light)!important;width:220px}
+.col-nome-container{display:flex;align-items:center;justify-content:space-between;padding:0 6px;width:100%;gap:4px}
+.col-nome-texto{flex-grow:1;text-align:left;outline:none;white-space:nowrap;overflow:hidden;font-size:9px;font-weight:700;color:#831843;text-transform:uppercase;min-height:11px}
+.celula-ferias{outline:none;font-size:8px;font-weight:700;background:#fff}
+.celula-ferias:focus{background:#fdf2f8;box-shadow:inset 0 0 0 1.5px var(--primary)}
+.celula-ferias.invalida{background:#fee2e2;color:var(--danger)}
+.col-saldo{width:45px;font-weight:800;background:var(--primary-bg);outline:none;color:#831843;font-size:9px}
+.col-saldo:focus{background:#fff;box-shadow:inset 0 0 0 1.5px var(--primary)}
+.botoes-acoes{display:flex;gap:2px;opacity:.3;transition:opacity .2s}
+tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
+.btn-acao{background:rgba(219,39,119,.1);border:1px solid rgba(219,39,119,.3);border-radius:3px;cursor:pointer;padding:1px 3px;font-size:8px;color:#831843}
+.btn-mais-linha{color:var(--success);font-weight:900}.btn-menos-linha{color:var(--accent);font-weight:900}.btn-lixeira{color:var(--danger)}
+@media(max-width:800px){.campos-painel{grid-template-columns:1fr}.btn-imprimir{margin-left:0}}
+@media print{
+@page{size:A4 landscape;margin:4mm 5mm}
+body{background:#fff!important;margin:0!important;padding:0!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.painel-controle,.barra-zoom,.botoes-acoes,.barra-controle-folha,#toastNotificacao{display:none!important}
+.rolagem{overflow:visible}.rolagem>table{min-width:0}
+.folha-a4{box-shadow:none!important;border:none!important;width:100%!important;max-width:100%!important;zoom:1!important;margin:0!important;padding:0!important;break-after:page;page-break-after:always}
+.folha-a4:last-child{break-after:auto;page-break-after:auto}
+table.tabela-ferias tbody tr:hover{background:inherit}
+.celula-ferias.invalida{background:#fff!important;color:inherit!important}
 }
 </style>
 </head>
 <body>
+<div id="toastNotificacao" role="status" aria-live="polite">Mensagem</div>
+<input type="file" id="arquivoBackupFerias" style="display:none" accept=".json" onchange="processarArquivoBackup(this)">
 
-    <div id="toastNotificacao">Mensagem</div>
-    <input type="file" id="arquivoBackupFerias" style="display:none;" accept=".json" onchange="processarArquivoBackup(this)">
+<div class="painel-controle">
+  <div class="topo-modulo-info">
+    <span class="badge-modulo">Módulo 3: Cronograma de Férias <span class="tag-v06">v07</span></span>
+    <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
+  </div>
+  <div class="campos-painel">
+    <div class="campo-grupo"><label for="anoInputFerias">Ano:</label><input type="text" id="anoInputFerias" value="2026" inputmode="numeric" oninput="sincronizarCabecalhosFerias()"></div>
+    <div class="campo-grupo"><label for="areaInputFerias">Área / Gerência:</label><input type="text" id="areaInputFerias" placeholder="Operação / Mina" oninput="sincronizarCabecalhosFerias()"></div>
+    <div class="campo-grupo"><label for="turnoInputFerias">Setor / Turno:</label><input type="text" id="turnoInputFerias" placeholder="Turno A" oninput="sincronizarCabecalhosFerias()"></div>
+  </div>
+  <div class="campo-grupo">
+    <label for="nomesInputFerias"><span>Lista de Colaboradores (A-Z automático):</span><span id="contadorColaboradores" class="contador-colaboradores">0 colaborador(es) | 1 folha(s)</span></label>
+    <textarea id="nomesInputFerias" oninput="atualizarContadorNomes()" placeholder="COLE OS NOMES AQUI (UM POR LINHA)..."></textarea>
+  </div>
+  <div class="botoes-painel">
+    <button type="button" class="btn btn-pink" onclick="gerarTabelaPorNomes()">Gerar com Nomes (A-Z)</button>
+    <button type="button" class="btn btn-add-folha" onclick="adicionarFolhaFerias()">📄➕ Folha Extra</button>
+    <button type="button" class="btn btn-renumerar" onclick="reordenarNumFerias(true)">🔢 Renumerar</button>
+    <button type="button" class="btn btn-salvar" onclick="salvarTudoFerias()">💾 Salvar</button>
+    <button type="button" class="btn btn-carregar" onclick="carregarTudoFerias()">📂 Carregar</button>
+    <button type="button" class="btn btn-exportar" onclick="exportarBackupJSON()">⬇️ Backup</button>
+    <button type="button" class="btn btn-exportar" onclick="document.getElementById('arquivoBackupFerias').click()">⬆️ Restaurar</button>
+    <button type="button" class="btn btn-limpar" onclick="limparTudoFerias()">Limpar</button>
+    <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
+  </div>
+  <p class="dica">💾 Salvamento automático neste navegador. Nas datas, digite 4 números (ex.: 1507) e ela vira 15/07. Duplo clique numa data vazia preenche com hoje. Enter desce para a linha de baixo.</p>
+</div>
 
-    <div class="painel-controle">
-        <div class="topo-modulo-info">
-            <span class="badge-modulo">Módulo 3: Cronograma de Férias <span class="tag-v06">v06</span></span>
-            <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
-        </div>
-        <div class="campos-painel">
-            <div class="campo-grupo">
-                <label>Ano:</label>
-                <input type="text" id="anoInputFerias" value="2026" oninput="sincronizarCabecalhosFerias()">
-            </div>
-            <div class="campo-grupo">
-                <label>Área / Gerência:</label>
-                <input type="text" id="areaInputFerias" placeholder="Operação / Mina" oninput="sincronizarCabecalhosFerias()">
-            </div>
-            <div class="campo-grupo">
-                <label>Setor / Turno:</label>
-                <input type="text" id="turnoInputFerias" placeholder="Turno A" oninput="sincronizarCabecalhosFerias()">
-            </div>
-        </div>
-        <div class="campo-grupo">
-            <label>
-                <span>Lista de Colaboradores (Ordenação A-Z automática):</span>
-                <span id="contadorColaboradores" class="contador-colaboradores">0 colaborador(es) | 0 folha(s)</span>
-            </label>
-            <textarea id="nomesInputFerias" oninput="atualizarContadorNomes()" placeholder="COLE OS NOMES AQUI (UM POR LINHA)..."></textarea>
-        </div>
-        <div class="botoes-painel">
-            <button type="button" class="btn btn-pink" onclick="gerarTabelaPorNomes()">Gerar com Nomes (A-Z)</button>
-            <button type="button" class="btn btn-add-folha" onclick="adicionarFolhaFerias()">📄➕ Folha Extra</button>
-            <button type="button" class="btn btn-renumerar" onclick="reordenarNumFerias()">🔢 Renumerar</button>
-            <button type="button" class="btn btn-salvar" onclick="salvarTudoFerias()">💾 Salvar</button>
-            <button type="button" class="btn btn-carregar" onclick="carregarTudoFerias()">📂 Carregar</button>
-            <button type="button" class="btn btn-exportar" onclick="exportarBackupJSON()">⬇️ Backup</button>
-            <button type="button" class="btn btn-exportar" onclick="document.getElementById('arquivoBackupFerias').click()">⬆️ Restaurar</button>
-            <button type="button" class="btn btn-limpar" onclick="limparTudoFerias()">Limpar</button>
-            <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
-        </div>
-    </div>
+<div class="barra-zoom">
+  <span>Zoom na tela:</span>
+  <button class="btn-zoom" onclick="mudarZoom(-0.05)">➖ Reduzir</button>
+  <button class="btn-zoom" onclick="resetZoom()">100%</button>
+  <button class="btn-zoom" onclick="mudarZoom(0.05)">➕ Ampliar</button>
+</div>
 
-    <div class="barra-zoom">
-        <span>Ajustar Visualização em Tela (Zoom):</span>
-        <button class="btn-zoom" onclick="mudarZoom(-0.05)">➖ Reduzir</button>
-        <button class="btn-zoom" onclick="resetZoom()">100%</button>
-        <button class="btn-zoom" onclick="mudarZoom(0.05)">➕ Ampliar</button>
-    </div>
+<div id="contentorFolhasFerias"></div>
 
-    <div id="contentorFolhasFerias"></div>
+<script>
+const TOTAL_LINHAS_FERIAS = 21, CHAVE = 'valeferias_v06';
+const DADOS_F_INICIAIS = [
+  "MARIANA PEREIRA CRUZ","RICARDO GONCALVES DE MELLO LEITE","JOAO SILVA RAMOS","ALFREDO AUGUSTO RAMOS NETO",
+  "MARCOS AURELIO CATALLARES MATTOS","VANDERSON TEIXEIRA","BRUNO RICARDO","GABRIEL CARNEIRO",
+  "GLEIVSTON SILVA MENDES","ROBSON DE SOUZA MENDONCA","PAULO HENRIQUE","BRUNO GOMES FIDELIS",
+  "ATMISTO SILVA","CAIO HENRIQUE","PABLO MESQUITA","DAVID MARCELO DELGADO DOS SANTOS",
+  "DOMINIQUE SILVA","RICHARD SILVA","EMERSON RIBEIRO DOS SANTOS","ALLAN SOUZA DE CARVALHO","TITO DACAL"];
+const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+const $ = id => document.getElementById(id);
+const pad = n => n < 10 ? '0' + n : '' + n;
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let nivelZoom = 1, _toast, _auto;
 
-    <script>
-        const TOTAL_LINHAS_FERIAS = 21;
-        let nivelZoom = 1.0;
+function mostrarToast(msg) {
+  const t = $('toastNotificacao'); t.innerText = msg; t.classList.add('ativo');
+  clearTimeout(_toast); _toast = setTimeout(() => t.classList.remove('ativo'), 2600);
+}
 
-        const DADOS_F_INICIAIS = [
-            "MARIANA PEREIRA CRUZ", "RICARDO GONCALVES DE MELLO LEITE",
-            "JOAO SILVA RAMOS", "ALFREDO AUGUSTO RAMOS NETO",
-            "MARCOS AURELIO CATALLARES MATTOS", "VANDERSON TEIXEIRA",
-            "BRUNO RICARDO", "GABRIEL CARNEIRO",
-            "GLEIVSTON SILVA MENDES", "ROBSON DE SOUZA MENDONCA",
-            "PAULO HENRIQUE", "BRUNO GOMES FIDELIS",
-            "ATMISTO SILVA", "CAIO HENRIQUE",
-            "PABLO MESQUITA", "DAVID MARCELO DELGADO DOS SANTOS",
-            "DOMINIQUE SILVA", "RICHARD SILVA",
-            "EMERSON RIBEIRO DOS SANTOS", "ALLAN SOUZA DE CARVALHO",
-            "TITO DACAL"
-        ];
+/* Zoom com a propriedade zoom: o espaço da página acompanha (transform deixava um vazio embaixo) */
+function aplicarZoom() { document.querySelectorAll('.folha-a4').forEach(f => { f.style.zoom = nivelZoom; f.style.transform = ''; }); }
+function mudarZoom(v) { nivelZoom = Math.round(Math.min(Math.max(nivelZoom + v, 0.7), 1.3) * 100) / 100; aplicarZoom(); }
+function resetZoom() { nivelZoom = 1; aplicarZoom(); }
 
-        function mostrarToast(msg) {
-            const toast = document.getElementById('toastNotificacao');
-            toast.innerText = msg;
-            toast.classList.add('ativo');
-            setTimeout(() => { toast.classList.remove('ativo'); }, 2600);
-        }
+const valorCampo = (id, p) => $(id).value.trim() || p;
+function sincronizarCabecalhosFerias() {
+  const v = { '.val-ano': valorCampo('anoInputFerias','2026'), '.val-area': valorCampo('areaInputFerias','---'), '.val-turno': valorCampo('turnoInputFerias','---') };
+  document.querySelectorAll('#contentorFolhasFerias .folha-a4').forEach(f => { for (const k in v) { const el = f.querySelector(k); if (el) el.innerText = v[k]; } });
+  agendarAutoSave();
+}
 
-        function mudarZoom(valor) {
-            nivelZoom = Math.min(Math.max(nivelZoom + valor, 0.7), 1.3);
-            document.querySelectorAll('.folha-a4').forEach(f => f.style.transform = `scale(${nivelZoom})`);
-        }
+function lerNomes() { return $('nomesInputFerias').value.toUpperCase().split('\n').map(l => l.trim()).filter(Boolean); }
+function atualizarContadorNomes() {
+  const ta = $('nomesInputFerias'), pos = ta.selectionStart;
+  ta.value = ta.value.toUpperCase(); ta.setSelectionRange(pos, pos);
+  const nomes = lerNomes(), total = nomes.length, dup = total - new Set(nomes).size, c = $('contadorColaboradores');
+  c.innerText = `${total} colaborador(es) | ${Math.max(1, Math.ceil(total / TOTAL_LINHAS_FERIAS))} folha(s)` + (dup ? ` | ⚠ ${dup} repetido(s)` : '');
+  c.classList.toggle('aviso', dup > 0);
+}
 
-        function resetZoom() {
-            nivelZoom = 1.0;
-            document.querySelectorAll('.folha-a4').forEach(f => f.style.transform = `scale(1)`);
-        }
+function criarLinhaFerias(numStr, nome = '') {
+  const tds = '<td class="celula-ferias" contenteditable="true" title="Data (4 números = dd/mm)"></td>'.repeat(24);
+  return `<td class="col-id"><span class="col-id-texto" contenteditable="true">${numStr}</span></td>` +
+    `<td class="col-nome"><div class="col-nome-container"><span class="col-nome-texto" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()">${esc(nome)}</span>` +
+    `<div class="botoes-acoes"><button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixoFerias(this)" title="Adicionar linha abaixo">➕</button><button type="button" class="btn-acao btn-menos-linha" onclick="removerLinhaFerias(this)" title="Remover linha">➖</button><button type="button" class="btn-acao btn-lixeira" onclick="apagarLinhaFerias(this)" title="Apagar nome">🗑️</button></div></div></td>` +
+    tds + '<td class="col-saldo" contenteditable="true" title="Saldo de dias">-</td>';
+}
+function apagarLinhaFerias(b) { b.closest('tr').querySelector('.col-nome-texto').innerText = ''; agendarAutoSave(); }
+function adicionarLinhaAbaixoFerias(b) { const tr = document.createElement('tr'); tr.innerHTML = criarLinhaFerias('00'); b.closest('tr').after(tr); reordenarNumFerias(); }
+function adicionarLinhaFimFerias(b) { const tr = document.createElement('tr'); tr.innerHTML = criarLinhaFerias('00'); b.closest('.folha-a4').querySelector('.corpo-tabela-ferias').appendChild(tr); reordenarNumFerias(); }
+function removerLinhaFerias(b) { const tr = b.closest('tr'); if (tr.parentNode.querySelectorAll('tr').length > 1) { tr.remove(); reordenarNumFerias(); } }
+function removerFolhaFerias(b) {
+  if (document.querySelectorAll('#contentorFolhasFerias .folha-a4').length <= 1) { mostrarToast('Mantenha ao menos uma folha na tela.'); return; }
+  if (!confirm('Remover esta folha e todos os dados dela?')) return;
+  b.closest('.folha-a4').remove(); atualizarPaginacaoFerias(); agendarAutoSave();
+}
+/* numeração reinicia em 01 a cada folha, como na versão anterior */
+function reordenarNumFerias(notificar = false) {
+  document.querySelectorAll('#contentorFolhasFerias .folha-a4').forEach(folha => {
+    folha.querySelectorAll('.corpo-tabela-ferias tr .col-id-texto').forEach((s, i) => { s.innerText = pad(i + 1); });
+  });
+  if (notificar) mostrarToast('Numeração reorganizada sequencialmente');
+  agendarAutoSave();
+}
 
-        function sincronizarCabecalhosFerias() {
-            const ano = document.getElementById('anoInputFerias').value || '2026';
-            const area = document.getElementById('areaInputFerias').value || '---';
-            const turno = document.getElementById('turnoInputFerias').value || '---';
+function criarTabelaFeriasHTML(nomes) {
+  const lista = nomes.length ? nomes : Array(TOTAL_LINHAS_FERIAS).fill('');
+  const linhas = lista.map((n, i) => `<tr>${criarLinhaFerias(pad(i + 1), n)}</tr>`).join('');
+  const f = document.createElement('div'); f.className = 'folha-a4'; f.style.zoom = nivelZoom;
+  f.innerHTML = `
+  <div class="barra-controle-folha">
+    <div><button type="button" class="btn-linha-topo" onclick="adicionarLinhaFimFerias(this)">➕ Linha no Fim</button></div>
+    <button type="button" class="btn-remover-folha" onclick="removerFolhaFerias(this)">Remover Folha ✕</button>
+  </div>
+  <div class="rolagem">
+  <table class="cabecalho-container"><tr><td class="logo-box">VALE</td><td class="titulo-box">CRONOGRAMA ANUAL DE CONTROLE DE FÉRIAS DA EQUIPE</td>
+    <td class="meta-box"><strong>Ano:</strong> <span class="val-ano">${esc(valorCampo('anoInputFerias','2026'))}</span><br><span class="indicador-folha"><strong>Folha:</strong> 01 / 01</span></td></tr></table>
+  <table class="info-ferias-bar"><tr>
+    <td><strong>Área / Gerência:</strong> <span class="val-area campo-editavel" contenteditable="true">${esc(valorCampo('areaInputFerias','---'))}</span></td>
+    <td><strong>Setor / Turno:</strong> <span class="val-turno campo-editavel" contenteditable="true">${esc(valorCampo('turnoInputFerias','---'))}</span></td></tr></table>
+  <table class="tabela-ferias"><thead>
+    <tr><th rowspan="2" style="width:38px">Nº</th><th rowspan="2" style="width:220px">COLABORADOR</th>${MESES.map(m => `<th colspan="2">${m}</th>`).join('')}<th rowspan="2" style="width:45px">Saldo</th></tr>
+    <tr style="font-size:7px">${'<th>Ini</th><th>Fim</th>'.repeat(12)}</tr>
+  </thead><tbody class="corpo-tabela-ferias">${linhas}</tbody></table></div>`;
+  return f;
+}
 
-            document.querySelectorAll('#contentorFolhasFerias .folha-a4').forEach(f => {
-                const elAno = f.querySelector('.val-ano');
-                const elArea = f.querySelector('.val-area');
-                const elTurno = f.querySelector('.val-turno');
+function atualizarPaginacaoFerias() {
+  const f = document.querySelectorAll('#contentorFolhasFerias .folha-a4');
+  f.forEach((folha, i) => { const ind = folha.querySelector('.indicador-folha'); if (ind) ind.innerHTML = `<strong>Folha:</strong> ${pad(i + 1)} / ${pad(f.length)}`; });
+}
+function temDadosPreenchidos() {
+  return [...$('contentorFolhasFerias').querySelectorAll('.celula-ferias,.col-nome-texto')].some(e => e.innerText.trim()) ||
+         [...$('contentorFolhasFerias').querySelectorAll('.col-saldo')].some(e => !['', '-'].includes(e.innerText.trim()));
+}
+function montarFolhas(nomes) {
+  const box = $('contentorFolhasFerias'); box.innerHTML = '';
+  if (!nomes.length) box.appendChild(criarTabelaFeriasHTML([]));
+  for (let i = 0; i < nomes.length; i += TOTAL_LINHAS_FERIAS) box.appendChild(criarTabelaFeriasHTML(nomes.slice(i, i + TOTAL_LINHAS_FERIAS)));
+  atualizarPaginacaoFerias();
+}
+function gerarTabelaPorNomes() {
+  if (temDadosPreenchidos() && !confirm('Gerar novas folhas vai substituir o que já está preenchido (nomes, datas e saldos). Continuar?')) return;
+  const nomes = lerNomes().sort((a, b) => a.localeCompare(b, 'pt-BR'));
+  $('nomesInputFerias').value = nomes.join('\n'); atualizarContadorNomes();
+  montarFolhas(nomes); agendarAutoSave();
+  mostrarToast(nomes.length ? 'Tabela de férias gerada em ordem A-Z' : 'Folha em branco gerada');
+}
+function adicionarFolhaFerias() {
+  $('contentorFolhasFerias').appendChild(criarTabelaFeriasHTML([]));
+  atualizarPaginacaoFerias(); agendarAutoSave(); mostrarToast('Folha extra adicionada');
+}
 
-                if (elAno) elAno.innerText = ano;
-                if (elArea) elArea.innerText = area;
-                if (elTurno) elTurno.innerText = turno;
-            });
-        }
+function obterEstadoCompleto() {
+  return { ano: $('anoInputFerias').value, area: $('areaInputFerias').value, turno: $('turnoInputFerias').value, nomes: $('nomesInputFerias').value, html: $('contentorFolhasFerias').innerHTML };
+}
+function gravar(silencioso) {
+  try { localStorage.setItem(CHAVE, JSON.stringify(obterEstadoCompleto())); if (!silencioso) mostrarToast('Cronograma de Férias salvo com sucesso!'); }
+  catch (e) { mostrarToast('Não foi possível salvar. Use o Backup.'); }
+}
+function salvarTudoFerias() { gravar(false); }
+function agendarAutoSave() { clearTimeout(_auto); _auto = setTimeout(() => gravar(true), 1200); }
+function lerSalvo() { try { const s = localStorage.getItem(CHAVE); return s ? JSON.parse(s) : null; } catch (e) { return null; } }
+function carregarTudoFerias() {
+  const d = lerSalvo();
+  if (!d) { mostrarToast('Nenhum dado salvo encontrado.'); return; }
+  restaurarEstado(d); mostrarToast('Cronograma carregado com sucesso!');
+}
+function restaurarEstado(d) {
+  const map = { ano:'anoInputFerias', area:'areaInputFerias', turno:'turnoInputFerias', nomes:'nomesInputFerias' };
+  for (const k in map) if (d[k] !== undefined) $(map[k]).value = d[k];
+  if (d.html !== undefined) $('contentorFolhasFerias').innerHTML = d.html;
+  if (!document.querySelector('#contentorFolhasFerias .folha-a4')) montarFolhas([]);
+  document.querySelectorAll('.folha-a4').forEach(f => { f.style.transform = ''; });
+  aplicarZoom(); atualizarPaginacaoFerias(); atualizarContadorNomes();
+}
+function exportarBackupJSON() {
+  const blob = new Blob([JSON.stringify(obterEstadoCompleto(), null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = url; a.download = `backup_ferias_${$('anoInputFerias').value.trim() || '2026'}.json`;
+  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  mostrarToast('Backup exportado com sucesso!');
+}
+function processarArquivoBackup(input) {
+  const file = input.files[0]; if (!file) return;
+  const r = new FileReader();
+  r.onload = e => {
+    try {
+      const d = JSON.parse(e.target.result);
+      if (typeof d !== 'object' || d === null || (d.html === undefined && d.nomes === undefined)) throw 0;
+      restaurarEstado(d); mostrarToast('Backup restaurado com sucesso!');
+    } catch (err) { mostrarToast('Arquivo de backup inválido.'); }
+  };
+  r.readAsText(file); input.value = '';
+}
+function limparTudoFerias() {
+  if (!confirm('Apagar todas as folhas e nomes? Não dá para desfazer (faça um Backup antes, se precisar).')) return;
+  $('nomesInputFerias').value = ''; atualizarContadorNomes(); montarFolhas([]); agendarAutoSave();
+  mostrarToast('Área resetada.');
+}
 
-        function atualizarContadorNomes() {
-            const textarea = document.getElementById('nomesInputFerias');
-            textarea.value = textarea.value.toUpperCase();
-            const linhas = textarea.value.split('\n').map(l => l.trim()).filter(l => l.length > 0);
-            const total = linhas.length;
-            const folhas = total === 0 ? 1 : Math.ceil(total / TOTAL_LINHAS_FERIAS);
-            document.getElementById('contadorColaboradores').innerText = `${total} colaborador(es) | ${folhas} folha(s)`;
-        }
+/* Datas: 4 números viram dd/mm; data impossível fica em vermelho na tela */
+function validaData(t) {
+  const m = t.match(/^(\d{1,2})\/(\d{1,2})(?:\/(\d{2,4}))?$/);
+  if (!m) return false;
+  const d = +m[1], mes = +m[2];
+  return mes >= 1 && mes <= 12 && d >= 1 && d <= new Date(2024, mes, 0).getDate();
+}
+const caixa = $('contentorFolhasFerias');
+caixa.addEventListener('focusout', e => {
+  const c = e.target;
+  if (!c.classList || !c.classList.contains('celula-ferias')) return;
+  let t = c.innerText.trim();
+  if (/^\d{4}$/.test(t)) { t = t.slice(0, 2) + '/' + t.slice(2); c.innerText = t; agendarAutoSave(); }
+  c.classList.toggle('invalida', !!t && !validaData(t));
+});
+caixa.addEventListener('paste', e => {
+  if (!e.target.isContentEditable) return;
+  e.preventDefault();
+  document.execCommand('insertText', false, (e.clipboardData || window.clipboardData).getData('text').replace(/\s*\n\s*/g, ' '));
+});
+caixa.addEventListener('keydown', e => {
+  const t = e.target;
+  if (e.key !== 'Enter' || !t.isContentEditable) return;
+  e.preventDefault();
+  const tr = t.closest('tr'), prox = tr && tr.nextElementSibling;
+  const cls = ['celula-ferias', 'col-nome-texto', 'col-saldo', 'col-id-texto'].find(c => t.classList.contains(c));
+  if (prox && cls) {
+    const alvo = prox.querySelectorAll('.' + cls)[[...tr.querySelectorAll('.' + cls)].indexOf(t)];
+    if (alvo) { alvo.focus(); return; }
+  }
+  t.blur();
+});
+caixa.addEventListener('dblclick', e => {
+  const t = e.target;
+  if (t.classList && t.classList.contains('celula-ferias') && !t.innerText.trim()) {
+    const d = new Date(); t.innerText = `${pad(d.getDate())}/${pad(d.getMonth() + 1)}`; agendarAutoSave();
+  }
+});
+caixa.addEventListener('input', agendarAutoSave);
+window.addEventListener('beforeunload', () => gravar(true));
 
-        function criarLinhaFerias(numStr, nome = '') {
-            let tds = ''; 
-            for(let i = 0; i < 24; i++) {
-                tds += `<td class="celula-ferias" contenteditable="true" title="Clique para editar data"></td>`;
-            }
-            return `<td class="col-id"><span class="col-id-texto" contenteditable="true">${numStr}</span></td>` +
-                `<td class="col-nome"><div class="col-nome-container">` +
-                `<span class="col-nome-texto" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()">${nome}</span>` +
-                `<div class="botoes-acoes">` +
-                `<button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixoFerias(this)" title="Adicionar linha abaixo">➕</button>` +
-                `<button type="button" class="btn-acao btn-menos-linha" onclick="removerLinhaFerias(this)" title="Remover linha">➖</button>` +
-                `<button type="button" class="btn-acao btn-lixeira" onclick="apagarLinhaFerias(this)" title="Apagar nome">🗑️</button>` +
-                `</div></div></td>` +
-                tds + `<td class="col-saldo" contenteditable="true" title="Saldo de dias">-</td>`;
-        }
-
-        function apagarLinhaFerias(b) {
-            b.closest('tr').querySelector('.col-nome-texto').innerText = '';
-        }
-
-        function adicionarLinhaAbaixoFerias(btn) {
-            const tr = document.createElement('tr');
-            tr.innerHTML = criarLinhaFerias('00', '');
-            btn.closest('tr').after(tr);
-        }
-
-        function adicionarLinhaFimFerias(btn) {
-            const corpo = btn.closest('.folha-a4').querySelector('.corpo-tabela-ferias');
-            const tr = document.createElement('tr');
-            const total = corpo.querySelectorAll('tr').length + 1;
-            const numStr = total < 10 ? '0' + total : total;
-            tr.innerHTML = criarLinhaFerias(numStr, '');
-            corpo.appendChild(tr);
-        }
-
-        function removerLinhaFerias(btn) {
-            const tr = btn.closest('tr');
-            const tbody = tr.parentNode;
-            if(tbody.querySelectorAll('tr').length > 1) {
-                tr.remove();
-            }
-        }
-
-        function removerFolhaFerias(btn) {
-            const folhas = document.querySelectorAll('#contentorFolhasFerias .folha-a4');
-            if(folhas.length > 1) {
-                btn.closest('.folha-a4').remove();
-                atualizarPaginacaoFerias();
-            } else {
-                mostrarToast('Mantenha ao menos uma folha na tela.');
-            }
-        }
-
-        function reordenarNumFerias() {
-            document.querySelectorAll('#contentorFolhasFerias .folha-a4').forEach(folha => {
-                const linhas = folha.querySelectorAll('.corpo-tabela-ferias tr');
-                linhas.forEach((tr, i) => {
-                    const spanNum = tr.querySelector('.col-id-texto');
-                    if (spanNum) spanNum.innerText = (i + 1 < 10 ? '0' + (i + 1) : (i + 1));
-                });
-            });
-            mostrarToast('Numeração reorganizada sequencialmente');
-        }
-
-        function criarTabelaFeriasHTML(nomesArr) {
-            let linhas = '';
-            const lista = nomesArr.length > 0 ? nomesArr : Array(TOTAL_LINHAS_FERIAS).fill('');
-            lista.forEach((n, idx) => {
-                let numStr = (idx + 1 < 10 ? '0' + (idx + 1) : (idx + 1));
-                linhas += `<tr>${criarLinhaFerias(numStr, n)}</tr>`;
-            });
-
-            const anoAtual = document.getElementById('anoInputFerias').value || '2026';
-            const areaAtual = document.getElementById('areaInputFerias').value || '---';
-            const turnoAtual = document.getElementById('turnoInputFerias').value || '---';
-
-            const f = document.createElement('div'); 
-            f.className = 'folha-a4'; 
-            f.style.transform = `scale(${nivelZoom})`;
-            f.innerHTML = `
-                <div class="barra-controle-folha">
-                    <div class="grupo-acoes-linhas">
-                        <button type="button" class="btn-linha-topo" onclick="adicionarLinhaFimFerias(this)">➕ Linha no Fim</button>
-                    </div>
-                    <button type="button" class="btn-remover-folha" onclick="removerFolhaFerias(this)">Remover Folha ✕</button>
-                </div>
-                <table class="cabecalho-container">
-                    <tr>
-                        <td class="logo-box">VALE</td>
-                        <td class="titulo-box">CRONOGRAMA ANUAL DE CONTROLE DE FÉRIAS DA EQUIPE</td>
-                        <td class="meta-box">
-                            <strong>Ano:</strong> <span class="val-ano">${anoAtual}</span><br>
-                            <span class="indicador-folha"><strong>Folha:</strong> 01 / 01</span>
-                        </td>
-                    </tr>
-                </table>
-                <table class="info-ferias-bar">
-                    <tr>
-                        <td><strong>Área / Gerência:</strong> <span class="val-area campo-editavel" contenteditable="true">${areaAtual}</span></td>
-                        <td><strong>Setor / Turno:</strong> <span class="val-turno campo-editavel" contenteditable="true">${turnoAtual}</span></td>
-                    </tr>
-                </table>
-                <table class="tabela-ferias">
-                    <thead>
-                        <tr>
-                            <th rowspan="2" style="width:38px;">Nº</th>
-                            <th rowspan="2" style="width:220px;">COLABORADOR</th>
-                            <th colspan="2">Jan</th><th colspan="2">Fev</th><th colspan="2">Mar</th><th colspan="2">Abr</th><th colspan="2">Mai</th><th colspan="2">Jun</th>
-                            <th colspan="2">Jul</th><th colspan="2">Ago</th><th colspan="2">Set</th><th colspan="2">Out</th><th colspan="2">Nov</th><th colspan="2">Dez</th>
-                            <th rowspan="2" style="width:45px;">Saldo</th>
-                        </tr>
-                        <tr style="font-size:7px;">
-                            <th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th>
-                            <th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th><th>Ini</th><th>Fim</th>
-                        </tr>
-                    </thead>
-                    <tbody class="corpo-tabela-ferias">${linhas}</tbody>
-                </table>`;
-            return f;
-        }
-
-        function atualizarPaginacaoFerias() {
-            const f = document.querySelectorAll('#contentorFolhasFerias .folha-a4');
-            f.forEach((folha, idx) => {
-                const ind = folha.querySelector('.indicador-folha');
-                const atual = (idx + 1 < 10 ? '0' + (idx + 1) : (idx + 1));
-                const total = (f.length < 10 ? '0' + f.length : f.length);
-                if(ind) ind.innerHTML = `<strong>Folha:</strong> ${atual} / ${total}`;
-            });
-        }
-
-        function gerarTabelaPorNomes() {
-            const txt = document.getElementById('nomesInputFerias').value;
-            let nomes = txt.split('\n').map(l => l.trim()).filter(l => l.length > 0).sort((a,b)=>a.localeCompare(b,'pt-BR'));
-            if(nomes.length === 0) nomes = DADOS_F_INICIAIS;
-            document.getElementById('nomesInputFerias').value = nomes.join('\n');
-            atualizarContadorNomes();
-            
-            const box = document.getElementById('contentorFolhasFerias'); 
-            box.innerHTML = '';
-            let blocos = []; 
-            for(let i=0; i<nomes.length; i+=TOTAL_LINHAS_FERIAS) {
-                blocos.push(nomes.slice(i, i+TOTAL_LINHAS_FERIAS));
-            }
-            blocos.forEach(b => box.appendChild(criarTabelaFeriasHTML(b)));
-            atualizarPaginacaoFerias();
-            mostrarToast('Tabela de férias gerada em ordem A-Z');
-        }
-
-        function adicionarFolhaFerias() {
-            document.getElementById('contentorFolhasFerias').appendChild(criarTabelaFeriasHTML([]));
-            atualizarPaginacaoFerias();
-            mostrarToast('Folha extra adicionada');
-        }
-
-        function obterEstadoCompleto() {
-            return {
-                ano: document.getElementById('anoInputFerias').value,
-                area: document.getElementById('areaInputFerias').value,
-                turno: document.getElementById('turnoInputFerias').value,
-                nomes: document.getElementById('nomesInputFerias').value,
-                html: document.getElementById('contentorFolhasFerias').innerHTML
-            };
-        }
-
-        function salvarTudoFerias() {
-            localStorage.setItem('valeferias_v06', JSON.stringify(obterEstadoCompleto()));
-            mostrarToast('Cronograma de Férias salvo com sucesso!');
-        }
-
-        function carregarTudoFerias() {
-            const s = localStorage.getItem('valeferias_v06');
-            if(s) {
-                restaurarEstado(JSON.parse(s));
-                mostrarToast('Cronograma Carregado com sucesso!');
-            } else {
-                mostrarToast('Nenhum dado salvo encontrado.');
-            }
-        }
-
-        function restaurarEstado(dados) {
-            if(dados.ano !== undefined) document.getElementById('anoInputFerias').value = dados.ano;
-            if(dados.area !== undefined) document.getElementById('areaInputFerias').value = dados.area;
-            if(dados.turno !== undefined) document.getElementById('turnoInputFerias').value = dados.turno;
-            if(dados.nomes !== undefined) document.getElementById('nomesInputFerias').value = dados.nomes;
-            if(dados.html !== undefined) document.getElementById('contentorFolhasFerias').innerHTML = dados.html;
-
-            sincronizarCabecalhosFerias();
-            atualizarPaginacaoFerias();
-            atualizarContadorNomes();
-        }
-
-        function exportarBackupJSON() {
-            const blob = new Blob([JSON.stringify(obterEstadoCompleto(), null, 2)], { type: 'application/json' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `backup_ferias_${document.getElementById('anoInputFerias').value || '2026'}.json`;
-            a.click();
-            URL.revokeObjectURL(url);
-            mostrarToast('Backup exportado com sucesso!');
-        }
-
-        function processarArquivoBackup(input) {
-            const file = input.files[0];
-            if (!file) return;
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const dados = JSON.parse(e.target.result);
-                    restaurarEstado(dados);
-                    mostrarToast('Backup restaurado com sucesso!');
-                } catch(err) {
-                    mostrarToast('Erro ao ler arquivo de backup.');
-                }
-            };
-            reader.readAsText(file);
-            input.value = '';
-        }
-
-        function limparTudoFerias() {
-            document.getElementById('contentorFolhasFerias').innerHTML = '';
-            document.getElementById('contentorFolhasFerias').appendChild(criarTabelaFeriasHTML([]));
-            atualizarPaginacaoFerias();
-            mostrarToast('Área resetada.');
-        }
-
-        window.onload = function() { 
-            document.getElementById('nomesInputFerias').value = DADOS_F_INICIAIS.join('\n');
-            gerarTabelaPorNomes(); 
-        };
-    </script>
+window.onload = function () {
+  const d = lerSalvo();
+  if (d && d.html) { restaurarEstado(d); mostrarToast('Último trabalho recuperado.'); }
+  else { $('nomesInputFerias').value = DADOS_F_INICIAIS.join('\n'); atualizarContadorNomes(); montarFolhas([...DADOS_F_INICIAIS].sort((a, b) => a.localeCompare(b, 'pt-BR'))); $('nomesInputFerias').value = [...DADOS_F_INICIAIS].sort((a, b) => a.localeCompare(b, 'pt-BR')).join('\n'); }
+};
+</script>
 </body>
 </html>
