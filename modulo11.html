@@ -92,10 +92,6 @@
                     <span id="textoConexao">Nuvem Conectada</span>
                 </span>
 
-                <button type="button" onclick="alternarGraficos()" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 transition flex items-center gap-1.5 shadow-sm">
-                    <span>📊</span> Gráficos
-                </button>
-
                 <button type="button" onclick="salvarTudoNoSupabase()" id="btnSalvarGeral" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white transition flex items-center gap-1.5 shadow-sm active:scale-95">
                     <span>💾</span> Salvar na Nuvem
                 </button>
@@ -122,94 +118,105 @@
                         <span class="text-2xl font-black tracking-widest text-teal-100">VALE</span>
                         <div class="h-5 w-px bg-teal-300/40"></div>
                         <h1 class="text-lg font-extrabold tracking-wide">Painel de OVs por Empresa & Saldos</h1>
-                        <span class="bg-emerald-500 text-white font-black text-[10px] px-2 py-0.5 rounded shadow-sm">GERDAU AZUL</span>
+                        <span class="bg-blue-600 text-white font-black text-[10px] px-2.5 py-0.5 rounded shadow-sm">GERDAU AZUL</span>
                     </div>
-                    <p class="text-xs text-teal-100/90 mt-1">Análise de utilização em tempo real, comparativo de balança e saldos segregados</p>
+                    <p class="text-xs text-teal-100/90 mt-1">Análise de utilização em tempo real, comparativo de balança e saldos segregados em Toneladas (TO)</p>
                 </div>
 
+                <!-- CARDS RESUMO DO CABEÇALHO: SALDO LIVRE RESTANTE E TOTAL DE OVS -->
                 <div class="flex flex-wrap gap-2 text-right">
-                    <div class="bg-white/10 backdrop-blur-sm px-3.5 py-2 rounded-xl border border-white/10 text-left">
-                        <div class="text-[10px] text-teal-100 font-bold uppercase tracking-wider">OVs Ativas</div>
-                        <div id="statTotalOvsContador" class="text-base font-black text-white leading-tight">0</div>
+                    <div class="bg-white/10 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-white/10 text-left">
+                        <div class="text-[10px] text-teal-100 font-bold uppercase tracking-wider">Qtd OVs Ativas</div>
+                        <div id="statTotalOvsContador" class="text-lg font-black text-white leading-tight">0 OV(s)</div>
                     </div>
-                    <div class="bg-white/10 backdrop-blur-sm px-3.5 py-2 rounded-xl border border-white/10 text-left">
-                        <div class="text-[10px] text-teal-100 font-bold uppercase tracking-wider">Saldo Líquido Geral</div>
-                        <div id="statSaldoTopResumo" class="text-base font-black text-emerald-300 leading-tight">0 KG</div>
+                    <div class="bg-emerald-900/30 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-emerald-400/30 text-left">
+                        <div class="text-[10px] text-emerald-200 font-bold uppercase tracking-wider">Saldo Livre Restante (Geral)</div>
+                        <div id="statSaldoTopResumo" class="text-lg font-black text-emerald-300 leading-tight">0,00 TO</div>
+                        <div id="statSaldoTopValor" class="text-[10px] font-bold text-emerald-100/90">R$ 0,00</div>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- TOTAL GERAL MESTRE -->
+        <!-- TOTAL GERAL MESTRE EM TONELADAS -->
         <section class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm space-y-3">
             <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
                 <div class="flex items-center gap-2">
                     <span class="text-lg">📊</span>
-                    <h2 class="text-xs font-black text-slate-800 uppercase tracking-wider">Total Geral Consolidado (Todas as Empresas)</h2>
+                    <h2 class="text-xs font-black text-slate-800 uppercase tracking-wider">Total Geral Consolidado (Todas as Empresas em TO)</h2>
                 </div>
-                <span class="text-[11px] font-semibold text-slate-400">Soma geral de todos os contratos e ordens de venda</span>
+                <span class="text-[11px] font-semibold text-slate-400">Valores consolidados em Toneladas (TO) e Valor Contratual</span>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 text-xs">
                 <div class="bg-slate-50 border border-slate-200/80 p-3.5 rounded-xl space-y-1">
                     <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Liberado</span>
-                    <div id="totalGeralLiberadoKG" class="text-base font-black text-slate-800">0 KG <span class="text-[11px] font-normal text-slate-500">(0,00 TO)</span></div>
+                    <div id="totalGeralLiberadoTO" class="text-lg font-black text-slate-800">0,00 TO</div>
                     <div id="totalGeralLiberadoValor" class="text-xs font-bold text-slate-600">R$ 0,00</div>
                 </div>
 
                 <div class="bg-rose-50/70 border border-rose-200/80 p-3.5 rounded-xl space-y-1">
-                    <span class="block text-[10px] font-bold text-rose-600 uppercase tracking-wider">Total Já Expedido</span>
-                    <div id="totalGeralGastoKG" class="text-base font-black text-rose-700">0 KG <span class="text-[11px] font-normal text-rose-500">(0,00 TO)</span></div>
+                    <span class="block text-[10px] font-bold text-rose-600 uppercase tracking-wider">Total Já Expedido (Balança)</span>
+                    <div id="totalGeralGastoTO" class="text-lg font-black text-rose-700">0,00 TO</div>
                     <div id="totalGeralGastoValor" class="text-xs font-bold text-rose-600">R$ 0,00</div>
                 </div>
 
                 <div class="bg-emerald-50/80 border-2 border-emerald-300 p-3.5 rounded-xl space-y-1 shadow-sm">
                     <span class="block text-[10px] font-bold text-emerald-700 uppercase tracking-wider flex items-center justify-between">
-                        <span>Saldo Geral Disponível</span>
+                        <span>Saldo Livre Restante</span>
                         <span id="badgePctSaldoGeral" class="bg-emerald-600 text-white font-black px-2 py-0.5 rounded-md text-[9px]">100%</span>
                     </span>
-                    <div id="totalGeralSaldoKG" class="text-lg font-black text-emerald-800">0 KG <span class="text-xs font-normal text-emerald-700">(0,00 TO)</span></div>
+                    <div id="totalGeralSaldoTO" class="text-xl font-black text-emerald-800">0,00 TO</div>
                     <div id="totalGeralSaldoValor" class="text-xs font-extrabold text-emerald-700">R$ 0,00 restante</div>
                 </div>
             </div>
         </section>
 
-        <!-- PAINEL DE GRÁFICOS DE UTILIZAÇÃO POR EMPRESA (OCULTO POR PADRÃO VIA hidden) -->
-        <section id="secaoGraficos" class="hidden bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm space-y-4">
-            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
-                <div class="flex items-center gap-2">
+        <!-- PAINEL DE GRÁFICOS: ESTILO SANFONA (FECHADO POR PADRÃO) -->
+        <section class="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden transition">
+            <div onclick="alternarCorpoGraficos()" class="p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3 cursor-pointer hover:bg-slate-50 transition select-none">
+                <div class="flex items-center gap-2.5">
                     <span class="text-lg">📈</span>
-                    <h2 class="text-xs font-black text-slate-800 uppercase tracking-wider">Gráficos de Utilização e Consumo por Empresa</h2>
+                    <div>
+                        <h2 class="text-xs font-black text-slate-800 uppercase tracking-wider">Gráficos de Utilização e Consumo por Empresa</h2>
+                        <span class="text-[11px] font-semibold text-slate-400">Atualizado dinamicamente em Toneladas (TO) e Valor (R$)</span>
+                    </div>
                 </div>
-                <span class="text-[11px] font-semibold text-slate-400">Atualizado dinamicamente em Toneladas (TO) e Valor (R$)</span>
+
+                <div class="flex items-center gap-2">
+                    <span id="labelSanfonaGraficos" class="text-[11px] font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl transition flex items-center gap-1.5">
+                        <span>Mostrar Gráficos</span>
+                        <span id="setaSanfonaGraficos" class="text-xs transition-transform duration-200">▼</span>
+                    </span>
+                </div>
             </div>
 
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
-                <!-- GRÁFICO 1: BARRAS COMPARATIVAS (GASTO vs SALDO) -->
-                <div class="lg:col-span-2 bg-slate-50/60 p-4 rounded-2xl border border-slate-100 flex flex-col justify-between">
-                    <div>
-                        <h3 class="text-xs font-black text-slate-700 mb-1">Volume Expedido vs Saldo Disponível (Toneladas)</h3>
-                        <p class="text-[11px] text-slate-400 mb-3">Comparativo de consumo acumulado das balanças por comprador</p>
+            <div id="corpoGraficos" class="hidden p-5 pt-0 border-t border-slate-100 mt-1">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 pt-4">
+                    <div class="lg:col-span-2 bg-slate-50/60 p-4 rounded-2xl border border-slate-100 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xs font-black text-slate-700 mb-1">Volume Expedido vs Saldo Disponível (Toneladas)</h3>
+                            <p class="text-[11px] text-slate-400 mb-3">Comparativo de consumo acumulado das balanças por comprador</p>
+                        </div>
+                        <div class="relative h-64 w-full">
+                            <canvas id="graficoUtilizacaoBarras"></canvas>
+                        </div>
                     </div>
-                    <div class="relative h-64 w-full">
-                        <canvas id="graficoUtilizacaoBarras"></canvas>
-                    </div>
-                </div>
 
-                <!-- GRÁFICO 2: ROSCA / FATURAMENTO POR EMPRESA -->
-                <div class="bg-slate-50/60 p-4 rounded-2xl border border-slate-100 flex flex-col justify-between">
-                    <div>
-                        <h3 class="text-xs font-black text-slate-700 mb-1">Participação Financeira Total (R$)</h3>
-                        <p class="text-[11px] text-slate-400 mb-3">Divisão percentual do valor contratado entre as empresas</p>
-                    </div>
-                    <div class="relative h-64 w-full flex items-center justify-center">
-                        <canvas id="graficoParticipacaoRosca"></canvas>
+                    <div class="bg-slate-50/60 p-4 rounded-2xl border border-slate-100 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xs font-black text-slate-700 mb-1">Participação Financeira Total (R$)</h3>
+                            <p class="text-[11px] text-slate-400 mb-3">Divisão percentual do valor contratado entre as empresas</p>
+                        </div>
+                        <div class="relative h-64 w-full flex items-center justify-center">
+                            <canvas id="graficoParticipacaoRosca"></canvas>
+                        </div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- QUADRADINHOS DO TOPO: TOTAIS POR EMPRESA -->
+        <!-- QUADRADINHOS DO TOPO: TOTAIS POR EMPRESA EM TO -->
         <div class="no-print space-y-2">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
@@ -239,7 +246,7 @@
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="w-3.5 h-3.5 rounded-md border-2 border-rose-500 bg-rose-100"></span>
-                    <span class="text-rose-700">Vermelho: Finalizada (0 KG)</span>
+                    <span class="text-rose-700">Vermelho: Finalizada (0 TO)</span>
                 </div>
             </div>
         </div>
@@ -250,7 +257,7 @@
                 <span class="text-2xl">📋</span>
                 <div>
                     <div class="font-bold text-slate-800">Cole qualquer print do SAP aqui! (Ctrl + V)</div>
-                    <div class="text-slate-500 text-[11px]">As imagens são processadas em memória e não ficam salvas, agrupando a OV diretamente na cor da sua empresa.</div>
+                    <div class="text-slate-500 text-[11px]">As imagens são processadas em memória e as ordens da Gerdau são agrupadas automaticamente no bloco Azul.</div>
                 </div>
             </div>
             <button type="button" onclick="abrirModalOCR()" class="text-xs font-bold px-3 py-1.5 bg-[#007e7a] text-white rounded-xl hover:bg-[#005a57] whitespace-nowrap shadow-sm">
@@ -311,7 +318,7 @@
 
                 <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-amber-900">
                     <span class="block font-bold">Saldo restante a transferir:</span>
-                    <span id="cancelarSaldoRestante" class="text-base font-black text-amber-700">0 KG</span>
+                    <span id="cancelarSaldoRestante" class="text-base font-black text-amber-700">0,00 TO</span>
                 </div>
 
                 <div>
@@ -404,16 +411,16 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
                     <div>
-                        <label class="block text-slate-500 text-[10px] font-bold uppercase">Qtd OV (KG)</label>
-                        <input type="number" id="campoQtdOV" placeholder="Ex: 5000" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50 font-bold text-teal-700">
+                        <label class="block text-slate-500 text-[10px] font-bold uppercase">Qtd OV (TO)</label>
+                        <input type="number" step="0.001" id="campoQtdOV" placeholder="Ex: 5.00" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50 font-bold text-teal-700">
                     </div>
                     <div>
                         <label class="block text-slate-500 text-[10px] font-bold uppercase">Valor da OV (R$)</label>
                         <input type="number" step="0.01" id="campoValorOV" placeholder="Ex: 6300.00" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50 font-bold">
                     </div>
                     <div>
-                        <label class="block text-slate-500 text-[10px] font-bold uppercase">Total Contrato (KG)</label>
-                        <input type="number" id="campoTotalContrato" placeholder="Ex: 2635000" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50 font-bold">
+                        <label class="block text-slate-500 text-[10px] font-bold uppercase">Total Contrato (TO)</label>
+                        <input type="number" step="0.001" id="campoTotalContrato" placeholder="Ex: 2635.00" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50 font-bold">
                     </div>
                     <div>
                         <label class="block text-slate-500 text-[10px] font-bold uppercase">Doc. Contábil</label>
@@ -438,7 +445,7 @@
     <div id="modalGasto" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                <h3 class="font-bold text-slate-900 text-sm">Registar Saída de Balança (Ticket)</h3>
+                <h3 class="font-bold text-slate-900 text-sm">Registrar Saída de Balança (Ticket)</h3>
                 <button type="button" onclick="fecharModalGasto()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
             </div>
 
@@ -454,8 +461,9 @@
                     <input type="text" id="gastoPlaca" placeholder="Ex: RIO-2A45" class="w-full border border-slate-300 rounded-xl p-2.5 bg-slate-50 outline-none focus:border-teal-600">
                 </div>
                 <div>
-                    <label class="block text-slate-500 font-bold mb-1">Peso Carregado / Abatido (KG)</label>
-                    <input type="number" id="gastoPeso" placeholder="Ex: 2500" class="w-full border border-slate-300 rounded-xl p-2.5 bg-slate-50 outline-none focus:border-teal-600 font-bold text-teal-800">
+                    <label class="block text-slate-500 font-bold mb-1">Peso Carregado / Abatido (Toneladas - TO)</label>
+                    <input type="number" step="0.001" id="gastoPesoTO" placeholder="Ex: 2.500" class="w-full border border-slate-300 rounded-xl p-2.5 bg-slate-50 outline-none focus:border-teal-600 font-bold text-teal-800">
+                    <span class="text-[10px] text-slate-400">Ex: 2,5 TO = 2.500 KG</span>
                 </div>
                 <div>
                     <label class="block text-slate-500 font-bold mb-1">Data da Pesagem</label>
@@ -484,14 +492,15 @@
             console.error("Falha ao inicializar o Supabase SDK:", e);
         }
 
-        const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v8";
+        const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v9_to";
         let cacheRegistros = [];
+        let gruposCacheParaGraficos = {};
 
         // Instâncias globais dos Gráficos do Chart.js
         let chartBarrasInstancia = null;
         let chartRoscaInstancia = null;
 
-        // GERDAU É FIXA NO TEMA AZUL (BLUE)
+        // TEMA FIXO DA GERDAU: AZUL
         const TEMA_GERDAU_AZUL = {
             nomeTema: "Gerdau Azul Corporativo",
             hexColor: "#1d4ed8",
@@ -503,6 +512,7 @@
             ovBordaPadrao: "border-blue-300 bg-blue-50/20"
         };
 
+        // CORES EXCLUSIVAS PARA CADA UMA DAS OUTRAS EMPRESAS
         const OUTRAS_CORES_EMPRESAS = [
             { 
                 nomeTema: "Roxo / Púrpura",
@@ -566,12 +576,29 @@
             }
         ];
 
+        // FUNÇÃO DE NORMALIZAÇÃO DE NOME: Unifica qualquer filial/unidade da Gerdau sob o mesmo grupo
+        function normalizarNomeEmpresa(nome) {
+            const raw = (nome || '').trim();
+            if (raw.toUpperCase().includes("GERDAU")) {
+                return "GERDAU AÇOS LONGOS S.A.";
+            }
+            return raw || "OUTROS CLIENTES";
+        }
+
         function obterTemaDaEmpresa(nomeEmpresa, indiceNaoGerdau = 0) {
-            const nomeFormatado = (nomeEmpresa || '').toUpperCase();
-            if (nomeFormatado.includes("GERDAU")) {
+            const normalizado = normalizarNomeEmpresa(nomeEmpresa);
+            if (normalizado.toUpperCase().includes("GERDAU")) {
                 return TEMA_GERDAU_AZUL;
             }
             return OUTRAS_CORES_EMPRESAS[indiceNaoGerdau % OUTRAS_CORES_EMPRESAS.length];
+        }
+
+        // FORMATAÇÃO PADRONIZADA EM TONELADAS (TO)
+        function formatarTO(valTO, casas = 2) {
+            return Number(valTO || 0).toLocaleString('pt-BR', {
+                minimumFractionDigits: casas,
+                maximumFractionDigits: casas
+            }) + " TO";
         }
 
         const DADOS_DEFAULT = [
@@ -582,7 +609,7 @@
                 contrato: {
                     numero: "0000071823",
                     item: "30",
-                    qtdTotalKG: 2635000,
+                    qtdTotalTO: 2635.00,
                     valorTotalBRL: 3320100.00
                 },
                 ov: {
@@ -590,22 +617,58 @@
                     cliente: "GERDAU AÇOS LONGOS S.A.",
                     material: "SUCATA DE FERRO",
                     pedidoDRS: "71823 DRS 034A/2023",
-                    qtdLiberadaKG: 5000,
+                    qtdLiberadaTO: 5.00,
                     valorBRL: 6300.00,
-                    precoUnitarioPorKG: 1.26,
+                    precoUnitarioPorTO: 1260.00,
                     docContabil: "5201091298"
                 },
                 gastos: [
-                    { id: 1, ticket: "TKT-88412", placa: "LRK-4921", pesoKG: 2450, data: "2026-05-02" },
-                    { id: 2, ticket: "TKT-88490", placa: "ABC-1D23", pesoKG: 1550, data: "2026-05-04" }
+                    { id: 1, ticket: "TKT-88412", placa: "LRK-4921", pesoTO: 2.45, data: "2026-05-02" },
+                    { id: 2, ticket: "TKT-88490", placa: "ABC-1D23", pesoTO: 1.55, data: "2026-05-04" }
+                ]
+            },
+            {
+                id: "115443890",
+                status: "ATIVO",
+                motivoCancelamento: "",
+                contrato: {
+                    numero: "0000071823",
+                    item: "30",
+                    qtdTotalTO: 2635.00,
+                    valorTotalBRL: 3320100.00
+                },
+                ov: {
+                    numero: "115443890",
+                    cliente: "GERDAU AÇOS LONGOS S.A. (COSIGUA)",
+                    material: "SUCATA DE FERRO PREPARADA",
+                    pedidoDRS: "71823 DRS 035B/2023",
+                    qtdLiberadaTO: 8.50,
+                    valorBRL: 10710.00,
+                    precoUnitarioPorTO: 1260.00,
+                    docContabil: "5201091350"
+                },
+                gastos: [
+                    { id: 10, ticket: "TKT-88510", placa: "XYZ-9988", pesoTO: 3.20, data: "2026-05-06" }
                 ]
             }
         ];
 
-        function alternarGraficos() {
-            const sec = document.getElementById('secaoGraficos');
-            if (sec) {
-                sec.classList.toggle('hidden');
+        function alternarCorpoGraficos() {
+            const corpo = document.getElementById('corpoGraficos');
+            const label = document.getElementById('labelSanfonaGraficos');
+
+            if (!corpo) return;
+
+            const estaFechado = corpo.classList.contains('hidden');
+            if (estaFechado) {
+                corpo.classList.remove('hidden');
+                if (label) label.innerHTML = `<span>Recolher Gráficos</span> <span id="setaSanfonaGraficos" class="text-xs">▲</span>`;
+                setTimeout(() => {
+                    atualizarGraficos(gruposCacheParaGraficos);
+                }, 50);
+            } else {
+                corpo.classList.add('hidden');
+                if (label) label.innerHTML = `<span>Mostrar Gráficos</span> <span id="setaSanfonaGraficos" class="text-xs">▼</span>`;
             }
         }
 
@@ -635,28 +698,47 @@
                     atualizarIndicadorStatus('gravando', 'Sincronizando...');
                     const { data, error } = await supabaseClient.from('modulo11_ovs').select('*').order('created_at', { ascending: false });
                     if (!error && data && data.length > 0) {
-                        cacheRegistros = data.map(d => ({
-                            id: String(d.id),
-                            status: d.status || "ATIVO",
-                            motivoCancelamento: d.motivo_cancelamento || "",
-                            contrato: {
-                                numero: d.contrato_numero,
-                                item: d.contrato_item || "30",
-                                qtdTotalKG: Number(d.contrato_total_kg || 0),
-                                valorTotalBRL: Number(d.contrato_total_brl || 0)
-                            },
-                            ov: {
-                                numero: String(d.ov),
-                                cliente: d.cliente,
-                                material: d.material,
-                                pedidoDRS: d.pedido_drs,
-                                qtdLiberadaKG: Number(d.qtd_liberada_kg || 0),
-                                valorBRL: Number(d.valor_brl || 0),
-                                precoUnitarioPorKG: Number(d.preco_unitario || 0),
-                                docContabil: d.doc_contabil
-                            },
-                            gastos: Array.isArray(d.gastos) ? d.gastos : []
-                        }));
+                        cacheRegistros = data.map(d => {
+                            // Suporte retrocompatível se antes estava gravado em KG
+                            const qtdLiberadaTO = d.qtd_liberada_to !== undefined 
+                                ? Number(d.qtd_liberada_to) 
+                                : Number(d.qtd_liberada_kg || 0) / (Number(d.qtd_liberada_kg) > 500 ? 1000 : 1);
+
+                            const totalContratoTO = d.contrato_total_to !== undefined
+                                ? Number(d.contrato_total_to)
+                                : Number(d.contrato_total_kg || 0) / (Number(d.contrato_total_kg) > 500 ? 1000 : 1);
+
+                            const gastosConvertidos = (Array.isArray(d.gastos) ? d.gastos : []).map(g => ({
+                                ...g,
+                                pesoTO: g.pesoTO !== undefined ? Number(g.pesoTO) : Number(g.pesoKG || 0) / (Number(g.pesoKG) > 500 ? 1000 : 1)
+                            }));
+
+                            const valorBRL = Number(d.valor_brl || 0);
+                            const precoUnitarioPorTO = qtdLiberadaTO > 0 ? (valorBRL / qtdLiberadaTO) : (Number(d.preco_unitario || 1.26) * 1000);
+
+                            return {
+                                id: String(d.id),
+                                status: d.status || "ATIVO",
+                                motivoCancelamento: d.motivo_cancelamento || "",
+                                contrato: {
+                                    numero: d.contrato_numero,
+                                    item: d.contrato_item || "30",
+                                    qtdTotalTO: totalContratoTO,
+                                    valorTotalBRL: Number(d.contrato_total_brl || 0)
+                                },
+                                ov: {
+                                    numero: String(d.ov),
+                                    cliente: d.cliente,
+                                    material: d.material,
+                                    pedidoDRS: d.pedido_drs,
+                                    qtdLiberadaTO: qtdLiberadaTO,
+                                    valorBRL: valorBRL,
+                                    precoUnitarioPorTO: precoUnitarioPorTO,
+                                    docContabil: d.doc_contabil
+                                },
+                                gastos: gastosConvertidos
+                            };
+                        });
                         localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheRegistros));
                         atualizarOpcoesEmpresas(cacheRegistros);
                         renderizar();
@@ -693,13 +775,15 @@
                         cliente: item.ov.cliente,
                         material: item.ov.material,
                         pedido_drs: item.ov.pedidoDRS,
-                        qtd_liberada_kg: Number(item.ov.qtdLiberadaKG || 0),
+                        qtd_liberada_kg: Number(item.ov.qtdLiberadaTO || 0) * 1000,
+                        qtd_liberada_to: Number(item.ov.qtdLiberadaTO || 0),
                         valor_brl: Number(item.ov.valorBRL || 0),
-                        preco_unitario: Number(item.ov.precoUnitarioPorKG || 0),
+                        preco_unitario: Number(item.ov.precoUnitarioPorTO || 0) / 1000,
                         doc_contabil: item.ov.docContabil,
                         contrato_numero: item.contrato.numero,
                         contrato_item: item.contrato.item || "30",
-                        contrato_total_kg: Number(item.contrato.qtdTotalKG || 0),
+                        contrato_total_kg: Number(item.contrato.qtdTotalTO || 0) * 1000,
+                        contrato_total_to: Number(item.contrato.qtdTotalTO || 0),
                         contrato_total_brl: Number(item.contrato.valorTotalBRL || 0),
                         gastos: item.gastos
                     }));
@@ -755,13 +839,15 @@
                         cliente: novoItem.ov.cliente,
                         material: novoItem.ov.material,
                         pedido_drs: novoItem.ov.pedidoDRS,
-                        qtd_liberada_kg: Number(novoItem.ov.qtdLiberadaKG || 0),
+                        qtd_liberada_kg: Number(novoItem.ov.qtdLiberadaTO || 0) * 1000,
+                        qtd_liberada_to: Number(novoItem.ov.qtdLiberadaTO || 0),
                         valor_brl: Number(novoItem.ov.valorBRL || 0),
-                        preco_unitario: Number(novoItem.ov.precoUnitarioPorKG || 0),
+                        preco_unitario: Number(novoItem.ov.precoUnitarioPorTO || 0) / 1000,
                         doc_contabil: novoItem.ov.docContabil,
                         contrato_numero: novoItem.contrato.numero,
                         contrato_item: novoItem.contrato.item || "30",
-                        contrato_total_kg: Number(novoItem.contrato.qtdTotalKG || 0),
+                        contrato_total_kg: Number(novoItem.contrato.qtdTotalTO || 0) * 1000,
+                        contrato_total_to: Number(novoItem.contrato.qtdTotalTO || 0),
                         contrato_total_brl: Number(novoItem.contrato.valorTotalBRL || 0),
                         gastos: novoItem.gastos
                     };
@@ -774,46 +860,48 @@
             }
         }
 
+        // CARDS RESUMO POR EMPRESA
         function atualizarOpcoesEmpresas(lista) {
             const select = document.getElementById('filtroEmpresa');
             const containerCards = document.getElementById('containerCardsEmpresas');
             if (!select || !containerCards) return;
 
             const valorAtual = select.value;
-            const empresas = [...new Set(lista.map(i => i.ov.cliente).filter(Boolean))];
+            // Unifica os nomes normalizados
+            const empresasNormalizadas = [...new Set(lista.map(i => normalizarNomeEmpresa(i.ov.cliente)).filter(Boolean))];
 
             select.innerHTML = '<option value="TODAS">Todas as Empresas</option>';
-            empresas.forEach(emp => {
+            empresasNormalizadas.forEach(emp => {
                 const opt = document.createElement('option');
                 opt.value = emp;
                 opt.innerText = emp;
                 select.appendChild(opt);
             });
 
-            if (empresas.includes(valorAtual)) {
+            if (empresasNormalizadas.includes(valorAtual)) {
                 select.value = valorAtual;
             }
 
             let contadorOutrasCores = 0;
 
-            containerCards.innerHTML = empresas.map((emp) => {
+            containerCards.innerHTML = empresasNormalizadas.map((emp) => {
                 const isGerdau = emp.toUpperCase().includes("GERDAU");
                 const tema = isGerdau ? TEMA_GERDAU_AZUL : obterTemaDaEmpresa(emp, contadorOutrasCores++);
-                const ovsEmp = lista.filter(i => i.ov.cliente === emp);
+                const ovsEmp = lista.filter(i => normalizarNomeEmpresa(i.ov.cliente) === emp);
                 
                 let empLiberadoValor = 0;
                 let empSaldoValor = 0;
-                let empSaldoKG = 0;
+                let empSaldoTO = 0;
 
                 ovsEmp.forEach(curr => {
                     if (curr.status !== 'CANCELADO') {
-                        const valUnit = curr.ov.precoUnitarioPorKG || (curr.ov.qtdLiberadaKG > 0 ? curr.ov.valorBRL / curr.ov.qtdLiberadaKG : 1.26);
-                        const gasto = (curr.gastos || []).reduce((s, g) => s + Number(g.pesoKG || 0), 0);
-                        const saldo = Math.max(0, curr.ov.qtdLiberadaKG - gasto);
+                        const valUnitTO = curr.ov.precoUnitarioPorTO || (curr.ov.qtdLiberadaTO > 0 ? curr.ov.valorBRL / curr.ov.qtdLiberadaTO : 1260);
+                        const gastoTO = (curr.gastos || []).reduce((s, g) => s + Number(g.pesoTO || 0), 0);
+                        const saldoTO = Math.max(0, curr.ov.qtdLiberadaTO - gastoTO);
 
                         empLiberadoValor += Number(curr.ov.valorBRL || 0);
-                        empSaldoKG += saldo;
-                        empSaldoValor += (saldo * valUnit);
+                        empSaldoTO += saldoTO;
+                        empSaldoValor += (saldoTO * valUnitTO);
                     }
                 });
 
@@ -833,8 +921,8 @@
                                 <span class="font-extrabold text-slate-800">${empLiberadoValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
                             </div>
                             <div class="flex justify-between items-center text-xs">
-                                <span class="text-slate-500 font-semibold">Saldo Restante:</span>
-                                <span class="font-black text-emerald-700">${empSaldoKG.toLocaleString('pt-BR')} KG</span>
+                                <span class="text-slate-500 font-semibold">Saldo Livre Restante:</span>
+                                <span class="font-black text-emerald-700">${formatarTO(empSaldoTO, 2)}</span>
                             </div>
                             <div class="flex justify-between items-center text-[11px]">
                                 <span class="text-slate-400">Saldo em R$:</span>
@@ -854,10 +942,15 @@
             }
         }
 
-        // ==========================================
-        // ATUALIZAÇÃO DOS GRÁFICOS CHART.JS
-        // ==========================================
+        // ATUALIZAÇÃO DOS GRÁFICOS CHART.JS EM TONELADAS
         function atualizarGraficos(gruposPorEmpresa) {
+            gruposCacheParaGraficos = gruposPorEmpresa;
+            
+            const corpo = document.getElementById('corpoGraficos');
+            if (corpo && corpo.classList.contains('hidden')) {
+                return;
+            }
+
             const canvasBarras = document.getElementById('graficoUtilizacaoBarras');
             const canvasRosca = document.getElementById('graficoParticipacaoRosca');
             if (!canvasBarras || !canvasRosca) return;
@@ -870,35 +963,33 @@
 
             let contadorCores = 0;
             for (const [nomeEmp, ovs] of Object.entries(gruposPorEmpresa)) {
-                labels.push(nomeEmp.length > 20 ? nomeEmp.substring(0, 18) + '...' : nomeEmp);
+                labels.push(nomeEmp.length > 22 ? nomeEmp.substring(0, 20) + '...' : nomeEmp);
                 const isGerdau = nomeEmp.toUpperCase().includes("GERDAU");
                 const tema = isGerdau ? TEMA_GERDAU_AZUL : obterTemaDaEmpresa(nomeEmp, contadorCores++);
                 coresEmpresas.push(tema.hexColor);
 
-                let totalGastoKG = 0;
-                let totalSaldoKG = 0;
+                let totalGastoTO = 0;
+                let totalSaldoTO = 0;
                 let totalValorBRL = 0;
 
                 ovs.forEach(o => {
                     if (o.status !== 'CANCELADO') {
-                        const g = (o.gastos || []).reduce((acc, curr) => acc + Number(curr.pesoKG || 0), 0);
-                        const s = Math.max(0, o.ov.qtdLiberadaKG - g);
-                        totalGastoKG += g;
-                        totalSaldoKG += s;
+                        const gTO = (o.gastos || []).reduce((acc, curr) => acc + Number(curr.pesoTO || 0), 0);
+                        const sTO = Math.max(0, o.ov.qtdLiberadaTO - gTO);
+                        totalGastoTO += gTO;
+                        totalSaldoTO += sTO;
                         totalValorBRL += Number(o.ov.valorBRL || 0);
                     }
                 });
 
-                dadosGastosTO.push((totalGastoKG / 1000).toFixed(2));
-                dadosSaldosTO.push((totalSaldoKG / 1000).toFixed(2));
-                dadosValoresBRL.push(totalValorBRL.toFixed(2));
+                dadosGastosTO.push(Number(totalGastoTO.toFixed(2)));
+                dadosSaldosTO.push(Number(totalSaldoTO.toFixed(2)));
+                dadosValoresBRL.push(Number(totalValorBRL.toFixed(2)));
             }
 
-            // 1. Destrói gráficos anteriores se existirem
             if (chartBarrasInstancia) chartBarrasInstancia.destroy();
             if (chartRoscaInstancia) chartRoscaInstancia.destroy();
 
-            // 2. Cria Gráfico de Barras Horizontais (Utilização)
             chartBarrasInstancia = new Chart(canvasBarras, {
                 type: 'bar',
                 data: {
@@ -911,7 +1002,7 @@
                             borderRadius: 6
                         },
                         {
-                            label: 'Saldo Disponível (TO)',
+                            label: 'Saldo Livre Restante (TO)',
                             data: dadosSaldosTO,
                             backgroundColor: coresEmpresas,
                             borderRadius: 6
@@ -945,7 +1036,6 @@
                 }
             });
 
-            // 3. Cria Gráfico de Rosca (Faturamento por Empresa)
             chartRoscaInstancia = new Chart(canvasRosca, {
                 type: 'doughnut',
                 data: {
@@ -976,7 +1066,7 @@
             });
         }
 
-        // RENDERIZAÇÃO: SEÇÕES SEPARADAS POR EMPRESA
+        // RENDERIZAÇÃO: AGRUPAMENTO UNIFICADO (GERDAU TODA NO QUADRADO AZUL)
         function renderizar() {
             const lista = cacheRegistros;
             const termo = (document.getElementById('filtroTexto')?.value || '').toLowerCase().trim();
@@ -984,42 +1074,43 @@
             const filtroEmpresa = document.getElementById('filtroEmpresa')?.value || 'TODAS';
             const container = document.getElementById('containerOVs');
 
-            let somaLiberadoKG = 0;
+            let somaLiberadoTO = 0;
             let somaLiberadoValor = 0;
 
-            let somaGastoTotalKG = 0;
+            let somaGastoTotalTO = 0;
             let somaGastoTotalValor = 0;
 
-            let somaSaldoTotalKG = 0;
+            let somaSaldoTotalTO = 0;
             let somaSaldoTotalValor = 0;
 
             let contagemOvsAtivas = 0;
 
             const listaFiltrada = lista.filter(item => {
                 const cancelado = item.status === "CANCELADO";
-                const totalGasto = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
-                const saldo = cancelado ? 0 : Math.max(0, item.ov.qtdLiberadaKG - totalGasto);
-                const concluido = !cancelado && saldo <= 0;
-                const percentualRestante = item.ov.qtdLiberadaKG > 0 ? (saldo / item.ov.qtdLiberadaKG) * 100 : 0;
+                const totalGastoTO = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoTO || 0), 0);
+                const saldoTO = cancelado ? 0 : Math.max(0, item.ov.qtdLiberadaTO - totalGastoTO);
+                const concluido = !cancelado && saldoTO <= 0;
+                const percentualRestante = item.ov.qtdLiberadaTO > 0 ? (saldoTO / item.ov.qtdLiberadaTO) * 100 : 0;
 
-                const valUnitario = item.ov.precoUnitarioPorKG || (item.ov.qtdLiberadaKG > 0 ? item.ov.valorBRL / item.ov.qtdLiberadaKG : 1.26);
-                const valGastoItem = totalGasto * valUnitario;
+                const valUnitTO = item.ov.precoUnitarioPorTO || (item.ov.qtdLiberadaTO > 0 ? item.ov.valorBRL / item.ov.qtdLiberadaTO : 1260);
+                const valGastoItem = totalGastoTO * valUnitTO;
                 const valSaldoItem = Math.max(0, item.ov.valorBRL - valGastoItem);
 
                 if (!cancelado) {
-                    somaLiberadoKG += Number(item.ov.qtdLiberadaKG || 0);
+                    somaLiberadoTO += Number(item.ov.qtdLiberadaTO || 0);
                     somaLiberadoValor += Number(item.ov.valorBRL || 0);
 
-                    somaGastoTotalKG += totalGasto;
+                    somaGastoTotalTO += totalGastoTO;
                     somaGastoTotalValor += valGastoItem;
 
-                    somaSaldoTotalKG += saldo;
+                    somaSaldoTotalTO += saldoTO;
                     somaSaldoTotalValor += valSaldoItem;
 
                     contagemOvsAtivas++;
                 }
 
-                if (filtroEmpresa !== 'TODAS' && item.ov.cliente !== filtroEmpresa) return false;
+                const nomeEmpresaNormalizado = normalizarNomeEmpresa(item.ov.cliente);
+                if (filtroEmpresa !== 'TODAS' && nomeEmpresaNormalizado !== filtroEmpresa) return false;
                 
                 if (filtroStatus === 'CHEIO' && (percentualRestante < 70 || cancelado || concluido)) return false;
                 if (filtroStatus === 'FINALZINHO' && (percentualRestante <= 0 || percentualRestante > 30 || cancelado)) return false;
@@ -1039,27 +1130,29 @@
                 return true;
             });
 
-            // ATUALIZA PAINEL DE CONSOLIDAÇÃO TOTAL
-            document.getElementById('totalGeralLiberadoKG').innerHTML = `${somaLiberadoKG.toLocaleString('pt-BR')} KG <span class="text-[11px] font-normal text-slate-500">(${(somaLiberadoKG/1000).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} TO)</span>`;
+            // ATUALIZA PAINEL DE CONSOLIDAÇÃO TOTAL EM TO
+            document.getElementById('totalGeralLiberadoTO').innerText = formatarTO(somaLiberadoTO, 2);
             document.getElementById('totalGeralLiberadoValor').innerText = somaLiberadoValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-            document.getElementById('totalGeralGastoKG').innerHTML = `${somaGastoTotalKG.toLocaleString('pt-BR')} KG <span class="text-[11px] font-normal text-rose-500">(${(somaGastoTotalKG/1000).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} TO)</span>`;
+            document.getElementById('totalGeralGastoTO').innerText = formatarTO(somaGastoTotalTO, 2);
             document.getElementById('totalGeralGastoValor').innerText = somaGastoTotalValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
 
-            document.getElementById('totalGeralSaldoKG').innerHTML = `${somaSaldoTotalKG.toLocaleString('pt-BR')} KG <span class="text-xs font-normal text-emerald-700">(${(somaSaldoTotalKG/1000).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} TO)</span>`;
-            document.getElementById('totalGeralSaldoValor').innerText = `${somaSaldoTotalValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} a carregar`;
+            document.getElementById('totalGeralSaldoTO').innerText = formatarTO(somaSaldoTotalTO, 2);
+            document.getElementById('totalGeralSaldoValor').innerText = `${somaSaldoTotalValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} livre`;
 
-            const pctSaldoGeral = somaLiberadoKG > 0 ? Math.round((somaSaldoTotalKG / somaLiberadoKG) * 100) : 0;
+            const pctSaldoGeral = somaLiberadoTO > 0 ? Math.round((somaSaldoTotalTO / somaLiberadoTO) * 100) : 0;
             document.getElementById('badgePctSaldoGeral').innerText = `${pctSaldoGeral}% Livre`;
 
-            document.getElementById('statSaldoTopResumo').innerText = `${somaSaldoTotalKG.toLocaleString('pt-BR')} KG`;
+            // ATUALIZA O TOPO DO CABEÇALHO (SALDO LIVRE RESTANTE E QUANTIDADE DE OVS)
+            document.getElementById('statSaldoTopResumo').innerText = formatarTO(somaSaldoTotalTO, 2);
+            document.getElementById('statSaldoTopValor').innerText = somaSaldoTotalValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             document.getElementById('statTotalOvsContador').innerText = `${contagemOvsAtivas} OV(s)`;
 
             if (listaFiltrada.length === 0) {
                 container.innerHTML = `
                     <div class="bg-white p-12 text-center rounded-2xl border border-slate-200">
                         <span class="text-4xl block mb-2">🔍</span>
-                        <h4 class="font-bold text-slate-700 text-sm">Nenhum registo encontrado</h4>
+                        <h4 class="font-bold text-slate-700 text-sm">Nenhum registro encontrado</h4>
                         <p class="text-xs text-slate-400 mt-1">Carregue novas OVs do SAP ou limpe os filtros.</p>
                     </div>
                 `;
@@ -1067,17 +1160,16 @@
                 return;
             }
 
-            // AGRUPAMENTO ESTRUTURADO POR EMPRESA
+            // AGRUPAMENTO UNIFICADO: Qualquer Gerdau vai para a mesma chave
             const gruposPorEmpresa = {};
             listaFiltrada.forEach(item => {
-                const emp = item.ov.cliente || "OUTROS CLIENTES";
-                if (!gruposPorEmpresa[emp]) {
-                    gruposPorEmpresa[emp] = [];
+                const empUnificada = normalizarNomeEmpresa(item.ov.cliente);
+                if (!gruposPorEmpresa[empUnificada]) {
+                    gruposPorEmpresa[empUnificada] = [];
                 }
-                gruposPorEmpresa[emp].push(item);
+                gruposPorEmpresa[empUnificada].push(item);
             });
 
-            // ATUALIZA OS GRÁFICOS COM OS GRUPOS DE EMPRESAS
             atualizarGraficos(gruposPorEmpresa);
 
             const nomesEmpresas = Object.keys(gruposPorEmpresa);
@@ -1088,37 +1180,36 @@
                 const tema = isGerdau ? TEMA_GERDAU_AZUL : obterTemaDaEmpresa(nomeEmpresa, contadorNaoGerdau++);
                 const ovsDestaEmpresa = gruposPorEmpresa[nomeEmpresa];
 
-                let empLiberadoKG = 0;
+                let empLiberadoTO = 0;
                 let empLiberadoBRL = 0;
-                let empGastoKG = 0;
+                let empGastoTO = 0;
                 let empGastoBRL = 0;
-                let empSaldoKG = 0;
+                let empSaldoTO = 0;
                 let empSaldoBRL = 0;
 
                 ovsDestaEmpresa.forEach(o => {
                     if (o.status !== 'CANCELADO') {
-                        const totalGasto = (o.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
-                        const saldo = Math.max(0, o.ov.qtdLiberadaKG - totalGasto);
-                        const valUnit = o.ov.precoUnitarioPorKG || (o.ov.qtdLiberadaKG > 0 ? o.ov.valorBRL / o.ov.qtdLiberadaKG : 1.26);
+                        const totalGastoTO = (o.gastos || []).reduce((acc, g) => acc + Number(g.pesoTO || 0), 0);
+                        const saldoTO = Math.max(0, o.ov.qtdLiberadaTO - totalGastoTO);
+                        const valUnitTO = o.ov.precoUnitarioPorTO || (o.ov.qtdLiberadaTO > 0 ? o.ov.valorBRL / o.ov.qtdLiberadaTO : 1260);
 
-                        empLiberadoKG += Number(o.ov.qtdLiberadaKG || 0);
+                        empLiberadoTO += Number(o.ov.qtdLiberadaTO || 0);
                         empLiberadoBRL += Number(o.ov.valorBRL || 0);
-                        empGastoKG += totalGasto;
-                        empGastoBRL += (totalGasto * valUnit);
-                        empSaldoKG += saldo;
-                        empSaldoBRL += (saldo * valUnit);
+                        empGastoTO += totalGastoTO;
+                        empGastoBRL += (totalGastoTO * valUnitTO);
+                        empSaldoTO += saldoTO;
+                        empSaldoBRL += (saldoTO * valUnitTO);
                     }
                 });
 
-                // CARDS DAS OVs DESTA EMPRESA (TODAS EMPILHADAS NA MESMA COR)
+                // CARDS DAS OVs DESTA EMPRESA (TODAS DENTRO DO MESMO QUADRADO AZUL OU RESPECTIVA COR)
                 const ovsHtml = ovsDestaEmpresa.map(item => {
                     const cancelado = item.status === "CANCELADO";
-                    const totalGasto = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
-                    const saldo = cancelado ? 0 : Math.max(0, item.ov.qtdLiberadaKG - totalGasto);
-                    const concluido = !cancelado && saldo <= 0;
-                    const percentualRestante = item.ov.qtdLiberadaKG > 0 ? (saldo / item.ov.qtdLiberadaKG) * 100 : 0;
-                    const pctGasto = cancelado ? 0 : (Math.min(100, Math.round((totalGasto / item.ov.qtdLiberadaKG) * 100)) || 0);
-                    const valorGasto = totalGasto * (item.ov.precoUnitarioPorKG || 1.26);
+                    const totalGastoTO = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoTO || 0), 0);
+                    const saldoTO = cancelado ? 0 : Math.max(0, item.ov.qtdLiberadaTO - totalGastoTO);
+                    const concluido = !cancelado && saldoTO <= 0;
+                    const percentualRestante = item.ov.qtdLiberadaTO > 0 ? (saldoTO / item.ov.qtdLiberadaTO) * 100 : 0;
+                    const valorGasto = totalGastoTO * (item.ov.precoUnitarioPorTO || 1260);
                     const valorSaldo = Math.max(0, item.ov.valorBRL - valorGasto);
 
                     let classeBorda = tema.ovBordaPadrao;
@@ -1132,10 +1223,10 @@
                         badgeStatusHtml = `<span class="bg-rose-600 text-white font-black px-3 py-1 rounded-full text-[10px] tracking-wide shadow-sm">FINALIZADA (100% EXPEDIDO)</span>`;
                     } else if (percentualRestante <= 30) {
                         classeBorda = "borda-amarela-piscar bg-yellow-50/30";
-                        badgeStatusHtml = `<span class="bg-amber-500 text-white font-black px-3 py-1 rounded-full text-[10px] tracking-wide animate-bounce shadow-sm">⚠️ NO FINALZINHO (${saldo.toLocaleString('pt-BR')} KG)</span>`;
+                        badgeStatusHtml = `<span class="bg-amber-500 text-white font-black px-3 py-1 rounded-full text-[10px] tracking-wide animate-bounce shadow-sm">⚠️ NO FINALZINHO (${formatarTO(saldoTO, 2)})</span>`;
                     } else if (percentualRestante >= 70) {
                         classeBorda = "border-2 border-emerald-500 bg-emerald-50/20";
-                        badgeStatusHtml = `<span class="bg-emerald-600 text-white font-black px-3 py-1 rounded-full text-[10px] tracking-wide shadow-sm">TOTALMENTE CHEIA (${saldo.toLocaleString('pt-BR')} KG)</span>`;
+                        badgeStatusHtml = `<span class="bg-emerald-600 text-white font-black px-3 py-1 rounded-full text-[10px] tracking-wide shadow-sm">TOTALMENTE CHEIA (${formatarTO(saldoTO, 2)})</span>`;
                     } else {
                         classeBorda = `border-2 ${tema.bordaCard} bg-white`;
                         badgeStatusHtml = `<span class="${tema.badge} text-white font-black px-3 py-1 rounded-full text-[10px] tracking-wide">EM ANDAMENTO</span>`;
@@ -1149,7 +1240,7 @@
                                     <span class="${tema.badge} text-white font-mono font-bold text-[10px] px-2 py-0.5 rounded">CONTRATO</span>
                                     <span class="font-bold text-slate-800">Contrato ${item.contrato.numero}</span>
                                     <span class="text-slate-400">|</span>
-                                    <span class="text-slate-600">Total: <b>${item.contrato.qtdTotalKG.toLocaleString('pt-BR')} KG</b></span>
+                                    <span class="text-slate-600">Total: <b>${formatarTO(item.contrato.qtdTotalTO, 2)}</b></span>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     ${badgeStatusHtml}
@@ -1171,7 +1262,7 @@
                                             <h3 class="font-bold text-slate-800 text-sm ${cancelado ? 'line-through text-slate-400' : ''}">${item.ov.material}</h3>
                                         </div>
                                         <p class="text-xs text-slate-600 font-medium mt-1">
-                                            Pedido DRS: <b class="text-slate-900">${item.ov.pedidoDRS || '---'}</b>
+                                            Parceiro: <b class="text-slate-900">${item.ov.cliente}</b> • DRS: <b class="text-slate-900">${item.ov.pedidoDRS || '---'}</b>
                                             ${cancelado ? ` • <span class="text-rose-600 font-bold">Motivo: ${item.motivoCancelamento || 'Cancelada'}</span>` : ''}
                                         </p>
                                     </div>
@@ -1191,35 +1282,35 @@
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                     <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl">
                                         <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">1. Qtd / Valor Inicial</span>
-                                        <div class="text-base font-black text-slate-800 mt-1">${item.ov.qtdLiberadaKG.toLocaleString('pt-BR')} KG</div>
+                                        <div class="text-base font-black text-slate-800 mt-1">${formatarTO(item.ov.qtdLiberadaTO, 2)}</div>
                                         <div class="text-xs font-bold text-slate-500">${(item.ov.valorBRL).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
                                     </div>
 
                                     <div class="bg-rose-50/70 border border-rose-200 p-3 rounded-xl">
                                         <span class="block text-[10px] font-bold text-rose-600 uppercase tracking-wider">2. O que JÁ FOI GASTO</span>
-                                        <div class="text-base font-black text-rose-700 mt-1">${totalGasto.toLocaleString('pt-BR')} KG</div>
+                                        <div class="text-base font-black text-rose-700 mt-1">${formatarTO(totalGastoTO, 2)}</div>
                                         <div class="text-xs font-bold text-rose-600">${valorGasto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
                                     </div>
 
                                     <div class="bg-emerald-50/70 border border-emerald-200 p-3 rounded-xl">
-                                        <span class="block text-[10px] font-bold text-emerald-700 uppercase tracking-wider">3. SALDO DISPONÍVEL</span>
-                                        <div class="text-base font-black text-emerald-800 mt-1">${saldo.toLocaleString('pt-BR')} KG</div>
-                                        <div class="text-xs font-bold text-emerald-700">${cancelado ? '0,00 (Cancelada)' : valorSaldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                                        <span class="block text-[10px] font-bold text-emerald-700 uppercase tracking-wider">3. SALDO LIVRE RESTANTE</span>
+                                        <div class="text-base font-black text-emerald-800 mt-1">${formatarTO(saldoTO, 2)}</div>
+                                        <div class="text-xs font-bold text-emerald-700">${cancelado ? 'R$ 0,00 (Cancelada)' : valorSaldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
                                     </div>
                                 </div>
 
                                 <div class="border-t border-slate-100 pt-3">
                                     <div class="flex justify-between items-center mb-2">
                                         <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                                            <span>⚖️</span> Romaneios / Saídas de Balança
+                                            <span>⚖️</span> Romaneios / Saídas de Balança (TO)
                                         </span>
-                                        <button type="button" onclick="abrirModalGasto('${item.id}')" ${cancelado || saldo <= 0 ? 'disabled' : ''} class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-teal-50 text-teal-800 border border-teal-200 hover:bg-teal-100 transition disabled:opacity-40 disabled:cursor-not-allowed no-print">
-                                            + Lançar Pesagem
+                                        <button type="button" onclick="abrirModalGasto('${item.id}')" ${cancelado || saldoTO <= 0 ? 'disabled' : ''} class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-teal-50 text-teal-800 border border-teal-200 hover:bg-teal-100 transition disabled:opacity-40 disabled:cursor-not-allowed no-print">
+                                            + Lançar Pesagem (TO)
                                         </button>
                                     </div>
 
                                     ${(!item.gastos || item.gastos.length === 0) 
-                                        ? `<p class="text-[11px] text-slate-400 italic">Nenhuma pesagem registada até ao momento.</p>`
+                                        ? `<p class="text-[11px] text-slate-400 italic">Nenhuma pesagem registrada até ao momento.</p>`
                                         : `
                                         <div class="overflow-x-auto">
                                             <table class="w-full text-left text-xs border border-slate-100 rounded-lg">
@@ -1238,7 +1329,7 @@
                                                         <td class="py-1.5 px-3 text-slate-600">${g.data}</td>
                                                         <td class="py-1.5 px-3 font-semibold text-slate-800">${g.ticket}</td>
                                                         <td class="py-1.5 px-3 text-slate-600 font-mono">${g.placa}</td>
-                                                        <td class="py-1.5 px-3 text-right font-bold text-rose-600">-${Number(g.pesoKG).toLocaleString('pt-BR')} KG</td>
+                                                        <td class="py-1.5 px-3 text-right font-bold text-rose-600">-${formatarTO(g.pesoTO, 3)}</td>
                                                         <td class="py-1.5 px-3 text-center no-print">
                                                             <button type="button" onclick="removerGasto('${item.id}', ${idx})" ${cancelado ? 'disabled' : ''} class="text-rose-400 hover:text-rose-600 text-xs disabled:opacity-30">✕</button>
                                                         </td>
@@ -1259,36 +1350,39 @@
             return `
                 <div class="rounded-3xl border-2 ${tema.bordaCard} overflow-hidden shadow-sm ${tema.bgLight} space-y-4 p-5">
                     
+                    <!-- CABEÇALHO DO BLOCO DA EMPRESA COM A SOMA DOS SALDOS LIVRES -->
                     <div class="${tema.header} text-white p-4 sm:p-5 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-md">
                         <div>
                             <div class="flex items-center gap-2">
                                 <span class="bg-white/20 text-white font-black text-[10px] px-2.5 py-1 rounded-md uppercase tracking-wider">
-                                    ${isGerdau ? 'EMPRESA PADRÃO (AZUL)' : 'EMPRESA COMPRADORA'}
+                                    ${isGerdau ? 'GERDAU (AZUL) • OVs CONSOLIDADAS' : 'EMPRESA COMPRADORA'}
                                 </span>
                                 <span class="text-xs text-white/80 font-bold">${ovsDestaEmpresa.length} OV(s) registradas</span>
                             </div>
                             <h3 class="text-base sm:text-lg font-black tracking-wide mt-1">${nomeEmpresa}</h3>
                         </div>
 
+                        <!-- SOMA DOS DOIS SALDOS LIVRES E TOTAIS DA EMPRESA -->
                         <div class="flex flex-wrap gap-2 text-xs">
                             <div class="bg-black/20 backdrop-blur-sm px-3.5 py-1.5 rounded-xl border border-white/10">
-                                <span class="block text-[9px] text-white/70 uppercase font-bold">Valor Total Emitido</span>
+                                <span class="block text-[9px] text-white/70 uppercase font-bold">Total Contratado</span>
                                 <div class="font-black text-white text-sm">${empLiberadoBRL.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                                <div class="text-[10px] text-white/80">${empLiberadoKG.toLocaleString('pt-BR')} KG</div>
+                                <div class="text-[10px] text-white/80">${formatarTO(empLiberadoTO, 2)}</div>
                             </div>
                             <div class="bg-black/20 backdrop-blur-sm px-3.5 py-1.5 rounded-xl border border-white/10">
-                                <span class="block text-[9px] text-rose-200 uppercase font-bold">Já Expedido / Gasto</span>
+                                <span class="block text-[9px] text-rose-200 uppercase font-bold">Já Expedido</span>
                                 <div class="font-black text-rose-200 text-sm">${empGastoBRL.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                                <div class="text-[10px] text-rose-200/80">${empGastoKG.toLocaleString('pt-BR')} KG</div>
+                                <div class="text-[10px] text-rose-200/80">${formatarTO(empGastoTO, 2)}</div>
                             </div>
-                            <div class="bg-white text-slate-900 px-4 py-1.5 rounded-xl font-bold shadow-sm">
-                                <span class="block text-[9px] text-slate-500 uppercase font-bold">Saldo Livre Restante</span>
-                                <div class="font-black text-emerald-700 text-sm">${empSaldoBRL.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                                <div class="text-[11px] font-extrabold text-emerald-800">${empSaldoKG.toLocaleString('pt-BR')} KG restante</div>
+                            <div class="bg-white text-slate-900 px-4 py-2 rounded-xl font-bold shadow-sm border border-slate-100">
+                                <span class="block text-[9px] text-slate-500 uppercase font-bold">Saldo Livre Restante (Soma OVs)</span>
+                                <div class="font-black text-emerald-700 text-base">${formatarTO(empSaldoTO, 2)}</div>
+                                <div class="text-[11px] font-bold text-emerald-600">${empSaldoBRL.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- TODAS AS OVS DA GERDAU (OU DEMAIS EMPRESAS) ENFILEIRADAS AQUI DENTRO -->
                     <div class="space-y-4">
                         ${ovsHtml}
                     </div>
@@ -1405,10 +1499,13 @@
                 document.getElementById('campoValorOV').value = parseFloat(matchVal[1].replace(/\./g, '').replace(',', '.'));
             }
 
-            const matchQtd = txt.match(/(\d+(?:\.\d+)?)\s*(?:KG|TO)/i);
+            const matchQtd = txt.match(/(\d+(?:[.,]\d+)?)\s*(?:KG|TO)/i);
             if (matchQtd && !document.getElementById('campoQtdOV').value) {
-                let peso = parseFloat(matchQtd[1].replace(/\./g, ''));
-                if (txt.includes(' TO')) peso = peso * 1000;
+                let peso = parseFloat(matchQtd[1].replace(/\./g, '').replace(',', '.'));
+                // Se a leitura for em KG (geralmente acima de 100), converte para TO
+                if (txt.includes(' KG') || peso > 100) {
+                    peso = peso / 1000;
+                }
                 document.getElementById('campoQtdOV').value = peso;
             }
 
@@ -1425,8 +1522,9 @@
 
         async function salvarExtraido() {
             const ovNum = document.getElementById('campoOV').value.trim() || String(Date.now()).slice(-8);
-            const qtdOV = parseFloat(document.getElementById('campoQtdOV').value) || 5000;
+            const qtdOV_TO = parseFloat(document.getElementById('campoQtdOV').value) || 5.0;
             const valOV = parseFloat(document.getElementById('campoValorOV').value) || 6300;
+            const contratoTO = parseFloat(document.getElementById('campoTotalContrato').value) || 2635.0;
 
             const novo = {
                 id: ovNum,
@@ -1435,17 +1533,17 @@
                 contrato: {
                     numero: document.getElementById('campoContrato').value.trim() || "0000071823",
                     item: "30",
-                    qtdTotalKG: parseFloat(document.getElementById('campoTotalContrato').value) || 2635000,
+                    qtdTotalTO: contratoTO,
                     valorTotalBRL: 3320100.00
                 },
                 ov: {
                     numero: ovNum,
-                    cliente: document.getElementById('campoCliente').value.trim() || "EMPRESA PARCEIRA SAP",
+                    cliente: document.getElementById('campoCliente').value.trim() || "GERDAU AÇOS LONGOS S.A.",
                     material: document.getElementById('campoMaterial').value.trim() || "SUCATA DE FERRO",
                     pedidoDRS: document.getElementById('campoDRS').value.trim() || "---",
-                    qtdLiberadaKG: qtdOV,
+                    qtdLiberadaTO: qtdOV_TO,
                     valorBRL: valOV,
-                    precoUnitarioPorKG: qtdOV > 0 ? (valOV / qtdOV) : 1.26,
+                    precoUnitarioPorTO: qtdOV_TO > 0 ? (valOV / qtdOV_TO) : 1260,
                     docContabil: document.getElementById('campoDocContabil').value.trim() || "---"
                 },
                 gastos: []
@@ -1459,15 +1557,15 @@
             const item = cacheRegistros.find(o => o.id === ovId);
             if (!item) return;
 
-            const totalGasto = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
-            const saldoRestante = Math.max(0, item.ov.qtdLiberadaKG - totalGasto);
+            const totalGastoTO = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoTO || 0), 0);
+            const saldoRestanteTO = Math.max(0, item.ov.qtdLiberadaTO - totalGastoTO);
 
             document.getElementById('cancelarOVId').value = ovId;
             document.getElementById('cancelarOVNumero').innerText = item.ov.numero;
-            document.getElementById('cancelarSaldoRestante').innerText = `${saldoRestante.toLocaleString('pt-BR')} KG (R$ ${(saldoRestante * (item.ov.precoUnitarioPorKG || 1.26)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })})`;
+            document.getElementById('cancelarSaldoRestante').innerText = `${formatarTO(saldoRestanteTO, 2)} (R$ ${(saldoRestanteTO * (item.ov.precoUnitarioPorTO || 1260)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })})`;
             document.getElementById('cancelarMotivo').value = '';
 
-            const outrasOVs = cacheRegistros.filter(o => o.id !== ovId && o.status !== "CANCELADO" && o.ov.cliente === item.ov.cliente);
+            const outrasOVs = cacheRegistros.filter(o => o.id !== ovId && o.status !== "CANCELADO" && normalizarNomeEmpresa(o.ov.cliente) === normalizarNomeEmpresa(item.ov.cliente));
             const select = document.getElementById('selectDestinoSaldo');
             select.innerHTML = '<option value="CONTRATO">Devolver ao Contrato Mestre (Saldo Livre)</option>';
             
@@ -1493,17 +1591,17 @@
             const itemOrigem = cacheRegistros.find(o => o.id === ovId);
             if (!itemOrigem) return;
 
-            const totalGasto = (itemOrigem.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
-            const saldoTransferir = Math.max(0, itemOrigem.ov.qtdLiberadaKG - totalGasto);
+            const totalGastoTO = (itemOrigem.gastos || []).reduce((acc, g) => acc + Number(g.pesoTO || 0), 0);
+            const saldoTransferirTO = Math.max(0, itemOrigem.ov.qtdLiberadaTO - totalGastoTO);
 
             itemOrigem.status = "CANCELADO";
             itemOrigem.motivoCancelamento = motivo;
 
-            if (destinoId !== "CONTRATO" && saldoTransferir > 0) {
+            if (destinoId !== "CONTRATO" && saldoTransferirTO > 0) {
                 const itemDestino = cacheRegistros.find(o => o.id === destinoId);
                 if (itemDestino) {
-                    itemDestino.ov.qtdLiberadaKG += saldoTransferir;
-                    itemDestino.ov.valorBRL += (saldoTransferir * (itemDestino.ov.precoUnitarioPorKG || itemOrigem.ov.precoUnitarioPorKG || 1.26));
+                    itemDestino.ov.qtdLiberadaTO += saldoTransferirTO;
+                    itemDestino.ov.valorBRL += (saldoTransferirTO * (itemDestino.ov.precoUnitarioPorTO || itemOrigem.ov.precoUnitarioPorTO || 1260));
                     await salvarNaBase(itemDestino);
                 }
             }
@@ -1517,7 +1615,7 @@
             document.getElementById('gastoOVId').value = ovId;
             document.getElementById('gastoTicket').value = '';
             document.getElementById('gastoPlaca').value = '';
-            document.getElementById('gastoPeso').value = '';
+            document.getElementById('gastoPesoTO').value = '';
             document.getElementById('gastoData').value = new Date().toISOString().split('T')[0];
             document.getElementById('modalGasto').classList.remove('hidden');
         }
@@ -1530,12 +1628,17 @@
             const ovId = document.getElementById('gastoOVId').value;
             const ticket = document.getElementById('gastoTicket').value.trim();
             const placa = document.getElementById('gastoPlaca').value.trim().toUpperCase();
-            const peso = parseFloat(document.getElementById('gastoPeso').value);
+            let pesoTO = parseFloat(document.getElementById('gastoPesoTO').value);
             const data = document.getElementById('gastoData').value;
 
-            if (!peso || peso <= 0) {
-                alert("Informe um peso válido.");
+            if (!pesoTO || pesoTO <= 0) {
+                alert("Informe um peso válido em Toneladas (TO).");
                 return;
+            }
+
+            // Se o operador digitar em quilos por engano (> 100), faz a conversão automática para TO
+            if (pesoTO > 100) {
+                pesoTO = pesoTO / 1000;
             }
 
             const item = cacheRegistros.find(o => o.id === ovId);
@@ -1545,7 +1648,7 @@
                     id: Date.now(),
                     ticket: ticket || 'S/N',
                     placa: placa || '---',
-                    pesoKG: peso,
+                    pesoTO: pesoTO,
                     data: data || new Date().toISOString().split('T')[0]
                 });
                 await salvarNaBase(item);
@@ -1593,20 +1696,20 @@
             if (!cacheRegistros.length) return;
 
             let csv = "data:text/csv;charset=utf-8,";
-            csv += "Status;Contrato;OV;Empresa/Cliente;Material;Qtd Liberada (KG);Gasto Realizado (KG);Saldo Restante (KG);Valor Total;Valor Gasto;Valor Saldo\r\n";
+            csv += "Status;Contrato;OV;Empresa/Cliente;Material;Qtd Liberada (TO);Gasto Realizado (TO);Saldo Restante (TO);Valor Total (R$);Valor Gasto (R$);Valor Saldo (R$)\r\n";
 
             cacheRegistros.forEach(item => {
-                const totalGasto = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
-                const saldo = item.status === "CANCELADO" ? 0 : Math.max(0, item.ov.qtdLiberadaKG - totalGasto);
-                const valGasto = totalGasto * (item.ov.precoUnitarioPorKG || 0);
+                const totalGastoTO = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoTO || 0), 0);
+                const saldoTO = item.status === "CANCELADO" ? 0 : Math.max(0, item.ov.qtdLiberadaTO - totalGastoTO);
+                const valGasto = totalGastoTO * (item.ov.precoUnitarioPorTO || 0);
                 const valSaldo = Math.max(0, item.ov.valorBRL - valGasto);
 
-                csv += `"${item.status}";"${item.contrato.numero}";"${item.ov.numero}";"${item.ov.cliente}";"${item.ov.material}";${item.ov.qtdLiberadaKG};${totalGasto};${saldo};${item.ov.valorBRL};${valGasto};${valSaldo}\r\n`;
+                csv += `"${item.status}";"${item.contrato.numero}";"${item.ov.numero}";"${item.ov.cliente}";"${item.ov.material}";${item.ov.qtdLiberadaTO};${totalGastoTO};${saldoTO};${item.ov.valorBRL};${valGasto};${valSaldo}\r\n`;
             });
 
             const link = document.createElement("a");
             link.setAttribute("href", encodeURI(csv));
-            link.setAttribute("download", `controle_ovs_por_empresa_${new Date().toISOString().slice(0,10)}.csv`);
+            link.setAttribute("download", `controle_ovs_por_empresa_TO_${new Date().toISOString().slice(0,10)}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
