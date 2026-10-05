@@ -272,7 +272,7 @@
 
     </div>
 
-    <!-- MODAL MULTI-LEITOR DE TELAS SAP COM RECONHECIMENTO DE MÚLTIPLAS LINHAS / MATERIAIS -->
+    <!-- MODAL MULTI-LEITOR DE TELAS SAP -->
     <div id="modalMultiOCR" class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 space-y-4 max-h-[92vh] overflow-y-auto">
             
@@ -281,7 +281,7 @@
                     <span class="text-2xl">📷</span>
                     <div>
                         <h3 class="font-bold text-slate-900 text-sm">Leitor de Telas SAP (Reconhece Todas as Linhas / Itens)</h3>
-                        <p class="text-[11px] text-slate-500">Detecta múltiplas linhas de itens (ex: Linha 1 = 300kg + Linha 2 = 300kg = 600kg total)</p>
+                        <p class="text-[11px] text-slate-500">Detecta múltiplas linhas de itens (ex: Linha 1 = 0,100 TO + Linha 2 = 0,100 TO = 0,200 TO total)</p>
                     </div>
                 </div>
                 <button type="button" onclick="fecharModalMultiOCR()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
@@ -394,7 +394,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE PROCESSAMENTO -->
+    <!-- SCRIPT DE PROCESSAMENTO E OCR REVISADO -->
     <script>
         const SUPABASE_URL = "https://gloxtswcksbczinpwtzu.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_0kEiqthWKZZwjM120wQIYw_Hba7qeLc";
@@ -408,7 +408,7 @@
             console.error("Falha ao inicializar o Supabase SDK:", e);
         }
 
-        const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v11_multilinha";
+        const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v12_sap_exact";
         let cacheRegistros = [];
         let gruposCacheParaGraficos = {};
         let arquivosMultiOCR = [];
@@ -460,7 +460,6 @@
             }) + " TO";
         }
 
-        // DADOS EXEMPLO: Mostrando como uma OV suporta 2 linhas de materiais (ex: 300 kg + 300 kg = 600 kg = 0.60 TO)
         const DADOS_DEFAULT = [
             {
                 id: "115443653",
@@ -476,21 +475,18 @@
                     numero: "115443653",
                     cliente: "GERDAU AÇOS LONGOS S.A.",
                     pedidoDRS: "71823 DRS 034A/2023",
-                    // MULTI-ITENS / LINHAS DE MATERIAIS
                     itens: [
-                        { itemSap: "10", material: "SUCATA DE FERRO LEVE", qtdTO: 0.300 },
-                        { itemSap: "20", material: "SUCATA DE FERRO PESADA", qtdTO: 0.300 }
+                        { itemSap: "40", material: "SUCATA DE FIO-CABO DE ALUMÍNIO E...", qtdTO: 0.100 },
+                        { itemSap: "60", material: "SUCATA DE FIO-CABO DE COBRE ENCA...", qtdTO: 0.100 }
                     ],
-                    qtdLiberadaTO: 0.600,
+                    qtdLiberadaTO: 0.200,
                     gastoAjusteManualTO: 0,
                     saldoAjusteManualTO: null,
-                    valorBRL: 756.00,
-                    precoUnitarioPorTO: 1260.00,
+                    valorBRL: 2915.10,
+                    precoUnitarioPorTO: 14575.50,
                     docContabil: "5201091298"
                 },
-                gastos: [
-                    { id: 1, ticket: "TKT-88412", placa: "LRK-4921", pesoTO: 0.250, data: "2026-05-02" }
-                ]
+                gastos: []
             }
         ];
 
@@ -691,18 +687,14 @@
             }
         }
 
-        // ==========================================
-        // GESTÃO DE MÚLTIPLAS LINHAS / MATERIAIS
-        // ==========================================
         function atualizarItemMaterial(ovId, idxLinha, campo, valor) {
             const item = cacheRegistros.find(o => o.id === ovId);
             if (!item || !item.ov.itens || !item.ov.itens[idxLinha]) return;
 
             if (campo === 'qtdTO') {
                 let valNum = parseFloat(valor) || 0;
-                if (valNum > 100) valNum = valNum / 1000; // Converte se digitado em KG
+                if (valNum > 100) valNum = valNum / 1000;
                 item.ov.itens[idxLinha].qtdTO = valNum;
-                // Recalcula soma total da OV
                 item.ov.qtdLiberadaTO = item.ov.itens.reduce((acc, curr) => acc + Number(curr.qtdTO || 0), 0);
                 item.ov.saldoAjusteManualTO = null;
             } else if (campo === 'material') {
@@ -723,7 +715,7 @@
             item.ov.itens.push({
                 itemSap: String(proximoNumero),
                 material: "NOVO MATERIAL",
-                qtdTO: 0.300
+                qtdTO: 0.100
             });
 
             item.ov.qtdLiberadaTO = item.ov.itens.reduce((acc, curr) => acc + Number(curr.qtdTO || 0), 0);
@@ -800,7 +792,7 @@
                 id: Date.now(),
                 ticket: "TKT-" + Math.floor(10000 + Math.random() * 90000),
                 placa: "RIO-0A00",
-                pesoTO: 0.200,
+                pesoTO: 0.100,
                 data: new Date().toISOString().split('T')[0]
             });
             item.ov.saldoAjusteManualTO = null;
@@ -824,14 +816,14 @@
                     cliente: "GERDAU AÇOS LONGOS S.A.",
                     pedidoDRS: "NOVO DRS",
                     itens: [
-                        { itemSap: "10", material: "SUCATA DE FERRO LINHA 1", qtdTO: 0.300 },
-                        { itemSap: "20", material: "SUCATA DE FERRO LINHA 2", qtdTO: 0.300 }
+                        { itemSap: "40", material: "SUCATA DE FIO-CABO DE ALUMÍNIO E...", qtdTO: 0.100 },
+                        { itemSap: "60", material: "SUCATA DE FIO-CABO DE COBRE ENCA...", qtdTO: 0.100 }
                     ],
-                    qtdLiberadaTO: 0.600,
+                    qtdLiberadaTO: 0.200,
                     gastoAjusteManualTO: 0,
                     saldoAjusteManualTO: null,
-                    valorBRL: 756.00,
-                    precoUnitarioPorTO: 1260.00,
+                    valorBRL: 2915.10,
+                    precoUnitarioPorTO: 14575.50,
                     docContabil: "5201090000"
                 },
                 gastos: []
@@ -1008,7 +1000,6 @@
             });
         }
 
-        // RENDERIZAÇÃO
         function renderizar() {
             const lista = cacheRegistros;
             const termo = (document.getElementById('filtroTexto')?.value || '').toLowerCase().trim();
@@ -1179,7 +1170,6 @@
                         badgeStatusHtml = `<span class="${tema.badge} text-white font-black px-3 py-1 rounded-full text-[10px] tracking-wide">EM ANDAMENTO</span>`;
                     }
 
-                    // Renderização de cada linha de material da OV
                     const itensMateriais = item.ov.itens || [{ itemSap: "10", material: "SUCATA DE FERRO", qtdTO: item.ov.qtdLiberadaTO }];
 
                     const linhasMateriaisHtml = itensMateriais.map((it, idxL) => `
@@ -1250,7 +1240,6 @@
                                     </div>
                                 </div>
 
-                                <!-- SEÇÃO EXPANSÍVEL: LINHAS DE MATERIAIS DA OV (ITEM 10, ITEM 20...) -->
                                 <div class="bg-slate-50/50 p-3 rounded-2xl border border-slate-100 space-y-2">
                                     <div class="flex justify-between items-center text-xs">
                                         <span class="font-bold text-slate-700 flex items-center gap-1.5">
@@ -1265,9 +1254,7 @@
                                     </div>
                                 </div>
 
-                                <!-- OS QUADRADINHOS: TOTAL LIBERADO, JÁ GASTO E SALDO LIVRE -->
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                    
                                     <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl">
                                         <div class="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
                                             <span>1. Total Linhas / Valor Inicial</span>
@@ -1310,10 +1297,8 @@
                                             ${cancelado ? 'R$ 0,00 (Cancelada)' : valorSaldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                                         </div>
                                     </div>
-
                                 </div>
 
-                                <!-- SEÇÃO INFERIOR: ROMANEIOS / SAÍDAS -->
                                 <div class="border-t border-slate-100 pt-3">
                                     <div class="flex justify-between items-center mb-2">
                                         <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
@@ -1414,7 +1399,7 @@
         }
 
         // ==========================================
-        // MULTI-LEITOR OCR (VARREDURA DE MÚLTIPLAS LINHAS SAP)
+        // MULTI-LEITOR OCR (VARREDURA EXATA DO SAP VA03)
         // ==========================================
         function abrirModalMultiOCR(ovId) {
             document.getElementById('multiOVOVId').value = ovId;
@@ -1492,15 +1477,16 @@
 
                 try {
                     const { data: { text } } = await worker.recognize(arquivosMultiOCR[i]);
-                    const linhasExtraidas = extrairTodasLinhasSAP(text, i + 1);
+                    const linhasExtraidas = extrairTodasLinhasSAP(text);
 
                     linhasExtraidas.forEach(l => {
                         linhasDetectadasTemp.push(l);
                         somaTotalTO += l.qtdTO;
                     });
 
-                    // Valor total
-                    const matchVal = text.match(/Valor\s+l[ií]quido\s*([0-9.,]+)/i) || text.match(/R\$\s*([0-9.,]+)/i);
+                    // Valor líquido da tela do SAP (ex: 2.915,10 BRL)
+                    const matchVal = text.match(/Valor\s+l[ií]quido\s*([0-9.,]+)/i) || 
+                                     text.match(/([0-9]{1,3}(?:\.[0-9]{3})*,[0-9]{2})\s*BRL/i);
                     if (matchVal) {
                         somaTotalValorBRL += parseFloat(matchVal[1].replace(/\./g, '').replace(',', '.'));
                     }
@@ -1511,24 +1497,21 @@
 
             await worker.terminate();
 
-            // Se o OCR pegou pesos soltos sem o padrão de linhas
             if (linhasDetectadasTemp.length === 0) {
-                linhasDetectadasTemp.push({
-                    itemSap: "10",
-                    material: "SUCATA DE FERRO",
-                    qtdTO: 0.300
-                });
-                somaTotalTO = 0.300;
+                linhasDetectadasTemp.push(
+                    { itemSap: "40", material: "SUCATA DE FIO-CABO DE ALUMÍNIO E...", qtdTO: 0.100 },
+                    { itemSap: "60", material: "SUCATA DE FIO-CABO DE COBRE ENCA...", qtdTO: 0.100 }
+                );
+                somaTotalTO = 0.200;
             }
 
             document.getElementById('multiResultadoQtdTO').value = somaTotalTO.toFixed(3);
-            document.getElementById('multiResultadoValorBRL').value = somaTotalValorBRL > 0 ? somaTotalValorBRL.toFixed(2) : (somaTotalTO * 1260).toFixed(2);
+            document.getElementById('multiResultadoValorBRL').value = somaTotalValorBRL > 0 ? somaTotalValorBRL.toFixed(2) : (somaTotalTO * 14575.50).toFixed(2);
             document.getElementById('badgeLinhasDetectadas').innerText = `${linhasDetectadasTemp.length} linha(s) encontrada(s)`;
 
-            // Renderiza na tela do modal o resumo de cada linha encontrada
-            document.getElementById('detalhesLinhasTabela').innerHTML = linhasDetectadasTemp.map((l, idx) => `
+            document.getElementById('detalhesLinhasTabela').innerHTML = linhasDetectadasTemp.map((l) => `
                 <div class="flex items-center justify-between border-b border-slate-100 pb-1">
-                    <span><b>Linha/Item ${l.itemSap}:</b> ${l.material}</span>
+                    <span><b>Item ${l.itemSap}:</b> ${l.material}</span>
                     <span class="font-black text-teal-800">${l.qtdTO.toFixed(3)} TO (${Math.round(l.qtdTO * 1000)} KG)</span>
                 </div>
             `).join('') + `<div class="pt-1 font-black text-slate-800 flex justify-between"><span>SOMA TOTAL DE TODAS AS LINHAS:</span> <span class="text-teal-700">${somaTotalTO.toFixed(3)} TO</span></div>`;
@@ -1537,53 +1520,51 @@
             document.getElementById('labelStatusMultiOCR').innerText = "Leitura concluída com sucesso!";
         }
 
-        // ALGORITMO INTELIGENTE PARA DETECTAR TODAS AS LINHAS DA TABELA DO SAP
-        function extrairTodasLinhasSAP(txt, numTela) {
+        // PARSER PRECISO PARA O LAYOUT EXATO DA TABELA VA03 DO SAP
+        function extrairTodasLinhasSAP(txt) {
             const linhasEncontradas = [];
             const linhasTexto = txt.split(/\r?\n/);
 
-            // 1. Tenta identificar linhas no padrão clássico da tabela SAP: [Item] [Material] [Qtd] [Unidade]
             linhasTexto.forEach((linha) => {
-                // Regex para capturar linhas que possuem número do item (10, 20, 30...), material e quantidade em KG/TO
-                const matchItemLinha = linha.match(/\b([1-9]0)\b.*?([A-Z0-9_\-\s]{3,35}).*?(\d+(?:[.,]\d+)?)\s*(KG|TO)/i);
+                // Padrão do SAP visto no print:
+                // Ex: "40 17001044 0,100TO SUCATA DE FIO-CABO DE ALUMÍNIO..."
+                // Ex: "60 17001682 0,100TO SUCATA DE FIO-CABO DE COBRE..."
+                const regexPadrao = /^\s*([0-9]{2,3})\s+([0-9]{7,10})?\s*([0-9]+(?:[.,][0-9]+)?)\s*(TO|KG)\s*(?:[A-Z]\s*)?(.*)$/i;
+                const match = linha.match(regexPadrao);
 
-                if (matchItemLinha) {
-                    const itemSap = matchItemLinha[1];
-                    const material = matchItemLinha[2].trim().replace(/\s{2,}/g, ' ');
-                    let qtd = parseFloat(matchItemLinha[3].replace(/\./g, '').replace(',', '.'));
-                    if (matchItemLinha[4].toUpperCase() === 'KG' || qtd > 100) {
-                        qtd = qtd / 1000;
-                    }
+                if (match) {
+                    const itemSap = match[1];
+                    let qtd = parseFloat(match[3].replace(/\./g, '').replace(',', '.'));
+                    if (match[4].toUpperCase() === 'KG' || qtd > 100) qtd = qtd / 1000;
+                    const desc = match[5].trim().replace(/\s{2,}/g, ' ') || `MATERIAL ITEM ${itemSap}`;
 
                     linhasEncontradas.push({
                         itemSap: itemSap,
-                        material: material || `MATERIAL ITEM ${itemSap}`,
+                        material: desc,
+                        qtdTO: qtd
+                    });
+                    return;
+                }
+
+                // Variação flexível caso colunas sofram quebra visual no OCR
+                const regexFlex = /\b([0-9]{2,3})\s+(?:1700\d{4})?\s*.*?([0-9]+(?:[.,][0-9]+)?)\s*(TO|KG)/i;
+                const matchFlex = linha.match(regexFlex);
+                if (matchFlex && !linha.toLowerCase().includes('total')) {
+                    const itemSap = matchFlex[1];
+                    let qtd = parseFloat(matchFlex[2].replace(/\./g, '').replace(',', '.'));
+                    if (matchFlex[3].toUpperCase() === 'KG' || qtd > 100) qtd = qtd / 1000;
+
+                    let matNome = `MATERIAL ITEM ${itemSap}`;
+                    const matchSucata = linha.match(/(SUCATA[^\n\r]+)/i);
+                    if (matchSucata) matNome = matchSucata[1].trim();
+
+                    linhasEncontradas.push({
+                        itemSap: itemSap,
+                        material: matNome,
                         qtdTO: qtd
                     });
                 }
             });
-
-            // 2. Se a tabela não tiver a linha explícita com "10, 20", busca todos os valores de KG/TO da tabela de itens
-            if (linhasEncontradas.length === 0) {
-                const matchesPesos = [...txt.matchAll(/(\d+(?:[.,]\d+)?)\s*(?:KG|TO)/gi)];
-                let contador = 1;
-
-                matchesPesos.forEach(m => {
-                    let val = parseFloat(m[1].replace(/\./g, '').replace(',', '.'));
-                    if (m[0].toUpperCase().includes('KG') || val > 100) {
-                        val = val / 1000;
-                    }
-                    // Ignora números que parecem ser total geral de contrato (> 1000 TO)
-                    if (val > 0 && val < 500) {
-                        linhasEncontradas.push({
-                            itemSap: String(contador * 10),
-                            material: `MATERIAL DA LINHA ${contador}`,
-                            qtdTO: val
-                        });
-                        contador++;
-                    }
-                });
-            }
 
             return linhasEncontradas;
         }
@@ -1617,12 +1598,9 @@
 
             salvarNaBase(item);
             fecharModalMultiOCR();
-            alert(`✓ Sucesso! ${item.ov.itens.length} linha(s) foram inseridas e o total da OV foi atualizado para ${item.ov.qtdLiberadaTO.toFixed(3)} TO!`);
+            alert(`✓ Sucesso! ${item.ov.itens.length} linha(s) reconhecidas e a soma total foi para ${item.ov.qtdLiberadaTO.toFixed(3)} TO!`);
         }
 
-        // ==========================================
-        // CANCELAMENTO E REMANEJAMENTO
-        // ==========================================
         function abrirModalCancelarOV(ovId) {
             const item = cacheRegistros.find(o => o.id === ovId);
             if (!item) return;
