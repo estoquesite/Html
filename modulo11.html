@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 11 - Controle de OVs & Supabase Cloud</title>
+    <title>Módulo 11 - Controle de OVs por Empresa & Supabase</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS Client -->
@@ -87,7 +87,7 @@
                     <span class="text-base">◀</span> Voltar ao Menu
                 </a>
                 <span class="text-slate-300">|</span>
-                <span class="text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200/60 px-2.5 py-1 rounded-lg">Módulo 11 • Gestão Visual de Saldos</span>
+                <span class="text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200/60 px-2.5 py-1 rounded-lg">Módulo 11 • Separado por Empresa</span>
             </div>
             
             <div class="flex flex-wrap items-center gap-2">
@@ -121,48 +121,81 @@
                     <div class="flex items-center gap-3">
                         <span class="text-2xl font-black tracking-widest text-teal-100">VALE</span>
                         <div class="h-5 w-px bg-teal-300/40"></div>
-                        <h1 class="text-lg font-extrabold tracking-wide">Painel de Ordens de Venda & Balança</h1>
-                        <span class="bg-emerald-500 text-white font-black text-[10px] px-2 py-0.5 rounded shadow-sm">SD - ZVSU</span>
+                        <h1 class="text-lg font-extrabold tracking-wide">Painel de Ordens de Venda por Empresa</h1>
+                        <span class="bg-emerald-500 text-white font-black text-[10px] px-2 py-0.5 rounded shadow-sm">VISÃO SEGREGADA</span>
                     </div>
-                    <p class="text-xs text-teal-100/90 mt-1">Status Dinâmico: Verde (Cheio), Amarelo Piscando (Finalzinho) e Vermelho (Finalizada)</p>
+                    <p class="text-xs text-teal-100/90 mt-1">OVs agrupadas em seções exclusivas com subtotais de peso e valor por empresa compradora</p>
                 </div>
 
-                <!-- CARDS DE CONSOLIDAÇÃO -->
                 <div class="flex flex-wrap gap-2 text-right">
                     <div class="bg-white/10 backdrop-blur-sm px-3.5 py-2 rounded-xl border border-white/10 text-left">
-                        <div class="text-[10px] text-teal-100 font-bold uppercase tracking-wider">Total Consumido (Ativas)</div>
-                        <div id="statGastoOV" class="text-base font-black text-amber-300 leading-tight">0 KG</div>
+                        <div class="text-[10px] text-teal-100 font-bold uppercase tracking-wider">Total OVs Ativas</div>
+                        <div id="statTotalOvsContador" class="text-base font-black text-white leading-tight">0</div>
                     </div>
                     <div class="bg-white/10 backdrop-blur-sm px-3.5 py-2 rounded-xl border border-white/10 text-left">
-                        <div class="text-[10px] text-teal-100 font-bold uppercase tracking-wider">Saldo em Aberto (Ativas)</div>
-                        <div id="statSaldoOV" class="text-base font-black text-white leading-tight">0 KG</div>
+                        <div class="text-[10px] text-teal-100 font-bold uppercase tracking-wider">Saldo Líquido Geral</div>
+                        <div id="statSaldoTopResumo" class="text-base font-black text-emerald-300 leading-tight">0 KG</div>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- QUADRADINHOS SEPARADORES POR EMPRESA (CADA UMA COM UMA COR) -->
+        <!-- CONSOLIDAÇÃO GERAL (TODAS AS EMPRESAS JUNTAS) -->
+        <section class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+                <div class="flex items-center gap-2">
+                    <span class="text-lg">📊</span>
+                    <h2 class="text-xs font-black text-slate-800 uppercase tracking-wider">Consolidação Geral de Todas as Empresas</h2>
+                </div>
+                <span class="text-[11px] font-semibold text-slate-400">Total acumulado de contratos e OVs</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 text-xs">
+                <div class="bg-slate-50 border border-slate-200/80 p-3.5 rounded-xl space-y-1">
+                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Liberado</span>
+                    <div id="totalGeralLiberadoKG" class="text-base font-black text-slate-800">0 KG <span class="text-[11px] font-normal text-slate-500">(0,00 TO)</span></div>
+                    <div id="totalGeralLiberadoValor" class="text-xs font-bold text-slate-600">R$ 0,00</div>
+                </div>
+
+                <div class="bg-rose-50/70 border border-rose-200/80 p-3.5 rounded-xl space-y-1">
+                    <span class="block text-[10px] font-bold text-rose-600 uppercase tracking-wider">Total Já Gasto / Expedido</span>
+                    <div id="totalGeralGastoKG" class="text-base font-black text-rose-700">0 KG <span class="text-[11px] font-normal text-rose-500">(0,00 TO)</span></div>
+                    <div id="totalGeralGastoValor" class="text-xs font-bold text-rose-600">R$ 0,00</div>
+                </div>
+
+                <div class="bg-emerald-50/80 border-2 border-emerald-300 p-3.5 rounded-xl space-y-1 shadow-sm">
+                    <span class="block text-[10px] font-bold text-emerald-700 uppercase tracking-wider flex items-center justify-between">
+                        <span>Saldo Total Disponível</span>
+                        <span id="badgePctSaldoGeral" class="bg-emerald-600 text-white font-black px-2 py-0.5 rounded-md text-[9px]">100%</span>
+                    </span>
+                    <div id="totalGeralSaldoKG" class="text-lg font-black text-emerald-800">0 KG <span class="text-xs font-normal text-emerald-700">(0,00 TO)</span></div>
+                    <div id="totalGeralSaldoValor" class="text-xs font-extrabold text-emerald-700">R$ 0,00 a carregar</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- NAVEGADOR RÁPIDO DE EMPRESAS NO TOPO -->
         <div class="no-print space-y-2">
             <div class="flex items-center justify-between">
-                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Empresas Cadastradas (Clique para filtrar):</span>
-                <button type="button" onclick="filtrarPorEmpresaCard('TODAS')" class="text-[11px] font-bold text-teal-700 hover:underline">Ver Todas</button>
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Atalhos por Empresa:</span>
+                <button type="button" onclick="filtrarPorEmpresaCard('TODAS')" class="text-[11px] font-bold text-teal-700 hover:underline">Mostrar Todas as Seções</button>
             </div>
             <div id="containerCardsEmpresas" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                <!-- Injetado dinamicamente via JS -->
+                <!-- Cards de topo gerados via JS -->
             </div>
         </div>
 
-        <!-- LEGENDA VISUAL DAS BORDAS -->
+        <!-- LEGENDA VISUAL -->
         <div class="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-sm flex flex-wrap items-center justify-between gap-3 text-xs font-semibold no-print">
-            <span class="text-slate-500 uppercase tracking-wider text-[11px] font-bold">Legenda de Status:</span>
+            <span class="text-slate-500 uppercase tracking-wider text-[11px] font-bold">Status das OVs:</span>
             <div class="flex flex-wrap items-center gap-4">
                 <div class="flex items-center gap-2">
                     <span class="w-3.5 h-3.5 rounded-md border-2 border-emerald-500 bg-emerald-100"></span>
-                    <span class="text-slate-700">Verde: Saldo Cheio / Alto (&gt;70%)</span>
+                    <span class="text-slate-700">Verde: Cheio (&gt;70%)</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="w-3.5 h-3.5 rounded-md border-2 border-teal-500 bg-teal-100"></span>
-                    <span class="text-slate-700">Azul/Teal: Em Carregamento</span>
+                    <span class="text-slate-700">Azul: Em Carregamento</span>
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="w-3.5 h-3.5 rounded-md border-2 border-yellow-500 bg-yellow-100 animate-pulse"></span>
@@ -170,7 +203,7 @@
                 </div>
                 <div class="flex items-center gap-2">
                     <span class="w-3.5 h-3.5 rounded-md border-2 border-rose-500 bg-rose-100"></span>
-                    <span class="text-rose-700">Vermelho: Finalizada / Saldo Zerado</span>
+                    <span class="text-rose-700">Vermelho: Finalizada (0 KG)</span>
                 </div>
             </div>
         </div>
@@ -181,7 +214,7 @@
                 <span class="text-2xl">📋</span>
                 <div>
                     <div class="font-bold text-slate-800">Cole qualquer print do SAP aqui! (Ctrl + V)</div>
-                    <div class="text-slate-500 text-[11px]">As fotos são processadas e descartadas imediatamente, gravando apenas texto e números.</div>
+                    <div class="text-slate-500 text-[11px]">Identifica a empresa e adiciona automaticamente na seção correspondente dela.</div>
                 </div>
             </div>
             <button type="button" onclick="abrirModalOCR()" class="text-xs font-bold px-3 py-1.5 bg-[#007e7a] text-white rounded-xl hover:bg-[#005a57] whitespace-nowrap shadow-sm">
@@ -192,7 +225,7 @@
         <!-- FILTROS -->
         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between no-print">
             <div class="relative w-full md:w-80">
-                <input type="text" id="filtroTexto" oninput="filtrar()" placeholder="Pesquisar por OV, Contrato ou DRS..." class="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-xl bg-slate-50 outline-none focus:border-teal-600 transition">
+                <input type="text" id="filtroTexto" oninput="filtrar()" placeholder="Pesquisar por OV, Contrato, Material ou DRS..." class="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-xl bg-slate-50 outline-none focus:border-teal-600 transition">
                 <span class="absolute left-3 top-2.5 text-xs text-slate-400">🔍</span>
             </div>
 
@@ -202,7 +235,7 @@
                 </select>
 
                 <select id="filtroStatus" onchange="filtrar()" class="text-xs border border-slate-300 bg-slate-50 rounded-xl px-3 py-2 outline-none focus:border-teal-600 font-semibold text-slate-700">
-                    <option value="TODOS">Todos os Registos</option>
+                    <option value="TODOS">Todos os Status</option>
                     <option value="CHEIO">Cheias (Verde)</option>
                     <option value="FINALZINHO">No Finalzinho (Amarelo)</option>
                     <option value="FINALIZADO">Finalizadas (Vermelho)</option>
@@ -215,9 +248,9 @@
             </div>
         </div>
 
-        <!-- LISTAGEM DAS OVS -->
-        <div id="containerOVs" class="space-y-5">
-            <!-- Cards montados dinamicamente com as novas bordas -->
+        <!-- CONTAINER DAS SEÇÕES DE EMPRESAS -->
+        <div id="containerOVs" class="space-y-8">
+            <!-- As seções das empresas com suas OVs serão inseridas aqui dinamicamente -->
         </div>
 
     </div>
@@ -401,7 +434,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE PROCESSAMENTO, SUPABASE E VISUAIS -->
+    <!-- SCRIPT DE PROCESSAMENTO E AGRUPAMENTO POR EMPRESA -->
     <script>
         const SUPABASE_URL = "https://SEU-PROJETO.supabase.co";
         const SUPABASE_ANON_KEY = "SUA-CHAVE-ANONIMA-AQUI";
@@ -411,18 +444,18 @@
             supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         }
 
-        const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v6";
+        const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v7";
         let cacheRegistros = [];
 
-        // Cores disponíveis para os quadradinhos de empresas adicionadas
+        // Cores temáticas para as seções de cada empresa
         const PALETA_EMPRESAS = [
-            { bg: "bg-blue-50 hover:bg-blue-100", border: "border-blue-400", text: "text-blue-800", badge: "bg-blue-600" },
-            { bg: "bg-purple-50 hover:bg-purple-100", border: "border-purple-400", text: "text-purple-800", badge: "bg-purple-600" },
-            { bg: "bg-emerald-50 hover:bg-emerald-100", border: "border-emerald-400", text: "text-emerald-800", badge: "bg-emerald-600" },
-            { bg: "bg-amber-50 hover:bg-amber-100", border: "border-amber-400", text: "text-amber-800", badge: "bg-amber-600" },
-            { bg: "bg-indigo-50 hover:bg-indigo-100", border: "border-indigo-400", text: "text-indigo-800", badge: "bg-indigo-600" },
-            { bg: "bg-pink-50 hover:bg-pink-100", border: "border-pink-400", text: "text-pink-800", badge: "bg-pink-600" },
-            { bg: "bg-cyan-50 hover:bg-cyan-100", border: "border-cyan-400", text: "text-cyan-800", badge: "bg-cyan-600" }
+            { bgHeader: "bg-blue-700", bgLight: "bg-blue-50/40", border: "border-blue-200", badge: "bg-blue-800", text: "text-blue-900" },
+            { bgHeader: "bg-purple-700", bgLight: "bg-purple-50/40", border: "border-purple-200", badge: "bg-purple-800", text: "text-purple-900" },
+            { bgHeader: "bg-emerald-700", bgLight: "bg-emerald-50/40", border: "border-emerald-200", badge: "bg-emerald-800", text: "text-emerald-900" },
+            { bgHeader: "bg-amber-700", bgLight: "bg-amber-50/40", border: "border-amber-200", badge: "bg-amber-800", text: "text-amber-900" },
+            { bgHeader: "bg-indigo-700", bgLight: "bg-indigo-50/40", border: "border-indigo-200", badge: "bg-indigo-800", text: "text-indigo-900" },
+            { bgHeader: "bg-pink-700", bgLight: "bg-pink-50/40", border: "border-pink-200", badge: "bg-pink-800", text: "text-pink-900" },
+            { bgHeader: "bg-teal-700", bgLight: "bg-teal-50/40", border: "border-teal-200", badge: "bg-teal-800", text: "text-teal-900" }
         ];
 
         const DADOS_DEFAULT = [
@@ -639,7 +672,6 @@
                 select.value = valorAtual;
             }
 
-            // Constrói os cards visuais coloridos para cada empresa
             containerCards.innerHTML = empresas.map((emp, idx) => {
                 const estiloCor = PALETA_EMPRESAS[idx % PALETA_EMPRESAS.length];
                 const ovsEmpresa = lista.filter(i => i.ov.cliente === emp);
@@ -650,7 +682,7 @@
                 }, 0);
 
                 return `
-                    <div onclick="filtrarPorEmpresaCard('${emp}')" class="cursor-pointer border-2 ${estiloCor.border} ${estiloCor.bg} rounded-2xl p-3 shadow-sm transition transform hover:-translate-y-1">
+                    <div onclick="filtrarPorEmpresaCard('${emp}')" class="cursor-pointer border-2 ${estiloCor.border} ${estiloCor.bgLight} rounded-2xl p-3 shadow-sm transition transform hover:-translate-y-1">
                         <div class="flex items-center justify-between mb-1">
                             <span class="${estiloCor.badge} text-white text-[9px] font-black px-2 py-0.5 rounded-md">EMPRESA</span>
                             <span class="text-[10px] font-bold text-slate-500">${ovsEmpresa.length} OV(s)</span>
@@ -672,6 +704,7 @@
             }
         }
 
+        // RENDERIZAÇÃO PRINCIPAL: AGRUPADA POR SEÇÃO DE CADA EMPRESA
         function renderizar() {
             const lista = cacheRegistros;
             const termo = (document.getElementById('filtroTexto')?.value || '').toLowerCase().trim();
@@ -679,9 +712,19 @@
             const filtroEmpresa = document.getElementById('filtroEmpresa')?.value || 'TODAS';
             const container = document.getElementById('containerOVs');
 
-            let somaGastoTotal = 0;
-            let somaSaldoTotal = 0;
+            // TOTAIS GERAIS MESTRE
+            let somaLiberadoKG = 0;
+            let somaLiberadoValor = 0;
 
+            let somaGastoTotalKG = 0;
+            let somaGastoTotalValor = 0;
+
+            let somaSaldoTotalKG = 0;
+            let somaSaldoTotalValor = 0;
+
+            let contagemOvsAtivas = 0;
+
+            // Filtra primeiro os itens individuais
             const listaFiltrada = lista.filter(item => {
                 const cancelado = item.status === "CANCELADO";
                 const totalGasto = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
@@ -689,14 +732,25 @@
                 const concluido = !cancelado && saldo <= 0;
                 const percentualRestante = item.ov.qtdLiberadaKG > 0 ? (saldo / item.ov.qtdLiberadaKG) * 100 : 0;
 
+                const valUnitario = item.ov.precoUnitarioPorKG || (item.ov.qtdLiberadaKG > 0 ? item.ov.valorBRL / item.ov.qtdLiberadaKG : 1.26);
+                const valGastoItem = totalGasto * valUnitario;
+                const valSaldoItem = Math.max(0, item.ov.valorBRL - valGastoItem);
+
                 if (!cancelado) {
-                    somaGastoTotal += totalGasto;
-                    somaSaldoTotal += saldo;
+                    somaLiberadoKG += Number(item.ov.qtdLiberadaKG || 0);
+                    somaLiberadoValor += Number(item.ov.valorBRL || 0);
+
+                    somaGastoTotalKG += totalGasto;
+                    somaGastoTotalValor += valGastoItem;
+
+                    somaSaldoTotalKG += saldo;
+                    somaSaldoTotalValor += valSaldoItem;
+
+                    contagemOvsAtivas++;
                 }
 
                 if (filtroEmpresa !== 'TODAS' && item.ov.cliente !== filtroEmpresa) return false;
                 
-                // Filtro avançado por status visual
                 if (filtroStatus === 'CHEIO' && (percentualRestante < 70 || cancelado || concluido)) return false;
                 if (filtroStatus === 'FINALZINHO' && (percentualRestante <= 0 || percentualRestante > 30 || cancelado)) return false;
                 if (filtroStatus === 'FINALIZADO' && (!concluido || cancelado)) return false;
@@ -715,8 +769,21 @@
                 return true;
             });
 
-            document.getElementById('statGastoOV').innerText = `${somaGastoTotal.toLocaleString('pt-BR')} KG`;
-            document.getElementById('statSaldoOV').innerText = `${somaSaldoTotal.toLocaleString('pt-BR')} KG`;
+            // ATUALIZA PAINEL DE CONSOLIDAÇÃO TOTAL
+            document.getElementById('totalGeralLiberadoKG').innerHTML = `${somaLiberadoKG.toLocaleString('pt-BR')} KG <span class="text-[11px] font-normal text-slate-500">(${(somaLiberadoKG/1000).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} TO)</span>`;
+            document.getElementById('totalGeralLiberadoValor').innerText = somaLiberadoValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            document.getElementById('totalGeralGastoKG').innerHTML = `${somaGastoTotalKG.toLocaleString('pt-BR')} KG <span class="text-[11px] font-normal text-rose-500">(${(somaGastoTotalKG/1000).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} TO)</span>`;
+            document.getElementById('totalGeralGastoValor').innerText = somaGastoTotalValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+            document.getElementById('totalGeralSaldoKG').innerHTML = `${somaSaldoTotalKG.toLocaleString('pt-BR')} KG <span class="text-xs font-normal text-emerald-700">(${(somaSaldoTotalKG/1000).toLocaleString('pt-BR', {minimumFractionDigits: 2, maximumFractionDigits: 2})} TO)</span>`;
+            document.getElementById('totalGeralSaldoValor').innerText = `${somaSaldoTotalValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} a carregar`;
+
+            const pctSaldoGeral = somaLiberadoKG > 0 ? Math.round((somaSaldoTotalKG / somaLiberadoKG) * 100) : 0;
+            document.getElementById('badgePctSaldoGeral').innerText = `${pctSaldoGeral}% Livre`;
+
+            document.getElementById('statSaldoTopResumo').innerText = `${somaSaldoTotalKG.toLocaleString('pt-BR')} KG`;
+            document.getElementById('statTotalOvsContador').innerText = `${contagemOvsAtivas} OV(s)`;
 
             if (listaFiltrada.length === 0) {
                 container.innerHTML = `
@@ -729,157 +796,230 @@
                 return;
             }
 
-            container.innerHTML = listaFiltrada.map(item => {
-                const cancelado = item.status === "CANCELADO";
-                const totalGasto = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
-                const saldo = cancelado ? 0 : Math.max(0, item.ov.qtdLiberadaKG - totalGasto);
-                const concluido = !cancelado && saldo <= 0;
-                const percentualRestante = item.ov.qtdLiberadaKG > 0 ? (saldo / item.ov.qtdLiberadaKG) * 100 : 0;
-                const pctGasto = cancelado ? 0 : (Math.min(100, Math.round((totalGasto / item.ov.qtdLiberadaKG) * 100)) || 0);
-                const valorGasto = totalGasto * (item.ov.precoUnitarioPorKG || 1.26);
-                const valorSaldo = Math.max(0, item.ov.valorBRL - valorGasto);
-
-                // ========================================================
-                // CLASSIFICAÇÃO DAS BORDAS E CORES:
-                // 1. Vermelha: Finalizada (Saldo zerado 100% expedido)
-                // 2. Amarela Piscando: No finalzinho (Saldo <= 30%)
-                // 3. Verde: Totalmente cheia / alto saldo (> 70%)
-                // ========================================================
-                let classeBorda = "border-slate-200";
-                let badgeStatusHtml = "";
-
-                if (cancelado) {
-                    classeBorda = "border-2 border-rose-300 bg-rose-50/20";
-                    badgeStatusHtml = `<span class="bg-rose-100 text-rose-800 font-black px-2.5 py-0.5 rounded-full border border-rose-300 text-[10px]">CANCELADA</span>`;
-                } else if (concluido) {
-                    // VERMELHA COM FINALIZADA
-                    classeBorda = "border-2 border-rose-500 bg-rose-50/30";
-                    badgeStatusHtml = `<span class="bg-rose-600 text-white font-black px-3 py-1 rounded-full text-[10px] tracking-wide shadow-sm">FINALIZADA (100% EXPEDIDO)</span>`;
-                } else if (percentualRestante <= 30) {
-                    // AMARELA PISCANTE NO FINALZINHO
-                    classeBorda = "borda-amarela-piscar bg-yellow-50/30";
-                    badgeStatusHtml = `<span class="bg-amber-500 text-white font-black px-3 py-1 rounded-full text-[10px] tracking-wide animate-bounce shadow-sm">⚠️ NO FINALZINHO (${saldo.toLocaleString('pt-BR')} KG)</span>`;
-                } else if (percentualRestante >= 70) {
-                    // VERDE TOTALMENTE CHEIO
-                    classeBorda = "border-2 border-emerald-500 bg-emerald-50/20";
-                    badgeStatusHtml = `<span class="bg-emerald-600 text-white font-black px-3 py-1 rounded-full text-[10px] tracking-wide shadow-sm">TOTALMENTE CHEIA (${saldo.toLocaleString('pt-BR')} KG)</span>`;
-                } else {
-                    // INTERMEDIÁRIA
-                    classeBorda = "border-2 border-teal-500 bg-white";
-                    badgeStatusHtml = `<span class="bg-teal-700 text-white font-black px-3 py-1 rounded-full text-[10px] tracking-wide">EM ANDAMENTO</span>`;
+            // ========================================================
+            // SEPARAÇÃO E AGRUPAMENTO POR EMPRESA
+            // ========================================================
+            const gruposPorEmpresa = {};
+            listaFiltrada.forEach(item => {
+                const emp = item.ov.cliente || "OUTROS CLIENTES";
+                if (!gruposPorEmpresa[emp]) {
+                    gruposPorEmpresa[emp] = [];
                 }
+                gruposPorEmpresa[emp].push(item);
+            });
 
-                return `
-                    <div class="bg-white rounded-2xl ${classeBorda} shadow-sm overflow-hidden card-sap transition duration-300">
-                        
-                        <div class="bg-slate-100/90 border-b border-slate-200 px-5 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
-                            <div class="flex items-center gap-2">
-                                <span class="bg-slate-800 text-white font-mono font-bold text-[10px] px-2 py-0.5 rounded">CONTRATO SAP</span>
-                                <span class="font-bold text-slate-800">Contrato ${item.contrato.numero}</span>
-                                <span class="text-slate-400">|</span>
-                                <span class="text-slate-600">Total Contrato: <b>${item.contrato.qtdTotalKG.toLocaleString('pt-BR')} KG</b></span>
-                            </div>
-                            <div class="flex items-center gap-2">
-                                ${badgeStatusHtml}
-                            </div>
-                        </div>
+            const nomesEmpresas = Object.keys(gruposPorEmpresa);
 
-                        <div class="p-5 space-y-4">
+            container.innerHTML = nomesEmpresas.map((nomeEmpresa, indexEmpresa) => {
+                const estilo = PALETA_EMPRESAS[indexEmpresa % PALETA_EMPRESAS.length];
+                const ovsDestaEmpresa = gruposPorEmpresa[nomeEmpresa];
+
+                // CÁLCULO DE SUBTOTAL ESPECÍFICO DESTA EMPRESA
+                let empLiberadoKG = 0;
+                let empLiberadoBRL = 0;
+                let empGastoKG = 0;
+                let empGastoBRL = 0;
+                let empSaldoKG = 0;
+                let empSaldoBRL = 0;
+
+                ovsDestaEmpresa.forEach(o => {
+                    if (o.status !== 'CANCELADO') {
+                        const totalGasto = (o.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
+                        const saldo = Math.max(0, o.ov.qtdLiberadaKG - totalGasto);
+                        const valUnit = o.ov.precoUnitarioPorKG || (o.ov.qtdLiberadaKG > 0 ? o.ov.valorBRL / o.ov.qtdLiberadaKG : 1.26);
+
+                        empLiberadoKG += Number(o.ov.qtdLiberadaKG || 0);
+                        empLiberadoBRL += Number(o.ov.valorBRL || 0);
+                        empGastoKG += totalGasto;
+                        empGastoBRL += (totalGasto * valUnit);
+                        empSaldoKG += saldo;
+                        empSaldoBRL += (saldo * valUnit);
+                    }
+                });
+
+                // CARDS DE OVs DA EMPRESA
+                const ovsHtml = ovsDestaEmpresa.map(item => {
+                    const cancelado = item.status === "CANCELADO";
+                    const totalGasto = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
+                    const saldo = cancelado ? 0 : Math.max(0, item.ov.qtdLiberadaKG - totalGasto);
+                    const concluido = !cancelado && saldo <= 0;
+                    const percentualRestante = item.ov.qtdLiberadaKG > 0 ? (saldo / item.ov.qtdLiberadaKG) * 100 : 0;
+                    const pctGasto = cancelado ? 0 : (Math.min(100, Math.round((totalGasto / item.ov.qtdLiberadaKG) * 100)) || 0);
+                    const valorGasto = totalGasto * (item.ov.precoUnitarioPorKG || 1.26);
+                    const valorSaldo = Math.max(0, item.ov.valorBRL - valorGasto);
+
+                    let classeBorda = "border-slate-200";
+                    let badgeStatusHtml = "";
+
+                    if (cancelado) {
+                        classeBorda = "border-2 border-rose-300 bg-rose-50/20";
+                        badgeStatusHtml = `<span class="bg-rose-100 text-rose-800 font-black px-2.5 py-0.5 rounded-full border border-rose-300 text-[10px]">CANCELADA</span>`;
+                    } else if (concluido) {
+                        classeBorda = "border-2 border-rose-500 bg-rose-50/30";
+                        badgeStatusHtml = `<span class="bg-rose-600 text-white font-black px-3 py-1 rounded-full text-[10px] tracking-wide shadow-sm">FINALIZADA (100% EXPEDIDO)</span>`;
+                    } else if (percentualRestante <= 30) {
+                        classeBorda = "borda-amarela-piscar bg-yellow-50/30";
+                        badgeStatusHtml = `<span class="bg-amber-500 text-white font-black px-3 py-1 rounded-full text-[10px] tracking-wide animate-bounce shadow-sm">⚠️ NO FINALZINHO (${saldo.toLocaleString('pt-BR')} KG)</span>`;
+                    } else if (percentualRestante >= 70) {
+                        classeBorda = "border-2 border-emerald-500 bg-emerald-50/20";
+                        badgeStatusHtml = `<span class="bg-emerald-600 text-white font-black px-3 py-1 rounded-full text-[10px] tracking-wide shadow-sm">TOTALMENTE CHEIA (${saldo.toLocaleString('pt-BR')} KG)</span>`;
+                    } else {
+                        classeBorda = "border-2 border-teal-500 bg-white";
+                        badgeStatusHtml = `<span class="bg-teal-700 text-white font-black px-3 py-1 rounded-full text-[10px] tracking-wide">EM ANDAMENTO</span>`;
+                    }
+
+                    return `
+                        <div class="bg-white rounded-2xl ${classeBorda} shadow-sm overflow-hidden card-sap transition duration-300">
                             
-                            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
-                                <div>
-                                    <div class="flex items-center gap-2">
-                                        ${cancelado 
-                                            ? `<span class="bg-rose-600 text-white text-xs font-black px-2.5 py-1 rounded-md tracking-wider">OV ${item.ov.numero}</span>`
-                                            : `<span class="ov-piscar bg-[#007e7a] text-white text-xs font-black px-2.5 py-1 rounded-md tracking-wider flex items-center gap-1.5 shadow-sm">
-                                                    <span class="inline-block w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
-                                                    OV ${item.ov.numero}
-                                               </span>`
-                                        }
-                                        <h3 class="font-bold text-slate-800 text-sm ${cancelado ? 'line-through text-slate-400' : ''}">${item.ov.material}</h3>
-                                    </div>
-                                    <p class="text-xs text-slate-600 font-medium mt-1">
-                                        Empresa: <b class="text-slate-900">${item.ov.cliente}</b> • DRS: ${item.ov.pedidoDRS || '---'}
-                                        ${cancelado ? ` • <span class="text-rose-600 font-bold">Motivo: ${item.motivoCancelamento || 'Cancelada'}</span>` : ''}
-                                    </p>
-                                </div>
-
+                            <div class="bg-slate-100/90 border-b border-slate-200 px-5 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
                                 <div class="flex items-center gap-2">
-                                    ${!cancelado ? `
-                                        <button type="button" onclick="abrirModalCancelarOV('${item.id}')" class="text-xs font-bold px-2.5 py-1 rounded-xl bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 transition no-print" title="Cancelar esta OV e remanejar saldo">
-                                            🚫 Cancelar OV
-                                        </button>
-                                    ` : ''}
-                                    <button type="button" onclick="excluirOV('${item.id}')" class="text-slate-400 hover:text-rose-600 text-xs px-2 py-1 rounded hover:bg-rose-50 no-print" title="Excluir Definitivamente">
-                                        🗑️
-                                    </button>
+                                    <span class="bg-slate-800 text-white font-mono font-bold text-[10px] px-2 py-0.5 rounded">CONTRATO</span>
+                                    <span class="font-bold text-slate-800">Contrato ${item.contrato.numero}</span>
+                                    <span class="text-slate-400">|</span>
+                                    <span class="text-slate-600">Total: <b>${item.contrato.qtdTotalKG.toLocaleString('pt-BR')} KG</b></span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    ${badgeStatusHtml}
                                 </div>
                             </div>
 
-                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl">
-                                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">1. Qtd / Valor Inicial</span>
-                                    <div class="text-base font-black text-slate-800 mt-1">${item.ov.qtdLiberadaKG.toLocaleString('pt-BR')} KG</div>
-                                    <div class="text-xs font-bold text-slate-500">${(item.ov.valorBRL).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                                </div>
-
-                                <div class="bg-rose-50/70 border border-rose-200 p-3 rounded-xl">
-                                    <span class="block text-[10px] font-bold text-rose-600 uppercase tracking-wider">2. O que JÁ FOI GASTO</span>
-                                    <div class="text-base font-black text-rose-700 mt-1">${totalGasto.toLocaleString('pt-BR')} KG</div>
-                                    <div class="text-xs font-bold text-rose-600">${valorGasto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                                </div>
-
-                                <div class="bg-emerald-50/70 border border-emerald-200 p-3 rounded-xl">
-                                    <span class="block text-[10px] font-bold text-emerald-700 uppercase tracking-wider">3. SALDO DISPONÍVEL</span>
-                                    <div class="text-base font-black text-emerald-800 mt-1">${saldo.toLocaleString('pt-BR')} KG</div>
-                                    <div class="text-xs font-bold text-emerald-700">${cancelado ? '0,00 (Cancelada)' : valorSaldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                                </div>
-                            </div>
-
-                            <div class="border-t border-slate-100 pt-3">
-                                <div class="flex justify-between items-center mb-2">
-                                    <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                                        <span>⚖️</span> Romaneios / Saídas de Balança
-                                    </span>
-                                    <button type="button" onclick="abrirModalGasto('${item.id}')" ${cancelado || saldo <= 0 ? 'disabled' : ''} class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-teal-50 text-teal-800 border border-teal-200 hover:bg-teal-100 transition disabled:opacity-40 disabled:cursor-not-allowed no-print">
-                                        + Lançar Pesagem
-                                    </button>
-                                </div>
-
-                                ${(!item.gastos || item.gastos.length === 0) 
-                                    ? `<p class="text-[11px] text-slate-400 italic">Nenhuma pesagem registada até ao momento.</p>`
-                                    : `
-                                    <div class="overflow-x-auto">
-                                        <table class="w-full text-left text-xs border border-slate-100 rounded-lg">
-                                            <thead>
-                                                <tr class="bg-slate-50 text-slate-500 text-[10px] uppercase font-bold border-b border-slate-100">
-                                                    <th class="py-1.5 px-3">Data</th>
-                                                    <th class="py-1.5 px-3">Ticket / NF</th>
-                                                    <th class="py-1.5 px-3">Placa</th>
-                                                    <th class="py-1.5 px-3 text-right">Peso Gasto</th>
-                                                    <th class="py-1.5 px-3 text-center no-print">Ação</th>
-                                                </tr>
-                                            </thead>
-                                            <tbody class="divide-y divide-slate-100">
-                                                ${item.gastos.map((g, idx) => `
-                                                    <tr class="hover:bg-slate-50/50">
-                                                        <td class="py-1.5 px-3 text-slate-600">${g.data}</td>
-                                                        <td class="py-1.5 px-3 font-semibold text-slate-800">${g.ticket}</td>
-                                                        <td class="py-1.5 px-3 text-slate-600 font-mono">${g.placa}</td>
-                                                        <td class="py-1.5 px-3 text-right font-bold text-rose-600">-${Number(g.pesoKG).toLocaleString('pt-BR')} KG</td>
-                                                        <td class="py-1.5 px-3 text-center no-print">
-                                                            <button type="button" onclick="removerGasto('${item.id}', ${idx})" ${cancelado ? 'disabled' : ''} class="text-rose-400 hover:text-rose-600 text-xs disabled:opacity-30">✕</button>
-                                                        </td>
-                                                    </tr>
-                                                `).join('')}
-                                            </tbody>
-                                        </table>
+                            <div class="p-5 space-y-4">
+                                
+                                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                                    <div>
+                                        <div class="flex items-center gap-2">
+                                            ${cancelado 
+                                                ? `<span class="bg-rose-600 text-white text-xs font-black px-2.5 py-1 rounded-md tracking-wider">OV ${item.ov.numero}</span>`
+                                                : `<span class="ov-piscar bg-[#007e7a] text-white text-xs font-black px-2.5 py-1 rounded-md tracking-wider flex items-center gap-1.5 shadow-sm">
+                                                        <span class="inline-block w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                                                        OV ${item.ov.numero}
+                                                   </span>`
+                                            }
+                                            <h3 class="font-bold text-slate-800 text-sm ${cancelado ? 'line-through text-slate-400' : ''}">${item.ov.material}</h3>
+                                        </div>
+                                        <p class="text-xs text-slate-600 font-medium mt-1">
+                                            Pedido DRS: <b class="text-slate-900">${item.ov.pedidoDRS || '---'}</b>
+                                            ${cancelado ? ` • <span class="text-rose-600 font-bold">Motivo: ${item.motivoCancelamento || 'Cancelada'}</span>` : ''}
+                                        </p>
                                     </div>
-                                    `
-                                }
+
+                                    <div class="flex items-center gap-2">
+                                        ${!cancelado ? `
+                                            <button type="button" onclick="abrirModalCancelarOV('${item.id}')" class="text-xs font-bold px-2.5 py-1 rounded-xl bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 transition no-print" title="Cancelar esta OV e remanejar saldo">
+                                                🚫 Cancelar OV
+                                            </button>
+                                        ` : ''}
+                                        <button type="button" onclick="excluirOV('${item.id}')" class="text-slate-400 hover:text-rose-600 text-xs px-2 py-1 rounded hover:bg-rose-50 no-print" title="Excluir Definitivamente">
+                                            🗑️
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl">
+                                        <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">1. Qtd / Valor Inicial</span>
+                                        <div class="text-base font-black text-slate-800 mt-1">${item.ov.qtdLiberadaKG.toLocaleString('pt-BR')} KG</div>
+                                        <div class="text-xs font-bold text-slate-500">${(item.ov.valorBRL).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                                    </div>
+
+                                    <div class="bg-rose-50/70 border border-rose-200 p-3 rounded-xl">
+                                        <span class="block text-[10px] font-bold text-rose-600 uppercase tracking-wider">2. O que JÁ FOI GASTO</span>
+                                        <div class="text-base font-black text-rose-700 mt-1">${totalGasto.toLocaleString('pt-BR')} KG</div>
+                                        <div class="text-xs font-bold text-rose-600">${valorGasto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                                    </div>
+
+                                    <div class="bg-emerald-50/70 border border-emerald-200 p-3 rounded-xl">
+                                        <span class="block text-[10px] font-bold text-emerald-700 uppercase tracking-wider">3. SALDO DISPONÍVEL</span>
+                                        <div class="text-base font-black text-emerald-800 mt-1">${saldo.toLocaleString('pt-BR')} KG</div>
+                                        <div class="text-xs font-bold text-emerald-700">${cancelado ? '0,00 (Cancelada)' : valorSaldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                                    </div>
+                                </div>
+
+                                <div class="border-t border-slate-100 pt-3">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                            <span>⚖️</span> Romaneios / Saídas de Balança
+                                        </span>
+                                        <button type="button" onclick="abrirModalGasto('${item.id}')" ${cancelado || saldo <= 0 ? 'disabled' : ''} class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-teal-50 text-teal-800 border border-teal-200 hover:bg-teal-100 transition disabled:opacity-40 disabled:cursor-not-allowed no-print">
+                                            + Lançar Pesagem
+                                        </button>
+                                    </div>
+
+                                    ${(!item.gastos || item.gastos.length === 0) 
+                                        ? `<p class="text-[11px] text-slate-400 italic">Nenhuma pesagem registada até ao momento.</p>`
+                                        : `
+                                        <div class="overflow-x-auto">
+                                            <table class="w-full text-left text-xs border border-slate-100 rounded-lg">
+                                                <thead>
+                                                    <tr class="bg-slate-50 text-slate-500 text-[10px] uppercase font-bold border-b border-slate-100">
+                                                        <th class="py-1.5 px-3">Data</th>
+                                                        <th class="py-1.5 px-3">Ticket / NF</th>
+                                                        <th class="py-1.5 px-3">Placa</th>
+                                                        <th class="py-1.5 px-3 text-right">Peso Gasto</th>
+                                                        <th class="py-1.5 px-3 text-center no-print">Ação</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="divide-y divide-slate-100">
+                                                    ${item.gastos.map((g, idx) => `
+                                                        <tr class="hover:bg-slate-50/50">
+                                                            <td class="py-1.5 px-3 text-slate-600">${g.data}</td>
+                                                            <td class="py-1.5 px-3 font-semibold text-slate-800">${g.ticket}</td>
+                                                            <td class="py-1.5 px-3 text-slate-600 font-mono">${g.placa}</td>
+                                                            <td class="py-1.5 px-3 text-right font-bold text-rose-600">-${Number(g.pesoKG).toLocaleString('pt-BR')} KG</td>
+                                                            <td class="py-1.5 px-3 text-center no-print">
+                                                                <button type="button" onclick="removerGasto('${item.id}', ${idx})" ${cancelado ? 'disabled' : ''} class="text-rose-400 hover:text-rose-600 text-xs disabled:opacity-30">✕</button>
+                                                            </td>
+                                                        </tr>
+                                                    `).join('')}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                        `
+                                    }
+                                </div>
+
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                // BLOCO COMPLETO DEDICADO À EMPRESA COM SEU CABEÇALHO E SEUS SUBTOTAIS
+                return `
+                    <div class="rounded-3xl border-2 ${estilo.border} overflow-hidden shadow-sm bg-slate-50/50 space-y-4 p-5">
+                        
+                        <!-- CABEÇALHO DO BLOCO DA EMPRESA -->
+                        <div class="${estilo.bgHeader} text-white p-4 sm:p-5 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-md">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="bg-white/20 text-white font-black text-[10px] px-2.5 py-1 rounded-md uppercase tracking-wider">EMPRESA COMPRADORA</span>
+                                    <span class="text-xs text-white/80 font-bold">${ovsDestaEmpresa.length} OV(s) cadastradas</span>
+                                </div>
+                                <h3 class="text-base sm:text-lg font-black tracking-wide mt-1">${nomeEmpresa}</h3>
                             </div>
 
+                            <!-- SUBTOTAIS DESTA EMPRESA ESPECÍFICA -->
+                            <div class="flex flex-wrap gap-2 text-xs">
+                                <div class="bg-black/20 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-white/10">
+                                    <span class="block text-[9px] text-white/70 uppercase font-bold">Total Liberado</span>
+                                    <div class="font-extrabold text-white">${empLiberadoKG.toLocaleString('pt-BR')} KG</div>
+                                </div>
+                                <div class="bg-black/20 backdrop-blur-sm px-3 py-1.5 rounded-xl border border-white/10">
+                                    <span class="block text-[9px] text-rose-200 uppercase font-bold">Total Já Gasto</span>
+                                    <div class="font-extrabold text-rose-200">${empGastoKG.toLocaleString('pt-BR')} KG</div>
+                                </div>
+                                <div class="bg-white text-slate-900 px-3.5 py-1.5 rounded-xl font-bold shadow-sm">
+                                    <span class="block text-[9px] text-slate-500 uppercase font-bold">Saldo Restante</span>
+                                    <div class="font-black text-emerald-700 text-sm">${empSaldoKG.toLocaleString('pt-BR')} KG</div>
+                                    <div class="text-[10px] text-slate-500">${empSaldoBRL.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                                </div>
+                            </div>
                         </div>
+
+                        <!-- LISTA DE OVS DA EMPRESA -->
+                        <div class="space-y-4">
+                            ${ovsHtml}
+                        </div>
+
                     </div>
                 `;
             }).join('');
@@ -1193,7 +1333,7 @@
 
             const link = document.createElement("a");
             link.setAttribute("href", encodeURI(csv));
-            link.setAttribute("download", `controle_ovs_vale_${new Date().toISOString().slice(0,10)}.csv`);
+            link.setAttribute("download", `controle_ovs_por_empresa_${new Date().toISOString().slice(0,10)}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
