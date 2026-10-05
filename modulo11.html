@@ -6,6 +6,8 @@
     <title>Módulo 11 - Controle de OVs por Empresa & Supabase</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js para os Gráficos de Utilização -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- Supabase JS Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Tesseract OCR Engine CDN -->
@@ -81,7 +83,7 @@
                     <span class="text-base">◀</span> Voltar ao Menu
                 </a>
                 <span class="text-slate-300">|</span>
-                <span class="text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200/60 px-2.5 py-1 rounded-lg">Módulo 11 • Cores por Empresa</span>
+                <span class="text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200/60 px-2.5 py-1 rounded-lg">Módulo 11 • Gráficos & Analytics</span>
             </div>
             
             <div class="flex flex-wrap items-center gap-2">
@@ -118,7 +120,7 @@
                         <h1 class="text-lg font-extrabold tracking-wide">Painel de OVs por Empresa & Saldos</h1>
                         <span class="bg-emerald-500 text-white font-black text-[10px] px-2 py-0.5 rounded shadow-sm">GERDAU AZUL</span>
                     </div>
-                    <p class="text-xs text-teal-100/90 mt-1">Gerdau padronizada em Azul e demais empresas em cores próprias e exclusivas</p>
+                    <p class="text-xs text-teal-100/90 mt-1">Análise de utilização em tempo real, comparativo de balança e saldos segregados</p>
                 </div>
 
                 <div class="flex flex-wrap gap-2 text-right">
@@ -134,7 +136,7 @@
             </div>
         </header>
 
-        <!-- TOTAL GERAL MESTRE (TODAS AS EMPRESAS JUNTAS) -->
+        <!-- TOTAL GERAL MESTRE -->
         <section class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm space-y-3">
             <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
                 <div class="flex items-center gap-2">
@@ -168,7 +170,42 @@
             </div>
         </section>
 
-        <!-- QUADRADINHOS DO TOPO: VALOR E SALDO TOTAL DE CADA EMPRESA POR COR -->
+        <!-- NOVO: PAINEL DE GRÁFICOS DE UTILIZAÇÃO POR EMPRESA -->
+        <section class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+                <div class="flex items-center gap-2">
+                    <span class="text-lg">📈</span>
+                    <h2 class="text-xs font-black text-slate-800 uppercase tracking-wider">Gráficos de Utilização e Consumo por Empresa</h2>
+                </div>
+                <span class="text-[11px] font-semibold text-slate-400">Atualizado dinamicamente em Toneladas (TO) e Valor (R$)</span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                <!-- GRÁFICO 1: BARRAS COMPARATIVAS (GASTO vs SALDO) -->
+                <div class="lg:col-span-2 bg-slate-50/60 p-4 rounded-2xl border border-slate-100 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xs font-black text-slate-700 mb-1">Volume Expedido vs Saldo Disponível (Toneladas)</h3>
+                        <p class="text-[11px] text-slate-400 mb-3">Comparativo de consumo acumulado das balanças por comprador</p>
+                    </div>
+                    <div class="relative h-64 w-full">
+                        <canvas id="graficoUtilizacaoBarras"></canvas>
+                    </div>
+                </div>
+
+                <!-- GRÁFICO 2: ROSCA / FATURAMENTO POR EMPRESA -->
+                <div class="bg-slate-50/60 p-4 rounded-2xl border border-slate-100 flex flex-col justify-between">
+                    <div>
+                        <h3 class="text-xs font-black text-slate-700 mb-1">Participação Financeira Total (R$)</h3>
+                        <p class="text-[11px] text-slate-400 mb-3">Divisão percentual do valor contratado entre as empresas</p>
+                    </div>
+                    <div class="relative h-64 w-full flex items-center justify-center">
+                        <canvas id="graficoParticipacaoRosca"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- QUADRADINHOS DO TOPO: TOTAIS POR EMPRESA -->
         <div class="no-print space-y-2">
             <div class="flex items-center justify-between">
                 <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
@@ -176,9 +213,7 @@
                 </span>
                 <button type="button" onclick="filtrarPorEmpresaCard('TODAS')" class="text-[11px] font-bold text-teal-700 hover:underline">Ver Todas as Empresas</button>
             </div>
-            <!-- Grid de cards superiores com cores exclusivas por empresa -->
             <div id="containerCardsEmpresas" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5">
-                <!-- Injetado dinamicamente via JS -->
             </div>
         </div>
 
@@ -431,11 +466,8 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE PROCESSAMENTO, SUPABASE E VISUAL CROMÁTICO -->
+    <!-- SCRIPT DE PROCESSAMENTO, SUPABASE E CHART.JS -->
     <script>
-        // ========================================================
-        // CONFIGURAÇÃO SUPABASE CONECTADA
-        // ========================================================
         const SUPABASE_URL = "https://gloxtswcksbczinpwtzu.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_0kEiqthWKZZwjM120wQIYw_Hba7qeLc";
         
@@ -451,9 +483,14 @@
         const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v8";
         let cacheRegistros = [];
 
+        // Instâncias globais dos Gráficos do Chart.js
+        let chartBarrasInstancia = null;
+        let chartRoscaInstancia = null;
+
         // GERDAU É FIXA NO TEMA AZUL (BLUE)
         const TEMA_GERDAU_AZUL = {
             nomeTema: "Gerdau Azul Corporativo",
+            hexColor: "#1d4ed8",
             header: "bg-blue-700",
             bgLight: "bg-blue-50/50",
             bordaCard: "border-blue-400",
@@ -462,10 +499,10 @@
             ovBordaPadrao: "border-blue-300 bg-blue-50/20"
         };
 
-        // OUTRAS EMPRESAS RECEBEM UMA COR DIFERENTE DA LISTA ABAIXO
         const OUTRAS_CORES_EMPRESAS = [
             { 
                 nomeTema: "Roxo / Púrpura",
+                hexColor: "#7e22ce",
                 header: "bg-purple-700",
                 bgLight: "bg-purple-50/50",
                 bordaCard: "border-purple-400",
@@ -475,6 +512,7 @@
             },
             { 
                 nomeTema: "Esmeralda",
+                hexColor: "#047857",
                 header: "bg-emerald-700",
                 bgLight: "bg-emerald-50/50",
                 bordaCard: "border-emerald-400",
@@ -484,6 +522,7 @@
             },
             { 
                 nomeTema: "Âmbar / Laranja",
+                hexColor: "#d97706",
                 header: "bg-amber-600",
                 bgLight: "bg-amber-50/50",
                 bordaCard: "border-amber-400",
@@ -493,6 +532,7 @@
             },
             { 
                 nomeTema: "Índigo",
+                hexColor: "#4338ca",
                 header: "bg-indigo-700",
                 bgLight: "bg-indigo-50/50",
                 bordaCard: "border-indigo-400",
@@ -502,6 +542,7 @@
             },
             { 
                 nomeTema: "Rosa / Magenta",
+                hexColor: "#be185d",
                 header: "bg-pink-700",
                 bgLight: "bg-pink-50/50",
                 bordaCard: "border-pink-400",
@@ -511,6 +552,7 @@
             },
             { 
                 nomeTema: "Teal Escuro",
+                hexColor: "#0f766e",
                 header: "bg-teal-700",
                 bgLight: "bg-teal-50/50",
                 bordaCard: "border-teal-400",
@@ -520,7 +562,6 @@
             }
         ];
 
-        // FUNÇÃO QUE GARANTE: GERDAU SEMPRE AZUL, DEMAIS EMPRESAS CADA UMA COM SUA COR
         function obterTemaDaEmpresa(nomeEmpresa, indiceNaoGerdau = 0) {
             const nomeFormatado = (nomeEmpresa || '').toUpperCase();
             if (nomeFormatado.includes("GERDAU")) {
@@ -722,7 +763,6 @@
             }
         }
 
-        // MONTAGEM DOS QUADRADINHOS NO TOPO: GERDAU AZUL E AS DEMAIS COM CORES PRÓPRIAS
         function atualizarOpcoesEmpresas(lista) {
             const select = document.getElementById('filtroEmpresa');
             const containerCards = document.getElementById('containerCardsEmpresas');
@@ -801,6 +841,128 @@
                 select.value = empresa;
                 filtrar();
             }
+        }
+
+        // ==========================================
+        // ATUALIZAÇÃO DOS GRÁFICOS CHART.JS
+        // ==========================================
+        function atualizarGraficos(gruposPorEmpresa) {
+            const canvasBarras = document.getElementById('graficoUtilizacaoBarras');
+            const canvasRosca = document.getElementById('graficoParticipacaoRosca');
+            if (!canvasBarras || !canvasRosca) return;
+
+            const labels = [];
+            const dadosGastosTO = [];
+            const dadosSaldosTO = [];
+            const dadosValoresBRL = [];
+            const coresEmpresas = [];
+
+            let contadorCores = 0;
+            for (const [nomeEmp, ovs] of Object.entries(gruposPorEmpresa)) {
+                labels.push(nomeEmp.length > 20 ? nomeEmp.substring(0, 18) + '...' : nomeEmp);
+                const isGerdau = nomeEmp.toUpperCase().includes("GERDAU");
+                const tema = isGerdau ? TEMA_GERDAU_AZUL : obterTemaDaEmpresa(nomeEmp, contadorCores++);
+                coresEmpresas.push(tema.hexColor);
+
+                let totalGastoKG = 0;
+                let totalSaldoKG = 0;
+                let totalValorBRL = 0;
+
+                ovs.forEach(o => {
+                    if (o.status !== 'CANCELADO') {
+                        const g = (o.gastos || []).reduce((acc, curr) => acc + Number(curr.pesoKG || 0), 0);
+                        const s = Math.max(0, o.ov.qtdLiberadaKG - g);
+                        totalGastoKG += g;
+                        totalSaldoKG += s;
+                        totalValorBRL += Number(o.ov.valorBRL || 0);
+                    }
+                });
+
+                dadosGastosTO.push((totalGastoKG / 1000).toFixed(2));
+                dadosSaldosTO.push((totalSaldoKG / 1000).toFixed(2));
+                dadosValoresBRL.push(totalValorBRL.toFixed(2));
+            }
+
+            // 1. Destrói gráficos anteriores se existirem
+            if (chartBarrasInstancia) chartBarrasInstancia.destroy();
+            if (chartRoscaInstancia) chartRoscaInstancia.destroy();
+
+            // 2. Cria Gráfico de Barras Horizontais (Utilização)
+            chartBarrasInstancia = new Chart(canvasBarras, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Expedido (TO)',
+                            data: dadosGastosTO,
+                            backgroundColor: '#e11d48', // Vermelho/Rosa suave
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Saldo Disponível (TO)',
+                            data: dadosSaldosTO,
+                            backgroundColor: coresEmpresas, // Cor exclusiva de cada empresa
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: {
+                            stacked: true,
+                            grid: { color: '#f1f5f9' },
+                            ticks: { font: { size: 10 } }
+                        },
+                        y: {
+                            stacked: true,
+                            grid: { display: false },
+                            ticks: { font: { weight: 'bold', size: 11 } }
+                        }
+                    },
+                    plugins: {
+                        legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => `${context.dataset.label}: ${context.raw} TO`
+                            }
+                        }
+                    }
+                }
+            });
+
+            // 3. Cria Gráfico de Rosca (Faturamento por Empresa)
+            chartRoscaInstancia = new Chart(canvasRosca, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: dadosValoresBRL,
+                        backgroundColor: coresEmpresas,
+                        borderWidth: 2,
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: {
+                        legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } },
+                        tooltip: {
+                            callbacks: {
+                                label: (context) => {
+                                    const val = Number(context.raw).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+                                    return ` ${context.label}: ${val}`;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
         }
 
         // RENDERIZAÇÃO: SEÇÕES SEPARADAS POR EMPRESA
@@ -890,6 +1052,7 @@
                         <p class="text-xs text-slate-400 mt-1">Carregue novas OVs do SAP ou limpe os filtros.</p>
                     </div>
                 `;
+                atualizarGraficos({});
                 return;
             }
 
@@ -902,6 +1065,9 @@
                 }
                 gruposPorEmpresa[emp].push(item);
             });
+
+            // ATUALIZA OS GRÁFICOS COM OS GRUPOS DE EMPRESAS
+            atualizarGraficos(gruposPorEmpresa);
 
             const nomesEmpresas = Object.keys(gruposPorEmpresa);
             let contadorNaoGerdau = 0;
@@ -1079,7 +1245,6 @@
                 `;
             }).join('');
 
-            // SEÇÃO DA EMPRESA: GERDAU AZUL OU OUTRA EMPRESA NA SUA COR
             return `
                 <div class="rounded-3xl border-2 ${tema.bordaCard} overflow-hidden shadow-sm ${tema.bgLight} space-y-4 p-5">
                     
@@ -1094,7 +1259,6 @@
                             <h3 class="text-base sm:text-lg font-black tracking-wide mt-1">${nomeEmpresa}</h3>
                         </div>
 
-                        <!-- SUBTOTAIS DA EMPRESA -->
                         <div class="flex flex-wrap gap-2 text-xs">
                             <div class="bg-black/20 backdrop-blur-sm px-3.5 py-1.5 rounded-xl border border-white/10">
                                 <span class="block text-[9px] text-white/70 uppercase font-bold">Valor Total Emitido</span>
@@ -1114,7 +1278,6 @@
                         </div>
                     </div>
 
-                    <!-- TODAS AS OVs DESTA EMPRESA EMPILHADAS UMA EMBAIXO DA OUTRA -->
                     <div class="space-y-4">
                         ${ovsHtml}
                     </div>
