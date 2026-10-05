@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 11 - Controle de OVs & Supabase Cloud</title>
+    <title>Módulo 11 - Controle de OVs & Transferência de Saldo</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS Client -->
@@ -74,15 +74,12 @@
                     <span class="text-base">◀</span> Voltar ao Menu
                 </a>
                 <span class="text-slate-300">|</span>
-                <span class="text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200/60 px-2.5 py-1 rounded-lg">Módulo 11 • Nuvem Supabase</span>
+                <span class="text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200/60 px-2.5 py-1 rounded-lg">Módulo 11 • Gestão de OVs & Cancelamentos</span>
             </div>
             
             <div class="flex items-center gap-2">
-                <span id="badgeConexao" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5">
-                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Nuvem Conectada
-                </span>
                 <button type="button" onclick="window.print()" class="text-xs font-bold px-3 py-1.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 transition">
-                    🖨️ Relatório
+                    🖨️ Relatório A4
                 </button>
                 <button type="button" onclick="exportarCSV()" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white transition">
                     📥 CSV
@@ -100,20 +97,20 @@
                     <div class="flex items-center gap-3">
                         <span class="text-2xl font-black tracking-widest text-teal-100">VALE</span>
                         <div class="h-5 w-px bg-teal-300/40"></div>
-                        <h1 class="text-lg font-extrabold tracking-wide">Gestão de OVs e Contratos (Sincronizado)</h1>
-                        <span class="bg-emerald-500 text-white font-black text-[10px] px-2 py-0.5 rounded shadow-sm">SUPABASE ATIVO</span>
+                        <h1 class="text-lg font-extrabold tracking-wide">Gestão & Cancelamento de OVs</h1>
+                        <span class="bg-amber-500 text-white font-black text-[10px] px-2 py-0.5 rounded shadow-sm">SD - ZVSU</span>
                     </div>
-                    <p class="text-xs text-teal-100/90 mt-1">Dados salvos em nuvem para acompanhamento em tempo real de saídas, balança e saldos</p>
+                    <p class="text-xs text-teal-100/90 mt-1">Reconhecimento de prints (volátil sem gravar imagem) com remanejamento automático de saldos cancelados</p>
                 </div>
 
                 <!-- CARDS DE CONSOLIDAÇÃO -->
                 <div class="flex flex-wrap gap-2 text-right">
                     <div class="bg-white/10 backdrop-blur-sm px-3.5 py-2 rounded-xl border border-white/10 text-left">
-                        <div class="text-[10px] text-teal-100 font-bold uppercase tracking-wider">Total Consumido</div>
+                        <div class="text-[10px] text-teal-100 font-bold uppercase tracking-wider">Total Consumido (Ativas)</div>
                         <div id="statGastoOV" class="text-base font-black text-amber-300 leading-tight">0 KG</div>
                     </div>
                     <div class="bg-white/10 backdrop-blur-sm px-3.5 py-2 rounded-xl border border-white/10 text-left">
-                        <div class="text-[10px] text-teal-100 font-bold uppercase tracking-wider">Saldo em Aberto</div>
+                        <div class="text-[10px] text-teal-100 font-bold uppercase tracking-wider">Saldo em Aberto (Ativas)</div>
                         <div id="statSaldoOV" class="text-base font-black text-white leading-tight">0 KG</div>
                     </div>
                 </div>
@@ -125,8 +122,8 @@
             <div class="flex items-center gap-3 text-left">
                 <span class="text-2xl">📋</span>
                 <div>
-                    <div class="font-bold text-slate-800">Dica: Cole os prints do SAP diretamente aqui!</div>
-                    <div class="text-slate-500 text-[11px]">Pressione <kbd class="px-1.5 py-0.5 bg-white border border-slate-300 rounded font-mono font-bold">Ctrl + V</kbd> para extrair a OV, empresa e quantidades via OCR.</div>
+                    <div class="font-bold text-slate-800">Cole qualquer print do SAP aqui! (Ctrl + V)</div>
+                    <div class="text-slate-500 text-[11px]">As imagens são processadas em memória e não ficam salvas, mantendo os registros leves e seguros.</div>
                 </div>
             </div>
             <button type="button" onclick="abrirModalOCR()" class="text-xs font-bold px-3 py-1.5 bg-[#007e7a] text-white rounded-xl hover:bg-[#005a57] whitespace-nowrap shadow-sm">
@@ -150,22 +147,66 @@
                     <option value="TODOS">Todos os Registos</option>
                     <option value="ABERTO">Com Saldo Pendente</option>
                     <option value="CONCLUIDO">Concluídas (100%)</option>
+                    <option value="CANCELADO">Canceladas</option>
                 </select>
 
                 <button type="button" onclick="sincronizarComSupabase()" class="text-xs font-semibold text-teal-700 bg-teal-50 border border-teal-200 hover:bg-teal-100 px-3 py-2 rounded-xl transition flex items-center gap-1">
-                    🔄 Atualizar Nuvem
+                    🔄 Sincronizar
                 </button>
             </div>
         </div>
 
-        <!-- LISTA DAS OVS -->
+        <!-- LISTAGEM DAS OVS -->
         <div id="containerOVs" class="space-y-5">
             <!-- Cards montados dinamicamente -->
         </div>
 
     </div>
 
-    <!-- MODAL DE UPLOAD E LEITURA OCR DAS FOTOS -->
+    <!-- MODAL: CANCELAR OV & TRANSFERIR SALDO -->
+    <div id="modalCancelarOV" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2 text-rose-600 font-bold text-sm">
+                    <span>🚫</span>
+                    <h3>Cancelar Ordem de Venda</h3>
+                </div>
+                <button type="button" onclick="fecharModalCancelarOV()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
+            </div>
+
+            <input type="hidden" id="cancelarOVId">
+
+            <div class="space-y-3 text-xs">
+                <p class="text-slate-600">
+                    Atenção: A OV <b id="cancelarOVNumero" class="text-slate-900 font-bold">---</b> será marcada como <b>CANCELADA</b>.
+                </p>
+
+                <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-amber-900">
+                    <span class="block font-bold">Saldo restante a transferir:</span>
+                    <span id="cancelarSaldoRestante" class="text-base font-black text-amber-700">0 KG</span>
+                </div>
+
+                <div>
+                    <label class="block text-slate-700 font-bold mb-1">Para onde deseja transferir o saldo?</label>
+                    <select id="selectDestinoSaldo" class="w-full border border-slate-300 rounded-xl p-2.5 bg-slate-50 outline-none focus:border-teal-600 font-semibold text-slate-800">
+                        <!-- Preenchido dinamicamente com as outras OVs da mesma empresa -->
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-slate-500 font-bold mb-1">Motivo do Cancelamento</label>
+                    <input type="text" id="cancelarMotivo" placeholder="Ex: Cancelada no SAP / Erro de emissão / Transferência" class="w-full border border-slate-300 rounded-xl p-2.5 bg-slate-50 outline-none focus:border-teal-600">
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                <button type="button" onclick="fecharModalCancelarOV()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Voltar</button>
+                <button type="button" onclick="confirmarCancelamento()" class="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm">Confirmar Cancelamento & Mover Saldo</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL DE UPLOAD E LEITURA OCR DAS FOTOS (SÓ LÊ, NÃO GRAVA IMAGEM) -->
     <div id="modalOCR" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 space-y-4 max-h-[92vh] overflow-y-auto">
             
@@ -173,8 +214,8 @@
                 <div class="flex items-center gap-2">
                     <span class="text-xl">🔍</span>
                     <div>
-                        <h3 class="font-bold text-slate-900 text-sm">Leitor Automático de Imagens SAP (OCR)</h3>
-                        <p class="text-[11px] text-slate-500">Reconhece o Número da OV, Contrato, Empresa Parceira e Saldo</p>
+                        <h3 class="font-bold text-slate-900 text-sm">Leitor de Imagens SAP (OCR)</h3>
+                        <p class="text-[11px] text-slate-500">As fotos são usadas apenas para leitura rápida e não são salvas no banco</p>
                     </div>
                 </div>
                 <button type="button" onclick="fecharModalOCR()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
@@ -262,7 +303,7 @@
                 </button>
                 <div class="flex gap-2">
                     <button type="button" onclick="fecharModalOCR()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Cancelar</button>
-                    <button type="button" onclick="salvarExtraido()" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-black text-white shadow-sm">Salvar na Nuvem</button>
+                    <button type="button" onclick="salvarExtraido()" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-black text-white shadow-sm">Salvar Registro</button>
                 </div>
             </div>
         </div>
@@ -304,11 +345,8 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE INTEGRAÇÃO COM O SUPABASE -->
+    <!-- SCRIPT DE PROCESSAMENTO E TRANSFERÊNCIA DE SALDOS -->
     <script>
-        // ========================================================
-        // CONFIGURAÇÕES DO SUPABASE (COLOQUE SUAS CHAVES AQUI)
-        // ========================================================
         const SUPABASE_URL = "https://SEU-PROJETO.supabase.co";
         const SUPABASE_ANON_KEY = "SUA-CHAVE-ANONIMA-AQUI";
         
@@ -317,13 +355,14 @@
             supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         }
 
-        const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v4";
+        const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v5";
         let cacheRegistros = [];
 
-        // Exemplo padrão
         const DADOS_DEFAULT = [
             {
                 id: "115443653",
+                status: "ATIVO", // ATIVO ou CANCELADO
+                motivoCancelamento: "",
                 contrato: {
                     numero: "0000071823",
                     item: "30",
@@ -348,13 +387,14 @@
         ];
 
         async function carregarRegistros() {
-            // Tenta carregar do Supabase primeiro
             if (supabaseClient) {
                 try {
                     const { data, error } = await supabaseClient.from('modulo11_ovs').select('*').order('created_at', { ascending: false });
                     if (!error && data && data.length > 0) {
                         cacheRegistros = data.map(d => ({
                             id: d.id,
+                            status: d.status || "ATIVO",
+                            motivoCancelamento: d.motivo_cancelamento || "",
                             contrato: {
                                 numero: d.contrato_numero,
                                 item: d.contrato_item || "30",
@@ -379,11 +419,10 @@
                         return;
                     }
                 } catch (e) {
-                    console.warn("Falha ao comunicar com Supabase, usando cache local:", e);
+                    console.warn("Falha no Supabase, usando local:", e);
                 }
             }
 
-            // Fallback para LocalStorage se o Supabase não estiver configurado ou offline
             const raw = localStorage.getItem(STORAGE_KEY);
             cacheRegistros = raw ? JSON.parse(raw) : DADOS_DEFAULT;
             atualizarOpcoesEmpresas(cacheRegistros);
@@ -392,11 +431,10 @@
 
         async function sincronizarComSupabase() {
             await carregarRegistros();
-            alert("Dados sincronizados com sucesso com o Supabase!");
+            alert("Dados sincronizados com o Supabase!");
         }
 
         async function salvarNaBase(novoItem) {
-            // 1. Atualiza cache em memória e LocalStorage
             const idx = cacheRegistros.findIndex(i => i.id === novoItem.id);
             if (idx !== -1) {
                 cacheRegistros[idx] = novoItem;
@@ -407,12 +445,13 @@
             atualizarOpcoesEmpresas(cacheRegistros);
             renderizar();
 
-            // 2. Grava no Supabase se cliente ativo
             if (supabaseClient) {
                 try {
                     const payload = {
                         id: novoItem.id,
                         ov: novoItem.ov.numero,
+                        status: novoItem.status || "ATIVO",
+                        motivo_cancelamento: novoItem.motivoCancelamento || "",
                         cliente: novoItem.ov.cliente,
                         material: novoItem.ov.material,
                         pedido_drs: novoItem.ov.pedidoDRS,
@@ -428,13 +467,74 @@
                     };
                     await supabaseClient.from('modulo11_ovs').upsert(payload);
                 } catch (err) {
-                    console.error("Erro ao salvar no Supabase:", err);
+                    console.error("Erro Supabase:", err);
                 }
             }
         }
 
+        function abrirModalCancelarOV(ovId) {
+            const item = cacheRegistros.find(o => o.id === ovId);
+            if (!item) return;
+
+            const totalGasto = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
+            const saldoRestante = Math.max(0, item.ov.qtdLiberadaKG - totalGasto);
+
+            document.getElementById('cancelarOVId').value = ovId;
+            document.getElementById('cancelarOVNumero').innerText = item.ov.numero;
+            document.getElementById('cancelarSaldoRestante').innerText = `${saldoRestante.toLocaleString('pt-BR')} KG (R$ ${(saldoRestante * (item.ov.precoUnitarioPorKG || 1.26)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })})`;
+            document.getElementById('cancelarMotivo').value = '';
+
+            // Lista outras OVs ativas da mesma empresa para onde o saldo pode ir
+            const outrasOVs = cacheRegistros.filter(o => o.id !== ovId && o.status !== "CANCELADO" && o.ov.cliente === item.ov.cliente);
+            const select = document.getElementById('selectDestinoSaldo');
+            select.innerHTML = '<option value="CONTRATO">Devolver ao Contrato Mestre (Saldo Livre)</option>';
+            
+            outrasOVs.forEach(o => {
+                const opt = document.createElement('option');
+                opt.value = o.id;
+                opt.innerText = `Transferir para OV ${o.ov.numero} (${o.ov.material})`;
+                select.appendChild(opt);
+            });
+
+            document.getElementById('modalCancelarOV').classList.remove('hidden');
+        }
+
+        function fecharModalCancelarOV() {
+            document.getElementById('modalCancelarOV').classList.add('hidden');
+        }
+
+        async function confirmarCancelamento() {
+            const ovId = document.getElementById('cancelarOVId').value;
+            const destinoId = document.getElementById('selectDestinoSaldo').value;
+            const motivo = document.getElementById('cancelarMotivo').value.trim() || 'Cancelada no SAP';
+
+            const itemOrigem = cacheRegistros.find(o => o.id === ovId);
+            if (!itemOrigem) return;
+
+            const totalGasto = (itemOrigem.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
+            const saldoTransferir = Math.max(0, itemOrigem.ov.qtdLiberadaKG - totalGasto);
+
+            // Marca como cancelada
+            itemOrigem.status = "CANCELADO";
+            itemOrigem.motivoCancelamento = motivo;
+
+            // Se o destino for outra OV, acrescenta o saldo a ela
+            if (destinoId !== "CONTRATO" && saldoTransferir > 0) {
+                const itemDestino = cacheRegistros.find(o => o.id === destinoId);
+                if (itemDestino) {
+                    itemDestino.ov.qtdLiberadaKG += saldoTransferir;
+                    itemDestino.ov.valorBRL += (saldoTransferir * (itemDestino.ov.precoUnitarioPorKG || itemOrigem.ov.precoUnitarioPorKG || 1.26));
+                    await salvarNaBase(itemDestino);
+                }
+            }
+
+            await salvarNaBase(itemOrigem);
+            fecharModalCancelarOV();
+            alert(`OV ${itemOrigem.ov.numero} cancelada com sucesso! O saldo de ${saldoTransferir.toLocaleString('pt-BR')} KG foi remanejado.`);
+        }
+
         async function excluirOV(id) {
-            if (!confirm(`Remover OV ${id}?`)) return;
+            if (!confirm(`Remover definitivamente a OV ${id}?`)) return;
             cacheRegistros = cacheRegistros.filter(o => o.id !== id);
             localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheRegistros));
             atualizarOpcoesEmpresas(cacheRegistros);
@@ -444,7 +544,7 @@
                 try {
                     await supabaseClient.from('modulo11_ovs').delete().eq('id', id);
                 } catch (err) {
-                    console.error("Erro ao remover no Supabase:", err);
+                    console.error("Erro Supabase:", err);
                 }
             }
         }
@@ -480,16 +580,20 @@
             let somaSaldoTotal = 0;
 
             const listaFiltrada = lista.filter(item => {
+                const cancelado = item.status === "CANCELADO";
                 const totalGasto = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
-                const saldo = Math.max(0, item.ov.qtdLiberadaKG - totalGasto);
-                const concluido = saldo <= 0;
+                const saldo = cancelado ? 0 : Math.max(0, item.ov.qtdLiberadaKG - totalGasto);
+                const concluido = !cancelado && saldo <= 0;
 
-                somaGastoTotal += totalGasto;
-                somaSaldoTotal += saldo;
+                if (!cancelado) {
+                    somaGastoTotal += totalGasto;
+                    somaSaldoTotal += saldo;
+                }
 
                 if (filtroEmpresa !== 'TODAS' && item.ov.cliente !== filtroEmpresa) return false;
-                if (filtroStatus === 'ABERTO' && concluido) return false;
+                if (filtroStatus === 'ABERTO' && (concluido || cancelado)) return false;
                 if (filtroStatus === 'CONCLUIDO' && !concluido) return false;
+                if (filtroStatus === 'CANCELADO' && !cancelado) return false;
 
                 if (termo) {
                     const match = (
@@ -519,19 +623,17 @@
             }
 
             container.innerHTML = listaFiltrada.map(item => {
+                const cancelado = item.status === "CANCELADO";
                 const totalGasto = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
-                const saldo = Math.max(0, item.ov.qtdLiberadaKG - totalGasto);
-                const pctGasto = Math.min(100, Math.round((totalGasto / item.ov.qtdLiberadaKG) * 100)) || 0;
+                const saldo = cancelado ? 0 : Math.max(0, item.ov.qtdLiberadaKG - totalGasto);
+                const pctGasto = cancelado ? 0 : (Math.min(100, Math.round((totalGasto / item.ov.qtdLiberadaKG) * 100)) || 0);
                 const valorGasto = totalGasto * (item.ov.precoUnitarioPorKG || 1.26);
                 const valorSaldo = Math.max(0, item.ov.valorBRL - valorGasto);
 
-                const saldoContrato = Math.max(0, item.contrato.qtdTotalKG - totalGasto);
-                const pctContrato = ((totalGasto / item.contrato.qtdTotalKG) * 100).toFixed(2);
-
                 return `
-                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden card-sap">
+                    <div class="bg-white rounded-2xl border ${cancelado ? 'border-rose-200 bg-rose-50/20' : 'border-slate-200'} shadow-sm overflow-hidden card-sap">
                         
-                        <!-- BARRA SUPERIOR DO CONTRATO GUARDA-CHUVA -->
+                        <!-- BARRA SUPERIOR DO CONTRATO -->
                         <div class="bg-slate-100/90 border-b border-slate-200 px-5 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
                             <div class="flex items-center gap-2">
                                 <span class="bg-slate-800 text-white font-mono font-bold text-[10px] px-2 py-0.5 rounded">CONTRATO SAP</span>
@@ -539,8 +641,11 @@
                                 <span class="text-slate-400">|</span>
                                 <span class="text-slate-600">Total Contrato: <b>${item.contrato.qtdTotalKG.toLocaleString('pt-BR')} KG</b></span>
                             </div>
-                            <div class="text-[11px] font-semibold text-slate-500">
-                                Saldo Contratual Global: <b class="text-teal-700">${saldoContrato.toLocaleString('pt-BR')} KG</b> (${pctContrato}% consumido)
+                            <div>
+                                ${cancelado 
+                                    ? `<span class="bg-rose-100 text-rose-800 font-black px-2 py-0.5 rounded border border-rose-300 text-[10px]">OV CANCELADA - SALDO TRANSFERIDO</span>`
+                                    : `<span class="text-slate-500 font-semibold text-[11px]">Consumo: <b>${pctGasto}%</b></span>`
+                                }
                             </div>
                         </div>
 
@@ -550,21 +655,29 @@
                             <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
                                 <div>
                                     <div class="flex items-center gap-2">
-                                        <!-- BADGE PISCANTE DA OV -->
-                                        <span class="ov-piscar bg-[#007e7a] text-white text-xs font-black px-2.5 py-1 rounded-md tracking-wider flex items-center gap-1.5 shadow-sm">
-                                            <span class="inline-block w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
-                                            OV ${item.ov.numero}
-                                        </span>
-                                        <h3 class="font-bold text-slate-800 text-sm">${item.ov.material}</h3>
+                                        <!-- BADGE DA OV COM ANIMAÇÃO PISCANTE SE ESTIVER ATIVA -->
+                                        ${cancelado 
+                                            ? `<span class="bg-rose-600 text-white text-xs font-black px-2.5 py-1 rounded-md tracking-wider">OV ${item.ov.numero} (CANCELADA)</span>`
+                                            : `<span class="ov-piscar bg-[#007e7a] text-white text-xs font-black px-2.5 py-1 rounded-md tracking-wider flex items-center gap-1.5 shadow-sm">
+                                                    <span class="inline-block w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                                                    OV ${item.ov.numero}
+                                               </span>`
+                                        }
+                                        <h3 class="font-bold text-slate-800 text-sm ${cancelado ? 'line-through text-slate-400' : ''}">${item.ov.material}</h3>
                                     </div>
-                                    <p class="text-xs text-slate-600 font-medium mt-1">Empresa / Parceiro: <b class="text-slate-900">${item.ov.cliente}</b> • DRS: ${item.ov.pedidoDRS || '---'}</p>
+                                    <p class="text-xs text-slate-600 font-medium mt-1">
+                                        Empresa: <b class="text-slate-900">${item.ov.cliente}</b> • DRS: ${item.ov.pedidoDRS || '---'}
+                                        ${cancelado ? ` • <span class="text-rose-600 font-bold">Motivo: ${item.motivoCancelamento || 'Cancelada'}</span>` : ''}
+                                    </p>
                                 </div>
 
                                 <div class="flex items-center gap-2">
-                                    <span class="text-xs font-bold px-2.5 py-1 rounded-xl bg-teal-50 text-teal-800 border border-teal-200">
-                                        Doc. Contábil: ${item.ov.docContabil || '---'} (Compensado)
-                                    </span>
-                                    <button type="button" onclick="excluirOV('${item.id}')" class="text-slate-400 hover:text-rose-600 text-xs px-2 py-1 rounded hover:bg-rose-50 no-print" title="Excluir">
+                                    ${!cancelado ? `
+                                        <button type="button" onclick="abrirModalCancelarOV('${item.id}')" class="text-xs font-bold px-2.5 py-1 rounded-xl bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 transition no-print" title="Cancelar esta OV e remanejar saldo">
+                                            🚫 Cancelar OV
+                                        </button>
+                                    ` : ''}
+                                    <button type="button" onclick="excluirOV('${item.id}')" class="text-slate-400 hover:text-rose-600 text-xs px-2 py-1 rounded hover:bg-rose-50 no-print" title="Excluir Definitivamente">
                                         🗑️
                                     </button>
                                 </div>
@@ -573,7 +686,7 @@
                             <!-- COMPARAÇÃO DE SALDO E GASTO -->
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl">
-                                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">1. Qtd / Valor Liberado</span>
+                                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">1. Qtd / Valor Inicial</span>
                                     <div class="text-base font-black text-slate-800 mt-1">${item.ov.qtdLiberadaKG.toLocaleString('pt-BR')} KG</div>
                                     <div class="text-xs font-bold text-slate-500">${(item.ov.valorBRL).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
                                 </div>
@@ -581,26 +694,13 @@
                                 <div class="bg-rose-50/70 border border-rose-200 p-3 rounded-xl">
                                     <span class="block text-[10px] font-bold text-rose-600 uppercase tracking-wider">2. O que JÁ FOI GASTO</span>
                                     <div class="text-base font-black text-rose-700 mt-1">${totalGasto.toLocaleString('pt-BR')} KG</div>
-                                    <div class="text-xs font-bold text-rose-600">${valorGasto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} (${pctGasto}%)</div>
+                                    <div class="text-xs font-bold text-rose-600">${valorGasto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
                                 </div>
 
                                 <div class="bg-emerald-50/70 border border-emerald-200 p-3 rounded-xl">
-                                    <span class="block text-[10px] font-bold text-emerald-700 uppercase tracking-wider">3. SALDO RESTANTE</span>
+                                    <span class="block text-[10px] font-bold text-emerald-700 uppercase tracking-wider">3. SALDO DISPONÍVEL</span>
                                     <div class="text-base font-black text-emerald-800 mt-1">${saldo.toLocaleString('pt-BR')} KG</div>
-                                    <div class="text-xs font-bold text-emerald-700">${valorSaldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                                </div>
-                            </div>
-
-                            <!-- BARRA DE PROGRESSO -->
-                            <div class="space-y-1">
-                                <div class="flex justify-between text-[11px] font-bold text-slate-600">
-                                    <span>Consumo da OV: ${pctGasto}% gasto</span>
-                                    <span class="${saldo === 0 ? 'text-emerald-700 font-extrabold' : 'text-amber-700'}">
-                                        ${saldo === 0 ? '✓ OV 100% CONCLUÍDA' : `Restam ${saldo.toLocaleString('pt-BR')} KG para expedir`}
-                                    </span>
-                                </div>
-                                <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
-                                    <div class="h-full rounded-full transition-all duration-500 ${pctGasto >= 100 ? 'bg-emerald-600' : 'bg-teal-600'}" style="width: ${pctGasto}%"></div>
+                                    <div class="text-xs font-bold text-emerald-700">${cancelado ? '0,00 (Cancelada)' : valorSaldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
                                 </div>
                             </div>
 
@@ -610,7 +710,7 @@
                                     <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
                                         <span>⚖️</span> Romaneios / Saídas de Balança
                                     </span>
-                                    <button type="button" onclick="abrirModalGasto('${item.id}')" ${saldo <= 0 ? 'disabled' : ''} class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-teal-50 text-teal-800 border border-teal-200 hover:bg-teal-100 transition disabled:opacity-40 disabled:cursor-not-allowed no-print">
+                                    <button type="button" onclick="abrirModalGasto('${item.id}')" ${cancelado || saldo <= 0 ? 'disabled' : ''} class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-teal-50 text-teal-800 border border-teal-200 hover:bg-teal-100 transition disabled:opacity-40 disabled:cursor-not-allowed no-print">
                                         + Lançar Pesagem
                                     </button>
                                 </div>
@@ -637,7 +737,7 @@
                                                         <td class="py-1.5 px-3 text-slate-600 font-mono">${g.placa}</td>
                                                         <td class="py-1.5 px-3 text-right font-bold text-rose-600">-${Number(g.pesoKG).toLocaleString('pt-BR')} KG</td>
                                                         <td class="py-1.5 px-3 text-center no-print">
-                                                            <button type="button" onclick="removerGasto('${item.id}', ${idx})" class="text-rose-400 hover:text-rose-600 text-xs">✕</button>
+                                                            <button type="button" onclick="removerGasto('${item.id}', ${idx})" ${cancelado ? 'disabled' : ''} class="text-rose-400 hover:text-rose-600 text-xs disabled:opacity-30">✕</button>
                                                         </td>
                                                     </tr>
                                                 `).join('')}
@@ -655,7 +755,7 @@
         }
 
         // ==========================================
-        // OCR E CLIPBOARD
+        // OCR VOLÁTIL (LÊ O PRINT E NÃO SALVA IMAGEM)
         // ==========================================
         function abrirModalOCR() {
             document.getElementById('modalOCR').classList.remove('hidden');
@@ -678,7 +778,7 @@
         });
 
         async function processarArquivoBlob(blob) {
-            atualizarProgressoOCR(10, "A ler a imagem colada via Clipboard...");
+            atualizarProgressoOCR(10, "A ler a imagem colada em memória...");
             await executarOCREmBlob(blob);
         }
 
@@ -694,15 +794,15 @@
             document.getElementById('btnProcessarOCR').disabled = true;
 
             if (f1) {
-                atualizarProgressoOCR(20, "A analisar a Foto 1 (Síntese da OV)...");
+                atualizarProgressoOCR(20, "A analisar Foto 1...");
                 await executarOCREmBlob(f1);
             }
             if (f2) {
-                atualizarProgressoOCR(60, "A analisar a Foto 2 (Fluxo de Documentos)...");
+                atualizarProgressoOCR(60, "A analisar Foto 2...");
                 await executarOCREmBlob(f2);
             }
 
-            atualizarProgressoOCR(100, "Leitura concluída com sucesso!");
+            atualizarProgressoOCR(100, "Leitura concluída! Imagem descartada.");
             document.getElementById('btnProcessarOCR').disabled = false;
         }
 
@@ -716,7 +816,7 @@
 
                 interpretarTextoExtraido(text);
             } catch (err) {
-                console.error("Erro no OCR:", err);
+                console.error("Erro OCR:", err);
                 interpretarTextoExtraido("");
             }
         }
@@ -729,7 +829,6 @@
         }
 
         function interpretarTextoExtraido(txt) {
-            // 1. Número da OV
             let matchOV = txt.match(/Venda\s+Sucata(?:\/Esc[oó]ria)?[^\d]*0?(\d{8,10})/i) ||
                           txt.match(/(?:OV|Ordem)[^\d]*0?(\d{8,10})/i) ||
                           txt.match(/\b(11\d{7}|011\d{7})\b/) ||
@@ -739,7 +838,6 @@
                 document.getElementById('campoOV').value = matchOV[1].replace(/^0+/, '');
             }
 
-            // 2. Empresa Parceira
             let matchParceiro = txt.match(/Parceiro\s+de\s+neg[oó]cios\s+([0-9]+)\s+([^\n\r]+)/i) ||
                                 txt.match(/Emissor\s+da\s+ordem\s+([0-9]+)\s+([^\/\n\r]+)/i) ||
                                 txt.match(/Receb\.mercad\.\s+([0-9]+)\s+([^\/\n\r]+)/i);
@@ -748,19 +846,16 @@
                 document.getElementById('campoCliente').value = `${matchParceiro[2].trim().replace(/\s{2,}/g, ' ')} (${matchParceiro[1].trim()})`;
             }
 
-            // 3. Pedido DRS
             const matchDRS = txt.match(/(\d+\s*DRS\s*[^\n\r]+)/i);
             if (matchDRS && !document.getElementById('campoDRS').value) {
                 document.getElementById('campoDRS').value = matchDRS[1].trim();
             }
 
-            // 4. Material
             const matchMat = txt.match(/(?:SUCATA[^\n\r]*|ESCORIA[^\n\r]*)/i);
             if (matchMat && !document.getElementById('campoMaterial').value) {
                 document.getElementById('campoMaterial').value = matchMat[0].trim();
             }
 
-            // 5. Valor Líquido e Quantidade
             const matchVal = txt.match(/Valor\s+l[ií]quido\s*([0-9.,]+)/i);
             if (matchVal) {
                 document.getElementById('campoValorOV').value = parseFloat(matchVal[1].replace(/\./g, '').replace(',', '.'));
@@ -773,13 +868,11 @@
                 document.getElementById('campoQtdOV').value = peso;
             }
 
-            // 6. Contrato
             const matchContrato = txt.match(/Contr[^\d]*(\d{5,10})/i);
             if (matchContrato && !document.getElementById('campoContrato').value) {
                 document.getElementById('campoContrato').value = matchContrato[1];
             }
 
-            // 7. Doc Contábil
             const matchDocContabil = txt.match(/Doc\.cont[aá]bil\s*(\d+)/i) || txt.match(/520109\d{4}/);
             if (matchDocContabil && !document.getElementById('campoDocContabil').value) {
                 document.getElementById('campoDocContabil').value = matchDocContabil[1] || matchDocContabil[0];
@@ -793,6 +886,8 @@
 
             const novo = {
                 id: ovNum,
+                status: "ATIVO",
+                motivoCancelamento: "",
                 contrato: {
                     numero: document.getElementById('campoContrato').value.trim() || "0000071823",
                     item: "30",
@@ -816,7 +911,6 @@
             fecharModalOCR();
         }
 
-        // Funções de Modal para Abater Gasto
         function abrirModalGasto(ovId) {
             document.getElementById('gastoOVId').value = ovId;
             document.getElementById('gastoTicket').value = '';
@@ -874,20 +968,20 @@
             if (!cacheRegistros.length) return;
 
             let csv = "data:text/csv;charset=utf-8,";
-            csv += "Contrato;OV;Empresa/Cliente;Material;Qtd Liberada (KG);Gasto Realizado (KG);Saldo Restante (KG);Valor Total;Valor Gasto;Valor Saldo\r\n";
+            csv += "Status;Contrato;OV;Empresa/Cliente;Material;Qtd Liberada (KG);Gasto Realizado (KG);Saldo Restante (KG);Valor Total;Valor Gasto;Valor Saldo\r\n";
 
             cacheRegistros.forEach(item => {
                 const totalGasto = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
-                const saldo = Math.max(0, item.ov.qtdLiberadaKG - totalGasto);
+                const saldo = item.status === "CANCELADO" ? 0 : Math.max(0, item.ov.qtdLiberadaKG - totalGasto);
                 const valGasto = totalGasto * (item.ov.precoUnitarioPorKG || 0);
                 const valSaldo = Math.max(0, item.ov.valorBRL - valGasto);
 
-                csv += `"${item.contrato.numero}";"${item.ov.numero}";"${item.ov.cliente}";"${item.ov.material}";${item.ov.qtdLiberadaKG};${totalGasto};${saldo};${item.ov.valorBRL};${valGasto};${valSaldo}\r\n`;
+                csv += `"${item.status}";"${item.contrato.numero}";"${item.ov.numero}";"${item.ov.cliente}";"${item.ov.material}";${item.ov.qtdLiberadaKG};${totalGasto};${saldo};${item.ov.valorBRL};${valGasto};${valSaldo}\r\n`;
             });
 
             const link = document.createElement("a");
             link.setAttribute("href", encodeURI(csv));
-            link.setAttribute("download", `controle_ovs_supabase_${new Date().toISOString().slice(0,10)}.csv`);
+            link.setAttribute("download", `controle_ovs_vale_${new Date().toISOString().slice(0,10)}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
