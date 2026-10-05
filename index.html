@@ -1,526 +1,121 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Portal Operacional - Vale (Menu Mestre)</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        vale: {
-                            DEFAULT: '#007e7a',
-                            dark: '#005a57',
-                            light: '#e6f4f4',
-                            amber: '#f59e0b'
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { 
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
-            background: #f0f4f8; 
-            color: #1e293b; 
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center; 
-            padding: 20px 16px; 
-        }
-        .container-menu { max-width: 1100px; width: 100%; }
-        
-        /* CARD DOS MÓDULOS */
-        .card-modulo { 
-            background: #fff; 
-            border-radius: 12px; 
-            border: 1px solid #e2e8f0; 
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.03); 
-            padding: 20px; 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: space-between; 
-            text-decoration: none; 
-            transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); 
-            position: relative; 
-            overflow: hidden; 
-            min-height: 180px; 
-        }
-        .card-modulo::before { 
-            content: ''; 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            right: 0; 
-            height: 4px; 
-        }
-        
-        .card-modulo.m1::before, .card-modulo.m2::before { background: #007e7a; }
-        .card-modulo.m3::before, .card-modulo.m4::before, .card-modulo.m5::before { background: #db2777; }
-        .card-modulo.m6::before { background: #059669; }
-        .card-modulo.m7::before { background: #6366f1; }
-        .card-modulo.m8::before { background: #0891b2; }
-        .card-modulo.m9::before { background: #f59e0b; }
-        .card-modulo.m10::before { background: #475569; }
-        .card-modulo.m11::before { background: #0284c7; }
-        
-        .card-modulo:hover { 
-            transform: translateY(-5px); 
-            box-shadow: 0 14px 25px -4px rgba(0, 0, 0, 0.08); 
-            border-color: #cbd5e1;
-        }
-        
-        .card-icone { 
-            width: 42px; 
-            height: 42px; 
-            border-radius: 10px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            font-size: 20px; 
-        }
-        
-        .m1 .card-icone, .m2 .card-icone { background: #e6f4f4; color: #007e7a; }
-        .m3 .card-icone, .m4 .card-icone, .m5 .card-icone { background: #fce7f3; color: #db2777; }
-        .m6 .card-icone { background: #ecfdf5; color: #059669; }
-        .m7 .card-icone { background: #eef2ff; color: #6366f1; }
-        .m8 .card-icone { background: #ecfeff; color: #0891b2; }
-        .m9 .card-icone { background: #fef3c7; color: #d97706; }
-        .m10 .card-icone { background: #f1f5f9; color: #475569; }
-        .m11 .card-icone { background: #e0f2fe; color: #0284c7; }
-        
-        .tecla-atalho {
-            font-size: 10px;
-            font-weight: 800;
-            background: #f1f5f9;
-            color: #64748b;
-            padding: 2px 6px;
-            border-radius: 4px;
-            border: 1px solid #cbd5e1;
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal Operacional - Vale (Menu Mestre)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { darkMode: 'class' }</script>
+<style>
+  body { font-family:'Segoe UI', system-ui, sans-serif; background:#f0f4f8; color:#1e293b; min-height:100vh; padding:20px 16px; }
+  .dark body { background:#0f172a; color:#e2e8f0; }
+  :focus-visible { outline:2px solid #007e7a; outline-offset:2px; }
+  .card-modulo { background:#fff; border-radius:12px; border:1px solid #e2e8f0; box-shadow:0 4px 6px -1px rgba(0,0,0,.03); padding:20px; display:flex; flex-direction:column;
+    justify-content:space-between; text-decoration:none; transition:transform .2s, box-shadow .2s; position:relative; overflow:hidden; min-height:180px; }
+  .card-modulo::before { content:''; position:absolute; inset:0 0 auto 0; height:4px; background:var(--c); }
+  .card-modulo:hover { transform:translateY(-4px); box-shadow:0 14px 25px -4px rgba(0,0,0,.1); border-color:#cbd5e1; }
+  .dark .card-modulo { background:#1e293b; border-color:#334155; }
+  .dark .card-modulo .tit { color:#f1f5f9; } .dark .card-modulo .desc { color:#94a3b8; } .dark .card-modulo .rod { border-color:#334155; }
+  .card-icone { width:42px; height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; background:var(--bg); }
+  .tecla { font-size:10px; font-weight:800; background:#f1f5f9; color:#64748b; padding:2px 6px; border-radius:4px; border:1px solid #cbd5e1; }
+  .dark .tecla { background:#0f172a; border-color:#475569; color:#94a3b8; }
+  @media (prefers-reduced-motion: reduce) { .card-modulo { transition:none; } .card-modulo:hover { transform:none; } }
+</style>
 </head>
-<body class="select-none">
+<body>
 
-    <!-- CAPA DE BLOQUEIO DE SEGURANÇA MOBILE -->
-    <div id="tela-bloqueio-mobile" class="fixed inset-0 z-50 bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4 md:hidden">
-        <div class="bg-white p-7 rounded-3xl shadow-2xl max-w-xs w-full text-center space-y-4 border border-slate-100">
-            <div class="w-16 h-16 bg-teal-50 text-teal-700 rounded-3xl mx-auto flex items-center justify-center text-3xl font-black shadow-inner">
-                🔒
-            </div>
-            
-            <div>
-                <h2 class="text-base font-black text-slate-900">Portal Vale Operacional</h2>
-                <p class="text-slate-500 mt-1 text-[11px] leading-relaxed">Autentique sua identidade para liberar o acesso móvel.</p>
-            </div>
-
-            <button type="button" id="btnBiometria" onclick="desbloquearPorBiometria()" class="w-full bg-[#007e7a] hover:bg-[#005a57] active:scale-95 text-white font-bold py-3 rounded-2xl transition shadow-md text-xs flex items-center justify-center gap-2 cursor-pointer">
-                <span>👆</span>
-                <span>Validar Digital / Face ID</span>
-            </button>
-
-            <div id="area-pin" class="space-y-2 pt-2 border-t border-slate-100">
-                <label class="block text-[10px] font-bold text-slate-400 uppercase">Ou digite o PIN de Segurança:</label>
-                <div class="flex gap-2 justify-center">
-                    <input type="password" id="pinInput" maxlength="4" placeholder="••••" class="w-28 text-center text-lg font-black tracking-widest py-1.5 border border-slate-300 rounded-xl bg-slate-50 outline-none focus:border-teal-600">
-                    <button type="button" onclick="verificarPIN()" class="bg-slate-800 text-white font-bold px-3 py-1.5 rounded-xl text-xs">Entrar</button>
-                </div>
-            </div>
-
-            <p id="erro-auth" class="text-rose-500 font-bold text-[11px] hidden"></p>
+<div class="max-w-[1100px] w-full mx-auto">
+  <header class="bg-gradient-to-r from-[#007e7a] to-[#005a57] text-white p-6 sm:p-7 rounded-2xl shadow-lg mb-6">
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="text-center sm:text-left">
+        <div class="flex items-center justify-center sm:justify-start gap-3">
+          <span class="text-2xl font-black tracking-widest text-teal-100">VALE</span>
+          <div class="h-5 w-px bg-teal-300/40"></div>
+          <h1 class="text-lg font-extrabold tracking-wide">Portal Operacional</h1>
+          <span class="bg-amber-500 text-white font-black text-[10px] px-2 py-0.5 rounded">v06</span>
         </div>
-    </div>
-
-    <!-- CONTEÚDO PRINCIPAL DO MENU MESTRE -->
-    <div id="conteudo-portal" class="container-menu">
-        
-        <!-- CABEÇALHO CORPORATIVO VALE -->
-        <header class="bg-gradient-to-r from-[#007e7a] to-[#005a57] text-white p-6 sm:p-7 rounded-2xl shadow-lg shadow-teal-900/10 mb-6">
-            <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
-                <div class="text-center sm:text-left">
-                    <div class="flex items-center justify-center sm:justify-start gap-3">
-                        <span class="text-2xl font-black tracking-widest text-teal-100">VALE</span>
-                        <div class="h-5 w-px bg-teal-300/40"></div>
-                        <span class="text-lg font-extrabold tracking-wide">Portal Operacional</span>
-                        <span class="bg-amber-500 text-white font-black text-[10px] px-2 py-0.5 rounded shadow-sm">v05</span>
-                    </div>
-                    <p class="text-xs text-teal-100/90 mt-1 font-medium">Suíte integrada de gestão diária, segurança, equipamentos, equipes e FMDS</p>
-                </div>
-
-                <div class="flex items-center gap-3 bg-white/10 backdrop-blur-sm px-3.5 py-1.5 rounded-xl text-xs font-semibold border border-white/10">
-                    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span id="relogioTopo">--:--:--</span>
-                    <span class="text-teal-200">|</span>
-                    <span id="dataTopo">--/--/----</span>
-                </div>
-            </div>
-        </header>
-
-        <!-- GRADE COM OS MÓDULOS -->
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 text-left">
-            
-            <!-- MÓDULO 1 -->
-            <a href="modulo1.html" class="card-modulo m1" title="Pressione [1] no teclado">
-                <div>
-                    <div class="flex justify-between items-center mb-3">
-                        <div class="card-icone">📋</div>
-                        <span class="tecla-atalho">Tecla 1</span>
-                    </div>
-                    <div class="text-sm font-bold text-slate-800 mb-1">DDS & Emociograma</div>
-                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
-                        Controle semanal com carinhas de emociograma, registro de rubricas e impressão A4 paisagem.
-                    </div>
-                </div>
-                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#007e7a]">
-                    <span>Abrir Módulo 1</span><span>➔</span>
-                </div>
-            </a>
-
-            <!-- MÓDULO 2 -->
-            <a href="modulo2.html" class="card-modulo m2" title="Pressione [2] no teclado">
-                <div>
-                    <div class="flex justify-between items-center mb-3">
-                        <div class="card-icone">📅</div>
-                        <span class="tecla-atalho">Tecla 2</span>
-                    </div>
-                    <div class="text-sm font-bold text-slate-800 mb-1">Matriz Anual de DDS</div>
-                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
-                        Grelha anual completa (12 meses) com visibilidade dinâmica por semestre/trimestre e autoajuste.
-                    </div>
-                </div>
-                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#007e7a]">
-                    <span>Abrir Módulo 2</span><span>➔</span>
-                </div>
-            </a>
-
-            <!-- MÓDULO 3 -->
-            <a href="modulo3.html" class="card-modulo m3" title="Pressione [3] no teclado">
-                <div>
-                    <div class="flex justify-between items-center mb-3">
-                        <div class="card-icone">🏖️</div>
-                        <span class="tecla-atalho">Tecla 3</span>
-                    </div>
-                    <div class="text-sm font-bold text-slate-800 mb-1">Cronograma de Férias</div>
-                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
-                        Planejamento anual de início e término das férias da equipe com controle de saldo de dias.
-                    </div>
-                </div>
-                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#db2777]">
-                    <span>Abrir Módulo 3</span><span>➔</span>
-                </div>
-            </a>
-
-            <!-- MÓDULO 4 -->
-            <a href="modulo4.html" class="card-modulo m4" title="Pressione [4] no teclado">
-                <div>
-                    <div class="flex justify-between items-center mb-3">
-                        <div class="card-icone">🎂</div>
-                        <span class="tecla-atalho">Tecla 4</span>
-                    </div>
-                    <div class="text-sm font-bold text-slate-800 mb-1">Aniversariantes do Ano</div>
-                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
-                        Grade vertical dos 12 meses preenchendo a folha A4 com ordenação cronológica por dia.
-                    </div>
-                </div>
-                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#db2777]">
-                    <span>Abrir Módulo 4</span><span>➔</span>
-                </div>
-            </a>
-
-            <!-- MÓDULO 5 -->
-            <a href="modulo5.html" class="card-modulo m5" title="Pressione [5] no teclado">
-                <div>
-                    <div class="flex justify-between items-center mb-3">
-                        <div class="card-icone">📊</div>
-                        <span class="tecla-atalho">Tecla 5</span>
-                    </div>
-                    <div class="text-sm font-bold text-slate-800 mb-1">Absenteísmo & Justificativas</div>
-                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
-                        Registro padronizado de ocorrências (AT, FA, CO, FO) com resumo e lançamento rápido.
-                    </div>
-                </div>
-                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#db2777]">
-                    <span>Abrir Módulo 5</span><span>➔</span>
-                </div>
-            </a>
-
-            <!-- MÓDULO 6 -->
-            <a href="modulo6.html" class="card-modulo m6" title="Pressione [6] no teclado">
-                <div>
-                    <div class="flex justify-between items-center mb-3">
-                        <div class="card-icone">🎓</div>
-                        <span class="tecla-atalho">Tecla 6</span>
-                    </div>
-                    <div class="text-sm font-bold text-slate-800 mb-1">Gestão de Treinamentos</div>
-                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
-                        Capacitações com suporte à turma em lote, sincronização em nuvem e exportação em Excel.
-                    </div>
-                </div>
-                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#059669]">
-                    <span>Abrir Módulo 6</span><span>➔</span>
-                </div>
-            </a>
-
-            <!-- MÓDULO 7 -->
-            <a href="modulo7.html" class="card-modulo m7" title="Pressione [7] no teclado">
-                <div>
-                    <div class="flex justify-between items-center mb-3">
-                        <div class="card-icone">💳</div>
-                        <span class="tecla-atalho">Tecla 7</span>
-                    </div>
-                    <div class="text-sm font-bold text-slate-800 mb-1">Compras Cartão Corporativo</div>
-                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
-                        Lançamento e controle de compras no cartão corporativo, extração via links e exportação para planilha.
-                    </div>
-                </div>
-                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#6366f1]">
-                    <span>Abrir Módulo 7</span><span>➔</span>
-                </div>
-            </a>
-
-            <!-- MÓDULO 8 -->
-            <a href="modulo8.html" class="card-modulo m8" title="Pressione [8] no teclado">
-                <div>
-                    <div class="flex justify-between items-center mb-3">
-                        <div class="card-icone">📄</div>
-                        <span class="tecla-atalho">Tecla 8</span>
-                    </div>
-                    <div class="text-sm font-bold text-slate-800 mb-1">Procura e Gestão de FDS / FISPQ</div>
-                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
-                        Consulta rápida de Fichas de Dados de Segurança com miniaturas visuais, fotos e links diretos.
-                    </div>
-                </div>
-                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#0891b2]">
-                    <span>Abrir Módulo 8</span><span>➔</span>
-                </div>
-            </a>
-
-            <!-- MÓDULO 9 -->
-            <a href="modulo9.html" class="card-modulo m9" title="Pressione [9] no teclado">
-                <div>
-                    <div class="flex justify-between items-center mb-3">
-                        <div class="card-icone">💻</div>
-                        <span class="tecla-atalho">Tecla 9</span>
-                    </div>
-                    <div class="text-sm font-bold text-slate-800 mb-1">Controle de Notebooks</div>
-                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
-                        Gestão de entrega e recebimento, patrimônio, termos de responsabilidade e status operacional.
-                    </div>
-                </div>
-                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#d97706]">
-                    <span>Abrir Módulo 9</span><span>➔</span>
-                </div>
-            </a>
-
-            <!-- MÓDULO 10 -->
-            <a href="modulo10.html" class="card-modulo m10" title="Pressione [0] no teclado">
-                <div>
-                    <div class="flex justify-between items-center mb-3">
-                        <div class="card-icone">👥</div>
-                        <span class="tecla-atalho">Tecla 0</span>
-                    </div>
-                    <div class="text-sm font-bold text-slate-800 mb-1">Troca dos Participantes FMDS</div>
-                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
-                        Matriz de controle e rotação de participantes por temas (DSS, SSMA, Produtividade, Qualidade).
-                    </div>
-                </div>
-                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#475569]">
-                    <span>Abrir Módulo 10</span><span>➔</span>
-                </div>
-            </a>
-
-            <!-- NOVO MÓDULO 11: CONTROLE DE OV (ORDEM DE VENDA / SUCATA) -->
-            <a href="modulo11.html" class="card-modulo m11">
-                <div>
-                    <div class="flex justify-between items-center mb-3">
-                        <div class="card-icone">📑</div>
-                        <span class="tecla-atalho">Módulo 11</span>
-                    </div>
-                    <div class="text-sm font-bold text-slate-800 mb-1">Controle de OV (Ordens de Venda)</div>
-                    <div class="text-xs text-slate-500 leading-relaxed mb-3">
-                        Gestão e rastreio de Ordens de Venda (ZVSU / Sucatas e Resíduos), saldos, emissor, pesagens e remessas.
-                    </div>
-                </div>
-                <div class="border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold text-[#0284c7]">
-                    <span>Abrir Módulo 11</span><span>➔</span>
-                </div>
-            </a>
-
+        <p class="text-xs text-teal-100/90 mt-1 font-medium">Gestão diária, segurança, equipamentos, equipes, FMDS e ordens de venda</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="flex items-center gap-3 bg-white/10 px-3.5 py-1.5 rounded-xl text-xs font-semibold border border-white/10">
+          <span id="relogio">--:--:--</span><span class="text-teal-200">|</span><span id="data">--/--/----</span>
         </div>
-
-        <!-- RODAPÉ -->
-        <footer class="mt-8 text-center text-xs text-slate-400 font-medium space-y-1">
-            <p>Sistema Operacional Integrado • Portal Vale Corporativo</p>
-            <p class="text-[10px] text-slate-400/80">Dica: Utilize os números de 1 a 9 e 0 no teclado para navegação rápida entre os módulos.</p>
-        </footer>
+        <button id="bTema" class="bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl px-3 py-1.5 text-xs" aria-label="Alternar tema">🌙</button>
+      </div>
     </div>
+  </header>
 
-    <!-- SCRIPT DE ATALHOS E SEGURANÇA -->
-    <script>
-        const PIN_CORRETO = "1234";
+  <input id="busca" type="search" placeholder="🔍 Buscar módulo (ex: férias, notebook, FDS)" aria-label="Buscar módulo"
+    class="w-full mb-4 text-sm p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm">
 
-        function atualizarRelogio() {
-            const agora = new Date();
-            const relogioEl = document.getElementById('relogioTopo');
-            const dataEl = document.getElementById('dataTopo');
-            if (relogioEl) relogioEl.innerText = agora.toLocaleTimeString('pt-BR');
-            if (dataEl) dataEl.innerText = agora.toLocaleDateString('pt-BR');
-        }
-        setInterval(atualizarRelogio, 1000);
-        atualizarRelogio();
+  <nav id="grade" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" aria-label="Módulos"></nav>
+  <p id="vazio" class="hidden text-center text-sm text-slate-400 italic py-8">Nenhum módulo encontrado para essa busca.</p>
 
-        document.addEventListener('keydown', (e) => {
-            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+  <footer class="mt-8 text-center text-xs text-slate-400 font-medium space-y-1">
+    <p>Sistema Operacional Integrado • Portal Vale Corporativo</p>
+    <p class="text-[10px]">Atalhos: teclas 1 a 9 abrem os módulos 1 a 9, 0 abre o 10 e – (hífen) abre o 11. Fora de campos de texto.</p>
+  </footer>
+</div>
 
-            const rotas = {
-                '1': 'modulo1.html',
-                '2': 'modulo2.html',
-                '3': 'modulo3.html',
-                '4': 'modulo4.html',
-                '5': 'modulo5.html',
-                '6': 'modulo6.html',
-                '7': 'modulo7.html',
-                '8': 'modulo8.html',
-                '9': 'modulo9.html',
-                '0': 'modulo10.html'
-            };
+<script>
+const MODULOS = [
+  [1, '📋', 'DDS & Emociograma', 'Controle semanal com carinhas de emociograma, registro de rubricas e impressão A4 paisagem.', '#007e7a', '#e6f4f4', '1'],
+  [2, '📅', 'Matriz Anual de DDS', 'Grelha anual completa (12 meses) com visibilidade por semestre/trimestre e autoajuste.', '#007e7a', '#e6f4f4', '2'],
+  [3, '🏖️', 'Cronograma de Férias', 'Planejamento anual de início e término das férias da equipe com controle de saldo de dias.', '#db2777', '#fce7f3', '3'],
+  [4, '🎂', 'Aniversariantes do Ano', 'Grade dos 12 meses preenchendo a folha A4, com ordenação cronológica por dia.', '#db2777', '#fce7f3', '4'],
+  [5, '📊', 'Absenteísmo & Justificativas', 'Registro padronizado de ocorrências (AT, FA, CO, FO) com resumo e lançamento rápido.', '#db2777', '#fce7f3', '5'],
+  [6, '🎓', 'Gestão de Treinamentos', 'Capacitações com cadastro de turma em lote, busca, indicadores por status, nuvem e exportação CSV.', '#059669', '#ecfdf5', '6'],
+  [7, '💳', 'Compras Cartão Corporativo', 'Compras no cartão com itens agrupados, leitura de nota fiscal e links, controle de entrega e CSV.', '#6366f1', '#eef2ff', '7'],
+  [8, '📄', 'Gestão de FDS / FISPQ', 'Fichas de segurança por produto e fornecedor, PDFs guardados no aparelho, junção em um só PDF e leitura por foto.', '#0891b2', '#ecfeff', '8'],
+  [9, '💻', 'Controle de Notebooks', 'Entrega e recebimento com leitor de código de barras, patrimônio, termos, status e alerta de duplicidade.', '#d97706', '#fef3c7', '9'],
+  [10, '👥', 'Troca dos Participantes FMDS', 'Matriz de rotação de participantes (SSMA, Pessoas, Produtividade, Qualidade) com folhas de 24 linhas e salvamento automático.', '#475569', '#f1f5f9', '0'],
+  [11, '📑', 'Controle de OV (Ordens de Venda)', 'Rastreio de Ordens de Venda (ZVSU / sucatas e resíduos), saldos, emissor, pesagens e remessas.', '#0284c7', '#e0f2fe', '-']
+];
+const ROTAS = Object.fromEntries(MODULOS.map(m => [m[6], `modulo${m[0]}.html`]));
+const nomeTecla = t => t === '-' ? 'Tecla –' : `Tecla ${t}`;
+const $ = id => document.getElementById(id);
 
-            if (rotas[e.key]) {
-                window.location.href = rotas[e.key];
-            }
-        });
+function desenhar(filtro = '') {
+  const f = filtro.trim().toLowerCase();
+  const lista = MODULOS.filter(m => !f || (m[2] + ' ' + m[3]).toLowerCase().includes(f) || String(m[0]) === f);
+  $('grade').innerHTML = lista.map(([n, ico, tit, desc, cor, bg, tecla]) => `
+    <a href="modulo${n}.html" class="card-modulo" style="--c:${cor};--bg:${bg}" title="Atalho: ${nomeTecla(tecla)}">
+      <div>
+        <div class="flex justify-between items-center mb-3"><div class="card-icone" aria-hidden="true">${ico}</div><span class="tecla">${nomeTecla(tecla)}</span></div>
+        <div class="tit text-sm font-bold text-slate-800 mb-1">${tit}</div>
+        <div class="desc text-xs text-slate-500 leading-relaxed mb-3">${desc}</div>
+      </div>
+      <div class="rod border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold" style="color:${cor}"><span>Abrir Módulo ${n}</span><span aria-hidden="true">➔</span></div>
+    </a>`).join('');
+  $('vazio').classList.toggle('hidden', lista.length > 0);
+}
 
-        function ehDispositivoMovel() {
-            return window.innerWidth < 768;
-        }
+function relogio() {
+  const d = new Date();
+  $('relogio').textContent = d.toLocaleTimeString('pt-BR');
+  $('data').textContent = d.toLocaleDateString('pt-BR');
+}
+function tema(escuro) {
+  document.documentElement.classList.toggle('dark', escuro);
+  $('bTema').textContent = escuro ? '☀️' : '🌙';
+  try { localStorage.setItem('tema_portal', escuro ? 'dark' : 'light'); } catch {}
+}
 
-        function liberarAcesso() {
-            const tela = document.getElementById('tela-bloqueio-mobile');
-            if (tela) {
-                tela.classList.add('transition-opacity', 'duration-300', 'opacity-0');
-                setTimeout(() => {
-                    tela.style.display = 'none';
-                    tela.classList.remove('opacity-0');
-                }, 300);
-            }
-        }
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  const t = e.target;
+  if (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable) return;
+  if (ROTAS[e.key]) location.href = ROTAS[e.key];
+});
 
-        function bloquearAcesso() {
-            if (!ehDispositivoMovel()) return;
-            sessionStorage.removeItem('vale_sessao_biometria');
-            const tela = document.getElementById('tela-bloqueio-mobile');
-            if (tela) {
-                document.getElementById('erro-auth').classList.add('hidden');
-                document.getElementById('pinInput').value = '';
-                tela.style.display = 'flex';
-            }
-        }
-
-        function verificarPIN() {
-            const input = document.getElementById('pinInput');
-            const erroEl = document.getElementById('erro-auth');
-
-            if (input.value === PIN_CORRETO) {
-                sessionStorage.setItem('vale_sessao_biometria', 'true');
-                liberarAcesso();
-            } else {
-                erroEl.innerText = "PIN incorreto. Tente novamente.";
-                erroEl.classList.remove('hidden');
-                input.value = '';
-                input.focus();
-            }
-        }
-
-        document.getElementById('pinInput')?.addEventListener('keyup', (e) => {
-            if (e.key === 'Enter') verificarPIN();
-        });
-
-        async function desbloquearPorBiometria() {
-            const erroEl = document.getElementById('erro-auth');
-            erroEl.classList.add('hidden');
-
-            if (!window.isSecureContext || !window.PublicKeyCredential) {
-                erroEl.innerText = "Biometria indisponível. Utilize o PIN de segurança.";
-                erroEl.classList.remove('hidden');
-                document.getElementById('pinInput').focus();
-                return;
-            }
-
-            try {
-                const disponivel = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-                if (!disponivel) {
-                    erroEl.innerText = "Nenhuma biometria ativa no aparelho. Utilize o PIN.";
-                    erroEl.classList.remove('hidden');
-                    document.getElementById('pinInput').focus();
-                    return;
-                }
-
-                const challenge = new Uint8Array(32);
-                window.crypto.getRandomValues(challenge);
-
-                const options = {
-                    publicKey: {
-                        challenge: challenge,
-                        rp: { name: "Portal Vale" },
-                        user: {
-                            id: new Uint8Array([1, 2, 3, 4]),
-                            name: "operacional@vale",
-                            displayName: "Operador Vale"
-                        },
-                        pubKeyCredParams: [{ type: "public-key", alg: -7 }],
-                        authenticatorSelection: {
-                            authenticatorAttachment: "platform",
-                            userVerification: "required"
-                        },
-                        timeout: 30000
-                    }
-                };
-
-                const cred = await navigator.credentials.create(options);
-                if (cred) {
-                    sessionStorage.setItem('vale_sessao_biometria', 'true');
-                    liberarAcesso();
-                }
-            } catch (err) {
-                if (err.name !== "NotAllowedError") {
-                    erroEl.innerText = "Validação não concluída. Digite o PIN de 4 dígitos.";
-                    erroEl.classList.remove('hidden');
-                    document.getElementById('pinInput').focus();
-                }
-            }
-        }
-
-        document.addEventListener('visibilitychange', () => {
-            if (document.hidden) {
-                bloquearAcesso();
-            } else if (ehDispositivoMovel() && sessionStorage.getItem('vale_sessao_biometria') !== 'true') {
-                setTimeout(desbloquearPorBiometria, 350);
-            }
-        });
-
-        window.addEventListener('DOMContentLoaded', () => {
-            if (!ehDispositivoMovel()) {
-                sessionStorage.setItem('vale_sessao_biometria', 'true');
-                const tela = document.getElementById('tela-bloqueio-mobile');
-                if (tela) tela.style.display = 'none';
-                return;
-            }
-
-            if (sessionStorage.getItem('vale_sessao_biometria') === 'true') {
-                liberarAcesso();
-            } else {
-                bloquearAcesso();
-                setTimeout(desbloquearPorBiometria, 400);
-            }
-        });
-    </script>
+window.addEventListener('DOMContentLoaded', () => {
+  let escuro = false;
+  try { const s = localStorage.getItem('tema_portal'); escuro = s ? s === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; } catch {}
+  tema(escuro); relogio(); setInterval(relogio, 1000); desenhar();
+  $('bTema').onclick = () => tema(!document.documentElement.classList.contains('dark'));
+  $('busca').oninput = e => desenhar(e.target.value);
+  $('busca').onkeydown = e => { if (e.key === 'Enter') { const a = document.querySelector('#grade a'); if (a) location.href = a.href; } };
+});
+</script>
 </body>
 </html>
