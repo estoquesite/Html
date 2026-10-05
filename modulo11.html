@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 11 - Controle de OVs Multi-Empresas (SAP SD)</title>
+    <title>Módulo 11 - Controle de OVs & Reconhecimento SAP SD</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Tesseract OCR Engine CDN -->
@@ -33,10 +33,31 @@
             color: #1e293b; 
             min-height: 100vh;
         }
+
+        /* ANIMAÇÃO PARA O NÚMERO DA OV PISCAR */
+        @keyframes piscarBadgeOV {
+            0%, 100% {
+                opacity: 1;
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(0, 126, 122, 0.4);
+            }
+            50% {
+                opacity: 0.35;
+                transform: scale(0.97);
+                box-shadow: 0 0 10px 2px rgba(0, 126, 122, 0.6);
+            }
+        }
+
+        .ov-piscar {
+            animation: piscarBadgeOV 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
         @media print {
             .no-print { display: none !important; }
             body { background: #fff; padding: 0; }
             .container-print { max-width: 100% !important; width: 100% !important; margin: 0 !important; }
+            .card-sap { border: 1px solid #94a3b8 !important; box-shadow: none !important; }
+            .ov-piscar { animation: none !important; opacity: 1 !important; }
         }
     </style>
 </head>
@@ -51,18 +72,18 @@
                     <span class="text-base">◀</span> Voltar ao Menu
                 </a>
                 <span class="text-slate-300">|</span>
-                <span class="text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200/60 px-2.5 py-1 rounded-lg">Módulo 11 • Multi-Empresas</span>
+                <span class="text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200/60 px-2.5 py-1 rounded-lg">Módulo 11 • Reconhecimento de OVs</span>
             </div>
             
             <div class="flex items-center gap-2">
-                <button type="button" onclick="window.print()" class="text-xs font-bold px-3 py-1.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 transition">
-                    🖨️ Relatório A4
+                <button type="button" onclick="window.print()" class="text-xs font-bold px-3 py-1.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 transition flex items-center gap-1.5">
+                    🖨️️ Relatório A4
                 </button>
-                <button type="button" onclick="exportarCSV()" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white transition">
+                <button type="button" onclick="exportarCSV()" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white transition flex items-center gap-1.5">
                     📥 Exportar CSV
                 </button>
-                <button type="button" onclick="abrirModalOCR()" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white transition flex items-center gap-1.5 shadow-sm">
-                    📷 Carregar Fotos SAP (OCR)
+                <button type="button" onclick="abrirModalOCR()" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-[#007e7a] hover:bg-[#005a57] text-white transition flex items-center gap-1.5 shadow-sm">
+                    📷 Capturar Prints SAP (OCR)
                 </button>
             </div>
         </nav>
@@ -74,68 +95,68 @@
                     <div class="flex items-center gap-3">
                         <span class="text-2xl font-black tracking-widest text-teal-100">VALE</span>
                         <div class="h-5 w-px bg-teal-300/40"></div>
-                        <h1 class="text-lg font-extrabold tracking-wide">Controle de OVs & Contratos por Empresa</h1>
-                        <span class="bg-amber-500 text-white font-black text-[10px] px-2 py-0.5 rounded shadow-sm">MULTI-EMPRESAS</span>
+                        <h1 class="text-lg font-extrabold tracking-wide">Gestão & Reconhecimento de OVs e Contratos</h1>
+                        <span class="bg-amber-500 text-white font-black text-[10px] px-2 py-0.5 rounded shadow-sm">SD - ZVSU</span>
                     </div>
-                    <p class="text-xs text-teal-100/90 mt-1">Reconhecimento dinâmico de empresas, controle de saldos mensais e consumo de balança</p>
+                    <p class="text-xs text-teal-100/90 mt-1">Reconhecimento do número da OV, empresa parceira, abatimento de pesagens e saldos contratuais</p>
                 </div>
 
                 <!-- CARDS DE CONSOLIDAÇÃO -->
                 <div class="flex flex-wrap gap-2 text-right">
                     <div class="bg-white/10 backdrop-blur-sm px-3.5 py-2 rounded-xl border border-white/10 text-left">
-                        <div class="text-[10px] text-teal-100 font-bold uppercase tracking-wider">Total Consumido (KG)</div>
+                        <div class="text-[10px] text-teal-100 font-bold uppercase tracking-wider">Total Consumido</div>
                         <div id="statGastoOV" class="text-base font-black text-amber-300 leading-tight">0 KG</div>
                     </div>
                     <div class="bg-white/10 backdrop-blur-sm px-3.5 py-2 rounded-xl border border-white/10 text-left">
-                        <div class="text-[10px] text-teal-100 font-bold uppercase tracking-wider">Saldo em Aberto (KG)</div>
+                        <div class="text-[10px] text-teal-100 font-bold uppercase tracking-wider">Saldo em Aberto</div>
                         <div id="statSaldoOV" class="text-base font-black text-white leading-tight">0 KG</div>
                     </div>
                 </div>
             </div>
         </header>
 
-        <!-- CAIXA DE ATALHO RÁPIDO PARA COLAR (CTRL+V) -->
-        <div id="pasteZone" class="bg-teal-50/60 border-2 border-dashed border-teal-300/80 rounded-2xl p-4 text-center text-xs text-teal-900 flex flex-col sm:flex-row items-center justify-between gap-3 no-print">
+        <!-- ÁREA PARA COLAR COM CTRL+V -->
+        <div id="pasteZone" class="bg-teal-50/70 border-2 border-dashed border-teal-300/80 rounded-2xl p-4 text-center text-xs text-teal-900 flex flex-col sm:flex-row items-center justify-between gap-3 no-print">
             <div class="flex items-center gap-3 text-left">
                 <span class="text-2xl">📋</span>
                 <div>
-                    <div class="font-bold text-slate-800">Cole qualquer print do SAP aqui!</div>
-                    <div class="text-slate-500 text-[11px]">Basta apertar <kbd class="px-1.5 py-0.5 bg-white border border-slate-300 rounded font-mono font-bold">Ctrl + V</kbd> nesta tela para reconhecer qualquer empresa e OV automaticamente.</div>
+                    <div class="font-bold text-slate-800">Dica Operacional: Pode colar os seus prints do SAP aqui!</div>
+                    <div class="text-slate-500 text-[11px]">Tire o print da tela do SAP (VA03 ou Fluxo) e pressione <kbd class="px-1.5 py-0.5 bg-white border border-slate-300 rounded font-mono font-bold">Ctrl + V</kbd> nesta janela para capturar a OV e a empresa.</div>
                 </div>
             </div>
             <button type="button" onclick="abrirModalOCR()" class="text-xs font-bold px-3 py-1.5 bg-[#007e7a] text-white rounded-xl hover:bg-[#005a57] whitespace-nowrap shadow-sm">
-                Abrir Scanner de Imagens
+                Abrir Leitor de Imagens
             </button>
         </div>
 
         <!-- FILTROS (TEXTO, STATUS E EMPRESA) -->
         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between no-print">
             <div class="relative w-full md:w-80">
-                <input type="text" id="filtroTexto" oninput="filtrar()" placeholder="Buscar por OV, Contrato ou DRS..." class="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-xl bg-slate-50 outline-none focus:border-teal-600 transition">
+                <input type="text" id="filtroTexto" oninput="filtrar()" placeholder="Pesquisar por OV, Contrato, Cliente ou DRS..." class="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-xl bg-slate-50 outline-none focus:border-teal-600 transition">
                 <span class="absolute left-3 top-2.5 text-xs text-slate-400">🔍</span>
             </div>
 
             <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-                <!-- FILTRO DINÂMICO DE EMPRESAS -->
-                <select id="filtroEmpresa" onchange="filtrar()" class="text-xs border border-slate-300 bg-slate-50 rounded-xl px-3 py-2 outline-none focus:border-teal-600 font-semibold text-slate-700 max-w-[200px]">
+                <!-- SELETOR DINÂMICO DE EMPRESAS -->
+                <select id="filtroEmpresa" onchange="filtrar()" class="text-xs border border-slate-300 bg-slate-50 rounded-xl px-3 py-2 outline-none focus:border-teal-600 font-semibold text-slate-700 max-w-[220px]">
                     <option value="TODAS">Todas as Empresas</option>
                 </select>
 
                 <select id="filtroStatus" onchange="filtrar()" class="text-xs border border-slate-300 bg-slate-50 rounded-xl px-3 py-2 outline-none focus:border-teal-600 font-semibold text-slate-700">
-                    <option value="TODOS">Todos os Status</option>
+                    <option value="TODOS">Todos os Registos</option>
                     <option value="ABERTO">Com Saldo Pendente</option>
-                    <option value="CONCLUIDO">Concluídas (100%)</option>
+                    <option value="CONCLUIDO">Concluídas (100% Expedidas)</option>
                 </select>
 
                 <button type="button" onclick="carregarDadosExemplo()" class="text-xs font-semibold text-teal-700 bg-teal-50 border border-teal-200 hover:bg-teal-100 px-3 py-2 rounded-xl transition">
-                    Carregar Padrão
+                    Carregar Exemplo SAP
                 </button>
             </div>
         </div>
 
-        <!-- LISTA DAS ORDENS DE VENDA -->
+        <!-- LISTAGEM DAS ORDENS DE VENDA -->
         <div id="containerOVs" class="space-y-5">
-            <!-- Cards injetados via JS -->
+            <!-- Cards gerados via JavaScript -->
         </div>
 
     </div>
@@ -149,7 +170,7 @@
                     <span class="text-xl">🔍</span>
                     <div>
                         <h3 class="font-bold text-slate-900 text-sm">Leitor Inteligente de Imagens SAP (OCR)</h3>
-                        <p class="text-[11px] text-slate-500">Detecta automaticamente qualquer cliente/empresa, OV e contrato</p>
+                        <p class="text-[11px] text-slate-500">Reconhece o Número da OV, Contrato, Empresa Parceira e Quantidades</p>
                     </div>
                 </div>
                 <button type="button" onclick="fecharModalOCR()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
@@ -171,7 +192,7 @@
             <!-- BARRA DE PROGRESSO DO OCR -->
             <div id="areaStatusOCR" class="hidden space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-200 text-xs">
                 <div class="flex justify-between font-bold text-slate-700">
-                    <span id="labelStatusOCR">Processando OCR...</span>
+                    <span id="labelStatusOCR">A processar o OCR...</span>
                     <span id="pctStatusOCR" class="text-teal-700">0%</span>
                 </div>
                 <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
@@ -179,7 +200,7 @@
                 </div>
             </div>
 
-            <!-- CAMPOS RECONHECIDOS -->
+            <!-- CAMPOS EXTRAÍDOS (PARA CONFERÊNCIA ANTES DE SALVAR) -->
             <div id="resultadoExtracao" class="space-y-3 text-xs border-t border-slate-100 pt-3">
                 <div class="flex justify-between items-center">
                     <span class="font-bold text-slate-700">Campos Reconhecidos:</span>
@@ -199,11 +220,11 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                     <div>
-                        <label class="block text-slate-500 text-[10px] font-bold uppercase">Nº OV</label>
-                        <input type="text" id="campoOV" placeholder="Ex: 115443653" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50 font-bold">
+                        <label class="block text-slate-500 text-[10px] font-bold uppercase">Nº Ordem de Venda (OV)</label>
+                        <input type="text" id="campoOV" placeholder="Ex: 115443653" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50 font-bold text-teal-800">
                     </div>
                     <div>
-                        <label class="block text-slate-500 text-[10px] font-bold uppercase">Nº Contrato</label>
+                        <label class="block text-slate-500 text-[10px] font-bold uppercase">Nº Contrato Mestre</label>
                         <input type="text" id="campoContrato" placeholder="Ex: 0000071823" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50 font-mono">
                     </div>
                     <div>
@@ -214,7 +235,7 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
                     <div>
-                        <label class="block text-slate-500 text-[10px] font-bold uppercase">Qtd OV (KG)</label>
+                        <label class="block text-slate-500 text-[10px] font-bold uppercase">Qtd da OV (KG)</label>
                         <input type="number" id="campoQtdOV" placeholder="Ex: 5000" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50 font-bold text-teal-700">
                     </div>
                     <div>
@@ -248,7 +269,7 @@
     <div id="modalGasto" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                <h3 class="font-bold text-slate-900 text-sm">Registar Saída de Balança (Ticket)</h3>
+                <h3 class="font-bold text-slate-900 text-sm">Registar Saída de Balança (Ticket / Romaneio)</h3>
                 <button type="button" onclick="fecharModalGasto()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
             </div>
 
@@ -256,15 +277,15 @@
 
             <div class="space-y-3 text-xs">
                 <div>
-                    <label class="block text-slate-500 font-bold mb-1">Ticket da Balança / NF</label>
+                    <label class="block text-slate-500 font-bold mb-1">Ticket da Balança / Número da NF</label>
                     <input type="text" id="gastoTicket" placeholder="Ex: TKT-10492 ou NF-8893" class="w-full border border-slate-300 rounded-xl p-2.5 bg-slate-50 outline-none focus:border-teal-600">
                 </div>
                 <div>
-                    <label class="block text-slate-500 font-bold mb-1">Placa / Transportadora</label>
+                    <label class="block text-slate-500 font-bold mb-1">Placa do Veículo / Transportador</label>
                     <input type="text" id="gastoPlaca" placeholder="Ex: RIO-2A45" class="w-full border border-slate-300 rounded-xl p-2.5 bg-slate-50 outline-none focus:border-teal-600">
                 </div>
                 <div>
-                    <label class="block text-slate-500 font-bold mb-1">Peso Carregado (KG)</label>
+                    <label class="block text-slate-500 font-bold mb-1">Peso Carregado / Abatido (KG)</label>
                     <input type="number" id="gastoPeso" placeholder="Ex: 2500" class="w-full border border-slate-300 rounded-xl p-2.5 bg-slate-50 outline-none focus:border-teal-600 font-bold text-teal-800">
                 </div>
                 <div>
@@ -280,13 +301,13 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE PROCESSAMENTO -->
+    <!-- SCRIPT DE PROCESSAMENTO E ARMAZENAMENTO -->
     <script>
-        const STORAGE_KEY = "vale_modulo11_sap_multi_empresas_v3";
+        const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v4";
 
         const DADOS_DEFAULT = [
             {
-                id: "0115443653",
+                id: "115443653",
                 contrato: {
                     numero: "0000071823",
                     item: "30",
@@ -294,7 +315,7 @@
                     valorTotalBRL: 3320100.00
                 },
                 ov: {
-                    numero: "0115443653",
+                    numero: "115443653",
                     cliente: "GERDAU AÇOS LONGOS S.A.",
                     material: "SUCATA DE FERRO",
                     pedidoDRS: "71823 DRS 034A/2023",
@@ -392,7 +413,7 @@
                     <div class="bg-white p-12 text-center rounded-2xl border border-slate-200">
                         <span class="text-4xl block mb-2">🔍</span>
                         <h4 class="font-bold text-slate-700 text-sm">Nenhum registo encontrado</h4>
-                        <p class="text-xs text-slate-400 mt-1">Carregue fotos de uma nova OV ou ajuste os filtros.</p>
+                        <p class="text-xs text-slate-400 mt-1">Carregue imagens com novas OVs ou ajuste os filtros.</p>
                     </div>
                 `;
                 return;
@@ -411,7 +432,7 @@
                 return `
                     <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden card-sap">
                         
-                        <!-- BARRA SUPERIOR DO CONTRATO -->
+                        <!-- BARRA SUPERIOR DO CONTRATO GUARDA-CHUVA -->
                         <div class="bg-slate-100/90 border-b border-slate-200 px-5 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
                             <div class="flex items-center gap-2">
                                 <span class="bg-slate-800 text-white font-mono font-bold text-[10px] px-2 py-0.5 rounded">CONTRATO SAP</span>
@@ -420,22 +441,24 @@
                                 <span class="text-slate-600">Total Contrato: <b>${item.contrato.qtdTotalKG.toLocaleString('pt-BR')} KG</b></span>
                             </div>
                             <div class="text-[11px] font-semibold text-slate-500">
-                                Saldo Global Contratual: <b class="text-teal-700">${saldoContrato.toLocaleString('pt-BR')} KG</b> (${pctContrato}% consumido)
+                                Saldo Contratual Global: <b class="text-teal-700">${saldoContrato.toLocaleString('pt-BR')} KG</b> (${pctContrato}% consumido)
                             </div>
                         </div>
 
-                        <!-- CORPO DA OV -->
+                        <!-- DADOS DA ORDEM DE VENDA ESPECÍFICA -->
                         <div class="p-5 space-y-4">
                             
                             <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
                                 <div>
                                     <div class="flex items-center gap-2">
-                                        <span class="bg-[#007e7a] text-white text-xs font-black px-2.5 py-0.5 rounded-md">
+                                        <!-- BADGE COM ANIMAÇÃO PISCANTE NO NÚMERO DA OV -->
+                                        <span class="ov-piscar bg-[#007e7a] text-white text-xs font-black px-2.5 py-1 rounded-md tracking-wider flex items-center gap-1.5 shadow-sm">
+                                            <span class="inline-block w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
                                             OV ${item.ov.numero}
                                         </span>
                                         <h3 class="font-bold text-slate-800 text-sm">${item.ov.material}</h3>
                                     </div>
-                                    <p class="text-xs text-slate-600 font-medium mt-0.5">Empresa: <b class="text-slate-900">${item.ov.cliente}</b> • Pedido DRS: ${item.ov.pedidoDRS || '---'}</p>
+                                    <p class="text-xs text-slate-600 font-medium mt-1">Empresa / Parceiro: <b class="text-slate-900">${item.ov.cliente}</b> • DRS: ${item.ov.pedidoDRS || '---'}</p>
                                 </div>
 
                                 <div class="flex items-center gap-2">
@@ -448,7 +471,7 @@
                                 </div>
                             </div>
 
-                            <!-- CARDS DE CONTROLE DE GASTO E SALDO -->
+                            <!-- PAINEL COMPARATIVO DE CONSUMO -->
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 
                                 <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl">
@@ -484,7 +507,7 @@
                                 </div>
                             </div>
 
-                            <!-- HISTÓRICO DE SAÍDAS DE BALANÇA -->
+                            <!-- HISTÓRICO DE SAÍDAS DA BALANÇA -->
                             <div class="border-t border-slate-100 pt-3">
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
@@ -535,7 +558,7 @@
         }
 
         // ==========================================
-        // LEITURA OCR DAS FOTOS DO SAP
+        // LEITURA OCR DAS IMAGENS DO SAP
         // ==========================================
         function abrirModalOCR() {
             document.getElementById('modalOCR').classList.remove('hidden');
@@ -558,7 +581,7 @@
         });
 
         async function processarArquivoBlob(blob) {
-            atualizarProgressoOCR(10, "Lendo imagem colada via Clipboard...");
+            atualizarProgressoOCR(10, "A ler a imagem colada via Clipboard...");
             await executarOCREmBlob(blob);
         }
 
@@ -574,11 +597,11 @@
             document.getElementById('btnProcessarOCR').disabled = true;
 
             if (f1) {
-                atualizarProgressoOCR(20, "Analisando Foto 1 (Síntese da OV)...");
+                atualizarProgressoOCR(20, "A analisar a Foto 1 (Síntese da OV)...");
                 await executarOCREmBlob(f1);
             }
             if (f2) {
-                atualizarProgressoOCR(60, "Analisando Foto 2 (Fluxo de Documentos)...");
+                atualizarProgressoOCR(60, "A analisar a Foto 2 (Fluxo de Documentos)...");
                 await executarOCREmBlob(f2);
             }
 
@@ -608,11 +631,28 @@
             document.getElementById('labelStatusOCR').innerText = texto;
         }
 
-        // EXTRAÇÃO GENÉRICA DE QUALQUER EMPRESA E DADOS DO SAP
+        // EXTRAÇÃO REFINADA DO NÚMERO DA OV, EMPRESA E QUANTIDADES
         function interpretarTextoExtraido(txt) {
             console.log("Texto extraído:", txt);
 
-            // 1. RECONHECIMENTO DA EMPRESA (Busca "Parceiro de negócios", "Emissor da ordem" ou "Receb.mercad.")
+            // 1. RECONHECIMENTO DO NÚMERO DA OV (Trata tanto '115443653' quanto '0115443653')
+            let matchOV = txt.match(/Venda\s+Sucata(?:\/Esc[oó]ria)?[^\d]*0?(\d{8,10})/i);
+            if (!matchOV) {
+                matchOV = txt.match(/(?:OV|Ordem)[^\d]*0?(\d{8,10})/i);
+            }
+            if (!matchOV) {
+                matchOV = txt.match(/\b(11\d{7}|011\d{7})\b/);
+            }
+            if (!matchOV) {
+                matchOV = txt.match(/\b(\d{8,10})\b/);
+            }
+
+            if (matchOV && !document.getElementById('campoOV').value) {
+                const ovFinal = matchOV[1].replace(/^0+/, '');
+                document.getElementById('campoOV').value = ovFinal;
+            }
+
+            // 2. RECONHECIMENTO DA EMPRESA
             let matchParceiro = txt.match(/Parceiro\s+de\s+neg[oó]cios\s+([0-9]+)\s+([^\n\r]+)/i);
             if (!matchParceiro) {
                 matchParceiro = txt.match(/Emissor\s+da\s+ordem\s+([0-9]+)\s+([^\/\n\r]+)/i);
@@ -627,12 +667,6 @@
                 document.getElementById('campoCliente').value = `${nomeCliente} (${codCliente})`;
             }
 
-            // 2. NÚMERO DA OV
-            const matchOV = txt.match(/(?:Venda\s+Sucata[^\d]*|OV[^\d]*)(\d{8,10})/i) || txt.match(/(\d{8,10})/);
-            if (matchOV && !document.getElementById('campoOV').value) {
-                document.getElementById('campoOV').value = matchOV[1];
-            }
-
             // 3. NÚMERO DO PEDIDO / DRS
             const matchDRS = txt.match(/(\d+\s*DRS\s*[^\n\r]+)/i);
             if (matchDRS && !document.getElementById('campoDRS').value) {
@@ -645,7 +679,7 @@
                 document.getElementById('campoMaterial').value = matchMat[0].trim();
             }
 
-            // 5. QUANTIDADE DA OV E VALOR
+            // 5. QUANTIDADE DA OV E VALOR LÍQUIDO
             const matchVal = txt.match(/Valor\s+l[ií]quido\s*([0-9.,]+)/i);
             if (matchVal) {
                 const valFormatado = matchVal[1].replace(/\./g, '').replace(',', '.');
@@ -659,13 +693,13 @@
                 document.getElementById('campoQtdOV').value = peso;
             }
 
-            // 6. CONTRATO SAP
+            // 6. CONTRATO GUARDA-CHUVA
             const matchContrato = txt.match(/Contr[^\d]*(\d{5,10})/i);
             if (matchContrato && !document.getElementById('campoContrato').value) {
                 document.getElementById('campoContrato').value = matchContrato[1];
             }
 
-            // 7. DOC CONTÁBIL
+            // 7. DOCUMENTO CONTÁBIL
             const matchDocContabil = txt.match(/Doc\.cont[aá]bil\s*(\d+)/i) || txt.match(/520109\d{4}/);
             if (matchDocContabil && !document.getElementById('campoDocContabil').value) {
                 document.getElementById('campoDocContabil').value = matchDocContabil[1] || matchDocContabil[0];
@@ -688,7 +722,7 @@
                 },
                 ov: {
                     numero: ovNum,
-                    cliente: document.getElementById('campoCliente').value.trim() || "EMPRESA CLIENTE SAP",
+                    cliente: document.getElementById('campoCliente').value.trim() || "EMPRESA PARCEIRA SAP",
                     material: document.getElementById('campoMaterial').value.trim() || "SUCATA DE FERRO",
                     pedidoDRS: document.getElementById('campoDRS').value.trim() || "---",
                     qtdLiberadaKG: qtdOV,
@@ -789,7 +823,7 @@
 
             const link = document.createElement("a");
             link.setAttribute("href", encodeURI(csv));
-            link.setAttribute("download", `controle_ovs_multi_empresas_${new Date().toISOString().slice(0,10)}.csv`);
+            link.setAttribute("download", `controle_ovs_reconhecimento_${new Date().toISOString().slice(0,10)}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
