@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 11 - Controle de OVs & Transferência de Saldo</title>
+    <title>Módulo 11 - Controle de OVs & Supabase Cloud</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Supabase JS Client -->
@@ -33,7 +33,7 @@
             font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
             background: #f0f4f8; 
             color: #1e293b; 
-            min-height: 100vh;
+            min-height: 100vh; 
         }
 
         /* ANIMAÇÃO PISCANTE NO BADGE DA OV */
@@ -41,25 +41,38 @@
             0%, 100% {
                 opacity: 1;
                 transform: scale(1);
-                box-shadow: 0 0 0 0 rgba(0, 126, 122, 0.4);
             }
             50% {
                 opacity: 0.35;
                 transform: scale(0.97);
-                box-shadow: 0 0 10px 2px rgba(0, 126, 122, 0.6);
             }
         }
-
         .ov-piscar {
             animation: piscarBadgeOV 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        /* ANIMAÇÃO DA BORDA AMARELA PISCANTE (SALDO NO FINALZINHO) */
+        @keyframes piscarBordaAmarela {
+            0%, 100% {
+                border-color: #eab308;
+                box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.4);
+            }
+            50% {
+                border-color: #ca8a04;
+                box-shadow: 0 0 16px 3px rgba(234, 179, 8, 0.7);
+            }
+        }
+        .borda-amarela-piscar {
+            border-width: 2px !important;
+            animation: piscarBordaAmarela 1.1s ease-in-out infinite;
         }
 
         @media print {
             .no-print { display: none !important; }
             body { background: #fff; padding: 0; }
             .container-print { max-width: 100% !important; width: 100% !important; margin: 0 !important; }
-            .card-sap { border: 1px solid #94a3b8 !important; box-shadow: none !important; }
-            .ov-piscar { animation: none !important; opacity: 1 !important; }
+            .card-sap { box-shadow: none !important; }
+            .ov-piscar, .borda-amarela-piscar { animation: none !important; }
         }
     </style>
 </head>
@@ -68,24 +81,35 @@
     <div class="max-w-7xl mx-auto space-y-6 container-print">
         
         <!-- NAVEGAÇÃO SUPERIOR -->
-        <nav class="flex items-center justify-between bg-white px-5 py-3.5 rounded-2xl shadow-sm border border-slate-200/80 no-print">
+        <nav class="flex flex-wrap items-center justify-between gap-3 bg-white px-5 py-3.5 rounded-2xl shadow-sm border border-slate-200/80 no-print">
             <div class="flex items-center gap-3">
                 <a href="index.html" class="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-teal-700 transition">
                     <span class="text-base">◀</span> Voltar ao Menu
                 </a>
                 <span class="text-slate-300">|</span>
-                <span class="text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200/60 px-2.5 py-1 rounded-lg">Módulo 11 • Gestão de OVs & Cancelamentos</span>
+                <span class="text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200/60 px-2.5 py-1 rounded-lg">Módulo 11 • Gestão Visual de Saldos</span>
             </div>
             
-            <div class="flex items-center gap-2">
-                <button type="button" onclick="window.print()" class="text-xs font-bold px-3 py-1.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 transition">
-                    🖨️ Relatório A4
+            <div class="flex flex-wrap items-center gap-2">
+                <span id="badgeConexao" class="text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5">
+                    <span id="pontoConexao" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span id="textoConexao">Nuvem Conectada</span>
+                </span>
+
+                <button type="button" onclick="salvarTudoNoSupabase()" id="btnSalvarGeral" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white transition flex items-center gap-1.5 shadow-sm active:scale-95">
+                    <span>💾</span> Salvar na Nuvem
                 </button>
+
+                <button type="button" onclick="sincronizarComSupabase()" id="btnSincronizarGeral" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white transition flex items-center gap-1.5 shadow-sm active:scale-95">
+                    <span id="iconeSync">🔄</span> Sincronizar
+                </button>
+
                 <button type="button" onclick="exportarCSV()" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white transition">
                     📥 CSV
                 </button>
+
                 <button type="button" onclick="abrirModalOCR()" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-[#007e7a] hover:bg-[#005a57] text-white transition flex items-center gap-1.5 shadow-sm">
-                    📷 Capturar Prints SAP (OCR)
+                    📷 Capturar Prints (OCR)
                 </button>
             </div>
         </nav>
@@ -97,10 +121,10 @@
                     <div class="flex items-center gap-3">
                         <span class="text-2xl font-black tracking-widest text-teal-100">VALE</span>
                         <div class="h-5 w-px bg-teal-300/40"></div>
-                        <h1 class="text-lg font-extrabold tracking-wide">Gestão & Cancelamento de OVs</h1>
-                        <span class="bg-amber-500 text-white font-black text-[10px] px-2 py-0.5 rounded shadow-sm">SD - ZVSU</span>
+                        <h1 class="text-lg font-extrabold tracking-wide">Painel de Ordens de Venda & Balança</h1>
+                        <span class="bg-emerald-500 text-white font-black text-[10px] px-2 py-0.5 rounded shadow-sm">SD - ZVSU</span>
                     </div>
-                    <p class="text-xs text-teal-100/90 mt-1">Reconhecimento de prints (volátil sem gravar imagem) com remanejamento automático de saldos cancelados</p>
+                    <p class="text-xs text-teal-100/90 mt-1">Status Dinâmico: Verde (Cheio), Amarelo Piscando (Finalzinho) e Vermelho (Finalizada)</p>
                 </div>
 
                 <!-- CARDS DE CONSOLIDAÇÃO -->
@@ -117,13 +141,47 @@
             </div>
         </header>
 
+        <!-- QUADRADINHOS SEPARADORES POR EMPRESA (CADA UMA COM UMA COR) -->
+        <div class="no-print space-y-2">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Empresas Cadastradas (Clique para filtrar):</span>
+                <button type="button" onclick="filtrarPorEmpresaCard('TODAS')" class="text-[11px] font-bold text-teal-700 hover:underline">Ver Todas</button>
+            </div>
+            <div id="containerCardsEmpresas" class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                <!-- Injetado dinamicamente via JS -->
+            </div>
+        </div>
+
+        <!-- LEGENDA VISUAL DAS BORDAS -->
+        <div class="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-sm flex flex-wrap items-center justify-between gap-3 text-xs font-semibold no-print">
+            <span class="text-slate-500 uppercase tracking-wider text-[11px] font-bold">Legenda de Status:</span>
+            <div class="flex flex-wrap items-center gap-4">
+                <div class="flex items-center gap-2">
+                    <span class="w-3.5 h-3.5 rounded-md border-2 border-emerald-500 bg-emerald-100"></span>
+                    <span class="text-slate-700">Verde: Saldo Cheio / Alto (&gt;70%)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3.5 h-3.5 rounded-md border-2 border-teal-500 bg-teal-100"></span>
+                    <span class="text-slate-700">Azul/Teal: Em Carregamento</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3.5 h-3.5 rounded-md border-2 border-yellow-500 bg-yellow-100 animate-pulse"></span>
+                    <span class="text-amber-800">Amarelo Piscando: No Finalzinho (&le;30%)</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <span class="w-3.5 h-3.5 rounded-md border-2 border-rose-500 bg-rose-100"></span>
+                    <span class="text-rose-700">Vermelho: Finalizada / Saldo Zerado</span>
+                </div>
+            </div>
+        </div>
+
         <!-- ÁREA PARA COLAR COM CTRL+V -->
         <div id="pasteZone" class="bg-teal-50/70 border-2 border-dashed border-teal-300/80 rounded-2xl p-4 text-center text-xs text-teal-900 flex flex-col sm:flex-row items-center justify-between gap-3 no-print">
             <div class="flex items-center gap-3 text-left">
                 <span class="text-2xl">📋</span>
                 <div>
                     <div class="font-bold text-slate-800">Cole qualquer print do SAP aqui! (Ctrl + V)</div>
-                    <div class="text-slate-500 text-[11px]">As imagens são processadas em memória e não ficam salvas, mantendo os registros leves e seguros.</div>
+                    <div class="text-slate-500 text-[11px]">As fotos são processadas e descartadas imediatamente, gravando apenas texto e números.</div>
                 </div>
             </div>
             <button type="button" onclick="abrirModalOCR()" class="text-xs font-bold px-3 py-1.5 bg-[#007e7a] text-white rounded-xl hover:bg-[#005a57] whitespace-nowrap shadow-sm">
@@ -145,20 +203,21 @@
 
                 <select id="filtroStatus" onchange="filtrar()" class="text-xs border border-slate-300 bg-slate-50 rounded-xl px-3 py-2 outline-none focus:border-teal-600 font-semibold text-slate-700">
                     <option value="TODOS">Todos os Registos</option>
-                    <option value="ABERTO">Com Saldo Pendente</option>
-                    <option value="CONCLUIDO">Concluídas (100%)</option>
+                    <option value="CHEIO">Cheias (Verde)</option>
+                    <option value="FINALZINHO">No Finalzinho (Amarelo)</option>
+                    <option value="FINALIZADO">Finalizadas (Vermelho)</option>
                     <option value="CANCELADO">Canceladas</option>
                 </select>
 
-                <button type="button" onclick="sincronizarComSupabase()" class="text-xs font-semibold text-teal-700 bg-teal-50 border border-teal-200 hover:bg-teal-100 px-3 py-2 rounded-xl transition flex items-center gap-1">
-                    🔄 Sincronizar
+                <button type="button" onclick="carregarDadosExemplo()" class="text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-xl transition">
+                    Carregar Padrão
                 </button>
             </div>
         </div>
 
         <!-- LISTAGEM DAS OVS -->
         <div id="containerOVs" class="space-y-5">
-            <!-- Cards montados dinamicamente -->
+            <!-- Cards montados dinamicamente com as novas bordas -->
         </div>
 
     </div>
@@ -189,7 +248,6 @@
                 <div>
                     <label class="block text-slate-700 font-bold mb-1">Para onde deseja transferir o saldo?</label>
                     <select id="selectDestinoSaldo" class="w-full border border-slate-300 rounded-xl p-2.5 bg-slate-50 outline-none focus:border-teal-600 font-semibold text-slate-800">
-                        <!-- Preenchido dinamicamente com as outras OVs da mesma empresa -->
                     </select>
                 </div>
 
@@ -206,7 +264,7 @@
         </div>
     </div>
 
-    <!-- MODAL DE UPLOAD E LEITURA OCR DAS FOTOS (SÓ LÊ, NÃO GRAVA IMAGEM) -->
+    <!-- MODAL DE OCR (VOLÁTIL) -->
     <div id="modalOCR" class="fixed inset-0 bg-slate-950/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 space-y-4 max-h-[92vh] overflow-y-auto">
             
@@ -233,7 +291,6 @@
                 </div>
             </div>
 
-            <!-- STATUS PROGRESSO -->
             <div id="areaStatusOCR" class="hidden space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-200 text-xs">
                 <div class="flex justify-between font-bold text-slate-700">
                     <span id="labelStatusOCR">A processar o OCR...</span>
@@ -244,7 +301,6 @@
                 </div>
             </div>
 
-            <!-- CAMPOS EXTRAÍDOS -->
             <div id="resultadoExtracao" class="space-y-3 text-xs border-t border-slate-100 pt-3">
                 <div class="flex justify-between items-center">
                     <span class="font-bold text-slate-700">Campos Reconhecidos:</span>
@@ -345,7 +401,7 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE PROCESSAMENTO E TRANSFERÊNCIA DE SALDOS -->
+    <!-- SCRIPT DE PROCESSAMENTO, SUPABASE E VISUAIS -->
     <script>
         const SUPABASE_URL = "https://SEU-PROJETO.supabase.co";
         const SUPABASE_ANON_KEY = "SUA-CHAVE-ANONIMA-AQUI";
@@ -355,13 +411,24 @@
             supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
         }
 
-        const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v5";
+        const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v6";
         let cacheRegistros = [];
+
+        // Cores disponíveis para os quadradinhos de empresas adicionadas
+        const PALETA_EMPRESAS = [
+            { bg: "bg-blue-50 hover:bg-blue-100", border: "border-blue-400", text: "text-blue-800", badge: "bg-blue-600" },
+            { bg: "bg-purple-50 hover:bg-purple-100", border: "border-purple-400", text: "text-purple-800", badge: "bg-purple-600" },
+            { bg: "bg-emerald-50 hover:bg-emerald-100", border: "border-emerald-400", text: "text-emerald-800", badge: "bg-emerald-600" },
+            { bg: "bg-amber-50 hover:bg-amber-100", border: "border-amber-400", text: "text-amber-800", badge: "bg-amber-600" },
+            { bg: "bg-indigo-50 hover:bg-indigo-100", border: "border-indigo-400", text: "text-indigo-800", badge: "bg-indigo-600" },
+            { bg: "bg-pink-50 hover:bg-pink-100", border: "border-pink-400", text: "text-pink-800", badge: "bg-pink-600" },
+            { bg: "bg-cyan-50 hover:bg-cyan-100", border: "border-cyan-400", text: "text-cyan-800", badge: "bg-cyan-600" }
+        ];
 
         const DADOS_DEFAULT = [
             {
                 id: "115443653",
-                status: "ATIVO", // ATIVO ou CANCELADO
+                status: "ATIVO",
                 motivoCancelamento: "",
                 contrato: {
                     numero: "0000071823",
@@ -386,9 +453,30 @@
             }
         ];
 
+        function atualizarIndicadorStatus(status, texto) {
+            const ponto = document.getElementById('pontoConexao');
+            const txt = document.getElementById('textoConexao');
+            const badge = document.getElementById('badgeConexao');
+
+            if (!ponto || !txt) return;
+
+            txt.innerText = texto;
+            if (status === 'online') {
+                badge.className = "text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5";
+                ponto.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+            } else if (status === 'gravando') {
+                badge.className = "text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1.5";
+                ponto.className = "w-2 h-2 rounded-full bg-amber-500 animate-ping";
+            } else {
+                badge.className = "text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-1.5";
+                ponto.className = "w-2 h-2 rounded-full bg-slate-400";
+            }
+        }
+
         async function carregarRegistros() {
             if (supabaseClient) {
                 try {
+                    atualizarIndicadorStatus('gravando', 'Sincronizando...');
                     const { data, error } = await supabaseClient.from('modulo11_ovs').select('*').order('created_at', { ascending: false });
                     if (!error && data && data.length > 0) {
                         cacheRegistros = data.map(d => ({
@@ -416,6 +504,7 @@
                         localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheRegistros));
                         atualizarOpcoesEmpresas(cacheRegistros);
                         renderizar();
+                        atualizarIndicadorStatus('online', 'Nuvem Conectada');
                         return;
                     }
                 } catch (e) {
@@ -427,11 +516,65 @@
             cacheRegistros = raw ? JSON.parse(raw) : DADOS_DEFAULT;
             atualizarOpcoesEmpresas(cacheRegistros);
             renderizar();
+            atualizarIndicadorStatus('offline', supabaseClient ? 'Modo Offline' : 'Salvo Localmente');
+        }
+
+        async function salvarTudoNoSupabase() {
+            const btn = document.getElementById('btnSalvarGeral');
+            btn.disabled = true;
+            btn.innerHTML = `<span>⏳</span> Salvando...`;
+            atualizarIndicadorStatus('gravando', 'Gravando Dados...');
+
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheRegistros));
+
+            if (supabaseClient) {
+                try {
+                    const payloads = cacheRegistros.map(item => ({
+                        id: item.id,
+                        ov: item.ov.numero,
+                        status: item.status || "ATIVO",
+                        motivo_cancelamento: item.motivoCancelamento || "",
+                        cliente: item.ov.cliente,
+                        material: item.ov.material,
+                        pedido_drs: item.ov.pedidoDRS,
+                        qtd_liberada_kg: item.ov.qtdLiberadaKG,
+                        valor_brl: item.ov.valorBRL,
+                        preco_unitario: item.ov.precoUnitarioPorKG,
+                        doc_contabil: item.ov.docContabil,
+                        contrato_numero: item.contrato.numero,
+                        contrato_item: item.contrato.item,
+                        contrato_total_kg: item.contrato.qtdTotalKG,
+                        contrato_total_brl: item.contrato.valorTotalBRL,
+                        gastos: item.gastos
+                    }));
+
+                    const { error } = await supabaseClient.from('modulo11_ovs').upsert(payloads);
+                    if (error) throw error;
+                    
+                    atualizarIndicadorStatus('online', 'Salvo com Sucesso!');
+                    alert("Todas as OVs foram salvas com sucesso no Supabase!");
+                } catch (err) {
+                    console.error("Erro ao salvar:", err);
+                    alert("Erro ao gravar na nuvem. Os dados estão salvos localmente.");
+                    atualizarIndicadorStatus('offline', 'Erro na Gravação');
+                }
+            } else {
+                alert("Dados salvos no armazenamento local!");
+                atualizarIndicadorStatus('offline', 'Salvo Localmente');
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = `<span>💾</span> Salvar na Nuvem`;
         }
 
         async function sincronizarComSupabase() {
+            const icone = document.getElementById('iconeSync');
+            if (icone) icone.classList.add('animate-spin');
+
             await carregarRegistros();
-            alert("Dados sincronizados com o Supabase!");
+
+            if (icone) icone.classList.remove('animate-spin');
+            alert("Sincronização concluída!");
         }
 
         async function salvarNaBase(novoItem) {
@@ -447,6 +590,7 @@
 
             if (supabaseClient) {
                 try {
+                    atualizarIndicadorStatus('gravando', 'Gravando...');
                     const payload = {
                         id: novoItem.id,
                         ov: novoItem.ov.numero,
@@ -466,92 +610,19 @@
                         gastos: novoItem.gastos
                     };
                     await supabaseClient.from('modulo11_ovs').upsert(payload);
+                    atualizarIndicadorStatus('online', 'Nuvem Conectada');
                 } catch (err) {
                     console.error("Erro Supabase:", err);
+                    atualizarIndicadorStatus('offline', 'Pendente');
                 }
             }
         }
 
-        function abrirModalCancelarOV(ovId) {
-            const item = cacheRegistros.find(o => o.id === ovId);
-            if (!item) return;
-
-            const totalGasto = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
-            const saldoRestante = Math.max(0, item.ov.qtdLiberadaKG - totalGasto);
-
-            document.getElementById('cancelarOVId').value = ovId;
-            document.getElementById('cancelarOVNumero').innerText = item.ov.numero;
-            document.getElementById('cancelarSaldoRestante').innerText = `${saldoRestante.toLocaleString('pt-BR')} KG (R$ ${(saldoRestante * (item.ov.precoUnitarioPorKG || 1.26)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })})`;
-            document.getElementById('cancelarMotivo').value = '';
-
-            // Lista outras OVs ativas da mesma empresa para onde o saldo pode ir
-            const outrasOVs = cacheRegistros.filter(o => o.id !== ovId && o.status !== "CANCELADO" && o.ov.cliente === item.ov.cliente);
-            const select = document.getElementById('selectDestinoSaldo');
-            select.innerHTML = '<option value="CONTRATO">Devolver ao Contrato Mestre (Saldo Livre)</option>';
-            
-            outrasOVs.forEach(o => {
-                const opt = document.createElement('option');
-                opt.value = o.id;
-                opt.innerText = `Transferir para OV ${o.ov.numero} (${o.ov.material})`;
-                select.appendChild(opt);
-            });
-
-            document.getElementById('modalCancelarOV').classList.remove('hidden');
-        }
-
-        function fecharModalCancelarOV() {
-            document.getElementById('modalCancelarOV').classList.add('hidden');
-        }
-
-        async function confirmarCancelamento() {
-            const ovId = document.getElementById('cancelarOVId').value;
-            const destinoId = document.getElementById('selectDestinoSaldo').value;
-            const motivo = document.getElementById('cancelarMotivo').value.trim() || 'Cancelada no SAP';
-
-            const itemOrigem = cacheRegistros.find(o => o.id === ovId);
-            if (!itemOrigem) return;
-
-            const totalGasto = (itemOrigem.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
-            const saldoTransferir = Math.max(0, itemOrigem.ov.qtdLiberadaKG - totalGasto);
-
-            // Marca como cancelada
-            itemOrigem.status = "CANCELADO";
-            itemOrigem.motivoCancelamento = motivo;
-
-            // Se o destino for outra OV, acrescenta o saldo a ela
-            if (destinoId !== "CONTRATO" && saldoTransferir > 0) {
-                const itemDestino = cacheRegistros.find(o => o.id === destinoId);
-                if (itemDestino) {
-                    itemDestino.ov.qtdLiberadaKG += saldoTransferir;
-                    itemDestino.ov.valorBRL += (saldoTransferir * (itemDestino.ov.precoUnitarioPorKG || itemOrigem.ov.precoUnitarioPorKG || 1.26));
-                    await salvarNaBase(itemDestino);
-                }
-            }
-
-            await salvarNaBase(itemOrigem);
-            fecharModalCancelarOV();
-            alert(`OV ${itemOrigem.ov.numero} cancelada com sucesso! O saldo de ${saldoTransferir.toLocaleString('pt-BR')} KG foi remanejado.`);
-        }
-
-        async function excluirOV(id) {
-            if (!confirm(`Remover definitivamente a OV ${id}?`)) return;
-            cacheRegistros = cacheRegistros.filter(o => o.id !== id);
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheRegistros));
-            atualizarOpcoesEmpresas(cacheRegistros);
-            renderizar();
-
-            if (supabaseClient) {
-                try {
-                    await supabaseClient.from('modulo11_ovs').delete().eq('id', id);
-                } catch (err) {
-                    console.error("Erro Supabase:", err);
-                }
-            }
-        }
-
+        // RENDERIZAÇÃO DOS QUADRADINHOS SEPARADOS POR EMPRESA
         function atualizarOpcoesEmpresas(lista) {
             const select = document.getElementById('filtroEmpresa');
-            if (!select) return;
+            const containerCards = document.getElementById('containerCardsEmpresas');
+            if (!select || !containerCards) return;
 
             const valorAtual = select.value;
             const empresas = [...new Set(lista.map(i => i.ov.cliente).filter(Boolean))];
@@ -566,6 +637,38 @@
 
             if (empresas.includes(valorAtual)) {
                 select.value = valorAtual;
+            }
+
+            // Constrói os cards visuais coloridos para cada empresa
+            containerCards.innerHTML = empresas.map((emp, idx) => {
+                const estiloCor = PALETA_EMPRESAS[idx % PALETA_EMPRESAS.length];
+                const ovsEmpresa = lista.filter(i => i.ov.cliente === emp);
+                const saldoTotalEmp = ovsEmpresa.reduce((acc, curr) => {
+                    if (curr.status === 'CANCELADO') return acc;
+                    const gasto = (curr.gastos || []).reduce((s, g) => s + Number(g.pesoKG || 0), 0);
+                    return acc + Math.max(0, curr.ov.qtdLiberadaKG - gasto);
+                }, 0);
+
+                return `
+                    <div onclick="filtrarPorEmpresaCard('${emp}')" class="cursor-pointer border-2 ${estiloCor.border} ${estiloCor.bg} rounded-2xl p-3 shadow-sm transition transform hover:-translate-y-1">
+                        <div class="flex items-center justify-between mb-1">
+                            <span class="${estiloCor.badge} text-white text-[9px] font-black px-2 py-0.5 rounded-md">EMPRESA</span>
+                            <span class="text-[10px] font-bold text-slate-500">${ovsEmpresa.length} OV(s)</span>
+                        </div>
+                        <div class="font-extrabold text-xs ${estiloCor.text} truncate" title="${emp}">${emp}</div>
+                        <div class="text-[11px] font-bold text-slate-700 mt-1">
+                            Saldo: <span class="font-black">${saldoTotalEmp.toLocaleString('pt-BR')} KG</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function filtrarPorEmpresaCard(empresa) {
+            const select = document.getElementById('filtroEmpresa');
+            if (select) {
+                select.value = empresa;
+                filtrar();
             }
         }
 
@@ -584,6 +687,7 @@
                 const totalGasto = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
                 const saldo = cancelado ? 0 : Math.max(0, item.ov.qtdLiberadaKG - totalGasto);
                 const concluido = !cancelado && saldo <= 0;
+                const percentualRestante = item.ov.qtdLiberadaKG > 0 ? (saldo / item.ov.qtdLiberadaKG) * 100 : 0;
 
                 if (!cancelado) {
                     somaGastoTotal += totalGasto;
@@ -591,8 +695,11 @@
                 }
 
                 if (filtroEmpresa !== 'TODAS' && item.ov.cliente !== filtroEmpresa) return false;
-                if (filtroStatus === 'ABERTO' && (concluido || cancelado)) return false;
-                if (filtroStatus === 'CONCLUIDO' && !concluido) return false;
+                
+                // Filtro avançado por status visual
+                if (filtroStatus === 'CHEIO' && (percentualRestante < 70 || cancelado || concluido)) return false;
+                if (filtroStatus === 'FINALZINHO' && (percentualRestante <= 0 || percentualRestante > 30 || cancelado)) return false;
+                if (filtroStatus === 'FINALIZADO' && (!concluido || cancelado)) return false;
                 if (filtroStatus === 'CANCELADO' && !cancelado) return false;
 
                 if (termo) {
@@ -626,14 +733,45 @@
                 const cancelado = item.status === "CANCELADO";
                 const totalGasto = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
                 const saldo = cancelado ? 0 : Math.max(0, item.ov.qtdLiberadaKG - totalGasto);
+                const concluido = !cancelado && saldo <= 0;
+                const percentualRestante = item.ov.qtdLiberadaKG > 0 ? (saldo / item.ov.qtdLiberadaKG) * 100 : 0;
                 const pctGasto = cancelado ? 0 : (Math.min(100, Math.round((totalGasto / item.ov.qtdLiberadaKG) * 100)) || 0);
                 const valorGasto = totalGasto * (item.ov.precoUnitarioPorKG || 1.26);
                 const valorSaldo = Math.max(0, item.ov.valorBRL - valorGasto);
 
+                // ========================================================
+                // CLASSIFICAÇÃO DAS BORDAS E CORES:
+                // 1. Vermelha: Finalizada (Saldo zerado 100% expedido)
+                // 2. Amarela Piscando: No finalzinho (Saldo <= 30%)
+                // 3. Verde: Totalmente cheia / alto saldo (> 70%)
+                // ========================================================
+                let classeBorda = "border-slate-200";
+                let badgeStatusHtml = "";
+
+                if (cancelado) {
+                    classeBorda = "border-2 border-rose-300 bg-rose-50/20";
+                    badgeStatusHtml = `<span class="bg-rose-100 text-rose-800 font-black px-2.5 py-0.5 rounded-full border border-rose-300 text-[10px]">CANCELADA</span>`;
+                } else if (concluido) {
+                    // VERMELHA COM FINALIZADA
+                    classeBorda = "border-2 border-rose-500 bg-rose-50/30";
+                    badgeStatusHtml = `<span class="bg-rose-600 text-white font-black px-3 py-1 rounded-full text-[10px] tracking-wide shadow-sm">FINALIZADA (100% EXPEDIDO)</span>`;
+                } else if (percentualRestante <= 30) {
+                    // AMARELA PISCANTE NO FINALZINHO
+                    classeBorda = "borda-amarela-piscar bg-yellow-50/30";
+                    badgeStatusHtml = `<span class="bg-amber-500 text-white font-black px-3 py-1 rounded-full text-[10px] tracking-wide animate-bounce shadow-sm">⚠️ NO FINALZINHO (${saldo.toLocaleString('pt-BR')} KG)</span>`;
+                } else if (percentualRestante >= 70) {
+                    // VERDE TOTALMENTE CHEIO
+                    classeBorda = "border-2 border-emerald-500 bg-emerald-50/20";
+                    badgeStatusHtml = `<span class="bg-emerald-600 text-white font-black px-3 py-1 rounded-full text-[10px] tracking-wide shadow-sm">TOTALMENTE CHEIA (${saldo.toLocaleString('pt-BR')} KG)</span>`;
+                } else {
+                    // INTERMEDIÁRIA
+                    classeBorda = "border-2 border-teal-500 bg-white";
+                    badgeStatusHtml = `<span class="bg-teal-700 text-white font-black px-3 py-1 rounded-full text-[10px] tracking-wide">EM ANDAMENTO</span>`;
+                }
+
                 return `
-                    <div class="bg-white rounded-2xl border ${cancelado ? 'border-rose-200 bg-rose-50/20' : 'border-slate-200'} shadow-sm overflow-hidden card-sap">
+                    <div class="bg-white rounded-2xl ${classeBorda} shadow-sm overflow-hidden card-sap transition duration-300">
                         
-                        <!-- BARRA SUPERIOR DO CONTRATO -->
                         <div class="bg-slate-100/90 border-b border-slate-200 px-5 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
                             <div class="flex items-center gap-2">
                                 <span class="bg-slate-800 text-white font-mono font-bold text-[10px] px-2 py-0.5 rounded">CONTRATO SAP</span>
@@ -641,23 +779,18 @@
                                 <span class="text-slate-400">|</span>
                                 <span class="text-slate-600">Total Contrato: <b>${item.contrato.qtdTotalKG.toLocaleString('pt-BR')} KG</b></span>
                             </div>
-                            <div>
-                                ${cancelado 
-                                    ? `<span class="bg-rose-100 text-rose-800 font-black px-2 py-0.5 rounded border border-rose-300 text-[10px]">OV CANCELADA - SALDO TRANSFERIDO</span>`
-                                    : `<span class="text-slate-500 font-semibold text-[11px]">Consumo: <b>${pctGasto}%</b></span>`
-                                }
+                            <div class="flex items-center gap-2">
+                                ${badgeStatusHtml}
                             </div>
                         </div>
 
-                        <!-- CORPO DA OV -->
                         <div class="p-5 space-y-4">
                             
                             <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
                                 <div>
                                     <div class="flex items-center gap-2">
-                                        <!-- BADGE DA OV COM ANIMAÇÃO PISCANTE SE ESTIVER ATIVA -->
                                         ${cancelado 
-                                            ? `<span class="bg-rose-600 text-white text-xs font-black px-2.5 py-1 rounded-md tracking-wider">OV ${item.ov.numero} (CANCELADA)</span>`
+                                            ? `<span class="bg-rose-600 text-white text-xs font-black px-2.5 py-1 rounded-md tracking-wider">OV ${item.ov.numero}</span>`
                                             : `<span class="ov-piscar bg-[#007e7a] text-white text-xs font-black px-2.5 py-1 rounded-md tracking-wider flex items-center gap-1.5 shadow-sm">
                                                     <span class="inline-block w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
                                                     OV ${item.ov.numero}
@@ -683,7 +816,6 @@
                                 </div>
                             </div>
 
-                            <!-- COMPARAÇÃO DE SALDO E GASTO -->
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                 <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl">
                                     <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">1. Qtd / Valor Inicial</span>
@@ -704,7 +836,6 @@
                                 </div>
                             </div>
 
-                            <!-- HISTÓRICO DE SAÍDAS -->
                             <div class="border-t border-slate-100 pt-3">
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
@@ -755,7 +886,7 @@
         }
 
         // ==========================================
-        // OCR VOLÁTIL (LÊ O PRINT E NÃO SALVA IMAGEM)
+        // OCR VOLÁTIL & CANCELAMENTO
         // ==========================================
         function abrirModalOCR() {
             document.getElementById('modalOCR').classList.remove('hidden');
@@ -778,7 +909,7 @@
         });
 
         async function processarArquivoBlob(blob) {
-            atualizarProgressoOCR(10, "A ler a imagem colada em memória...");
+            atualizarProgressoOCR(10, "A ler imagem colada...");
             await executarOCREmBlob(blob);
         }
 
@@ -802,7 +933,7 @@
                 await executarOCREmBlob(f2);
             }
 
-            atualizarProgressoOCR(100, "Leitura concluída! Imagem descartada.");
+            atualizarProgressoOCR(100, "Leitura concluída!");
             document.getElementById('btnProcessarOCR').disabled = false;
         }
 
@@ -911,6 +1042,64 @@
             fecharModalOCR();
         }
 
+        function abrirModalCancelarOV(ovId) {
+            const item = cacheRegistros.find(o => o.id === ovId);
+            if (!item) return;
+
+            const totalGasto = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
+            const saldoRestante = Math.max(0, item.ov.qtdLiberadaKG - totalGasto);
+
+            document.getElementById('cancelarOVId').value = ovId;
+            document.getElementById('cancelarOVNumero').innerText = item.ov.numero;
+            document.getElementById('cancelarSaldoRestante').innerText = `${saldoRestante.toLocaleString('pt-BR')} KG (R$ ${(saldoRestante * (item.ov.precoUnitarioPorKG || 1.26)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })})`;
+            document.getElementById('cancelarMotivo').value = '';
+
+            const outrasOVs = cacheRegistros.filter(o => o.id !== ovId && o.status !== "CANCELADO" && o.ov.cliente === item.ov.cliente);
+            const select = document.getElementById('selectDestinoSaldo');
+            select.innerHTML = '<option value="CONTRATO">Devolver ao Contrato Mestre (Saldo Livre)</option>';
+            
+            outrasOVs.forEach(o => {
+                const opt = document.createElement('option');
+                opt.value = o.id;
+                opt.innerText = `Transferir para OV ${o.ov.numero} (${o.ov.material})`;
+                select.appendChild(opt);
+            });
+
+            document.getElementById('modalCancelarOV').classList.remove('hidden');
+        }
+
+        function fecharModalCancelarOV() {
+            document.getElementById('modalCancelarOV').classList.add('hidden');
+        }
+
+        async function confirmarCancelamento() {
+            const ovId = document.getElementById('cancelarOVId').value;
+            const destinoId = document.getElementById('selectDestinoSaldo').value;
+            const motivo = document.getElementById('cancelarMotivo').value.trim() || 'Cancelada no SAP';
+
+            const itemOrigem = cacheRegistros.find(o => o.id === ovId);
+            if (!itemOrigem) return;
+
+            const totalGasto = (itemOrigem.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
+            const saldoTransferir = Math.max(0, itemOrigem.ov.qtdLiberadaKG - totalGasto);
+
+            itemOrigem.status = "CANCELADO";
+            itemOrigem.motivoCancelamento = motivo;
+
+            if (destinoId !== "CONTRATO" && saldoTransferir > 0) {
+                const itemDestino = cacheRegistros.find(o => o.id === destinoId);
+                if (itemDestino) {
+                    itemDestino.ov.qtdLiberadaKG += saldoTransferir;
+                    itemDestino.ov.valorBRL += (saldoTransferir * (itemDestino.ov.precoUnitarioPorKG || itemOrigem.ov.precoUnitarioPorKG || 1.26));
+                    await salvarNaBase(itemDestino);
+                }
+            }
+
+            await salvarNaBase(itemOrigem);
+            fecharModalCancelarOV();
+            alert(`OV ${itemOrigem.ov.numero} cancelada! Saldo remanejado com sucesso.`);
+        }
+
         function abrirModalGasto(ovId) {
             document.getElementById('gastoOVId').value = ovId;
             document.getElementById('gastoTicket').value = '';
@@ -958,6 +1147,29 @@
                 item.gastos.splice(idx, 1);
                 await salvarNaBase(item);
             }
+        }
+
+        async function excluirOV(id) {
+            if (!confirm(`Remover definitivamente a OV ${id}?`)) return;
+            cacheRegistros = cacheRegistros.filter(o => o.id !== id);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheRegistros));
+            atualizarOpcoesEmpresas(cacheRegistros);
+            renderizar();
+
+            if (supabaseClient) {
+                try {
+                    await supabaseClient.from('modulo11_ovs').delete().eq('id', id);
+                } catch (err) {
+                    console.error("Erro Supabase:", err);
+                }
+            }
+        }
+
+        function carregarDadosExemplo() {
+            cacheRegistros = DADOS_DEFAULT;
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheRegistros));
+            atualizarOpcoesEmpresas(cacheRegistros);
+            renderizar();
         }
 
         function filtrar() {
