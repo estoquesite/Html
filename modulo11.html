@@ -3,9 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 11 - Controle de OVs & Reconhecimento SAP SD</title>
+    <title>Módulo 11 - Controle de OVs & Supabase Cloud</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Tesseract OCR Engine CDN -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script>
@@ -34,7 +36,7 @@
             min-height: 100vh;
         }
 
-        /* ANIMAÇÃO PARA O NÚMERO DA OV PISCAR */
+        /* ANIMAÇÃO PISCANTE NO BADGE DA OV */
         @keyframes piscarBadgeOV {
             0%, 100% {
                 opacity: 1;
@@ -72,15 +74,18 @@
                     <span class="text-base">◀</span> Voltar ao Menu
                 </a>
                 <span class="text-slate-300">|</span>
-                <span class="text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200/60 px-2.5 py-1 rounded-lg">Módulo 11 • Reconhecimento de OVs</span>
+                <span class="text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200/60 px-2.5 py-1 rounded-lg">Módulo 11 • Nuvem Supabase</span>
             </div>
             
             <div class="flex items-center gap-2">
-                <button type="button" onclick="window.print()" class="text-xs font-bold px-3 py-1.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 transition flex items-center gap-1.5">
-                    🖨️️ Relatório A4
+                <span id="badgeConexao" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Nuvem Conectada
+                </span>
+                <button type="button" onclick="window.print()" class="text-xs font-bold px-3 py-1.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 transition">
+                    🖨️ Relatório
                 </button>
-                <button type="button" onclick="exportarCSV()" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white transition flex items-center gap-1.5">
-                    📥 Exportar CSV
+                <button type="button" onclick="exportarCSV()" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white transition">
+                    📥 CSV
                 </button>
                 <button type="button" onclick="abrirModalOCR()" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-[#007e7a] hover:bg-[#005a57] text-white transition flex items-center gap-1.5 shadow-sm">
                     📷 Capturar Prints SAP (OCR)
@@ -95,10 +100,10 @@
                     <div class="flex items-center gap-3">
                         <span class="text-2xl font-black tracking-widest text-teal-100">VALE</span>
                         <div class="h-5 w-px bg-teal-300/40"></div>
-                        <h1 class="text-lg font-extrabold tracking-wide">Gestão & Reconhecimento de OVs e Contratos</h1>
-                        <span class="bg-amber-500 text-white font-black text-[10px] px-2 py-0.5 rounded shadow-sm">SD - ZVSU</span>
+                        <h1 class="text-lg font-extrabold tracking-wide">Gestão de OVs e Contratos (Sincronizado)</h1>
+                        <span class="bg-emerald-500 text-white font-black text-[10px] px-2 py-0.5 rounded shadow-sm">SUPABASE ATIVO</span>
                     </div>
-                    <p class="text-xs text-teal-100/90 mt-1">Reconhecimento do número da OV, empresa parceira, abatimento de pesagens e saldos contratuais</p>
+                    <p class="text-xs text-teal-100/90 mt-1">Dados salvos em nuvem para acompanhamento em tempo real de saídas, balança e saldos</p>
                 </div>
 
                 <!-- CARDS DE CONSOLIDAÇÃO -->
@@ -120,24 +125,23 @@
             <div class="flex items-center gap-3 text-left">
                 <span class="text-2xl">📋</span>
                 <div>
-                    <div class="font-bold text-slate-800">Dica Operacional: Pode colar os seus prints do SAP aqui!</div>
-                    <div class="text-slate-500 text-[11px]">Tire o print da tela do SAP (VA03 ou Fluxo) e pressione <kbd class="px-1.5 py-0.5 bg-white border border-slate-300 rounded font-mono font-bold">Ctrl + V</kbd> nesta janela para capturar a OV e a empresa.</div>
+                    <div class="font-bold text-slate-800">Dica: Cole os prints do SAP diretamente aqui!</div>
+                    <div class="text-slate-500 text-[11px]">Pressione <kbd class="px-1.5 py-0.5 bg-white border border-slate-300 rounded font-mono font-bold">Ctrl + V</kbd> para extrair a OV, empresa e quantidades via OCR.</div>
                 </div>
             </div>
             <button type="button" onclick="abrirModalOCR()" class="text-xs font-bold px-3 py-1.5 bg-[#007e7a] text-white rounded-xl hover:bg-[#005a57] whitespace-nowrap shadow-sm">
-                Abrir Leitor de Imagens
+                Abrir Scanner OCR
             </button>
         </div>
 
-        <!-- FILTROS (TEXTO, STATUS E EMPRESA) -->
+        <!-- FILTROS -->
         <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between no-print">
             <div class="relative w-full md:w-80">
-                <input type="text" id="filtroTexto" oninput="filtrar()" placeholder="Pesquisar por OV, Contrato, Cliente ou DRS..." class="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-xl bg-slate-50 outline-none focus:border-teal-600 transition">
+                <input type="text" id="filtroTexto" oninput="filtrar()" placeholder="Pesquisar por OV, Contrato ou DRS..." class="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-xl bg-slate-50 outline-none focus:border-teal-600 transition">
                 <span class="absolute left-3 top-2.5 text-xs text-slate-400">🔍</span>
             </div>
 
             <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
-                <!-- SELETOR DINÂMICO DE EMPRESAS -->
                 <select id="filtroEmpresa" onchange="filtrar()" class="text-xs border border-slate-300 bg-slate-50 rounded-xl px-3 py-2 outline-none focus:border-teal-600 font-semibold text-slate-700 max-w-[220px]">
                     <option value="TODAS">Todas as Empresas</option>
                 </select>
@@ -145,18 +149,18 @@
                 <select id="filtroStatus" onchange="filtrar()" class="text-xs border border-slate-300 bg-slate-50 rounded-xl px-3 py-2 outline-none focus:border-teal-600 font-semibold text-slate-700">
                     <option value="TODOS">Todos os Registos</option>
                     <option value="ABERTO">Com Saldo Pendente</option>
-                    <option value="CONCLUIDO">Concluídas (100% Expedidas)</option>
+                    <option value="CONCLUIDO">Concluídas (100%)</option>
                 </select>
 
-                <button type="button" onclick="carregarDadosExemplo()" class="text-xs font-semibold text-teal-700 bg-teal-50 border border-teal-200 hover:bg-teal-100 px-3 py-2 rounded-xl transition">
-                    Carregar Exemplo SAP
+                <button type="button" onclick="sincronizarComSupabase()" class="text-xs font-semibold text-teal-700 bg-teal-50 border border-teal-200 hover:bg-teal-100 px-3 py-2 rounded-xl transition flex items-center gap-1">
+                    🔄 Atualizar Nuvem
                 </button>
             </div>
         </div>
 
-        <!-- LISTAGEM DAS ORDENS DE VENDA -->
+        <!-- LISTA DAS OVS -->
         <div id="containerOVs" class="space-y-5">
-            <!-- Cards gerados via JavaScript -->
+            <!-- Cards montados dinamicamente -->
         </div>
 
     </div>
@@ -169,14 +173,13 @@
                 <div class="flex items-center gap-2">
                     <span class="text-xl">🔍</span>
                     <div>
-                        <h3 class="font-bold text-slate-900 text-sm">Leitor Inteligente de Imagens SAP (OCR)</h3>
-                        <p class="text-[11px] text-slate-500">Reconhece o Número da OV, Contrato, Empresa Parceira e Quantidades</p>
+                        <h3 class="font-bold text-slate-900 text-sm">Leitor Automático de Imagens SAP (OCR)</h3>
+                        <p class="text-[11px] text-slate-500">Reconhece o Número da OV, Contrato, Empresa Parceira e Saldo</p>
                     </div>
                 </div>
                 <button type="button" onclick="fecharModalOCR()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
             </div>
 
-            <!-- ENTRADA DE ARQUIVOS -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
                 <div class="border border-slate-200 rounded-2xl p-3 bg-slate-50 space-y-2">
                     <span class="font-bold text-slate-700 block">Foto 1: Síntese da OV (VA03)</span>
@@ -189,7 +192,7 @@
                 </div>
             </div>
 
-            <!-- BARRA DE PROGRESSO DO OCR -->
+            <!-- STATUS PROGRESSO -->
             <div id="areaStatusOCR" class="hidden space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-200 text-xs">
                 <div class="flex justify-between font-bold text-slate-700">
                     <span id="labelStatusOCR">A processar o OCR...</span>
@@ -200,7 +203,7 @@
                 </div>
             </div>
 
-            <!-- CAMPOS EXTRAÍDOS (PARA CONFERÊNCIA ANTES DE SALVAR) -->
+            <!-- CAMPOS EXTRAÍDOS -->
             <div id="resultadoExtracao" class="space-y-3 text-xs border-t border-slate-100 pt-3">
                 <div class="flex justify-between items-center">
                     <span class="font-bold text-slate-700">Campos Reconhecidos:</span>
@@ -209,7 +212,7 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                     <div>
-                        <label class="block text-slate-500 text-[10px] font-bold uppercase">Empresa / Parceiro Comercial</label>
+                        <label class="block text-slate-500 text-[10px] font-bold uppercase">Empresa / Parceiro</label>
                         <input type="text" id="campoCliente" placeholder="Ex: GERDAU AÇOS LONGOS S.A." class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50 font-bold text-slate-800">
                     </div>
                     <div>
@@ -235,7 +238,7 @@
 
                 <div class="grid grid-cols-1 sm:grid-cols-4 gap-2.5">
                     <div>
-                        <label class="block text-slate-500 text-[10px] font-bold uppercase">Qtd da OV (KG)</label>
+                        <label class="block text-slate-500 text-[10px] font-bold uppercase">Qtd OV (KG)</label>
                         <input type="number" id="campoQtdOV" placeholder="Ex: 5000" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50 font-bold text-teal-700">
                     </div>
                     <div>
@@ -259,7 +262,7 @@
                 </button>
                 <div class="flex gap-2">
                     <button type="button" onclick="fecharModalOCR()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Cancelar</button>
-                    <button type="button" onclick="salvarExtraido()" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-black text-white shadow-sm">Salvar Registro</button>
+                    <button type="button" onclick="salvarExtraido()" class="px-4 py-2 rounded-xl text-xs font-bold bg-slate-900 hover:bg-black text-white shadow-sm">Salvar na Nuvem</button>
                 </div>
             </div>
         </div>
@@ -269,7 +272,7 @@
     <div id="modalGasto" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                <h3 class="font-bold text-slate-900 text-sm">Registar Saída de Balança (Ticket / Romaneio)</h3>
+                <h3 class="font-bold text-slate-900 text-sm">Registar Saída de Balança (Ticket)</h3>
                 <button type="button" onclick="fecharModalGasto()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
             </div>
 
@@ -301,10 +304,23 @@
         </div>
     </div>
 
-    <!-- SCRIPT DE PROCESSAMENTO E ARMAZENAMENTO -->
+    <!-- SCRIPT DE INTEGRAÇÃO COM O SUPABASE -->
     <script>
-        const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v4";
+        // ========================================================
+        // CONFIGURAÇÕES DO SUPABASE (COLOQUE SUAS CHAVES AQUI)
+        // ========================================================
+        const SUPABASE_URL = "https://SEU-PROJETO.supabase.co";
+        const SUPABASE_ANON_KEY = "SUA-CHAVE-ANONIMA-AQUI";
+        
+        let supabaseClient = null;
+        if (SUPABASE_URL && !SUPABASE_URL.includes("SEU-PROJETO")) {
+            supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        }
 
+        const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v4";
+        let cacheRegistros = [];
+
+        // Exemplo padrão
         const DADOS_DEFAULT = [
             {
                 id: "115443653",
@@ -331,23 +347,106 @@
             }
         ];
 
-        function getRegistros() {
-            const raw = localStorage.getItem(STORAGE_KEY);
-            if (!raw) {
-                localStorage.setItem(STORAGE_KEY, JSON.stringify(DADOS_DEFAULT));
-                return DADOS_DEFAULT;
+        async function carregarRegistros() {
+            // Tenta carregar do Supabase primeiro
+            if (supabaseClient) {
+                try {
+                    const { data, error } = await supabaseClient.from('modulo11_ovs').select('*').order('created_at', { ascending: false });
+                    if (!error && data && data.length > 0) {
+                        cacheRegistros = data.map(d => ({
+                            id: d.id,
+                            contrato: {
+                                numero: d.contrato_numero,
+                                item: d.contrato_item || "30",
+                                qtdTotalKG: Number(d.contrato_total_kg || 0),
+                                valorTotalBRL: Number(d.contrato_total_brl || 0)
+                            },
+                            ov: {
+                                numero: d.ov,
+                                cliente: d.cliente,
+                                material: d.material,
+                                pedidoDRS: d.pedido_drs,
+                                qtdLiberadaKG: Number(d.qtd_liberada_kg || 0),
+                                valorBRL: Number(d.valor_brl || 0),
+                                precoUnitarioPorKG: Number(d.preco_unitario || 0),
+                                docContabil: d.doc_contabil
+                            },
+                            gastos: Array.isArray(d.gastos) ? d.gastos : []
+                        }));
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheRegistros));
+                        atualizarOpcoesEmpresas(cacheRegistros);
+                        renderizar();
+                        return;
+                    }
+                } catch (e) {
+                    console.warn("Falha ao comunicar com Supabase, usando cache local:", e);
+                }
             }
-            try { return JSON.parse(raw); } catch (e) { return DADOS_DEFAULT; }
-        }
 
-        function salvarRegistros(lista) {
-            localStorage.setItem(STORAGE_KEY, JSON.stringify(lista));
-            atualizarOpcoesEmpresas(lista);
+            // Fallback para LocalStorage se o Supabase não estiver configurado ou offline
+            const raw = localStorage.getItem(STORAGE_KEY);
+            cacheRegistros = raw ? JSON.parse(raw) : DADOS_DEFAULT;
+            atualizarOpcoesEmpresas(cacheRegistros);
             renderizar();
         }
 
-        function carregarDadosExemplo() {
-            salvarRegistros(DADOS_DEFAULT);
+        async function sincronizarComSupabase() {
+            await carregarRegistros();
+            alert("Dados sincronizados com sucesso com o Supabase!");
+        }
+
+        async function salvarNaBase(novoItem) {
+            // 1. Atualiza cache em memória e LocalStorage
+            const idx = cacheRegistros.findIndex(i => i.id === novoItem.id);
+            if (idx !== -1) {
+                cacheRegistros[idx] = novoItem;
+            } else {
+                cacheRegistros.unshift(novoItem);
+            }
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheRegistros));
+            atualizarOpcoesEmpresas(cacheRegistros);
+            renderizar();
+
+            // 2. Grava no Supabase se cliente ativo
+            if (supabaseClient) {
+                try {
+                    const payload = {
+                        id: novoItem.id,
+                        ov: novoItem.ov.numero,
+                        cliente: novoItem.ov.cliente,
+                        material: novoItem.ov.material,
+                        pedido_drs: novoItem.ov.pedidoDRS,
+                        qtd_liberada_kg: novoItem.ov.qtdLiberadaKG,
+                        valor_brl: novoItem.ov.valorBRL,
+                        preco_unitario: novoItem.ov.precoUnitarioPorKG,
+                        doc_contabil: novoItem.ov.docContabil,
+                        contrato_numero: novoItem.contrato.numero,
+                        contrato_item: novoItem.contrato.item,
+                        contrato_total_kg: novoItem.contrato.qtdTotalKG,
+                        contrato_total_brl: novoItem.contrato.valorTotalBRL,
+                        gastos: novoItem.gastos
+                    };
+                    await supabaseClient.from('modulo11_ovs').upsert(payload);
+                } catch (err) {
+                    console.error("Erro ao salvar no Supabase:", err);
+                }
+            }
+        }
+
+        async function excluirOV(id) {
+            if (!confirm(`Remover OV ${id}?`)) return;
+            cacheRegistros = cacheRegistros.filter(o => o.id !== id);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheRegistros));
+            atualizarOpcoesEmpresas(cacheRegistros);
+            renderizar();
+
+            if (supabaseClient) {
+                try {
+                    await supabaseClient.from('modulo11_ovs').delete().eq('id', id);
+                } catch (err) {
+                    console.error("Erro ao remover no Supabase:", err);
+                }
+            }
         }
 
         function atualizarOpcoesEmpresas(lista) {
@@ -371,7 +470,7 @@
         }
 
         function renderizar() {
-            const lista = getRegistros();
+            const lista = cacheRegistros;
             const termo = (document.getElementById('filtroTexto')?.value || '').toLowerCase().trim();
             const filtroStatus = document.getElementById('filtroStatus')?.value || 'TODOS';
             const filtroEmpresa = document.getElementById('filtroEmpresa')?.value || 'TODAS';
@@ -413,7 +512,7 @@
                     <div class="bg-white p-12 text-center rounded-2xl border border-slate-200">
                         <span class="text-4xl block mb-2">🔍</span>
                         <h4 class="font-bold text-slate-700 text-sm">Nenhum registo encontrado</h4>
-                        <p class="text-xs text-slate-400 mt-1">Carregue imagens com novas OVs ou ajuste os filtros.</p>
+                        <p class="text-xs text-slate-400 mt-1">Carregue novas OVs do SAP ou limpe os filtros.</p>
                     </div>
                 `;
                 return;
@@ -445,13 +544,13 @@
                             </div>
                         </div>
 
-                        <!-- DADOS DA ORDEM DE VENDA ESPECÍFICA -->
+                        <!-- CORPO DA OV -->
                         <div class="p-5 space-y-4">
                             
                             <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
                                 <div>
                                     <div class="flex items-center gap-2">
-                                        <!-- BADGE COM ANIMAÇÃO PISCANTE NO NÚMERO DA OV -->
+                                        <!-- BADGE PISCANTE DA OV -->
                                         <span class="ov-piscar bg-[#007e7a] text-white text-xs font-black px-2.5 py-1 rounded-md tracking-wider flex items-center gap-1.5 shadow-sm">
                                             <span class="inline-block w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
                                             OV ${item.ov.numero}
@@ -471,9 +570,8 @@
                                 </div>
                             </div>
 
-                            <!-- PAINEL COMPARATIVO DE CONSUMO -->
+                            <!-- COMPARAÇÃO DE SALDO E GASTO -->
                             <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                                
                                 <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl">
                                     <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">1. Qtd / Valor Liberado</span>
                                     <div class="text-base font-black text-slate-800 mt-1">${item.ov.qtdLiberadaKG.toLocaleString('pt-BR')} KG</div>
@@ -491,7 +589,6 @@
                                     <div class="text-base font-black text-emerald-800 mt-1">${saldo.toLocaleString('pt-BR')} KG</div>
                                     <div class="text-xs font-bold text-emerald-700">${valorSaldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
                                 </div>
-
                             </div>
 
                             <!-- BARRA DE PROGRESSO -->
@@ -507,7 +604,7 @@
                                 </div>
                             </div>
 
-                            <!-- HISTÓRICO DE SAÍDAS DA BALANÇA -->
+                            <!-- HISTÓRICO DE SAÍDAS -->
                             <div class="border-t border-slate-100 pt-3">
                                 <div class="flex justify-between items-center mb-2">
                                     <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
@@ -558,7 +655,7 @@
         }
 
         // ==========================================
-        // LEITURA OCR DAS IMAGENS DO SAP
+        // OCR E CLIPBOARD
         // ==========================================
         function abrirModalOCR() {
             document.getElementById('modalOCR').classList.remove('hidden');
@@ -631,59 +728,42 @@
             document.getElementById('labelStatusOCR').innerText = texto;
         }
 
-        // EXTRAÇÃO REFINADA DO NÚMERO DA OV, EMPRESA E QUANTIDADES
         function interpretarTextoExtraido(txt) {
-            console.log("Texto extraído:", txt);
-
-            // 1. RECONHECIMENTO DO NÚMERO DA OV (Trata tanto '115443653' quanto '0115443653')
-            let matchOV = txt.match(/Venda\s+Sucata(?:\/Esc[oó]ria)?[^\d]*0?(\d{8,10})/i);
-            if (!matchOV) {
-                matchOV = txt.match(/(?:OV|Ordem)[^\d]*0?(\d{8,10})/i);
-            }
-            if (!matchOV) {
-                matchOV = txt.match(/\b(11\d{7}|011\d{7})\b/);
-            }
-            if (!matchOV) {
-                matchOV = txt.match(/\b(\d{8,10})\b/);
-            }
+            // 1. Número da OV
+            let matchOV = txt.match(/Venda\s+Sucata(?:\/Esc[oó]ria)?[^\d]*0?(\d{8,10})/i) ||
+                          txt.match(/(?:OV|Ordem)[^\d]*0?(\d{8,10})/i) ||
+                          txt.match(/\b(11\d{7}|011\d{7})\b/) ||
+                          txt.match(/\b(\d{8,10})\b/);
 
             if (matchOV && !document.getElementById('campoOV').value) {
-                const ovFinal = matchOV[1].replace(/^0+/, '');
-                document.getElementById('campoOV').value = ovFinal;
+                document.getElementById('campoOV').value = matchOV[1].replace(/^0+/, '');
             }
 
-            // 2. RECONHECIMENTO DA EMPRESA
-            let matchParceiro = txt.match(/Parceiro\s+de\s+neg[oó]cios\s+([0-9]+)\s+([^\n\r]+)/i);
-            if (!matchParceiro) {
-                matchParceiro = txt.match(/Emissor\s+da\s+ordem\s+([0-9]+)\s+([^\/\n\r]+)/i);
-            }
-            if (!matchParceiro) {
-                matchParceiro = txt.match(/Receb\.mercad\.\s+([0-9]+)\s+([^\/\n\r]+)/i);
-            }
+            // 2. Empresa Parceira
+            let matchParceiro = txt.match(/Parceiro\s+de\s+neg[oó]cios\s+([0-9]+)\s+([^\n\r]+)/i) ||
+                                txt.match(/Emissor\s+da\s+ordem\s+([0-9]+)\s+([^\/\n\r]+)/i) ||
+                                txt.match(/Receb\.mercad\.\s+([0-9]+)\s+([^\/\n\r]+)/i);
 
             if (matchParceiro) {
-                const codCliente = matchParceiro[1].trim();
-                const nomeCliente = matchParceiro[2].trim().replace(/\s{2,}/g, ' ');
-                document.getElementById('campoCliente').value = `${nomeCliente} (${codCliente})`;
+                document.getElementById('campoCliente').value = `${matchParceiro[2].trim().replace(/\s{2,}/g, ' ')} (${matchParceiro[1].trim()})`;
             }
 
-            // 3. NÚMERO DO PEDIDO / DRS
+            // 3. Pedido DRS
             const matchDRS = txt.match(/(\d+\s*DRS\s*[^\n\r]+)/i);
             if (matchDRS && !document.getElementById('campoDRS').value) {
                 document.getElementById('campoDRS').value = matchDRS[1].trim();
             }
 
-            // 4. MATERIAL
+            // 4. Material
             const matchMat = txt.match(/(?:SUCATA[^\n\r]*|ESCORIA[^\n\r]*)/i);
             if (matchMat && !document.getElementById('campoMaterial').value) {
                 document.getElementById('campoMaterial').value = matchMat[0].trim();
             }
 
-            // 5. QUANTIDADE DA OV E VALOR LÍQUIDO
+            // 5. Valor Líquido e Quantidade
             const matchVal = txt.match(/Valor\s+l[ií]quido\s*([0-9.,]+)/i);
             if (matchVal) {
-                const valFormatado = matchVal[1].replace(/\./g, '').replace(',', '.');
-                document.getElementById('campoValorOV').value = parseFloat(valFormatado);
+                document.getElementById('campoValorOV').value = parseFloat(matchVal[1].replace(/\./g, '').replace(',', '.'));
             }
 
             const matchQtd = txt.match(/(\d+(?:\.\d+)?)\s*(?:KG|TO)/i);
@@ -693,25 +773,24 @@
                 document.getElementById('campoQtdOV').value = peso;
             }
 
-            // 6. CONTRATO GUARDA-CHUVA
+            // 6. Contrato
             const matchContrato = txt.match(/Contr[^\d]*(\d{5,10})/i);
             if (matchContrato && !document.getElementById('campoContrato').value) {
                 document.getElementById('campoContrato').value = matchContrato[1];
             }
 
-            // 7. DOCUMENTO CONTÁBIL
+            // 7. Doc Contábil
             const matchDocContabil = txt.match(/Doc\.cont[aá]bil\s*(\d+)/i) || txt.match(/520109\d{4}/);
             if (matchDocContabil && !document.getElementById('campoDocContabil').value) {
                 document.getElementById('campoDocContabil').value = matchDocContabil[1] || matchDocContabil[0];
             }
         }
 
-        function salvarExtraido() {
+        async function salvarExtraido() {
             const ovNum = document.getElementById('campoOV').value.trim() || String(Date.now()).slice(-8);
             const qtdOV = parseFloat(document.getElementById('campoQtdOV').value) || 5000;
             const valOV = parseFloat(document.getElementById('campoValorOV').value) || 6300;
 
-            const lista = getRegistros();
             const novo = {
                 id: ovNum,
                 contrato: {
@@ -733,17 +812,11 @@
                 gastos: []
             };
 
-            const idxExistente = lista.findIndex(i => i.id === ovNum);
-            if (idxExistente !== -1) {
-                lista[idxExistente] = { ...lista[idxExistente], ...novo, gastos: lista[idxExistente].gastos };
-            } else {
-                lista.unshift(novo);
-            }
-
-            salvarRegistros(lista);
+            await salvarNaBase(novo);
             fecharModalOCR();
         }
 
+        // Funções de Modal para Abater Gasto
         function abrirModalGasto(ovId) {
             document.getElementById('gastoOVId').value = ovId;
             document.getElementById('gastoTicket').value = '';
@@ -757,7 +830,7 @@
             document.getElementById('modalGasto').classList.add('hidden');
         }
 
-        function salvarGasto() {
+        async function salvarGasto() {
             const ovId = document.getElementById('gastoOVId').value;
             const ticket = document.getElementById('gastoTicket').value.trim();
             const placa = document.getElementById('gastoPlaca').value.trim().toUpperCase();
@@ -769,8 +842,7 @@
                 return;
             }
 
-            const lista = getRegistros();
-            const item = lista.find(o => o.id === ovId);
+            const item = cacheRegistros.find(o => o.id === ovId);
             if (item) {
                 if (!item.gastos) item.gastos = [];
                 item.gastos.push({
@@ -780,25 +852,18 @@
                     pesoKG: peso,
                     data: data || new Date().toISOString().split('T')[0]
                 });
-                salvarRegistros(lista);
+                await salvarNaBase(item);
             }
             fecharModalGasto();
         }
 
-        function removerGasto(ovId, idx) {
+        async function removerGasto(ovId, idx) {
             if (!confirm("Deseja remover esta saída?")) return;
-            const lista = getRegistros();
-            const item = lista.find(o => o.id === ovId);
+            const item = cacheRegistros.find(o => o.id === ovId);
             if (item && item.gastos) {
                 item.gastos.splice(idx, 1);
-                salvarRegistros(lista);
+                await salvarNaBase(item);
             }
-        }
-
-        function excluirOV(id) {
-            if (!confirm(`Remover OV ${id}?`)) return;
-            const lista = getRegistros().filter(o => o.id !== id);
-            salvarRegistros(lista);
         }
 
         function filtrar() {
@@ -806,13 +871,12 @@
         }
 
         function exportarCSV() {
-            const lista = getRegistros();
-            if (!lista.length) return;
+            if (!cacheRegistros.length) return;
 
             let csv = "data:text/csv;charset=utf-8,";
             csv += "Contrato;OV;Empresa/Cliente;Material;Qtd Liberada (KG);Gasto Realizado (KG);Saldo Restante (KG);Valor Total;Valor Gasto;Valor Saldo\r\n";
 
-            lista.forEach(item => {
+            cacheRegistros.forEach(item => {
                 const totalGasto = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoKG || 0), 0);
                 const saldo = Math.max(0, item.ov.qtdLiberadaKG - totalGasto);
                 const valGasto = totalGasto * (item.ov.precoUnitarioPorKG || 0);
@@ -823,15 +887,14 @@
 
             const link = document.createElement("a");
             link.setAttribute("href", encodeURI(csv));
-            link.setAttribute("download", `controle_ovs_reconhecimento_${new Date().toISOString().slice(0,10)}.csv`);
+            link.setAttribute("download", `controle_ovs_supabase_${new Date().toISOString().slice(0,10)}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
         }
 
         window.addEventListener('DOMContentLoaded', () => {
-            atualizarOpcoesEmpresas(getRegistros());
-            renderizar();
+            carregarRegistros();
         });
     </script>
 </body>
