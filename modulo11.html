@@ -3,498 +3,620 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRO-043927 - Gestão de Estoque do CTSS</title>
-    <!-- Ícones e Estilos -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>Módulo 11 - Controle de OVs (Sucata e Escória)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        vale: {
+                            DEFAULT: '#007e7a',
+                            dark: '#005a57',
+                            light: '#e6f4f4',
+                            amber: '#f59e0b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
     <style>
-        body {
-            font-family: 'Times New Roman', Times, serif;
-            font-size: 12pt;
-            color: #000000;
-            line-height: 1.5;
-            margin: 0;
-            padding: 0;
-            background-color: #e2e8f0;
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            background: #f0f4f8; 
+            color: #1e293b; 
+            min-height: 100vh;
         }
-
-        /* BARRA DE FERRAMENTAS DO TOPO */
-        .word-ribbon {
-            background: #f3f4f6;
-            border-bottom: 1px solid #cbd5e1;
-            padding: 8px 16px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 15px;
-            align-items: center;
-            position: sticky;
-            top: 0;
-            z-index: 1000;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-            font-family: Arial, sans-serif;
-        }
-        .ribbon-group {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            border-right: 1px solid #d1d5db;
-            padding-right: 15px;
-        }
-        .ribbon-btn {
-            background: transparent;
-            border: 1px solid transparent;
-            padding: 6px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 13px;
-            color: #374151;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            text-decoration: none;
-        }
-        .ribbon-btn:hover {
-            background: #e5e7eb;
-            border-color: #d1d5db;
-        }
-        .ribbon-select {
-            padding: 5px;
-            border: 1px solid #d1d5db;
-            border-radius: 4px;
-            font-size: 12px;
-            background: white;
-        }
-
-        /* ÁREA DE TRABALHO E PÁGINAS A4 */
-        .workspace {
-            padding: 30px 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 30px;
-        }
-        .pagina-a4 {
-            width: 21cm;
-            min-height: 29.7cm;
-            background: #ffffff;
-            padding: 2.5cm 2cm 2cm 2.5cm;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            outline: none;
-            box-sizing: border-box;
-            position: relative;
-            page-break-after: always;
-        }
-
-        /* CABEÇALHO REPETIDO EM CADA PÁGINA (ESTILO PRO) */
-        .cabecalho-pagina {
-            border-bottom: 2px solid #007e7a;
-            padding-bottom: 8px;
-            margin-bottom: 20px;
-        }
-        .topo-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-        .topo-titulo {
-            font-size: 16pt;
-            font-weight: bold;
-            color: #007e7a;
-            font-family: Arial, sans-serif;
-        }
-        .logo-vale {
-            font-size: 14pt;
-            font-weight: bold;
-            color: #007e7a;
-            letter-spacing: 1px;
-            text-align: right;
-            font-family: Arial, sans-serif;
-        }
-        .pro-info {
-            font-size: 10pt;
-            color: #555555;
-            font-weight: bold;
-            margin-top: 5px;
-            font-family: Arial, sans-serif;
-        }
-
-        /* CAIXA DE DESTAQUE COM BORDA AMARELA */
-        .caixa-destaque {
-            border: 1px solid #eab308;
-            background-color: #fffbeb;
-            padding: 15px;
-            margin: 15px 0;
-        }
-        .caixa-destaque h3 {
-            margin-top: 0;
-            color: #000;
-            font-size: 12pt;
-        }
-
-        /* CAIXA DE ALERTA VERMELHO / ATENÇÃO */
-        .alerta-box {
-            border: 2px solid #dc2626;
-            background-color: #fef2f2;
-            padding: 12px;
-            margin: 15px 0;
-            display: flex;
-            gap: 12px;
-            align-items: flex-start;
-        }
-        .alerta-icone {
-            font-size: 22px;
-            color: #dc2626;
-        }
-
-        /* TÍTULOS E TEXTOS */
-        h2 {
-            font-size: 12pt;
-            color: #007e7a;
-            margin-top: 20px;
-            margin-bottom: 8px;
-            text-transform: uppercase;
-            font-family: Arial, sans-serif;
-        }
-        h3 {
-            font-size: 11pt;
-            color: #007e7a;
-            margin-top: 12px;
-            margin-bottom: 4px;
-            font-family: Arial, sans-serif;
-        }
-        p, li {
-            margin-bottom: 6px;
-            text-align: justify;
-        }
-        ul {
-            margin: 0 0 10px 0;
-            padding-left: 20px;
-        }
-
-        /* TABELAS */
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-bottom: 12px;
-            font-size: 11pt;
-        }
-        table, th, td {
-            border: 1px solid #000000;
-        }
-        th, td {
-            padding: 5px 7px;
-            text-align: left;
-            vertical-align: top;
-        }
-        th {
-            background-color: #f1f5f9;
-            text-align: center;
-        }
-
-        .link-box {
-            background: #f8fafc;
-            padding: 6px;
-            border-left: 3px solid #007e7a;
-            word-break: break-all;
-            font-size: 9pt;
-            font-family: monospace;
-            margin-top: 4px;
-        }
-
-        /* PAINEL DE VOZ ALTA */
-        .painel-voz {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background: #ffffff;
-            border: 2px solid #007e7a;
-            padding: 10px 14px;
-            border-radius: 10px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.15);
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            z-index: 1000;
-            font-size: 10pt;
-            font-family: Arial, sans-serif;
-        }
-        .btn-voz {
-            background: #007e7a;
-            color: white;
-            border: none;
-            padding: 6px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-weight: bold;
-        }
-
         @media print {
-            .word-ribbon, .painel-voz {
-                display: none;
-            }
-            body {
-                background: white;
-            }
-            .pagina-a4 {
-                box-shadow: none;
-                padding: 0;
-                width: 100%;
-                min-height: auto;
-            }
+            .no-print { display: none !important; }
+            body { background: #fff; padding: 0; }
+            .container-print { max-width: 100% !important; width: 100% !important; margin: 0 !important; }
+            .card-sap { border: 1px solid #94a3b8 !important; box-shadow: none !important; }
         }
     </style>
 </head>
-<body>
+<body class="p-4 sm:p-6 lg:p-8">
 
-    <!-- BARRA DE FERRAMENTAS ESTILO WORD -->
-    <div class="word-ribbon">
-        <a href="index.html" class="ribbon-btn" style="background: #64748b; color: white;">
-            <i class="fa-solid fa-arrow-left"></i> Menu
-        </a>
+    <div class="max-w-7xl mx-auto space-y-6 container-print">
         
-        <div class="ribbon-group">
-            <select class="ribbon-select" onchange="execCmd('fontName', this.value)">
-                <option value="Times New Roman">Times New Roman</option>
-                <option value="Arial">Arial</option>
-            </select>
-            <select class="ribbon-select" onchange="execCmd('fontSize', this.value)">
-                <option value="3">Tamanho (11pt)</option>
-                <option value="4">Médio (12pt)</option>
-            </select>
-        </div>
-
-        <div class="ribbon-group">
-            <button class="ribbon-btn" onclick="execCmd('bold', null)"><i class="fa-solid fa-bold"></i></button>
-            <button class="ribbon-btn" onclick="execCmd('italic', null)"><i class="fa-solid fa-italic"></i></button>
-            <button class="ribbon-btn" onclick="execCmd('underline', null)"><i class="fa-solid fa-underline"></i></button>
-        </div>
-
-        <div class="ribbon-group">
-            <button class="ribbon-btn" onclick="execCmd('justifyLeft', null)"><i class="fa-solid fa-align-left"></i></button>
-            <button class="ribbon-btn" onclick="execCmd('justifyFull', null)"><i class="fa-solid fa-align-justify"></i></button>
-            <button class="ribbon-btn" onclick="execCmd('insertUnorderedList', null)"><i class="fa-solid fa-list-ul"></i></button>
-        </div>
-
-        <div class="ribbon-group" style="border: none; gap: 8px;">
-            <button class="ribbon-btn" onclick="baixarWord()" style="background: #2563eb; color: white; font-weight: bold;">
-                <i class="fa-solid fa-file-word"></i> Baixar em Word (.doc)
-            </button>
-            <button class="ribbon-btn" onclick="window.print()" style="background: #007e7a; color: white; font-weight: bold;">
-                <i class="fa-solid fa-print"></i> Imprimir
-            </button>
-        </div>
-    </div>
-
-    <!-- LEITOR DE VOZ ALTA -->
-    <div class="painel-voz">
-        <span>🔊 Ouvir:</span>
-        <button onclick="lerTexto()" class="btn-voz">Play</button>
-        <button onclick="pararLeitura()" class="btn-voz" style="background: #dc2626;">Parar</button>
-    </div>
-
-    <!-- ÁREA EDITÁVEL COM MÚLTIPLAS PÁGINAS A4 E CABEÇALHOS REPETIDOS -->
-    <div class="workspace" id="conteudoCompleto">
-
-        <!-- ================= PÁGINA 1 ================= -->
-        <div class="pagina-a4" contenteditable="true">
-            <div class="cabecalho-pagina">
-                <div class="topo-header">
-                    <div class="topo-titulo">Gestão de estoque do CTSS</div>
-                    <div class="logo-vale">VALE</div>
-                </div>
-                <div class="pro-info">PRO-043927, Rev.: 01 – 13/03/2025[cite: 1]</div>
+        <!-- BARRA DE NAVEGAÇÃO SUPERIOR -->
+        <nav class="flex items-center justify-between bg-white px-5 py-3.5 rounded-2xl shadow-sm border border-slate-200/80 no-print">
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-teal-700 transition">
+                    <span class="text-base">◀</span> Voltar ao Menu
+                </a>
+                <span class="text-slate-300">|</span>
+                <span class="text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200/60 px-2.5 py-1 rounded-lg">Módulo 11</span>
             </div>
-
-            <p><strong>Responsável Técnico:</strong> Mariana Pereira Cruz | <strong>Matrícula:</strong> 81025364 | <strong>Área:</strong> GER INDUSTR PROCESSO MINERAL[cite: 1]</p>
-            <p><strong>Público-alvo:</strong> Almoxarifado do CTSS – Centro Tecnológico de Soluções Sustentáveis da Gerência Industrial Processo Mineral (Diretoria Processamento Mineral)[cite: 1].</p>
-            <p><strong>Necessidade de Treinamento:</strong> ( _ ) SIM (&nbsp;x&nbsp;) NÃO &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <strong>Tarefa prioritária:</strong> (&nbsp;X&nbsp;) SIM ( _ ) NÃO[cite: 1]</p>
-
-            <div class="caixa-destaque">
-                <h3>Resultados Esperados:</h3>
-                <ul>
-                    <li>Realizar as atividades de recebimento, estoque, salvaguarda, movimentação e expedição no almoxarifado do CTSS, conforme as diretrizes estabelecidas neste procedimento, priorizando a aplicação de normas de SSMAC, visando à preservação da saúde e integridade físicas dos empregados e patrimônio da empresa[cite: 1].</li>
-                </ul>
-            </div>
-
-            <h2>1 Contextualização</h2>
-            <p><strong>Quais RACs estão associadas a estas atividades descritas no PRO?[cite: 1]</strong></p>
-            <table>
-                <tr>
-                    <td>RAC 1[cite: 1]</td><td>RAC 2[cite: 1]</td><td>RAC 3</td><td>RAC 4[cite: 1]</td><td>RAC 5</td><td>RAC 6</td><td>RAC 7</td><td>RAC 8</td><td>RAC 9</td><td>RAC 10</td><td>RAC 11</td><td>N/A</td>
-                </tr>
-                <tr>
-                    <td>X[cite: 1]</td><td>x[cite: 1]</td><td></td><td>x[cite: 1]</td><td></td><td></td><td></td><td></td><td></td><td></td><td></td><td></td>
-                </tr>
-            </table>
-
-            <p><strong>A elaboração/revisão deste PRO foi feita a partir de desdobramento de evento N1 ou N2?[cite: 1]</strong><br>
-            ( _ ) NÃO &nbsp;&nbsp;&nbsp;&nbsp; (&nbsp;X&nbsp;) SIM[cite: 1]</p>
-
-            <p><strong>Caso o procedimento esteja relacionado a uma Tarefa Prioritária, qual a dimensão envolvida?[cite: 1]</strong><br>
-            ( _ ) Custos &nbsp;&nbsp; (&nbsp;X&nbsp;) Meio Ambiente &nbsp;&nbsp; ( _ ) Produtividade &nbsp;&nbsp; ( _ ) Qualidade &nbsp;&nbsp; ( _ ) Riscos &nbsp;&nbsp; ( _ ) Saúde e Segurança[cite: 1]</p>
-
-            <h2>2 Referência</h2>
-            <p>Este procedimento se aplica ao Almoxarifado da GER INDUSTR PROCESSO MINERAL[cite: 1].</p>
-
-            <h2>3 Definições</h2>
-            <p><strong>FDS (Ficha com Dados de Segurança):</strong> Documento que fornece informações a respeito de vários aspectos de produtos químicos quanto à proteção, à segurança e ao meio ambiente[cite: 1].</p>
-            <p><strong>Reserva:</strong> Pedido de material de um item em estoque, realizado via SAP pela transação MB21[cite: 1].</p>
-        </div>
-
-        <!-- ================= PÁGINA 2 ================= -->
-        <div class="pagina-a4" contenteditable="true">
-            <div class="cabecalho-pagina">
-                <div class="topo-header">
-                    <div class="topo-titulo">Gestão de estoque do CTSS</div>
-                    <div class="logo-vale">VALE</div>
-                </div>
-                <div class="pro-info">PRO-043927, Rev.: 01 – 13/03/2025[cite: 1]</div>
-            </div>
-
-            <p><strong>APP Sistema de (gestão de materiais) DI Processamento Mineral:</strong> APP para solicitações[cite: 1]:</p>
-            <ul>
-                <li><strong>Gestão de Estoque:</strong> Acompanhamento de materiais em estoque[cite: 1].</li>
-                <li><strong>Cadastro de materiais:</strong> Solicite o cadastro de novos materiais[cite: 1].</li>
-                <li><strong>Requisições de compras:</strong> Solicite requisições de compras[cite: 1].</li>
-                <li><strong>Retirada de materiais não estocáveis:</strong> Solicite a retirada de materiais[cite: 1].</li>
-                <li><strong>Solicitar NF e/ou Coleta:</strong> Solicite a Nota fiscal e/ou Coleta[cite: 1].</li>
-                <li><strong>Status da solicitação:</strong> Acompanhe a solicitação[cite: 1].</li>
-                <li><strong>Verificar materiais:</strong> Scaneie materiais em estoque[cite: 1].</li>
-                <li><strong>Gestão de ferramentas:</strong> Uso exclusivo para almoxarifado no V-TOOLING[cite: 1].</li>
-            </ul>
-            <div class="link-box">https://apps.powerapps.com/play/e/c06a757f-f8de-45e1-8170-f613f20739f5/a/cfc020af-97dc-4d8c-9b1c-ac31228d7d9e?tenantId=7893571b-6c2c-4cef-b4da-7d4b266a0626&hint=da5815fe-aa76-4265-a806-d776714e948b&sourcetime=1723492153963[cite: 1]</div>
-
-            <p><strong>Material Estocável:</strong> Itens mantidos em estoque de forma contínua ou periódica[cite: 1].</p>
-            <p><strong>Material Não Estocável:</strong> Itens adquiridos sob demanda, sem armazenamento de longo prazo[cite: 1].</p>
-
-            <h2>4 Recursos Mínimos para Realizar a Atividade</h2>
-            <table>
-                <tr>
-                    <th>Nº[cite: 1]</th>
-                    <th>Item[cite: 1]</th>
-                    <th>Descrição[cite: 1]</th>
-                </tr>
-                <tr>
-                    <td>1[cite: 1]</td>
-                    <td>EPI’S[cite: 1]</td>
-                    <td>Botina de Segurança (com palmilha autoperfurante), capacete com jugular e óculos de segurança, colete refletivo, luvas conforme atividade[cite: 1].</td>
-                </tr>
-                <tr>
-                    <td>2[cite: 1]</td>
-                    <td>FERRAMENTAS DE SAÚDE E SEGURANÇA[cite: 1]</td>
-                    <td>Portar a ART da atividade e desenvolver ART LOCAL em campo[cite: 1].</td>
-                </tr>
-                <tr>
-                    <td>3[cite: 1]</td>
-                    <td>EQUIPAMENTOS E/OU FERRAMENTAS[cite: 1]</td>
-                    <td>Rádio De Comunicação; empilhadeira, paleteira, transpaleteira elétrica, varredeira, Munck; Pick up[cite: 1].</td>
-                </tr>
-            </table>
-
-            <h2>5 Cuidados Especiais</h2>
-            <p>Preparar todo material necessário antes de iniciar a tarefa, não faça improviso. Respeitar os sinais sonoros e visuais do Armazém, mantendo distância segura dos veículos e equipamentos[cite: 1].</p>
-
-            <div class="alerta-box">
-                <div class="alerta-icone">⚠️</div>
-                <div>
-                    <strong>ATENÇÃO!</strong><br>
-                    Para atividades em áreas abertas, deve-se: Consultar o boletim meteorológico. Não realizar atividades em caso de previsão de descarga atmosférica[cite: 1].
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= PÁGINA 3 ================= -->
-        <div class="pagina-a4" contenteditable="true">
-            <div class="cabecalho-pagina">
-                <div class="topo-header">
-                    <div class="topo-titulo">Gestão de estoque do CTSS</div>
-                    <div class="logo-vale">VALE</div>
-                </div>
-                <div class="pro-info">PRO-043927, Rev.: 01 – 13/03/2025[cite: 1]</div>
-            </div>
-
-            <h2>6 Descrição Sequencial dos Passos da Tarefa / Atividade</h2>
             
-            <h3>6.1 Fluxo para Envio de Material Vale x Vale (CTSS x G4)</h3>
-            <ul>
-                <li>Identificar o material e enviar e-mail com fotos, descrição e quantidade para <code>almoxarifado@ctss.com</code>[cite: 2].</li>
-                <li>Preencher formulário no Sistema de Gestão de Materiais para emissão da Nota Fiscal e acompanhar a aba "NF e Frete"[cite: 2].</li>
-                <li>Preencher o Romaneio Online e aguardar aprovação do Coordenador[cite: 2].</li>
-                <li>Validação patrimonial prévia antes de embalar e liberação do transporte pelo almoxarifado[cite: 2].</li>
-            </ul>
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="window.print()" class="text-xs font-bold px-3 py-1.5 rounded-xl border border-slate-300 text-slate-700 hover:bg-slate-50 transition flex items-center gap-1.5">
+                    🖨️ Imprimir / PDF
+                </button>
+                <button type="button" onclick="exportarCSV()" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white transition flex items-center gap-1.5">
+                    📥 Exportar CSV
+                </button>
+                <button type="button" onclick="abrirModalNovaOV()" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-[#007e7a] hover:bg-[#005a57] text-white transition flex items-center gap-1.5 shadow-sm">
+                    ➕ Nova OV (SAP)
+                </button>
+            </div>
+        </nav>
 
-            <h3>6.2 Fluxo para Retirada de Materiais Vale x Vale (G4 x CTSS)</h3>
-            <ul>
-                <li>Solicitar no app de Gestão de Materiais ("Retirada de Materiais Não Estocáveis") informando site, material e quantidade[cite: 2].</li>
-                <li>Almoxarifado verifica diariamente, separa, carrega e emite o Romaneio Online[cite: 2].</li>
-                <li>Portaria valida e autoriza a saída com registro fotográfico para rastreabilidade[cite: 2].</li>
-            </ul>
+        <!-- CABEÇALHO DO MÓDULO -->
+        <header class="bg-gradient-to-r from-[#007e7a] to-[#005a57] text-white p-6 rounded-2xl shadow-lg shadow-teal-900/10">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl font-black tracking-widest text-teal-100">VALE</span>
+                        <div class="h-5 w-px bg-teal-300/40"></div>
+                        <h1 class="text-lg font-extrabold tracking-wide">Controle de Ordens de Venda (OV / SD)</h1>
+                        <span class="bg-amber-500 text-white font-black text-[10px] px-2 py-0.5 rounded shadow-sm">ZVSU</span>
+                    </div>
+                    <p class="text-xs text-teal-100/90 mt-1">Gestão, pesagens e rastreabilidade de OVs de Sucata, Escória e Resíduos Operacionais</p>
+                </div>
 
-            <h3>6.3 Fluxo de Envio e Retirada de Terceirizadas e Funcionário x Residência</h3>
-            <ul>
-                <li>Informar na reunião de programação, enviar e-mail ao almoxarifado com evidência fotográfica e preencher o Romaneio Online[cite: 2].</li>
-                <li>Para retirada residencial, o colaborador preenche o Romaneio Online informando justificativa, data de devolução e obtém aprovação do gestor[cite: 2].</li>
-            </ul>
+                <!-- CARDS DE RESUMO RÁPIDO -->
+                <div class="flex flex-wrap gap-2 text-right">
+                    <div class="bg-white/10 backdrop-blur-sm px-3.5 py-2 rounded-xl border border-white/10 text-left">
+                        <div class="text-[10px] text-teal-100 font-bold uppercase tracking-wider">Total em Aberto</div>
+                        <div id="statTotalAberto" class="text-base font-black text-white leading-tight">0 OVs</div>
+                    </div>
+                    <div class="bg-white/10 backdrop-blur-sm px-3.5 py-2 rounded-xl border border-white/10 text-left">
+                        <div class="text-[10px] text-teal-100 font-bold uppercase tracking-wider">Peso Total Negociado</div>
+                        <div id="statPesoTotal" class="text-base font-black text-amber-300 leading-tight">0.000 KG</div>
+                    </div>
+                </div>
+            </div>
+        </header>
 
-            <h2>7 Anexos</h2>
-            <table>
-                <tr>
-                    <th>#[cite: 1]</th>
-                    <th>Descrição[cite: 1]</th>
-                    <th>Endereço / Referência[cite: 1]</th>
-                </tr>
-                <tr><td>1[cite: 1]</td><td>Reserva MB21[cite: 1]</td><td>Passo a Passo RC Reserva.pdf[cite: 1]</td></tr>
-                <tr><td>2[cite: 1]</td><td>V-tooling[cite: 1]</td><td>https://app.vtooling.valeglobal.net/selecao-area-usuaria[cite: 1]</td></tr>
-                <tr><td>3[cite: 1]</td><td>Autorização de Saída de materiais[cite: 1]</td><td>N/A[cite: 1]</td></tr>
-                <tr><td>4[cite: 1]</td><td>Retiradas de Ferramentas[cite: 1]</td><td>retirada de ferramentas.xlsx[cite: 1]</td></tr>
-            </table>
+        <!-- FILTROS E BUSCA -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between no-print">
+            <div class="relative w-full md:w-96">
+                <input type="text" id="filtroTexto" oninput="filtrarOVs()" placeholder="Buscar por OV, Cliente, Pedido DRS ou Material..." class="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-xl bg-slate-50 outline-none focus:border-teal-600 focus:bg-white transition">
+                <span class="absolute left-3 top-2.5 text-xs text-slate-400">🔍</span>
+            </div>
 
-            <h2>8 Elaboradores e Aprovadores</h2>
-            <table>
-                <tr>
-                    <th>Nome[cite: 1]</th>
-                    <th>Matrícula[cite: 1]</th>
-                    <th>Gerência[cite: 1]</th>
-                </tr>
-                <tr><td>Alfredo Augusto Ramos Neto[cite: 1]</td><td>81021893[cite: 1]</td><td>GER INDUSTR PROCESSO MINERAL[cite: 1]</td></tr>
-                <tr><td>Allan Souza De Carvalho[cite: 1]</td><td>10900407[cite: 1]</td><td>GER INDUSTR PROCESSO MINERAL[cite: 1]</td></tr>
-                <tr><td>Atmisto Silva[cite: 1]</td><td>C0625384[cite: 1]</td><td>GER INDUSTR PROCESSO MINERAL[cite: 1]</td></tr>
-                <tr><td>Mariana Pereira Cruz[cite: 1]</td><td>81025364[cite: 1]</td><td>GER INDUSTR PROCESSO MINERAL[cite: 1]</td></tr>
-            </table>
+            <div class="flex items-center gap-2 w-full md:w-auto">
+                <select id="filtroStatus" onchange="filtrarOVs()" class="text-xs border border-slate-300 bg-slate-50 rounded-xl px-3 py-2 outline-none focus:border-teal-600 font-semibold text-slate-700">
+                    <option value="TODOS">Todos os Status</option>
+                    <option value="ABERTO">Em Aberto / Com Saldo</option>
+                    <option value="CONCLUIDO">Concluídas (100% Expedidas)</option>
+                    <option value="BLOQUEADO">Com Bloqueio de Remessa</option>
+                </select>
+                <button type="button" onclick="carregarExemploPadrao()" class="text-xs font-semibold text-teal-700 bg-teal-50 border border-teal-200 hover:bg-teal-100 px-3 py-2 rounded-xl transition">
+                    Carregar OV Padrão SAP
+                </button>
+            </div>
+        </div>
+
+        <!-- LISTA DE ORDENS DE VENDA -->
+        <div id="containerOVs" class="space-y-4">
+            <!-- Cards injetados via JS -->
         </div>
 
     </div>
 
-    <!-- SCRIPTS -->
+    <!-- MODAL: REGISTRAR CARREGAMENTO / EXPEDIÇÃO DE PESAGEM -->
+    <div id="modalExpedicao" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <h3 class="font-bold text-slate-900 text-sm">Registrar Carregamento / Pesagem (Ticket)</h3>
+                <button type="button" onclick="fecharModalExpedicao()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
+            </div>
+
+            <input type="hidden" id="expOVId">
+
+            <div class="space-y-3 text-xs">
+                <div>
+                    <label class="block text-slate-500 font-bold mb-1">Nº do Ticket de Balança / Nota Fiscal</label>
+                    <input type="text" id="expTicket" placeholder="Ex: TKT-98432 ou NF-10492" class="w-full border border-slate-300 rounded-xl p-2.5 bg-slate-50 outline-none focus:border-teal-600">
+                </div>
+                <div>
+                    <label class="block text-slate-500 font-bold mb-1">Placa do Veículo / Transportador</label>
+                    <input type="text" id="expPlaca" placeholder="Ex: ABC-1D23 / Gerdau Log" class="w-full border border-slate-300 rounded-xl p-2.5 bg-slate-50 outline-none focus:border-teal-600">
+                </div>
+                <div>
+                    <label class="block text-slate-500 font-bold mb-1">Peso Líquido Carregado (KG)</label>
+                    <input type="number" id="expPeso" placeholder="Ex: 2500" class="w-full border border-slate-300 rounded-xl p-2.5 bg-slate-50 outline-none focus:border-teal-600 font-bold text-teal-800">
+                </div>
+                <div>
+                    <label class="block text-slate-500 font-bold mb-1">Data da Pesagem</label>
+                    <input type="date" id="expData" class="w-full border border-slate-300 rounded-xl p-2.5 bg-slate-50 outline-none focus:border-teal-600">
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                <button type="button" onclick="fecharModalExpedicao()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Cancelar</button>
+                <button type="button" onclick="salvarExpedicao()" class="px-4 py-2 rounded-xl text-xs font-bold bg-[#007e7a] hover:bg-[#005a57] text-white shadow-sm">Confirmar Pesagem</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: NOVA OV (SAP SD) -->
+    <div id="modalNovaOV" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 space-y-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-teal-700 text-lg">📑</span>
+                    <h3 class="font-bold text-slate-900 text-sm">Cadastrar Ordem de Venda (SAP SD)</h3>
+                </div>
+                <button type="button" onclick="fecharModalNovaOV()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
+            </div>
+
+            <form id="formNovaOV" onsubmit="salvarNovaOV(event)" class="space-y-4 text-xs">
+                
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-slate-500 font-bold mb-1">Nº Venda Sucata / OV</label>
+                        <input type="text" id="novoOV" required placeholder="Ex: 115443653" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50 outline-none focus:border-teal-600 font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-slate-500 font-bold mb-1">Tipo Doc. Vendas</label>
+                        <input type="text" id="novoTipoDoc" value="ZVSU - Venda Sucata/Escoria" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-100 text-slate-600 font-medium" readonly>
+                    </div>
+                    <div>
+                        <label class="block text-slate-500 font-bold mb-1">Data do Pedido</label>
+                        <input type="date" id="novoDataPedido" required class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50 outline-none focus:border-teal-600">
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-slate-500 font-bold mb-1">Cód. Emissor / Recebedor</label>
+                        <input type="text" id="novoCodCliente" placeholder="Ex: 100070" value="100070" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50 outline-none focus:border-teal-600">
+                    </div>
+                    <div>
+                        <label class="block text-slate-500 font-bold mb-1">Razão Social do Cliente</label>
+                        <input type="text" id="novoNomeCliente" required placeholder="Ex: GERDAU AÇOS LONGOS S.A." class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50 outline-none focus:border-teal-600 font-bold">
+                    </div>
+                </div>
+
+                <div>
+                    <label class="block text-slate-500 font-bold mb-1">Endereço do Cliente / Destino</label>
+                    <input type="text" id="novoEnderecoCliente" placeholder="Ex: AVENIDA JOAO XXIII 6777 / RIO DE JANEIRO" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50 outline-none focus:border-teal-600">
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-slate-500 font-bold mb-1">Nº Pedido Cliente / DRS</label>
+                        <input type="text" id="novoNumPedidoDRS" placeholder="Ex: 71823 DRS 034A/2023" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50 outline-none focus:border-teal-600">
+                    </div>
+                    <div>
+                        <label class="block text-slate-500 font-bold mb-1">Valor Líquido (R$)</label>
+                        <input type="number" step="0.01" id="novoValor" placeholder="Ex: 6300.00" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50 outline-none focus:border-teal-600 font-bold">
+                    </div>
+                    <div>
+                        <label class="block text-slate-500 font-bold mb-1">Condição de Pagamento</label>
+                        <input type="text" id="novoCondPgto" value="ZPRE Pré-Pagamento" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50 outline-none focus:border-teal-600">
+                    </div>
+                </div>
+
+                <div class="border-t border-slate-100 pt-3">
+                    <span class="block font-bold text-slate-700 text-xs mb-2">Item do Material (SD)</span>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div>
+                            <label class="block text-slate-500 font-bold mb-1">Cód. Material</label>
+                            <input type="text" id="novoMaterialCod" placeholder="Ex: 3017001038" value="3017001038" class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50 outline-none focus:border-teal-600">
+                        </div>
+                        <div>
+                            <label class="block text-slate-500 font-bold mb-1">Denominação</label>
+                            <input type="text" id="novoMaterialDesc" placeholder="Ex: SUCATA DE FERRO" value="SUCATA DE FERRO" required class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50 outline-none focus:border-teal-600 font-bold">
+                        </div>
+                        <div>
+                            <label class="block text-slate-500 font-bold mb-1">Peso Total (KG)</label>
+                            <input type="number" id="novoPesoTotal" placeholder="Ex: 5000" required class="w-full border border-slate-300 rounded-xl p-2 bg-slate-50 outline-none focus:border-teal-600 font-bold text-teal-800">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                    <button type="button" onclick="fecharModalNovaOV()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Cancelar</button>
+                    <button type="submit" class="px-4 py-2 rounded-xl text-xs font-bold bg-[#007e7a] hover:bg-[#005a57] text-white shadow-sm">Gravar OV no Sistema</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SCRIPT DO MÓDULO 11 -->
     <script>
-        function execCmd(command, value = null) {
-            document.execCommand(command, false, value);
+        const STORAGE_KEY = "vale_modulo11_ovs_v1";
+
+        // Exemplo default idêntico à tela do SAP da foto
+        const DADOS_INICIAIS = [
+            {
+                id: "115443653",
+                ov: "115443653",
+                tipoDoc: "ZVSU",
+                tipoDocDesc: "Venda Sucata/Escoria",
+                emissorCod: "100070",
+                cliente: "GERDAU AÇOS LONGOS S.A.",
+                endereco: "AVENIDA JOAO XXIII 6777 / RIO DE JANEIRO",
+                pedidoDRS: "71823 DRS 034A/2023",
+                dataPedido: "2026-04-29",
+                valorLiquido: 6300.00,
+                moeda: "BRL",
+                condPgto: "ZPRE Pré-Pagamento",
+                materialCod: "3017001038",
+                materialDesc: "SUCATA DE FERRO",
+                pesoTotalKG: 5000,
+                bloqueioRemessa: false,
+                expedicoes: [
+                    { id: 1, ticket: "TKT-88412", placa: "LRK-4921", pesoKG: 2450, data: "2026-05-02" }
+                ]
+            }
+        ];
+
+        function getOVs() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(DADOS_INICIAIS));
+                return DADOS_INICIAIS;
+            }
+            try {
+                return JSON.parse(raw);
+            } catch (e) {
+                return DADOS_INICIAIS;
+            }
         }
 
-        function baixarWord() {
-            let conteudoHTML = "<html><head><meta charset='utf-8'></head><body>" + document.getElementById('conteudoCompleto').innerHTML + "</body></html>";
-            let blob = new Blob(['\ufeff' + conteudoHTML], {
-                type: 'application/msword'
+        function salvarListaOVs(lista) {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(lista));
+            renderizar();
+        }
+
+        function carregarExemploPadrao() {
+            salvarListaOVs(DADOS_INICIAIS);
+        }
+
+        function renderizar() {
+            const ovs = getOVs();
+            const termo = (document.getElementById('filtroTexto')?.value || '').toLowerCase().trim();
+            const statusFiltro = document.getElementById('filtroStatus')?.value || 'TODOS';
+            const container = document.getElementById('containerOVs');
+
+            let totalAbertoCount = 0;
+            let pesoTotalSoma = 0;
+
+            const listaFiltrada = ovs.filter(item => {
+                const expedido = (item.expedicoes || []).reduce((acc, curr) => acc + Number(curr.pesoKG || 0), 0);
+                const saldo = item.pesoTotalKG - expedido;
+                const concluido = saldo <= 0;
+
+                pesoTotalSoma += Number(item.pesoTotalKG || 0);
+                if (!concluido) totalAbertoCount++;
+
+                // Filtro Status
+                if (statusFiltro === 'ABERTO' && concluido) return false;
+                if (statusFiltro === 'CONCLUIDO' && !concluido) return false;
+                if (statusFiltro === 'BLOQUEADO' && !item.bloqueioRemessa) return false;
+
+                // Filtro Texto
+                if (termo) {
+                    const match = (
+                        (item.ov || '').toLowerCase().includes(termo) ||
+                        (item.cliente || '').toLowerCase().includes(termo) ||
+                        (item.pedidoDRS || '').toLowerCase().includes(termo) ||
+                        (item.materialDesc || '').toLowerCase().includes(termo) ||
+                        (item.materialCod || '').toLowerCase().includes(termo)
+                    );
+                    if (!match) return false;
+                }
+                return true;
             });
-            let url = URL.createObjectURL(blob);
-            let a = document.createElement('a');
-            a.href = url;
-            a.download = 'PRO-043927-Gestao-Estoque-CTSS.doc';
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
+
+            // Atualiza resumo
+            const elTotalAberto = document.getElementById('statTotalAberto');
+            const elPesoTotal = document.getElementById('statPesoTotal');
+            if (elTotalAberto) elTotalAberto.innerText = `${totalAbertoCount} OVs`;
+            if (elPesoTotal) elPesoTotal.innerText = `${(pesoTotalSoma).toLocaleString('pt-BR')} KG`;
+
+            if (listaFiltrada.length === 0) {
+                container.innerHTML = `
+                    <div class="bg-white p-12 text-center rounded-2xl border border-slate-200">
+                        <span class="text-4xl block mb-2">🔍</span>
+                        <h4 class="font-bold text-slate-700 text-sm">Nenhuma Ordem de Venda encontrada</h4>
+                        <p class="text-xs text-slate-400 mt-1">Ajuste os filtros ou cadastre uma nova OV do SAP.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = listaFiltrada.map(ov => {
+                const totalExpedido = (ov.expedicoes || []).reduce((acc, curr) => acc + Number(curr.pesoKG || 0), 0);
+                const saldoKG = Math.max(0, ov.pesoTotalKG - totalExpedido);
+                const percentual = Math.min(100, Math.round((totalExpedido / ov.pesoTotalKG) * 100)) || 0;
+                const concluido = saldoKG <= 0;
+
+                return `
+                    <div class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden card-sap transition hover:shadow-md">
+                        
+                        <!-- BARRA SUPERIOR SAP STYLE -->
+                        <div class="bg-slate-50 border-b border-slate-200/80 px-5 py-3 flex flex-wrap items-center justify-between gap-3">
+                            <div class="flex items-center gap-3">
+                                <span class="bg-[#007e7a] text-white text-xs font-black px-2.5 py-1 rounded-md tracking-wider">
+                                    OV ${ov.ov}
+                                </span>
+                                <span class="text-xs font-bold text-slate-700">${ov.tipoDocDesc || 'Venda Sucata/Escoria'}</span>
+                                <span class="text-[11px] text-slate-400 font-mono">(${ov.tipoDoc || 'ZVSU'})</span>
+                            </div>
+
+                            <div class="flex items-center gap-2">
+                                ${concluido 
+                                    ? `<span class="bg-emerald-100 text-emerald-800 text-[10px] font-black px-2.5 py-0.5 rounded-full border border-emerald-200">CONCLUÍDO (100%)</span>`
+                                    : `<span class="bg-amber-100 text-amber-800 text-[10px] font-black px-2.5 py-0.5 rounded-full border border-amber-200">SALDO: ${saldoKG.toLocaleString('pt-BR')} KG</span>`
+                                }
+                                <button type="button" onclick="excluirOV('${ov.id}')" class="text-slate-400 hover:text-rose-600 text-xs px-2 py-1 rounded hover:bg-rose-50 no-print" title="Excluir OV">
+                                    🗑️
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- CONTEÚDO PRINCIPAL DOS DADOS DA OV -->
+                        <div class="p-5 space-y-4">
+                            
+                            <!-- GRID DE INFORMAÇÕES DE CABEÇALHO SAP -->
+                            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 text-xs">
+                                <div>
+                                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Emissor / Cliente</span>
+                                    <div class="font-bold text-slate-900 mt-0.5">${ov.cliente}</div>
+                                    <div class="text-[11px] text-slate-500">Cód: ${ov.emissorCod} • ${ov.endereco || ''}</div>
+                                </div>
+
+                                <div>
+                                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Nº Pedido Cliente / DRS</span>
+                                    <div class="font-bold text-slate-900 mt-0.5">${ov.pedidoDRS || '---'}</div>
+                                    <div class="text-[11px] text-slate-500">Data Pedido: ${formatarData(ov.dataPedido)}</div>
+                                </div>
+
+                                <div>
+                                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Valor Líquido & Condição</span>
+                                    <div class="font-bold text-emerald-700 mt-0.5">${(ov.valorLiquido || 0).toLocaleString('pt-BR', { style: 'currency', currency: ov.moeda || 'BRL' })}</div>
+                                    <div class="text-[11px] text-slate-500">${ov.condPgto || 'ZPRE Pré-Pagamento'}</div>
+                                </div>
+
+                                <div>
+                                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Material / Quantidade SAP</span>
+                                    <div class="font-bold text-slate-900 mt-0.5">${ov.materialDesc}</div>
+                                    <div class="text-[11px] text-slate-500">Cód: ${ov.materialCod} • <b>${(ov.pesoTotalKG).toLocaleString('pt-BR')} KG (${(ov.pesoTotalKG/1000).toFixed(2)} TO)</b></div>
+                                </div>
+                            </div>
+
+                            <!-- BARRA DE PROGRESSO DO CARREGAMENTO -->
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-100 space-y-1.5">
+                                <div class="flex justify-between text-xs font-bold text-slate-600">
+                                    <span>Progresso das Pesagens / Expedição</span>
+                                    <span class="text-teal-800">${totalExpedido.toLocaleString('pt-BR')} KG expedidos de ${ov.pesoTotalKG.toLocaleString('pt-BR')} KG (${percentual}%)</span>
+                                </div>
+                                <div class="w-full bg-slate-200 h-2.5 rounded-full overflow-hidden">
+                                    <div class="bg-teal-600 h-full rounded-full transition-all duration-500" style="width: ${percentual}%"></div>
+                                </div>
+                            </div>
+
+                            <!-- SUBTABELA DE EXPEDIÇÕES / TICKETS DE BALANÇA -->
+                            <div class="border-t border-slate-100 pt-3">
+                                <div class="flex justify-between items-center mb-2">
+                                    <h4 class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                        <span>🚛</span> Histórico de Pesagens / Tickets Vinculados
+                                    </h4>
+                                    <button type="button" onclick="abrirModalExpedicao('${ov.id}')" ${concluido ? 'disabled' : ''} class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-teal-50 text-teal-800 border border-teal-200 hover:bg-teal-100 transition disabled:opacity-40 disabled:cursor-not-allowed no-print">
+                                        + Lançar Pesagem
+                                    </button>
+                                </div>
+
+                                ${(!ov.expedicoes || ov.expedicoes.length === 0) 
+                                    ? `<p class="text-[11px] text-slate-400 italic">Nenhum carregamento ou ticket registrado para esta ordem até o momento.</p>`
+                                    : `
+                                    <div class="overflow-x-auto">
+                                        <table class="w-full text-left text-xs border border-slate-100 rounded-lg">
+                                            <thead>
+                                                <tr class="bg-slate-50 text-slate-500 text-[10px] uppercase font-bold border-b border-slate-100">
+                                                    <th class="py-1.5 px-3">Data</th>
+                                                    <th class="py-1.5 px-3">Ticket / NF</th>
+                                                    <th class="py-1.5 px-3">Placa / Transporte</th>
+                                                    <th class="py-1.5 px-3 text-right">Peso Carregado (KG)</th>
+                                                    <th class="py-1.5 px-3 text-center no-print">Ação</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody class="divide-y divide-slate-100">
+                                                ${ov.expedicoes.map((exp, idx) => `
+                                                    <tr class="hover:bg-slate-50/50">
+                                                        <td class="py-1.5 px-3 text-slate-600">${formatarData(exp.data)}</td>
+                                                        <td class="py-1.5 px-3 font-semibold text-slate-800">${exp.ticket || 'S/N'}</td>
+                                                        <td class="py-1.5 px-3 text-slate-600 font-mono">${exp.placa || '---'}</td>
+                                                        <td class="py-1.5 px-3 text-right font-bold text-teal-700">${Number(exp.pesoKG).toLocaleString('pt-BR')} KG</td>
+                                                        <td class="py-1.5 px-3 text-center no-print">
+                                                            <button type="button" onclick="removerExpedicao('${ov.id}', ${idx})" class="text-rose-400 hover:text-rose-600 text-xs">✕</button>
+                                                        </td>
+                                                    </tr>
+                                                `).join('')}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    `
+                                }
+                            </div>
+
+                        </div>
+                    </div>
+                `;
+            }).join('');
         }
 
-        let synth = window.speechSynthesis;
-        function lerTexto() {
-            if (synth.speaking) synth.cancel();
-            let utterance = new SpeechSynthesisUtterance(document.getElementById('conteudoCompleto').innerText);
-            utterance.lang = 'pt-BR';
-            synth.speak(utterance);
+        function formatarData(dataStr) {
+            if (!dataStr) return '---';
+            const partes = dataStr.split('-');
+            if (partes.length === 3) {
+                return `${partes[2]}/${partes[1]}/${partes[0]}`;
+            }
+            return dataStr;
         }
-        function pararLeitura() {
-            if (synth.speaking) synth.cancel();
+
+        // Funções de Modal Nova OV
+        function abrirModalNovaOV() {
+            document.getElementById('formNovaOV').reset();
+            document.getElementById('novoDataPedido').value = new Date().toISOString().split('T')[0];
+            document.getElementById('modalNovaOV').classList.remove('hidden');
         }
+
+        function fecharModalNovaOV() {
+            document.getElementById('modalNovaOV').classList.add('hidden');
+        }
+
+        function salvarNovaOV(e) {
+            e.preventDefault();
+            const ovs = getOVs();
+
+            const novaOV = {
+                id: String(document.getElementById('novoOV').value).trim(),
+                ov: String(document.getElementById('novoOV').value).trim(),
+                tipoDoc: "ZVSU",
+                tipoDocDesc: "Venda Sucata/Escoria",
+                emissorCod: document.getElementById('novoCodCliente').value.trim() || '100070',
+                cliente: document.getElementById('novoNomeCliente').value.trim().toUpperCase(),
+                endereco: document.getElementById('novoEnderecoCliente').value.trim(),
+                pedidoDRS: document.getElementById('novoNumPedidoDRS').value.trim(),
+                dataPedido: document.getElementById('novoDataPedido').value,
+                valorLiquido: parseFloat(document.getElementById('novoValor').value) || 0,
+                moeda: "BRL",
+                condPgto: document.getElementById('novoCondPgto').value.trim() || 'ZPRE Pré-Pagamento',
+                materialCod: document.getElementById('novoMaterialCod').value.trim() || '3017001038',
+                materialDesc: document.getElementById('novoMaterialDesc').value.trim().toUpperCase(),
+                pesoTotalKG: parseFloat(document.getElementById('novoPesoTotal').value) || 0,
+                bloqueioRemessa: false,
+                expedicoes: []
+            };
+
+            ovs.unshift(novaOV);
+            salvarListaOVs(ovs);
+            fecharModalNovaOV();
+        }
+
+        function excluirOV(id) {
+            if (!confirm(`Deseja realmente remover a OV ${id}?`)) return;
+            const ovs = getOVs().filter(o => o.id !== id);
+            salvarListaOVs(ovs);
+        }
+
+        // Funções de Pesagem / Expedição
+        function abrirModalExpedicao(ovId) {
+            document.getElementById('expOVId').value = ovId;
+            document.getElementById('expTicket').value = '';
+            document.getElementById('expPlaca').value = '';
+            document.getElementById('expPeso').value = '';
+            document.getElementById('expData').value = new Date().toISOString().split('T')[0];
+            document.getElementById('modalExpedicao').classList.remove('hidden');
+        }
+
+        function fecharModalExpedicao() {
+            document.getElementById('modalExpedicao').classList.add('hidden');
+        }
+
+        function salvarExpedicao() {
+            const ovId = document.getElementById('expOVId').value;
+            const ticket = document.getElementById('expTicket').value.trim();
+            const placa = document.getElementById('expPlaca').value.trim().toUpperCase();
+            const peso = parseFloat(document.getElementById('expPeso').value);
+            const data = document.getElementById('expData').value;
+
+            if (!peso || peso <= 0) {
+                alert("Por favor, digite um peso líquido válido.");
+                return;
+            }
+
+            const ovs = getOVs();
+            const index = ovs.findIndex(o => o.id === ovId);
+            if (index !== -1) {
+                if (!ovs[index].expedicoes) ovs[index].expedicoes = [];
+                ovs[index].expedicoes.push({
+                    ticket: ticket || 'S/N',
+                    placa: placa || '---',
+                    pesoKG: peso,
+                    data: data || new Date().toISOString().split('T')[0]
+                });
+                salvarListaOVs(ovs);
+            }
+            fecharModalExpedicao();
+        }
+
+        function removerExpedicao(ovId, expIndex) {
+            if (!confirm("Remover este ticket de balança?")) return;
+            const ovs = getOVs();
+            const index = ovs.findIndex(o => o.id === ovId);
+            if (index !== -1 && ovs[index].expedicoes) {
+                ovs[index].expedicoes.splice(expIndex, 1);
+                salvarListaOVs(ovs);
+            }
+        }
+
+        function filtrarOVs() {
+            renderizar();
+        }
+
+        function exportarCSV() {
+            const ovs = getOVs();
+            if (!ovs || ovs.length === 0) {
+                alert("Não há dados para exportar.");
+                return;
+            }
+
+            let csvContent = "data:text/csv;charset=utf-8,";
+            csvContent += "Numero OV;Tipo Doc;Cliente;Pedido DRS;Data Pedido;Material Cod;Material Desc;Peso Negociado (KG);Peso Expedido (KG);Saldo Pendente (KG);Valor Liquido (BRL)\r\n";
+
+            ovs.forEach(o => {
+                const totalExp = (o.expedicoes || []).reduce((acc, curr) => acc + Number(curr.pesoKG || 0), 0);
+                const saldo = Math.max(0, o.pesoTotalKG - totalExp);
+                const linha = [
+                    o.ov,
+                    o.tipoDoc,
+                    `"${o.cliente}"`,
+                    `"${o.pedidoDRS || ''}"`,
+                    o.dataPedido,
+                    o.materialCod,
+                    `"${o.materialDesc}"`,
+                    o.pesoTotalKG,
+                    totalExp,
+                    saldo,
+                    o.valorLiquido
+                ].join(";");
+                csvContent += linha + "\r\n";
+            });
+
+            const encodedUri = encodeURI(csvContent);
+            const link = document.createElement("a");
+            link.setAttribute("href", encodedUri);
+            link.setAttribute("download", `controle_ovs_vale_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            renderizar();
+        });
     </script>
-
 </body>
 </html>
