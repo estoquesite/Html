@@ -25,7 +25,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1e293
   </div>
   <div class="flex flex-wrap items-center gap-2">
     <span id="badgeConexao" class="text-[11px] font-bold px-2.5 py-1.5 rounded-xl border flex items-center gap-1.5 bg-slate-100 text-slate-600 border-slate-200"><span id="pontoConexao" class="w-2 h-2 rounded-full bg-slate-400"></span><span id="textoConexao">Iniciando...</span></span>
-    <button onclick="abrir('ov','')" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white">📷 Ler Nova OV (Print)</button>
+    <button onclick="abrir('ov','')" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white">📷 Ler Nova OV (VA03)</button>
     <button id="btnSalvar" onclick="salvarTudo()" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50">💾 Salvar na Nuvem</button>
     <button onclick="sincronizar()" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white"><span id="iconeSync" class="inline-block">🔄</span> Sincronizar</button>
     <button onclick="exportarCSV()" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white">📥 CSV</button>
@@ -36,19 +36,19 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1e293
   <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
     <div>
       <div class="flex flex-wrap items-center gap-3"><span class="text-2xl font-black tracking-widest text-teal-100">VALE</span><h1 class="text-lg font-extrabold">Painel de OVs por Empresa & Saldos</h1></div>
-      <p class="text-xs text-teal-100/90 mt-1">Leitura de faturas emitidas do SAP e controle de saldo livre em toneladas (TO)</p>
+      <p class="text-xs text-teal-100/90 mt-1">Leitura da OV (VA03) e do fluxo de faturas (SAP) • saldo livre em toneladas (TO) e em R$</p>
     </div>
     <div class="flex gap-2">
       <div class="bg-white/10 px-4 py-2.5 rounded-xl border border-white/10"><div class="text-[10px] text-teal-100 font-bold uppercase">OVs Ativas</div><div id="hCount" class="text-lg font-black">0</div></div>
-      <div class="bg-emerald-900/30 px-4 py-2.5 rounded-xl border border-emerald-400/30"><div class="text-[10px] text-emerald-200 font-bold uppercase">Saldo Livre Geral</div><div id="hSal" class="text-lg font-black text-emerald-300">0,00 TO</div><div id="hSalV" class="text-[10px] font-bold text-emerald-100">R$ 0,00</div></div>
+      <div class="bg-emerald-900/30 px-4 py-2.5 rounded-xl border border-emerald-400/30"><div id="hEsc" class="text-[10px] text-emerald-200 font-bold uppercase">Saldo Livre Geral</div><div id="hSal" class="text-lg font-black text-emerald-300">0,00 TO</div><div id="hSalV" class="text-[10px] font-bold text-emerald-100">R$ 0,00</div></div>
     </div>
   </div>
 </header>
 
 <section class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-  <h2 class="text-xs font-black text-slate-800 uppercase tracking-wider">📊 Total Geral Consolidado (todas as empresas)</h2>
+  <h2 id="tTitulo" class="text-xs font-black text-slate-800 uppercase tracking-wider">📊 Total Geral</h2>
   <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-    <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl"><span class="block text-[10px] font-bold text-slate-400 uppercase">Total Liberado</span><div id="tLib" class="text-lg font-black">0,00 TO</div><div id="tLibV" class="font-bold text-slate-600">R$ 0,00</div></div>
+    <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl"><span class="block text-[10px] font-bold text-slate-400 uppercase">Total das OVs (solicitado)</span><div id="tLib" class="text-lg font-black">0,00 TO</div><div id="tLibV" class="font-bold text-slate-600">R$ 0,00</div></div>
     <div class="bg-rose-50 border border-rose-200 p-3.5 rounded-xl"><span class="block text-[10px] font-bold text-rose-600 uppercase">Já Faturado (saída real)</span><div id="tGas" class="text-lg font-black text-rose-700">0,00 TO</div><div id="tGasV" class="font-bold text-rose-600">R$ 0,00</div></div>
     <div class="bg-emerald-50 border-2 border-emerald-300 p-3.5 rounded-xl"><span class="text-[10px] font-bold text-emerald-700 uppercase flex justify-between">Saldo Livre Restante <b id="tPct" class="bg-emerald-600 text-white px-2 rounded-md">0%</b></span><div id="tSal" class="text-xl font-black text-emerald-800">0,00 TO</div><div id="tSalV" class="font-extrabold text-emerald-700">R$ 0,00</div></div>
   </div>
@@ -56,7 +56,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1e293
 
 <div class="np space-y-2">
   <div class="flex justify-between items-center"><span class="text-xs font-bold text-slate-700 uppercase">🏢 Totais por empresa (clique para filtrar)</span><button onclick="filtrarEmpresa('TODAS')" class="text-[11px] font-bold text-teal-700 hover:underline">Ver todas</button></div>
-  <div id="cardsEmp" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3"></div>
+  <div id="cardsEmp" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
 </div>
 
 <div class="np bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 justify-between">
@@ -70,7 +70,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1e293
 <div id="containerOVs" class="space-y-8"></div>
 </div>
 
-<!-- MODAL ÚNICO: leitor de OV (VA03) ou de faturas -->
+<!-- MODAL ÚNICO: leitor de OV (VA03) ou de faturas (fluxo de documentos) -->
 <div id="modal" class="fixed inset-0 bg-slate-950/75 z-50 hidden items-center justify-center p-4">
   <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
     <div class="flex justify-between items-start border-b pb-3">
@@ -97,7 +97,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1e293
 
 <script>
 const SB_URL="https://gloxtswcksbczinpwtzu.supabase.co",SB_KEY="sb_publishable_0kEiqthWKZZwjM120wQIYw_Hba7qeLc";
-const KEY="vale_modulo11_sap_ovs_reconhecimento_v15_fatura_estrita",PRECO=14575.5,TABELA='modulo11_ovs';
+const KEY="vale_modulo11_sap_ovs_v16_leitor_va03_fluxo",PRECO=14575.5,TABELA='modulo11_ovs';
 const $=i=>document.getElementById(i);
 let sb=null;try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){console.error(e)}
 let dados=[],modo='ov',tmp=null,busy=false,tt;const pend=new Map();
@@ -109,9 +109,14 @@ const TO=(v,c=2)=>num(v).toLocaleString('pt-BR',{minimumFractionDigits:c,maximum
 const BRL=v=>num(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const sid=s=>String(s).replace(/[^\w-]/g,'');
 const hoje=()=>new Date().toISOString().slice(0,10);
+const sz=s=>String(s==null?'':s).replace(/^0+/,'');          /* tira zeros à esquerda (0115443653 -> 115443653) */
 const norm=n=>{n=(n||'').trim();return /gerdau/i.test(n)?'GERDAU AÇOS LONGOS S.A.':(n||'OUTROS CLIENTES')};
-const aviso=m=>{const t=$('toast');t.textContent=m;t.style.opacity=1;clearTimeout(tt);tt=setTimeout(()=>t.style.opacity=0,3500)};
+const aviso=m=>{const t=$('toast');t.textContent=m;t.style.opacity=1;clearTimeout(tt);tt=setTimeout(()=>t.style.opacity=0,3800)};
 const loc=()=>{try{localStorage.setItem(KEY,JSON.stringify(dados))}catch(e){}};
+/* número no padrão brasileiro: "6.300,00" -> 6300 | "5.000" -> 5000 | "0,3" -> 0.3 | "5.000" digitado em campo TO com ponto decimal também funciona */
+const BR=s=>{s=String(s==null?'':s).trim();if(s.indexOf(',')>=0)s=s.replace(/\./g,'').replace(',','.');return parseFloat(s)||0};
+/* quantidade + unidade -> toneladas (KG divide por 1000; TO mantém) */
+const qTO=(n,u)=>{if(/KG/i.test(u))return(parseFloat(String(n).replace(/\./g,'').replace(',','.'))||0)/1000;return BR(n)};
 const T=[
  {h:'bg-blue-700',l:'bg-blue-50/50',b:'border-blue-400',t:'text-blue-900',d:'bg-blue-800',o:'border-blue-300'},
  {h:'bg-purple-700',l:'bg-purple-50/50',b:'border-purple-400',t:'text-purple-900',d:'bg-purple-800',o:'border-purple-300'},
@@ -126,15 +131,20 @@ const DEFAULT=()=>({id:'115939257',status:'ATIVO',contrato:{numero:'0000071823',
  itens:[{itemSap:'40',material:'SUCATA DE FIO-CABO DE ALUMÍNIO E...',qtdTO:.3},{itemSap:'60',material:'SUCATA DE FIO-CABO DE COBRE ENCA...',qtdTO:.3}],
  qtdLiberadaTO:.6,valorBRL:8745.3,precoUnitarioPorTO:PRECO},gastos:[]});
 
+/* cálculo de uma OV: liberado (TO), faturado (TO e R$), saldo livre (TO e R$) */
 function calc(i){const canc=i.status==='CANCELADO',lib=num(i.ov.qtdLiberadaTO),gasto=(i.gastos||[]).reduce((s,g)=>s+num(g.pesoTO),0),
  unit=num(i.ov.precoUnitarioPorTO)||(lib>0?num(i.ov.valorBRL)/lib:PRECO),vg=gasto*unit;
- return{canc,lib,gasto,vg,saldo:canc?0:Math.max(0,lib-gasto),vs:canc?0:Math.max(0,num(i.ov.valorBRL)-vg)}}
+ return{canc,lib,gasto,unit,vg,saldo:canc?0:Math.max(0,lib-gasto),vs:canc?0:Math.max(0,num(i.ov.valorBRL)-vg)}}
+/* soma de uma lista de OVs (ignora canceladas) */
+function totais(list){const t={n:0,lib:0,libV:0,gas:0,gasV:0,sal:0,salV:0};
+ list.forEach(i=>{const c=calc(i);if(c.canc)return;t.n++;t.lib+=c.lib;t.libV+=num(i.ov.valorBRL);t.gas+=c.gasto;t.gasV+=c.vg;t.sal+=c.saldo;t.salV+=c.vs});return t}
+const pct=t=>t.lib>0?Math.round(t.sal/t.lib*100):0;
 
 /* ---------- Supabase / armazenamento ---------- */
 const payload=i=>({id:String(i.id),ov:String(i.ov.numero),status:i.status||'ATIVO',cliente:i.ov.cliente,material:(i.ov.itens||[]).map(x=>x.material).join(' / '),itens:i.ov.itens||[],pedido_drs:i.ov.pedidoDRS,qtd_liberada_to:num(i.ov.qtdLiberadaTO),qtd_liberada_kg:num(i.ov.qtdLiberadaTO)*1000,valor_brl:num(i.ov.valorBRL),preco_unitario_to:num(i.ov.precoUnitarioPorTO)||PRECO,contrato_numero:i.contrato.numero,contrato_total_to:num(i.contrato.qtdTotalTO),gastos:i.gastos||[]});
-const fromRow=d=>{const it=Array.isArray(d.itens)?d.itens:[],soma=it.reduce((s,x)=>s+num(x.qtdTO),0);
+const fromRow=d=>{const it=Array.isArray(d.itens)?d.itens:[],soma=it.reduce((s,x)=>s+num(x.qtdTO),0),q=soma||num(d.qtd_liberada_to),v=num(d.valor_brl);
  return{id:String(d.id),status:d.status||'ATIVO',contrato:{numero:d.contrato_numero||'0000071823',item:'30',qtdTotalTO:num(d.contrato_total_to)||2635,valorTotalBRL:num(d.contrato_total_brl)},
- ov:{numero:String(d.ov),cliente:d.cliente||'',pedidoDRS:d.pedido_drs||'',itens:it,qtdLiberadaTO:soma||num(d.qtd_liberada_to),valorBRL:num(d.valor_brl),precoUnitarioPorTO:num(d.preco_unitario_to)||PRECO},gastos:Array.isArray(d.gastos)?d.gastos:[]}};
+ ov:{numero:String(d.ov),cliente:d.cliente||'',pedidoDRS:d.pedido_drs||'',itens:it,qtdLiberadaTO:q,valorBRL:v,precoUnitarioPorTO:num(d.preco_unitario_to)||(q>0&&v>0?v/q:PRECO)},gastos:Array.isArray(d.gastos)?d.gastos:[]}};
 
 async function carregar(){
  if(sb){try{status('gravando','Sincronizando...');
@@ -166,6 +176,8 @@ function persistir(i){
   catch(e){status('offline','Pendente de envio')}},600))}
 
 /* ---------- renderização ---------- */
+const mini=(rot,cls,t)=>`<div class="${cls} border rounded-xl p-2.5"><span class="block text-[10px] font-bold uppercase opacity-70">${rot}</span><div class="text-sm font-black">${TO(t[0],2)}</div><div class="text-[11px] font-bold opacity-80">${BRL(t[1])}</div></div>`;
+
 function render(){
  const q=($('filtroTexto').value||'').toLowerCase().trim();
  const emps=[...new Set(dados.map(i=>norm(i.ov.cliente)))],tm=temas(emps);
@@ -174,24 +186,34 @@ function render(){
  sel.value=emps.includes(atual)?atual:'TODAS';
  const fe=sel.value;
 
- let L=0,LV=0,G=0,GV=0,S=0,SV=0,n=0;const porEmp={};
- dados.forEach(i=>{const c=calc(i),e=norm(i.ov.cliente);porEmp[e]=porEmp[e]||{n:0,v:0,s:0};porEmp[e].n++;
-  if(!c.canc){L+=c.lib;LV+=num(i.ov.valorBRL);G+=c.gasto;GV+=c.vg;S+=c.saldo;SV+=c.vs;n++;porEmp[e].v+=num(i.ov.valorBRL);porEmp[e].s+=c.saldo}});
- $('tLib').textContent=TO(L);$('tLibV').textContent=BRL(LV);$('tGas').textContent=TO(G);$('tGasV').textContent=BRL(GV);
- $('tSal').textContent=TO(S);$('tSalV').textContent=BRL(SV)+' livre';$('tPct').textContent=(L>0?Math.round(S/L*100):0)+'% livre';
- $('hCount').textContent=n+' OV(s)';$('hSal').textContent=TO(S);$('hSalV').textContent=BRL(SV);
+ /* TOTAL GERAL: respeita a empresa escolhida (por fornecedor). Sem filtro = consolidado de todas */
+ const escopo=fe==='TODAS'?dados:dados.filter(i=>norm(i.ov.cliente)===fe),G=totais(escopo);
+ $('tTitulo').textContent=fe==='TODAS'?'📊 Total Geral Consolidado (todas as empresas)':'📊 Total Geral — '+fe;
+ $('tLib').textContent=TO(G.lib);$('tLibV').textContent=BRL(G.libV);$('tGas').textContent=TO(G.gas);$('tGasV').textContent=BRL(G.gasV);
+ $('tSal').textContent=TO(G.sal);$('tSalV').textContent=BRL(G.salV)+' livre';$('tPct').textContent=pct(G)+'% livre';
+ $('hCount').textContent=G.n+' OV(s)';$('hSal').textContent=TO(G.sal);$('hSalV').textContent=BRL(G.salV);
+ $('hEsc').textContent=fe==='TODAS'?'Saldo Livre Geral':'Saldo Livre • '+fe.split(' ')[0];
 
- $('cardsEmp').innerHTML=emps.map(e=>{const t=tm[e],p=porEmp[e];
-  return`<div data-emp="${esc(e)}" onclick="filtrarEmpresa(this.dataset.emp)" class="cursor-pointer border-2 ${t.b} ${t.l} rounded-2xl p-3.5 shadow-sm hover:-translate-y-1 transition">
-  <div class="flex justify-between mb-2"><span class="${t.d} text-white text-[10px] font-black px-2.5 py-0.5 rounded-md">EMPRESA</span><span class="text-[11px] font-bold text-slate-500">${p.n} OV(s)</span></div>
+ /* cards por empresa: total das OVs, faturado e saldo (TO e R$) */
+ $('cardsEmp').innerHTML=emps.map(e=>{const t=tm[e],p=totais(dados.filter(i=>norm(i.ov.cliente)===e)),total=dados.filter(i=>norm(i.ov.cliente)===e).length;
+  return`<div data-emp="${esc(e)}" onclick="filtrarEmpresa(this.dataset.emp)" class="cursor-pointer border-2 ${t.b} ${t.l} rounded-2xl p-3.5 shadow-sm hover:-translate-y-1 transition ${fe===e?'ring-2 ring-teal-500':''}">
+  <div class="flex justify-between mb-2"><span class="${t.d} text-white text-[10px] font-black px-2.5 py-0.5 rounded-md">EMPRESA</span><span class="text-[11px] font-bold text-slate-500">${p.n} OV(s) ativa(s)${total>p.n?' • '+(total-p.n)+' cancelada(s)':''}</span></div>
   <div class="font-black text-sm ${t.t} truncate" title="${esc(e)}">${esc(e)}</div>
-  <div class="mt-2 pt-2 border-t text-xs space-y-1"><div class="flex justify-between"><span class="text-slate-500 font-semibold">Valor total:</span><b>${BRL(p.v)}</b></div><div class="flex justify-between"><span class="text-slate-500 font-semibold">Saldo livre:</span><b class="text-emerald-700">${TO(p.s)}</b></div></div></div>`}).join('');
+  <div class="mt-2 pt-2 border-t grid grid-cols-3 gap-1.5">${mini('Total OVs','bg-white',[p.lib,p.libV])}${mini('Faturado','bg-rose-50 text-rose-700',[p.gas,p.gasV])}${mini('Saldo livre','bg-emerald-50 text-emerald-800',[p.sal,p.salV])}</div></div>`}).join('');
 
  const lista=dados.filter(i=>(fe==='TODAS'||norm(i.ov.cliente)===fe)&&(!q||[i.ov.numero,i.contrato.numero,i.ov.cliente,i.ov.pedidoDRS,...(i.ov.itens||[]).map(x=>x.material)].join(' ').toLowerCase().includes(q)));
  if(!lista.length){$('containerOVs').innerHTML='<div class="bg-white p-12 text-center rounded-2xl border font-bold text-slate-700">Nenhum registro encontrado</div>';return}
  const grupos={};lista.forEach(i=>(grupos[norm(i.ov.cliente)]=grupos[norm(i.ov.cliente)]||[]).push(i));
- $('containerOVs').innerHTML=Object.keys(grupos).map(e=>{const t=tm[e];
-  return`<div class="rounded-3xl border-2 ${t.b} ${t.l} space-y-4 p-5"><div class="${t.h} text-white p-4 rounded-2xl flex justify-between items-center"><h3 class="text-base font-black">${esc(e)}</h3><span class="text-xs bg-white/20 px-3 py-1 rounded-xl font-bold">${grupos[e].length} OV(s)</span></div><div class="space-y-4">${grupos[e].map(i=>cardOV(i,t)).join('')}</div></div>`}).join('')}
+ $('containerOVs').innerHTML=Object.keys(grupos).map(e=>{const t=tm[e],all=dados.filter(i=>norm(i.ov.cliente)===e),p=totais(all);
+  /* contrato(s) da empresa: total do contrato x quanto já foi aberto em OVs */
+  const ct={};all.forEach(i=>{if(i.status==='CANCELADO')return;const k=i.contrato.numero;ct[k]=ct[k]||{tot:num(i.contrato.qtdTotalTO),lib:0};ct[k].lib+=num(i.ov.qtdLiberadaTO)});
+  const ctx=Object.keys(ct).map(k=>`<span class="bg-white/15 px-2 py-0.5 rounded-lg">Contrato ${esc(k)}: ${TO(ct[k].tot,0)} • em OVs ${TO(ct[k].lib)} • sem OV ${TO(Math.max(0,ct[k].tot-ct[k].lib))}</span>`).join(' ');
+  return`<div class="rounded-3xl border-2 ${t.b} ${t.l} space-y-4 p-5"><div class="${t.h} text-white p-4 rounded-2xl space-y-3">
+   <div class="flex justify-between items-center"><h3 class="text-base font-black">${esc(e)}</h3><span class="text-xs bg-white/20 px-3 py-1 rounded-xl font-bold">${grupos[e].length} OV(s)</span></div>
+   <div class="text-[11px] font-bold uppercase opacity-80">Total desta empresa (todas as OVs)</div>
+   <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-slate-800">${mini('Total das OVs','bg-white',[p.lib,p.libV])}${mini('Já faturado','bg-rose-50 text-rose-700',[p.gas,p.gasV])}${mini('Saldo livre ('+pct(p)+'%)','bg-emerald-50 text-emerald-800',[p.sal,p.salV])}</div>
+   <div class="text-[10px] font-semibold flex flex-wrap gap-1.5">${ctx}</div></div>
+   <div class="space-y-4">${grupos[e].map(i=>cardOV(i,t)).join('')}</div></div>`}).join('')}
 
 function cardOV(i,t){
  const id=sid(i.id),c=calc(i);
@@ -201,25 +223,26 @@ function cardOV(i,t){
   <input type="number" step="0.001" class="in w-24 text-right font-black text-teal-800" value="${num(m.qtdTO).toFixed(3)}" onchange="editMat('${id}',${k},'qtdTO',this.value)">
   <span class="text-[10px] font-bold text-slate-500">TO (${Math.round(num(m.qtdTO)*1000)} KG)</span>
   <button class="np text-rose-500 font-bold px-1" onclick="delMat('${id}',${k})">✕</button></div>`).join('');
- const fat=(i.gastos||[]).length?`<div class="overflow-x-auto"><table class="w-full text-left text-xs border rounded-lg"><thead><tr class="bg-slate-50 text-slate-500 text-[10px] uppercase font-bold"><th class="py-1.5 px-3">Data</th><th class="px-3">Fatura / NF</th><th class="px-3">Identificação</th><th class="px-3 text-right">Peso (TO)</th><th class="px-3 np"></th></tr></thead><tbody class="divide-y">`+
+ const fat=(i.gastos||[]).length?`<div class="overflow-x-auto"><table class="w-full text-left text-xs border rounded-lg"><thead><tr class="bg-slate-50 text-slate-500 text-[10px] uppercase font-bold"><th class="py-1.5 px-3">Data</th><th class="px-3">Fatura</th><th class="px-3">Identificação</th><th class="px-3 text-right">Peso (TO)</th><th class="px-3 text-right">Valor</th><th class="px-3 np"></th></tr></thead><tbody class="divide-y">`+
   i.gastos.map((g,k)=>`<tr><td class="px-3 py-1"><input type="date" class="in" value="${esc(g.data)}" onchange="editGasto('${id}',${k},'data',this.value)"></td>
   <td class="px-3"><input class="in font-semibold w-36" value="${esc(g.ticket)}" onchange="editGasto('${id}',${k},'ticket',this.value)"></td>
   <td class="px-3"><input class="in font-mono w-36 uppercase" value="${esc(g.placa)}" onchange="editGasto('${id}',${k},'placa',this.value)"></td>
   <td class="px-3 text-right"><span class="text-rose-500 font-bold">-</span><input type="number" step="0.001" class="in w-24 text-right font-black text-rose-600" value="${num(g.pesoTO).toFixed(3)}" onchange="editGasto('${id}',${k},'pesoTO',this.value)"></td>
+  <td class="px-3 text-right font-bold text-rose-600">${BRL(num(g.pesoTO)*c.unit)}</td>
   <td class="px-3 np"><button class="text-rose-500" onclick="delGasto('${id}',${k})">✕</button></td></tr>`).join('')+`</tbody></table></div>`
-  :'<p class="text-[11px] text-slate-400 italic">Nenhuma fatura emitida. Leia o print do fluxo de faturamento ou lance manualmente.</p>';
+  :'<p class="text-[11px] text-slate-400 italic">Nenhuma fatura emitida ainda: o saldo está integral. Leia o print do fluxo de documentos ou lance manualmente.</p>';
  return`<div class="bg-white rounded-2xl border-2 ${t.o} shadow-sm overflow-hidden ${c.canc?'opacity-60':''}">
  <div class="bg-slate-100 border-b px-5 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
-  <div class="flex flex-wrap items-center gap-2"><span class="${t.d} text-white font-mono font-bold text-[10px] px-2 py-0.5 rounded">OV ${esc(i.ov.numero)}</span>${c.canc?'<span class="bg-rose-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">CANCELADA</span>':''}<span class="font-bold">${esc(i.ov.cliente)}</span><span class="text-slate-600">DRS: <b>${esc(i.ov.pedidoDRS)}</b></span></div>
+  <div class="flex flex-wrap items-center gap-2"><span class="${t.d} text-white font-mono font-bold text-[10px] px-2 py-0.5 rounded">OV ${esc(i.ov.numero)}</span>${c.canc?'<span class="bg-rose-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">CANCELADA</span>':''}<span class="font-bold">${esc(i.ov.cliente)}</span><span class="text-slate-600">DRS: <b>${esc(i.ov.pedidoDRS)}</b></span><span class="text-slate-500">Contrato: <b>${esc(i.contrato.numero)}</b></span></div>
   <div class="np flex gap-2"><button onclick="abrir('ov','${id}')" class="font-bold px-3 py-1 rounded-xl bg-teal-700 hover:bg-teal-800 text-white">📷 1. Ler OV (VA03)</button><button onclick="toggleCancel('${id}')" class="font-bold px-3 py-1 rounded-xl bg-white border text-slate-600 hover:bg-slate-50">${c.canc?'Reativar':'Cancelar'}</button></div></div>
  <div class="p-5 space-y-4">
   <div class="bg-slate-50/60 p-3 rounded-2xl border space-y-2"><div class="flex justify-between items-center text-xs"><b class="text-slate-700">📋 Materiais da OV (soma = ${TO(i.ov.qtdLiberadaTO,3)})</b><button onclick="addMat('${id}')" class="np text-[11px] font-bold text-teal-700 hover:underline">+ Adicionar linha</button></div><div class="space-y-1.5">${mats}</div></div>
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-   <div class="bg-slate-50 border p-3 rounded-xl"><span class="block text-[10px] font-bold text-slate-400 uppercase mb-1">1. Total inicial</span><div class="text-base font-black">${TO(c.lib,3)}</div><div class="text-xs font-bold text-slate-500">${BRL(i.ov.valorBRL)}</div></div>
-   <div class="bg-rose-50 border border-rose-200 p-3 rounded-xl"><span class="block text-[10px] font-bold text-rose-600 uppercase mb-1">2. Já faturado</span><div class="text-base font-black text-rose-700">${TO(c.gasto,3)}</div><div class="text-xs font-bold text-rose-600">${BRL(c.vg)}</div></div>
+   <div class="bg-slate-50 border p-3 rounded-xl"><span class="block text-[10px] font-bold text-slate-400 uppercase mb-1">1. Total da OV (solicitado)</span><div class="text-base font-black">${TO(c.lib,3)}</div><div class="text-xs font-bold text-slate-500">${BRL(i.ov.valorBRL)}</div><div class="text-[10px] text-slate-400">${BRL(c.unit)} por TO</div></div>
+   <div class="bg-rose-50 border border-rose-200 p-3 rounded-xl"><span class="block text-[10px] font-bold text-rose-600 uppercase mb-1">2. Já faturado (${(i.gastos||[]).length} fatura(s))</span><div class="text-base font-black text-rose-700">${TO(c.gasto,3)}</div><div class="text-xs font-bold text-rose-600">${BRL(c.vg)}</div></div>
    <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl"><span class="block text-[10px] font-bold text-emerald-700 uppercase mb-1">3. Saldo livre</span><div class="text-base font-black text-emerald-800">${TO(c.saldo,3)}</div><div class="text-xs font-bold text-emerald-700">${BRL(c.vs)}</div></div></div>
-  <div class="border-t pt-3"><div class="flex flex-wrap justify-between items-center gap-2 mb-2"><b class="text-xs text-slate-700">⚖️ Faturas emitidas / romaneios</b>
-   <div class="np flex gap-2"><button onclick="abrir('notas','${id}')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100">📷 2. Ler Faturas (SAP)</button><button onclick="addGasto('${id}')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-50 border hover:bg-slate-100">+ Lançar manual</button></div></div>${fat}</div>
+  <div class="border-t pt-3"><div class="flex flex-wrap justify-between items-center gap-2 mb-2"><b class="text-xs text-slate-700">⚖️ Faturas emitidas</b>
+   <div class="np flex gap-2"><button onclick="abrir('notas','${id}')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100">📷 2. Ler Faturas (Fluxo SAP)</button><button onclick="addGasto('${id}')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-50 border hover:bg-slate-100">+ Lançar manual</button></div></div>${fat}</div>
  </div></div>`}
 
 function filtrarEmpresa(e){$('filtroEmpresa').value=e;render()}
@@ -243,89 +266,149 @@ function carregarExemplo(){if(!confirm('Inserir a OV de exemplo? As demais OVs n
 function abrir(m,id){
  modo=m;tmp=null;$('mAlvo').value=id||'';$('mProg').classList.add('hidden');
  const ov=m==='ov';
- $('mTitulo').textContent=ov?'📋 Leitor de Linhas da OV (tela VA03)':'⚖️ Leitor de Faturas Emitidas (fluxo SAP)';
- $('mSub').innerHTML=ov?'Reconhece número da OV, cliente, linhas de material e peso em TO':'Só linhas identificadas como <b>FATURA</b> contam como saída';
- $('mAplicar').textContent=ov?'Aplicar na OV':'Lançar peso emitido';
- $('mRes').textContent=ov?'Aguardando print da VA03...':'Aguardando print do fluxo do SAP...';
+ $('mTitulo').textContent=ov?'📋 Leitor da OV (tela VA03 — "exibir Venda Sucata/Escória: Síntese")':'⚖️ Leitor de Faturas (tela "Fluxo de documentos")';
+ $('mSub').innerHTML=ov?'Lê nº da OV, cliente, pedido/DRS, <b>valor líquido</b> e as linhas de material com a quantidade em TO':'Só linhas <b>Fatura</b> abaixo da sua OV contam como saída. Pré-pagamento, remessa e adiantamento são ignorados';
+ $('mAplicar').textContent=ov?'Aplicar na OV':'Lançar faturas';
+ $('mRes').textContent=ov?'Aguardando print da VA03...':'Aguardando print do fluxo de documentos do SAP...';
  $('modal').classList.remove('hidden');$('modal').classList.add('flex')}
 function fecharModal(){$('modal').classList.add('hidden');$('modal').classList.remove('flex')}
 const prog=(p,t)=>{$('mBarra').style.width=p+'%';$('mProgPct').textContent=p+'%';$('mProgTxt').textContent=t};
 
+/* amplia o print (melhora muito o OCR de texto pequeno do SAP) */
+async function preparar(blob){
+ try{const b=await createImageBitmap(blob),f=Math.max(1,Math.min(3,2600/b.width)),c=document.createElement('canvas');
+  c.width=Math.round(b.width*f);c.height=Math.round(b.height*f);
+  const x=c.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(b,0,0,c.width,c.height);
+  return await new Promise(r=>c.toBlob(r,'image/png'))}catch(e){return blob}}
+
 async function ocr(blob){
  if(busy)return aviso('Aguarde: leitura em andamento...');
  if(typeof Tesseract==='undefined')return aviso('Leitor de imagem não carregou. Verifique a internet.');
- busy=true;$('mProg').classList.remove('hidden');prog(0,'Preparando leitor...');
+ busy=true;$('mProg').classList.remove('hidden');prog(0,'Preparando imagem...');
+ const parser=modo==='ov'?parseOV:parseFluxo;
  try{
-  const w=await Tesseract.createWorker('por',1,{logger:m=>{if(m.status==='recognizing text')prog(Math.round(m.progress*100),'Lendo imagem...')}});
-  const{data:{text}}=await w.recognize(blob);await w.terminate();
-  modo==='ov'?mostrarOV(text):mostrarNotas(text);
+  const img=await preparar(blob);let passo='';
+  const w=await Tesseract.createWorker('por',1,{logger:m=>{if(m.status==='recognizing text')prog(Math.round(m.progress*100),'Lendo imagem'+passo+'...')}});
+  /* tenta modos de leitura de página até o resultado fazer sentido (6 = bloco/linhas de tabela, 4 = colunas, 3 = automático) */
+  let res=null;
+  for(const psm of['6','4','3']){
+   passo=psm==='6'?'':' (tentativa '+(psm==='4'?2:3)+')';
+   await w.setParameters({tessedit_pageseg_mode:psm,preserve_interword_spaces:'1'});
+   const{data:{text}}=await w.recognize(img);
+   const r=parser(text);if(!res)res=r;if(r.ok){res=r;break}}
+  await w.terminate();
+  modo==='ov'?mostrarOV(res):mostrarNotas(res);
  }catch(e){console.error(e);aviso('Falha ao ler a imagem. Tente outro print.')}
  finally{busy=false;$('mProg').classList.add('hidden')}}
 
-const peso=(n,u)=>{let v=parseFloat(String(n).replace(/\./g,'').replace(',','.'));if(/KG/i.test(u)||v>100)v/=1000;return v};
+/* limpa o nome do material ("☐ SUCATA DE FERRO ZVSU 0 D 29." -> "SUCATA DE FERRO") */
+function limpaMat(s){
+ s=String(s||'').replace(/^[^A-Za-zÀ-ú]+/,'').replace(/^[A-Za-z]\s+(?=[A-ZÀ-Ú]{3})/,'');
+ s=s.split(/\s{2,}|\b(?:ZVSU|ZV[A-Z]{2})\b/)[0].replace(/[^A-Za-zÀ-ú0-9\/\.\-\(\) ].*$/,'').trim();
+ return s||'MATERIAL (conferir)'}
 
-function parseLinhas(txt){const r=[];
- txt.split(/\r?\n/).forEach(l=>{
-  const m=l.match(/(?:^|\s)([0-9]{2})(?:1700[0-9]{4}|\s+[0-9]{7,10})?\s+([0-9]+(?:[.,][0-9]+)?)\s*(TO|KG)\s*(.*)$/i);
-  if(m)r.push({itemSap:m[1],material:m[4].trim().replace(/\s{2,}/g,' ')||'MATERIAL (conferir)',qtdTO:peso(m[2],m[3])})});
- return r}
+/* ----- VA03: "exibir Venda Sucata/Escória 115443653: Síntese" ----- */
+function parseOV(text){
+ const flat=text.replace(/\r/g,'').replace(/\s+/g,' ');
+ const mo=flat.match(/Venda\s+Sucata[^\d]{0,15}(\d{8,10})/i)||flat.match(/(\d{8,10})\s*:\s*S[ií]ntese/i)||flat.match(/\b(11\d{7})\b/);
+ const mc=flat.match(/Emissor\s+da\s+ordem\s+\d{4,10}\s+(.{4,70}?)\s*(?:\/|$)/i)||flat.match(/Receb\.?\s*mercad\.?\s+\d{4,10}\s+(.{4,70}?)\s*(?:\/|$)/i)||flat.match(/Parceiro\s+de\s+neg[oó]cios\s+\d{4,10}\s+(.{4,70}?)(?:\s+Material|$)/i)||flat.match(/(GERDAU[^\/]{0,30}?S\.?\s?A\.?)/i);
+ const md=flat.match(/(D[RS]{2}\s*[0-9]{1,4}[A-Z]?\s*[-\/]\s*[0-9]{2,4})/i);
+ const mp=flat.match(/N[ºo°]?\s*do\s*pedido\s+(\d{4,10})\s+D/i);
+ const mv=flat.match(/Valor\s+l[ií]quido\D{0,25}([0-9][0-9.]*,[0-9]{2})/i);
+ const mw=flat.match(/Peso\s+total\D{0,25}([0-9][0-9.,]*)\s*(KG|T[O0])/i);
+ const linhas=[];
+ text.split(/\r?\n/).forEach(l=>{
+  const m=l.match(/(?:^|\s)(\d{2})\s?0*(\d{7,12})\s+(\d+(?:[.,]\d+)?)\s*(KG|T[O0])\b\s*(.*)$/i);
+  if(m)linhas.push({itemSap:m[1],material:limpaMat(m[5]),qtdTO:qTO(m[3],m[4])})});
+ if(!linhas.length)text.split(/\r?\n/).forEach(l=>{
+  const m=l.match(/(?:^|\s)(\d{2})\s+(\d+(?:[.,]\d+)?)\s*(KG|T[O0])\b\s*(.*)$/i);
+  if(m&&/[A-Za-z]{4}/.test(m[4]))linhas.push({itemSap:m[1],material:limpaMat(m[4]),qtdTO:qTO(m[2],m[3])})});
+ return{ok:linhas.length>0,linhas,
+  numero:mo?sz(mo[1]):'',cliente:mc?mc[1].replace(/\s+/g,' ').trim():'',
+  drs:md?md[1].replace(/\s*([\/-])\s*/,'$1').replace(/\s+/g,' ').toUpperCase():'',
+  contrato:mp?mp[1].padStart(10,'0'):'',valor:mv?BR(mv[1]):0,pesoTO:mw?qTO(mw[1],mw[2]):0}}
 
-function mostrarOV(text){
- const mo=text.match(/Sucata(?:\/Esc[oó]ria)?[^\d]*([0-9]{8,10})/i)||text.match(/([0-9]{8,10}):\s*S[ií]ntese/i)||text.match(/\b(11\d{7})\b/);
- const mc=text.match(/Emissor\s+da\s+ordem[^\n\r]*[\r\n]+[^\n\r]*?(AUCOBRE[^\/\n\r]+|[A-Z\s]{4,40}LTDA|[A-Z\s]{4,40}S\.A\.)/i)||text.match(/(AUCOBRE[^\/\n\r]+)/i);
- const md=text.match(/([A-Z]{2,4}\s*[0-9]{2,4}[-\/][0-9]{2,4})/i);
- const linhas=parseLinhas(text);
- tmp={linhas};
- const alvo=achar($('mAlvo').value),soma=linhas.reduce((s,l)=>s+l.qtdTO,0);
+function mostrarOV(r){
+ tmp=r;const alvo=achar($('mAlvo').value),soma=r.linhas.reduce((s,l)=>s+l.qtdTO,0);
  const cmp='w-full border rounded-lg px-2 py-1 text-xs font-bold text-slate-800 bg-white';
+ const valor=r.valor>0?r.valor.toLocaleString('pt-BR',{minimumFractionDigits:2}):'';
+ let chk='';
+ if(r.pesoTO>0)chk=Math.abs(soma-r.pesoTO)<0.0005?`<div class="text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg p-2">✓ A soma das linhas (${soma.toFixed(3)} TO) bate com o <b>Peso total</b> da OV.</div>`:`<div class="text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-2">⚠ A soma das linhas (${soma.toFixed(3)} TO) é diferente do <b>Peso total</b> da OV (${r.pesoTO.toFixed(3)} TO). Confira as quantidades abaixo.</div>`;
+ const aviso1=[!r.numero&&'Número da OV não detectado.',!r.cliente&&'Cliente não detectado.',!(r.valor>0)&&'Valor líquido não detectado: digite o valor.'].filter(Boolean).join(' ');
  $('mRes').innerHTML=`<div class="grid grid-cols-3 gap-2">
-  <label class="text-[10px] font-bold text-slate-500 uppercase">OV<input id="mNum" class="${cmp}" value="${esc(mo?mo[1]:(alvo?alvo.ov.numero:''))}"></label>
-  <label class="col-span-2 text-[10px] font-bold text-slate-500 uppercase">Cliente<input id="mCli" class="${cmp}" value="${esc(mc?mc[1].trim():(alvo?alvo.ov.cliente:''))}"></label>
-  <label class="col-span-3 text-[10px] font-bold text-slate-500 uppercase">Pedido / DRS<input id="mDrs" class="${cmp}" value="${esc(md?md[1].trim():(alvo?alvo.ov.pedidoDRS:''))}"></label></div>
-  <p class="text-[10px] text-slate-500">Confira os campos acima: o OCR pode errar.${mo?'':' <b class="text-amber-700">Número da OV não detectado.</b>'}</p>
-  <div class="bg-white p-2.5 rounded-xl border max-h-40 overflow-y-auto space-y-1">${linhas.length?linhas.map(l=>`<div class="flex justify-between border-b pb-1"><span><b>Item ${esc(l.itemSap)}:</b> ${esc(l.material)}</span><b class="text-teal-800">${l.qtdTO.toFixed(3)} TO</b></div>`).join('')+`<div class="pt-1 font-black flex justify-between"><span>SOMA DAS LINHAS</span><span class="text-teal-700">${soma.toFixed(3)} TO</span></div>`:'<span class="text-amber-800">Nenhuma linha reconhecida. Tente um print mais nítido e com a tabela inteira.</span>'}</div>`}
+  <label class="text-[10px] font-bold text-slate-500 uppercase">OV<input id="mNum" class="${cmp}" value="${esc(r.numero||(alvo?alvo.ov.numero:''))}"></label>
+  <label class="col-span-2 text-[10px] font-bold text-slate-500 uppercase">Cliente (Emissor da ordem)<input id="mCli" class="${cmp}" value="${esc(r.cliente||(alvo?alvo.ov.cliente:''))}"></label>
+  <label class="col-span-2 text-[10px] font-bold text-slate-500 uppercase">Pedido / DRS<input id="mDrs" class="${cmp}" value="${esc(r.drs||(alvo?alvo.ov.pedidoDRS:''))}"></label>
+  <label class="text-[10px] font-bold text-slate-500 uppercase">Valor líquido (R$)<input id="mVal" class="${cmp}" value="${esc(valor||(alvo?num(alvo.ov.valorBRL).toLocaleString('pt-BR',{minimumFractionDigits:2}):''))}"></label></div>
+  ${aviso1?`<p class="text-[11px] text-amber-700 font-bold">${esc(aviso1)}</p>`:''}${chk}
+  <div class="bg-white p-2.5 rounded-xl border max-h-52 overflow-y-auto space-y-1.5">${r.linhas.length?r.linhas.map(l=>`<div class="mLin flex items-center gap-2 border-b pb-1.5" data-item="${esc(l.itemSap)}"><b class="text-[10px] bg-slate-100 px-1.5 rounded">Item ${esc(l.itemSap)}</b><input class="lm ${cmp} flex-1" value="${esc(l.material)}"><input class="lq ${cmp} w-24 text-right text-teal-800" value="${l.qtdTO.toFixed(3)}"><b class="text-[10px] text-slate-500">TO</b></div>`).join('')+`<div class="pt-1 font-black flex justify-between"><span>SOMA DAS LINHAS</span><span class="text-teal-700">${soma.toFixed(3)} TO</span></div>`:'<span class="text-amber-800">Nenhuma linha reconhecida. Tente um print mais nítido com a tabela "Todos os itens" visível.</span>'}</div>
+  <p class="text-[10px] text-slate-500">Você pode corrigir qualquer campo acima antes de aplicar (quantidade em <b>TO</b>).</p>`}
 
 function aplicarOV(){
- if(!tmp.linhas.length)return aviso('Nenhuma linha foi reconhecida.');
+ const ls=[...document.querySelectorAll('#mRes .mLin')].map(el=>({itemSap:el.dataset.item,material:el.querySelector('.lm').value.trim()||'MATERIAL',qtdTO:BR(el.querySelector('.lq').value)})).filter(l=>l.qtdTO>0);
+ if(!ls.length)return aviso('Nenhuma linha com quantidade para aplicar.');
  const numOV=sid($('mNum').value.trim());if(!numOV)return aviso('Informe o número da OV.');
- const cli=$('mCli').value.trim()||'OUTROS CLIENTES',drs=$('mDrs').value.trim();
- let i=achar($('mAlvo').value)||dados.find(o=>o.ov.numero===numOV);
- if(!i)i={id:numOV,status:'ATIVO',contrato:{numero:'0000071823',item:'30',qtdTotalTO:2635,valorTotalBRL:3320100},ov:{numero:numOV,cliente:cli,pedidoDRS:drs,itens:[],qtdLiberadaTO:0,valorBRL:0,precoUnitarioPorTO:PRECO},gastos:[]};
- Object.assign(i.ov,{numero:numOV,cliente:cli,pedidoDRS:drs,itens:tmp.linhas});somar(i);
- persistir(i);fecharModal();aviso(`✓ OV ${numOV} atualizada. Soma: ${i.ov.qtdLiberadaTO.toFixed(3)} TO`)}
+ const cli=$('mCli').value.trim()||'OUTROS CLIENTES',drs=$('mDrs').value.trim(),valor=BR($('mVal').value);
+ let i=achar($('mAlvo').value);
+ if(i&&sz(i.ov.numero)!==sz(numOV)&&!confirm(`Este print é da OV ${numOV}, mas você abriu o leitor na OV ${i.ov.numero}.\nAtualizar a OV ${i.ov.numero} com os dados deste print?`))return;
+ if(!i)i=dados.find(o=>sz(o.ov.numero)===sz(numOV));
+ if(!i)i={id:numOV,status:'ATIVO',contrato:{numero:tmp.contrato||'0000071823',item:'30',qtdTotalTO:2635,valorTotalBRL:3320100},ov:{numero:numOV,cliente:cli,pedidoDRS:drs,itens:[],qtdLiberadaTO:0,valorBRL:0,precoUnitarioPorTO:PRECO},gastos:[]};
+ const soma=ls.reduce((s,l)=>s+l.qtdTO,0),preco=valor>0&&soma>0?valor/soma:(num(i.ov.precoUnitarioPorTO)||PRECO);
+ Object.assign(i.ov,{numero:numOV,cliente:cli,pedidoDRS:drs,itens:ls,qtdLiberadaTO:soma,valorBRL:valor>0?valor:soma*preco,precoUnitarioPorTO:preco});
+ persistir(i);fecharModal();aviso(`✓ OV ${numOV} atualizada\nSolicitado: ${soma.toFixed(3)} TO • ${BRL(i.ov.valorBRL)}`)}
 
-function parseFaturas(txt){const r=[];
- txt.split(/\r?\n/).forEach((l,ix)=>{
-  if(!/fatura|faturam|doc\.fatur|nf-e|nota fiscal/i.test(l))return;
-  const m=l.match(/[0-9]{8,10}/),p=l.match(/([0-9]+(?:[.,][0-9]+)?)\s*(TO|KG)/i);
-  if(!p)return;const v=peso(p[1],p[2]);
-  if(v>0)r.push({ticket:'Fatura '+(m?m[0]:'s/nº '+(ix+1)),placa:'FATURA CONCLUÍDA',pesoTO:v,data:hoje()})});
- return r}
+/* ----- Fluxo de documentos: contrato > venda (OV) > fatura ----- */
+function parseFluxo(text){
+ const QTY=/([0-9]{1,3}(?:\.[0-9]{3})*(?:,[0-9]+)?|[0-9]+(?:,[0-9]+)?)\s*(KG|T[O0])\b/i;
+ let cur=null,contrato=null;const vendas=[],faturas=[];
+ text.split(/\r?\n/).forEach((l,ix)=>{
+  const mc=l.match(/Contr\w*\.?\s+Sucata\S*\s+(\d{8,10})\s*\/\s*(\d+)/i);
+  if(mc){const q=l.slice(mc.index+mc[0].length).match(QTY),v=l.match(/([0-9][0-9.]*,[0-9]{2})\s*BRL/i);
+   contrato={numero:mc[1],qtdTO:q?qTO(q[1],q[2]):0,valor:v?BR(v[1]):0};return}
+  const mv=l.match(/Venda\s+Sucata\S*\s+(\d{8,10})/i);
+  if(mv){cur=sz(mv[1]);if(!vendas.includes(cur))vendas.push(cur);return}
+  if(!/\bfatura\b/i.test(l)||/estorn|cancel|pr[eé]-?\s?pag/i.test(l))return;
+  const q=l.match(QTY);if(!q)return;const p=qTO(q[1],q[2]);if(!(p>0))return;
+  const n=l.match(/fatura[^\d\n]{0,25}(\d{8,10})/i),d=l.match(/(\d{2})\.(\d{2})\.(\d{4})/),data=d?`${d[3]}-${d[2]}-${d[1]}`:hoje();
+  faturas.push({ov:cur,ticket:'Fatura '+(n?sz(n[1]):`s/nº ${data} ${p.toFixed(3)}`),placa:'FATURA CONCLUÍDA',pesoTO:p,data})});
+ return{ok:vendas.length>0||faturas.length>0||!!contrato,vendas,faturas,contrato}}
 
-function mostrarNotas(text){
- const f=parseFaturas(text);tmp={notas:f};
- $('mRes').innerHTML=f.length?`<div class="flex justify-between font-bold"><span>Faturas reconhecidas</span><span class="bg-rose-100 text-rose-800 px-2 rounded">${f.length}</span></div><div class="bg-white p-2.5 rounded-xl border max-h-40 overflow-y-auto space-y-1">`+f.map(n=>`<div class="flex justify-between border-b pb-1"><b>${esc(n.ticket)}</b><b class="text-rose-700">-${n.pesoTO.toFixed(3)} TO</b></div>`).join('')+'</div>'
- :'<div class="text-amber-800 bg-amber-50 p-2.5 rounded-xl border border-amber-200"><b>Nenhuma fatura encontrada.</b><br>Só linhas com a palavra "Fatura" (e um peso) são contabilizadas; ordens e remessas são ignoradas.</div>'}
+function mostrarNotas(r){
+ tmp=r;const alvo=achar($('mAlvo').value);if(!alvo)return;
+ const meu=sz(alvo.ov.numero),erradoOV=r.vendas.length>0&&!r.vendas.includes(meu);
+ r.minhas=erradoOV?[]:r.faturas.filter(f=>f.ov===meu||(f.ov==null&&r.vendas.length===0));
+ const outras=r.faturas.length-r.minhas.length;
+ let h='';
+ if(r.vendas.length)h+=`<div class="text-[11px]">OV(s) encontrada(s) no print: ${r.vendas.map(v=>`<b class="px-1.5 py-0.5 rounded ${v===meu?'bg-emerald-100 text-emerald-800':'bg-slate-200 text-slate-700'}">${esc(v)}</b>`).join(' ')} • OV selecionada: <b>${esc(meu)}</b></div>`;
+ if(erradoOV)h+=`<div class="text-rose-800 bg-rose-50 border border-rose-200 rounded-lg p-2"><b>Este print não é da OV ${esc(meu)}.</b> Abra o leitor no card da OV correta (ou no fluxo da OV ${esc(meu)}).</div>`;
+ if(r.contrato)h+=`<div class="bg-white border rounded-lg p-2 flex justify-between"><span>Contrato <b>${esc(r.contrato.numero)}</b></span><span><b>${TO(r.contrato.qtdTO,0)}</b> • ${BRL(r.contrato.valor)}</span></div>`;
+ if(!erradoOV)h+=r.minhas.length?`<div class="flex justify-between font-bold"><span>Faturas da OV ${esc(meu)}</span><span class="bg-rose-100 text-rose-800 px-2 rounded">${r.minhas.length}</span></div><div class="bg-white p-2.5 rounded-xl border max-h-40 overflow-y-auto space-y-1">`+r.minhas.map(n=>`<div class="flex justify-between border-b pb-1"><span><b>${esc(n.ticket)}</b> <span class="text-slate-400">${esc(n.data)}</span></span><b class="text-rose-700">-${n.pesoTO.toFixed(3)} TO</b></div>`).join('')+'</div>'
+  :'<div class="text-emerald-800 bg-emerald-50 p-2.5 rounded-xl border border-emerald-200"><b>Nenhuma fatura emitida nesta OV.</b><br>O fluxo mostra apenas venda/pré-pagamento, que não contam como saída. O saldo livre continua integral.</div>';
+ if(outras>0&&!erradoOV)h+=`<p class="text-[11px] text-slate-500">${outras} fatura(s) de outras OVs foram ignoradas.</p>`;
+ $('mRes').innerHTML=h}
 
 function aplicarNotas(){
  const i=achar($('mAlvo').value);if(!i)return;
- if(!tmp.notas.length)return aviso('Nenhuma fatura com peso para lançar.');
+ if(tmp.vendas.length&&!tmp.vendas.includes(sz(i.ov.numero)))return aviso('Este print é de outra OV. Abra o leitor na OV correta.');
+ let msg='';
+ if(tmp.contrato&&tmp.contrato.qtdTO>0){const k=sz(tmp.contrato.numero);
+  dados.filter(o=>sz(o.contrato.numero)===k).forEach(o=>{o.contrato.qtdTotalTO=tmp.contrato.qtdTO;if(tmp.contrato.valor>0)o.contrato.valorTotalBRL=tmp.contrato.valor;if(o!==i)persistir(o)});msg=' • contrato atualizado'}
  i.gastos=i.gastos||[];const ja=new Set(i.gastos.map(g=>g.ticket));
- const novas=tmp.notas.filter(n=>!ja.has(n.ticket));
- if(!novas.length)return aviso('Essas faturas já estão lançadas nesta OV.');
- novas.forEach(n=>i.gastos.push({id:Date.now()+Math.random(),...n}));
+ const novas=(tmp.minhas||[]).filter(n=>!ja.has(n.ticket));
+ novas.forEach(n=>{const{ov,...g}=n;i.gastos.push({id:Date.now()+Math.random(),...g})});
  persistir(i);fecharModal();
- aviso(`✓ ${novas.length} fatura(s) lançada(s)`+(novas.length<tmp.notas.length?` (${tmp.notas.length-novas.length} já existiam)`:''))}
+ if(!tmp.minhas||!tmp.minhas.length)aviso('Nenhuma fatura emitida nesta OV: saldo integral'+msg);
+ else aviso(`✓ ${novas.length} fatura(s) lançada(s)`+((tmp.minhas.length-novas.length)?` (${tmp.minhas.length-novas.length} já existiam)`:'')+msg)}
 
 function aplicar(){if(!tmp)return aviso('Leia um print primeiro.');modo==='ov'?aplicarOV():aplicarNotas()}
 
 /* ---------- CSV ---------- */
 function exportarCSV(){
  if(!dados.length)return aviso('Nada para exportar.');
- const q=s=>'"'+String(s==null?'':s).replace(/"/g,'""')+'"',n=v=>num(v).toFixed(3).replace('.',',');
- const L=['OV;Cliente;Materiais;Total Liberado (TO);Faturado Emitido (TO);Saldo Livre (TO);Status'];
+ const q=s=>'"'+String(s==null?'':s).replace(/"/g,'""')+'"',n=v=>num(v).toFixed(3).replace('.',','),r=v=>num(v).toFixed(2).replace('.',',');
+ const L=['Empresa;OV;Contrato;DRS;Materiais;Total da OV (TO);Valor da OV (R$);Faturado (TO);Faturado (R$);Saldo Livre (TO);Saldo Livre (R$);Status'];
  dados.forEach(i=>{const c=calc(i);
-  L.push([q(i.ov.numero),q(i.ov.cliente),q((i.ov.itens||[]).map(m=>`${m.itemSap}:${m.material}(${m.qtdTO}TO)`).join(' | ')),n(c.lib),n(c.gasto),n(c.saldo),q(i.status||'ATIVO')].join(';'))});
+  L.push([q(norm(i.ov.cliente)),q(i.ov.numero),q(i.contrato.numero),q(i.ov.pedidoDRS),q((i.ov.itens||[]).map(m=>`${m.itemSap}:${m.material}(${m.qtdTO}TO)`).join(' | ')),n(c.lib),r(i.ov.valorBRL),n(c.gasto),r(c.vg),n(c.saldo),r(c.vs),q(i.status||'ATIVO')].join(';'))});
  const a=document.createElement('a');
  a.href=URL.createObjectURL(new Blob(['\ufeff'+L.join('\r\n')],{type:'text/csv;charset=utf-8'}));
  a.download=`ovs_faturas_emitidas_${hoje()}.csv`;document.body.appendChild(a);a.click();a.remove();
