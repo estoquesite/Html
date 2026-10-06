@@ -132,7 +132,7 @@
                         <h1 class="text-lg font-extrabold tracking-wide">Painel de OVs por Empresa & Saldos</h1>
                         <span class="bg-blue-600 text-white font-black text-[10px] px-2.5 py-0.5 rounded shadow-sm">GERDAU AZUL</span>
                     </div>
-                    <p class="text-xs text-teal-100/90 mt-1">Leitores segregados: Linhas da OV em cima e Notas Emitidas / Saídas em baixo</p>
+                    <p class="text-xs text-teal-100/90 mt-1">Leitor otimizado para o padrão VA03: Item, Qtd, Unidade e Denominação</p>
                 </div>
 
                 <div class="flex flex-wrap gap-2 text-right">
@@ -225,7 +225,7 @@
                     <span class="text-2xl">📋</span>
                     <div>
                         <h3 class="font-bold text-slate-900 text-sm">Leitor de Linhas da OV (Tela VA03)</h3>
-                        <p class="text-[11px] text-slate-500">Substitui as linhas anteriores da OV pelas linhas encontradas nesta tela</p>
+                        <p class="text-[11px] text-slate-500">Lê o Item, Quantidade, Unidade e Denominação exatos do print</p>
                     </div>
                 </div>
                 <button type="button" onclick="fecharModalLeitorOV()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
@@ -240,8 +240,8 @@
 
             <div id="progressoLeitorOV" class="hidden space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-200 text-xs">
                 <div class="flex justify-between font-bold text-slate-700">
-                    <span id="labelStatusLeitorOV">Processando imagem e executando OCR...</span>
-                    <span id="pctStatusLeitorOV" class="text-teal-700 animate-pulse">Aguarde...</span>
+                    <span id="labelStatusLeitorOV">Processando imagem em alto contraste...</span>
+                    <span id="pctStatusLeitorOV" class="text-teal-700 animate-pulse">Lendo...</span>
                 </div>
                 <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
                     <div id="barraProgressoLeitorOV" class="bg-[#007e7a] h-full rounded-full transition-all duration-300 w-full animate-pulse"></div>
@@ -250,7 +250,7 @@
 
             <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3 text-xs">
                 <span class="font-bold text-slate-700 uppercase tracking-wider block">Linhas Identificadas na OV:</span>
-                <div id="detalhesLeitorOV" class="text-[11px] text-slate-700 bg-white p-2.5 rounded-xl border border-slate-200 max-h-48 overflow-y-auto space-y-1">
+                <div id="detalhesLeitorOV" class="text-[11px] text-slate-700 bg-white p-2.5 rounded-xl border border-slate-200 max-h-52 overflow-y-auto space-y-1">
                     Aguardando print da VA03...
                 </div>
             </div>
@@ -290,7 +290,7 @@
 
             <div id="progressoLeitorNotas" class="hidden space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-200 text-xs">
                 <div class="flex justify-between font-bold text-slate-700">
-                    <span id="labelStatusLeitorNotas">Processando imagem e extraindo notas...</span>
+                    <span id="labelStatusLeitorNotas">Processando notas fiscais...</span>
                     <span id="pctStatusLeitorNotas" class="text-rose-700 animate-pulse">Aguarde...</span>
                 </div>
                 <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
@@ -303,7 +303,7 @@
                     <span class="font-bold text-slate-700 uppercase tracking-wider">Notas / Saídas Encontradas:</span>
                     <span id="badgeNotasDetectadas" class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded text-[10px]">0 nota(s)</span>
                 </div>
-                <div id="detalhesLeitorNotas" class="text-[11px] text-slate-700 bg-white p-2.5 rounded-xl border border-slate-200 max-h-48 overflow-y-auto space-y-1">
+                <div id="detalhesLeitorNotas" class="text-[11px] text-slate-700 bg-white p-2.5 rounded-xl border border-slate-200 max-h-52 overflow-y-auto space-y-1">
                     Aguardando print do fluxo de notas fiscais...
                 </div>
             </div>
@@ -334,7 +334,7 @@
             console.error("Falha ao inicializar o Supabase SDK:", e);
         }
 
-        const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v14_otimizado";
+        const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v15_va03_corrigido";
         let cacheRegistros = [];
         let linhasTempLeitorOV = [];
         let notasTempLeitorNotas = [];
@@ -368,7 +368,7 @@
             return OUTRAS_CORES_EMPRESAS[indiceNaoGerdau % OUTRAS_CORES_EMPRESAS.length];
         }
 
-        function formatarTO(valTO, casas = 2) {
+        function formatarTO(valTO, casas = 3) {
             return Number(valTO || 0).toLocaleString('pt-BR', {
                 minimumFractionDigits: casas,
                 maximumFractionDigits: casas
@@ -376,26 +376,19 @@
         }
 
         // ==========================================
-        // TRATAMENTO NUMÉRICO & PRÉ-PROCESSAMENTO OCR
+        // PARSER PRECISO DE NÚMEROS SAP & CANVAS
         // ==========================================
-        function converterQtdSapParaTO(valorStr, unidade = 'TO') {
-            if (!valorStr) return 0;
-            let limpo = valorStr.trim().replace(/\s+/g, '');
+        function parseNumeroSap(str) {
+            if (!str) return 0;
+            let limpo = String(str).trim().replace(/\s+/g, '');
 
+            // Trata formatos brasileiros e padrão SAP: "0,300" ou "1.250,00"
             if (limpo.includes('.') && limpo.includes(',')) {
                 limpo = limpo.replace(/\./g, '').replace(',', '.');
             } else if (limpo.includes(',')) {
                 limpo = limpo.replace(',', '.');
             }
-
-            let num = parseFloat(limpo) || 0;
-            const u = (unidade || '').toUpperCase().trim();
-            if (u === 'KG') {
-                num = num / 1000;
-            } else if (u === 'G') {
-                num = num / 1000000;
-            }
-            return Number(num);
+            return parseFloat(limpo) || 0;
         }
 
         function preProcessarImagemParaOCR(arquivoImagem) {
@@ -406,19 +399,21 @@
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
-                        canvas.width = img.width;
-                        canvas.height = img.height;
-                        ctx.drawImage(img, 0, 0);
+                        
+                        // Escala proporcional para aumentar resolução dos caracteres finos do SAP
+                        const fator = 1.5;
+                        canvas.width = img.width * fator;
+                        canvas.height = img.height * fator;
+                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
                         const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                         const data = imgData.data;
 
-                        // Aumenta o contraste das linhas do SAP
                         for (let i = 0; i < data.length; i += 4) {
                             const r = data[i], g = data[i+1], b = data[i+2];
                             const cinza = 0.299 * r + 0.587 * g + 0.114 * b;
-                            const threshold = 175;
-                            const val = cinza > threshold ? 255 : 0;
+                            // Limiar ótimo para texto azul escuro/preto da interface SAP
+                            const val = cinza > 165 ? 255 : 0;
                             data[i] = val;
                             data[i+1] = val;
                             data[i+2] = val;
@@ -435,19 +430,19 @@
 
         const DADOS_DEFAULT = [
             {
-                id: "115925077",
+                id: "115939257",
                 status: "ATIVO",
                 contrato: { numero: "0000071823", item: "30", qtdTotalTO: 2635.00, valorTotalBRL: 3320100.00 },
                 ov: {
-                    numero: "115925077",
+                    numero: "115939257",
                     cliente: "AUCOBRE GESTÃO DE RESIDUOS LTDA.",
                     pedidoDRS: "DSR 018-2025",
                     itens: [
-                        { itemSap: "40", material: "SUCATA DE FIO-CABO DE ALUMÍNIO E...", qtdTO: 0.100 },
-                        { itemSap: "60", material: "SUCATA DE FIO-CABO DE COBRE ENCA...", qtdTO: 0.100 }
+                        { itemSap: "40", material: "SUCATA DE FIO-CABO DE ALUMÍNIO E...", qtdTO: 0.300 },
+                        { itemSap: "60", material: "SUCATA DE FIO-CABO DE COBRE ENCA...", qtdTO: 0.300 }
                     ],
-                    qtdLiberadaTO: 0.200,
-                    valorBRL: 2915.10,
+                    qtdLiberadaTO: 0.600,
+                    valorBRL: 8746.32,
                     precoUnitarioPorTO: 14575.50
                 },
                 gastos: []
@@ -481,8 +476,8 @@
                     if (!error && data && data.length > 0) {
                         cacheRegistros = data.map(d => {
                             const itens = Array.isArray(d.itens) && d.itens.length > 0 ? d.itens : [
-                                { itemSap: "40", material: d.material || "SUCATA DE FIO-CABO DE ALUMÍNIO E...", qtdTO: 0.100 },
-                                { itemSap: "60", material: "SUCATA DE FIO-CABO DE COBRE ENCA...", qtdTO: 0.100 }
+                                { itemSap: "40", material: d.material || "SUCATA DE FIO-CABO DE ALUMÍNIO E...", qtdTO: 0.300 },
+                                { itemSap: "60", material: "SUCATA DE FIO-CABO DE COBRE ENCA...", qtdTO: 0.300 }
                             ];
                             const somaItens = itens.reduce((s, it) => s + Number(it.qtdTO || 0), 0);
                             return {
@@ -494,8 +489,8 @@
                                     cliente: d.cliente || "AUCOBRE GESTÃO DE RESIDUOS LTDA.",
                                     pedidoDRS: d.pedido_drs || "DSR 018-2025",
                                     itens: itens,
-                                    qtdLiberadaTO: somaItens > 0 ? somaItens : 0.200,
-                                    valorBRL: Number(d.valor_brl || 2915.10),
+                                    qtdLiberadaTO: somaItens > 0 ? somaItens : 0.600,
+                                    valorBRL: Number(d.valor_brl || 8746.32),
                                     precoUnitarioPorTO: Number(d.preco_unitario_to || 14575.50)
                                 },
                                 gastos: Array.isArray(d.gastos) ? d.gastos : []
@@ -608,7 +603,7 @@
         }
 
         function adicionarNovaOVManual() {
-            const novaId = prompt("Informe o Número da Nova OV:", "1159" + Math.floor(10000 + Math.random() * 90000));
+            const novaId = prompt("Informe o Número da Nova OV:", "115939257");
             if (!novaId) return;
 
             const novoItem = {
@@ -618,12 +613,12 @@
                 ov: {
                     numero: String(novaId).trim(),
                     cliente: "NOVO CLIENTE S.A.",
-                    pedidoDRS: "DRS 000-2026",
+                    pedidoDRS: "DRS 018-2025",
                     itens: [
-                        { itemSap: "10", material: "MATERIAL PADRÃO", qtdTO: 1.000 }
+                        { itemSap: "40", material: "MATERIAL PADRÃO", qtdTO: 0.300 }
                     ],
-                    qtdLiberadaTO: 1.000,
-                    valorBRL: 14575.50,
+                    qtdLiberadaTO: 0.300,
+                    valorBRL: 4372.65,
                     precoUnitarioPorTO: 14575.50
                 },
                 gastos: []
@@ -684,7 +679,7 @@
                             </div>
                             <div class="flex justify-between items-center text-xs">
                                 <span class="text-slate-500 font-semibold">Saldo Livre Restante:</span>
-                                <span class="font-black text-emerald-700">${formatarTO(empSaldoTO, 2)}</span>
+                                <span class="font-black text-emerald-700">${formatarTO(empSaldoTO, 3)}</span>
                             </div>
                         </div>
                     </div>
@@ -752,17 +747,17 @@
                 return true;
             });
 
-            document.getElementById('totalGeralLiberadoTO').innerText = formatarTO(somaLiberadoTO, 2);
+            document.getElementById('totalGeralLiberadoTO').innerText = formatarTO(somaLiberadoTO, 3);
             document.getElementById('totalGeralLiberadoValor').innerText = somaLiberadoValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            document.getElementById('totalGeralGastoTO').innerText = formatarTO(somaGastoTotalTO, 2);
+            document.getElementById('totalGeralGastoTO').innerText = formatarTO(somaGastoTotalTO, 3);
             document.getElementById('totalGeralGastoValor').innerText = somaGastoTotalValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-            document.getElementById('totalGeralSaldoTO').innerText = formatarTO(somaSaldoTotalTO, 2);
+            document.getElementById('totalGeralSaldoTO').innerText = formatarTO(somaSaldoTotalTO, 3);
             document.getElementById('totalGeralSaldoValor').innerText = `${somaSaldoTotalValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} livre`;
 
             const pctSaldoGeral = somaLiberadoTO > 0 ? Math.round((somaSaldoTotalTO / somaLiberadoTO) * 100) : 0;
             document.getElementById('badgePctSaldoGeral').innerText = `${pctSaldoGeral}% Livre`;
 
-            document.getElementById('statSaldoTopResumo').innerText = formatarTO(somaSaldoTotalTO, 2);
+            document.getElementById('statSaldoTopResumo').innerText = formatarTO(somaSaldoTotalTO, 3);
             document.getElementById('statSaldoTopValor').innerText = somaSaldoTotalValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
             document.getElementById('statTotalOvsContador').innerText = `${contagemOvsAtivas} OV(s)`;
 
@@ -813,7 +808,6 @@
                     return `
                         <div class="bg-white rounded-2xl border-2 ${tema.ovBordaPadrao} shadow-sm overflow-hidden card-sap transition duration-300">
                             
-                            <!-- BARRA SUPERIOR DO CARD -->
                             <div class="bg-slate-100/90 border-b border-slate-200 px-5 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
                                 <div class="flex items-center gap-2">
                                     <span class="${tema.badge} text-white font-mono font-bold text-[10px] px-2 py-0.5 rounded">OV ${item.ov.numero}</span>
@@ -822,7 +816,6 @@
                                     <span class="text-slate-600">DRS: <b>${item.ov.pedidoDRS}</b></span>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <!-- LEITOR 1: SÓ PARA LER A TELA DA OV (VA03) -->
                                     <button type="button" onclick="abrirModalLeitorOV('${item.id}')" class="text-xs font-bold px-3 py-1 rounded-xl bg-teal-700 hover:bg-teal-800 text-white transition flex items-center gap-1.5 shadow-sm no-print">
                                         <span>📷</span> 1. Ler Tela OV (VA03)
                                     </button>
@@ -830,7 +823,6 @@
                             </div>
 
                             <div class="p-5 space-y-4">
-                                <!-- LINHAS DE MATERIAIS DA OV (PREENCHIDAS PELO LEITOR 1) -->
                                 <div class="bg-slate-50/50 p-3 rounded-2xl border border-slate-100 space-y-2">
                                     <div class="flex justify-between items-center text-xs">
                                         <span class="font-bold text-slate-700 flex items-center gap-1.5">
@@ -845,7 +837,6 @@
                                     </div>
                                 </div>
 
-                                <!-- QUADRADINHOS: LIBERADO, GASTO E SALDO -->
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                     <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl">
                                         <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">1. Total Inicial (Soma Linhas)</span>
@@ -866,14 +857,12 @@
                                     </div>
                                 </div>
 
-                                <!-- SEÇÃO INFERIOR: NOTAS FISCAIS EMITIDAS E ROMANEIOS (LEITOR 2) -->
                                 <div class="border-t border-slate-100 pt-3">
                                     <div class="flex justify-between items-center mb-2">
                                         <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
                                             <span>⚖️</span> Romaneios / Notas Fiscais Emitidas
                                         </span>
                                         <div class="flex gap-2">
-                                            <!-- LEITOR 2: SÓ PARA LER AS NOTAS FISCAIS / FLUXO -->
                                             <button type="button" onclick="abrirModalLeitorNotas('${item.id}')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100 transition no-print">
                                                 📷 2. Ler Tela de Notas (Fluxo SAP)
                                             </button>
@@ -945,7 +934,7 @@
         }
 
         // ==========================================
-        // LEITOR 1: LINHAS DA OV (VA03) COM CANVAS
+        // LEITOR 1: VA03 (Item, Qtd, UV, Denominação)
         // ==========================================
         function abrirModalLeitorOV(ovId) {
             document.getElementById('leitorOVTargetId').value = ovId;
@@ -975,7 +964,7 @@
 
                 const worker = await Tesseract.createWorker('por');
                 await worker.setParameters({
-                    tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÁÉÍÓÚáéíóúÃÕãõÇç.,-/ '
+                    tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÁÉÍÓÚáéíóúÃÕãõÇç.,:-/ '
                 });
 
                 const { data: { text } } = await worker.recognize(imagemOtimizada);
@@ -985,7 +974,9 @@
 
                 if (linhasTempLeitorOV.length === 0) {
                     document.getElementById('detalhesLeitorOV').innerHTML = `
-                        <div class="text-rose-600 font-semibold p-2">Não foi possível identificar as linhas automaticamente. Verifique se o cabeçalho e colunas do SAP estão visíveis.</div>
+                        <div class="text-rose-600 font-semibold p-2">
+                            Não foi possível extrair automaticamente. O print precisa estar legível e conter as colunas de Quantidade e Denominação.
+                        </div>
                     `;
                     btn.disabled = false;
                     return;
@@ -994,14 +985,20 @@
                 const soma = linhasTempLeitorOV.reduce((acc, l) => acc + l.qtdTO, 0);
 
                 document.getElementById('detalhesLeitorOV').innerHTML = linhasTempLeitorOV.map(l => `
-                    <div class="flex justify-between border-b border-slate-100 py-1 items-center">
-                        <span><b>Item ${l.itemSap}:</b> ${l.material}</span>
-                        <span class="font-black text-teal-800">${l.qtdTO.toFixed(3)} TO (${(l.qtdTO * 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} KG)</span>
+                    <div class="flex justify-between border-b border-slate-100 py-1.5 items-center text-xs">
+                        <div>
+                            <span class="font-bold text-slate-800">Item ${l.itemSap}:</span>
+                            <span class="text-slate-600 ml-1">${l.material}</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="font-black text-teal-800">${l.qtdTO.toFixed(3)} TO</span>
+                            <span class="text-[10px] text-slate-400 block">(${Math.round(l.qtdTO * 1000)} KG)</span>
+                        </div>
                     </div>
                 `).join('') + `
                     <div class="pt-2 font-bold text-slate-800 flex justify-between border-t border-slate-300 mt-2">
-                        <span>TOTAL RECONHECIDO:</span> 
-                        <span class="text-teal-700 text-sm font-black">${soma.toFixed(3)} TO</span>
+                        <span>TOTAL DA ORDEM RECONHECIDO:</span> 
+                        <span class="text-teal-700 text-sm font-black">${soma.toFixed(3)} TO (${Math.round(soma * 1000)} KG)</span>
                     </div>
                 `;
             } catch (err) {
@@ -1012,32 +1009,43 @@
             }
         }
 
+        // Reconhecimento estruturado de acordo com o print real da VA03
         function extrairLinhasVA03(txt) {
             const linhas = [];
             const linhasTexto = txt.split(/\r?\n/);
 
-            // Item (10, 20...), Código de material opcional, Quantidade com decimal e Unidade
-            const regexVA03 = /(?:^|\s)([0-9]{2,3})\s+(?:([0-9]{6,12})\s+)?([0-9]+(?:[.,][0-9]{1,4})?)\s*(TO|KG|TON|T)\b(?:\s*[A-Z]\b)?\s*(.*)$/i;
+            // Regex 1: Padrão SAP estrito com as colunas em sequência:
+            // [Item (ex: 40|60)] [Material (ex: 17001044)] [Qtd (ex: 0,300)] [UV (TO|KG)] [Denominação]
+            const regexPadrao = /(?:^|\s)([0-9]{2,3})\s+([0-9]{7,10})\s+([0-9]+(?:[.,][0-9]{1,3})?)\s*(TO|KG|TON)?\s*(?:[A-Z]\s*)?(SUCATA[^\n\r]*|FIO-CABO[^\n\r]*|[A-Z0-9\-\.\s]{5,})/i;
+
+            // Regex 2: Formato flexível caso o OCR junte a quantidade e a unidade (ex: 0,300TO)
+            const regexFlexivel = /([0-9]{2,3})[^\d]+([0-9]+(?:[.,][0-9]{1,3})?)\s*(TO|KG|TON)\b\s*(?:[A-Z]\s*)?(.*)/i;
 
             linhasTexto.forEach(linha => {
-                const match = linha.match(regexVA03);
+                let match = linha.match(regexPadrao);
                 if (match) {
-                    const itemNum = match[1];
-                    const qtdStr = match[3];
-                    const unidade = match[4];
-                    const descMaterial = (match[5] || '').trim().replace(/\s{2,}/g, ' ');
+                    const item = match[1];
+                    let qtd = parseNumeroSap(match[3]);
+                    const unidade = (match[4] || 'TO').toUpperCase();
+                    if (unidade === 'KG') qtd = qtd / 1000;
 
-                    const qtdConvertidaTO = converterQtdSapParaTO(qtdStr, unidade);
+                    let mat = (match[5] || '').trim().replace(/\s{2,}/g, ' ');
+                    linhas.push({ itemSap: item, material: mat || `ITEM ${item}`, qtdTO: qtd });
+                    return;
+                }
 
-                    if (qtdConvertidaTO > 0) {
-                        linhas.push({
-                            itemSap: itemNum,
-                            material: descMaterial || `MATERIAL ITEM ${itemNum}`,
-                            qtdTO: qtdConvertidaTO
-                        });
-                    }
+                match = linha.match(regexFlexivel);
+                if (match) {
+                    const item = match[1];
+                    let qtd = parseNumeroSap(match[2]);
+                    const unidade = (match[3] || 'TO').toUpperCase();
+                    if (unidade === 'KG') qtd = qtd / 1000;
+
+                    let mat = (match[4] || '').trim().replace(/\s{2,}/g, ' ');
+                    linhas.push({ itemSap: item, material: mat || `ITEM ${item}`, qtdTO: qtd });
                 }
             });
+
             return linhas;
         }
 
@@ -1048,13 +1056,19 @@
 
             item.ov.itens = linhasTempLeitorOV;
             item.ov.qtdLiberadaTO = linhasTempLeitorOV.reduce((acc, l) => acc + l.qtdTO, 0);
+            
+            // Recalcula o valor monetário caso exista preço unitário cadastrado
+            if (item.ov.precoUnitarioPorTO) {
+                item.ov.valorBRL = item.ov.qtdLiberadaTO * item.ov.precoUnitarioPorTO;
+            }
+
             salvarNaBase(item);
             fecharModalLeitorOV();
-            alert(`✓ Linhas da OV atualizadas com sucesso para ${item.ov.qtdLiberadaTO.toFixed(3)} TO!`);
+            alert(`✓ Linhas da OV atualizadas com sucesso para o total de ${item.ov.qtdLiberadaTO.toFixed(3)} TO!`);
         }
 
         // ==========================================
-        // LEITOR 2: NOTAS FISCAIS / FLUXO SAP COM CANVAS
+        // LEITOR 2: FLUXO DE NOTAS / FATURAMENTO
         // ==========================================
         function abrirModalLeitorNotas(ovId) {
             document.getElementById('leitorNotasTargetId').value = ovId;
@@ -1127,15 +1141,15 @@
             let index = 1;
             while ((match = regexNota.exec(txt)) !== null) {
                 const numDoc = match[1];
-                const qtdStr = match[2];
-                const unidade = match[3];
-                const pesoTO = converterQtdSapParaTO(qtdStr, unidade);
+                let peso = parseNumeroSap(match[2]);
+                const unidade = (match[3] || 'TO').toUpperCase();
+                if (unidade === 'KG') peso = peso / 1000;
 
-                if (pesoTO > 0) {
+                if (peso > 0) {
                     notas.push({
                         ticket: `NF-${numDoc}`,
                         placa: `VEIC-${index++}`,
-                        pesoTO: pesoTO,
+                        pesoTO: peso,
                         data: new Date().toISOString().split('T')[0]
                     });
                 }
@@ -1165,14 +1179,14 @@
         }
 
         // ==========================================
-        // ATUALIZAÇÕES INLINE E OPERAÇÕES AUXILIARES
+        // ATUALIZAÇÕES MANUAIS INLINE
         // ==========================================
         function atualizarItemMaterial(ovId, idxLinha, campo, valor) {
             const item = cacheRegistros.find(o => o.id === ovId);
             if (!item || !item.ov.itens || !item.ov.itens[idxLinha]) return;
 
             if (campo === 'qtdTO') {
-                item.ov.itens[idxLinha].qtdTO = converterQtdSapParaTO(String(valor), 'TO');
+                item.ov.itens[idxLinha].qtdTO = parseNumeroSap(valor);
                 item.ov.qtdLiberadaTO = item.ov.itens.reduce((acc, curr) => acc + Number(curr.qtdTO || 0), 0);
             } else if (campo === 'material') {
                 item.ov.itens[idxLinha].material = valor.trim();
@@ -1187,7 +1201,7 @@
             if (!item.ov.itens) item.ov.itens = [];
 
             const prox = (item.ov.itens.length + 1) * 10;
-            item.ov.itens.push({ itemSap: String(prox), material: "NOVO MATERIAL", qtdTO: 0.100 });
+            item.ov.itens.push({ itemSap: String(prox), material: "NOVO MATERIAL", qtdTO: 0.300 });
             item.ov.qtdLiberadaTO = item.ov.itens.reduce((acc, curr) => acc + Number(curr.qtdTO || 0), 0);
             salvarNaBase(item);
         }
@@ -1205,7 +1219,7 @@
             if (!item || !item.gastos || !item.gastos[idxGasto]) return;
 
             if (campo === 'pesoTO') {
-                item.gastos[idxGasto].pesoTO = converterQtdSapParaTO(String(valor), 'TO');
+                item.gastos[idxGasto].pesoTO = parseNumeroSap(valor);
             } else if (campo === 'ticket') {
                 item.gastos[idxGasto].ticket = valor.trim();
             } else if (campo === 'placa') {
@@ -1226,7 +1240,7 @@
                 id: Date.now(),
                 ticket: "NF-" + Math.floor(10000 + Math.random() * 90000),
                 placa: "RIO-0A00",
-                pesoTO: 0.100,
+                pesoTO: 0.300,
                 data: new Date().toISOString().split('T')[0]
             });
             salvarNaBase(item);
@@ -1266,7 +1280,7 @@
             document.body.removeChild(link);
         }
 
-        // Listener de Colagem (Ctrl+V) direto na área dos modais
+        // Listener de Colagem (Ctrl+V) direto nos modais
         window.addEventListener('paste', e => {
             const clipboardItems = e.clipboardData.items;
             for (let i = 0; i < clipboardItems.length; i++) {
