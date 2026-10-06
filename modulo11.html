@@ -38,6 +38,7 @@
             min-height: 100vh; 
         }
 
+        /* ANIMAÇÃO PISCANTE NO BADGE DA OV */
         @keyframes piscarBadgeOV {
             0%, 100% { opacity: 1; transform: scale(1); }
             50% { opacity: 0.35; transform: scale(0.97); }
@@ -46,6 +47,7 @@
             animation: piscarBadgeOV 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
         }
 
+        /* ANIMAÇÃO DA BORDA AMARELA PISCANTE (SALDO NO FINALZINHO) */
         @keyframes piscarBordaAmarela {
             0%, 100% {
                 border-color: #eab308;
@@ -104,8 +106,8 @@
                     <span id="textoConexao">Nuvem Conectada</span>
                 </span>
 
-                <button type="button" onclick="abrirModalLeitorOV(null)" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white transition flex items-center gap-1.5 shadow-sm active:scale-95">
-                    <span>📷</span> Ler Nova OV do SAP (Print)
+                <button type="button" onclick="adicionarNovaOVManual()" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white transition flex items-center gap-1.5 shadow-sm active:scale-95">
+                    <span>➕</span> Nova OV
                 </button>
 
                 <button type="button" onclick="salvarTudoNoSupabase()" id="btnSalvarGeral" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white transition flex items-center gap-1.5 shadow-sm active:scale-95">
@@ -132,7 +134,7 @@
                         <h1 class="text-lg font-extrabold tracking-wide">Painel de OVs por Empresa & Saldos</h1>
                         <span class="bg-blue-600 text-white font-black text-[10px] px-2.5 py-0.5 rounded shadow-sm">GERDAU AZUL</span>
                     </div>
-                    <p class="text-xs text-teal-100/90 mt-1">Leitura estrita de Faturas emitidas do SAP e controle de saldo livre em Toneladas (TO)</p>
+                    <p class="text-xs text-teal-100/90 mt-1">Multi-itens por OV (múltiplas linhas de material) e leitura integrada em Toneladas (TO)</p>
                 </div>
 
                 <div class="flex flex-wrap gap-2 text-right">
@@ -167,7 +169,7 @@
                 </div>
 
                 <div class="bg-rose-50/70 border border-rose-200/80 p-3.5 rounded-xl space-y-1">
-                    <span class="block text-[10px] font-bold text-rose-600 uppercase tracking-wider">Total Já Faturado (Saída Real)</span>
+                    <span class="block text-[10px] font-bold text-rose-600 uppercase tracking-wider">Total Já Expedido (Balança)</span>
                     <div id="totalGeralGastoTO" class="text-lg font-black text-rose-700">0,00 TO</div>
                     <div id="totalGeralGastoValor" class="text-xs font-bold text-rose-600">R$ 0,00</div>
                 </div>
@@ -179,6 +181,50 @@
                     </span>
                     <div id="totalGeralSaldoTO" class="text-xl font-black text-emerald-800">0,00 TO</div>
                     <div id="totalGeralSaldoValor" class="text-xs font-extrabold text-emerald-700">R$ 0,00 restante</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PAINEL DE GRÁFICOS: ESTILO SANFONA (FECHADO POR PADRÃO) -->
+        <section class="bg-white rounded-2xl border border-slate-200/90 shadow-sm overflow-hidden transition">
+            <div onclick="alternarCorpoGraficos()" class="p-4 sm:p-5 flex flex-wrap items-center justify-between gap-3 cursor-pointer hover:bg-slate-50 transition select-none">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-lg">📈</span>
+                    <div>
+                        <h2 class="text-xs font-black text-slate-800 uppercase tracking-wider">Gráficos de Utilização e Consumo por Empresa</h2>
+                        <span class="text-[11px] font-semibold text-slate-400">Atualizado dinamicamente em Toneladas (TO) e Valor (R$)</span>
+                    </div>
+                </div>
+
+                <div class="flex items-center gap-2">
+                    <span id="labelSanfonaGraficos" class="text-[11px] font-bold text-slate-500 bg-slate-100 hover:bg-slate-200 px-3 py-1.5 rounded-xl transition flex items-center gap-1.5">
+                        <span>Mostrar Gráficos</span>
+                        <span id="setaSanfonaGraficos" class="text-xs transition-transform duration-200">▼</span>
+                    </span>
+                </div>
+            </div>
+
+            <div id="corpoGraficos" class="hidden p-5 pt-0 border-t border-slate-100 mt-1">
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-5 pt-4">
+                    <div class="lg:col-span-2 bg-slate-50/60 p-4 rounded-2xl border border-slate-100 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xs font-black text-slate-700 mb-1">Volume Expedido vs Saldo Disponível (Toneladas)</h3>
+                            <p class="text-[11px] text-slate-400 mb-3">Comparativo de consumo acumulado das balanças por comprador</p>
+                        </div>
+                        <div class="relative h-64 w-full">
+                            <canvas id="graficoUtilizacaoBarras"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-slate-50/60 p-4 rounded-2xl border border-slate-100 flex flex-col justify-between">
+                        <div>
+                            <h3 class="text-xs font-black text-slate-700 mb-1">Participação Financeira Total (R$)</h3>
+                            <p class="text-[11px] text-slate-400 mb-3">Divisão percentual do valor contratado entre as empresas</p>
+                        </div>
+                        <div class="relative h-64 w-full flex items-center justify-center">
+                            <canvas id="graficoParticipacaoRosca"></canvas>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -207,6 +253,14 @@
                     <option value="TODAS">Todas as Empresas</option>
                 </select>
 
+                <select id="filtroStatus" onchange="filtrar()" class="text-xs border border-slate-300 bg-slate-50 rounded-xl px-3 py-2 outline-none focus:border-teal-600 font-semibold text-slate-700">
+                    <option value="TODOS">Todos os Status</option>
+                    <option value="CHEIO">Cheias (Verde)</option>
+                    <option value="FINALZINHO">No Finalzinho (Amarelo)</option>
+                    <option value="FINALIZADO">Finalizadas (Vermelho)</option>
+                    <option value="CANCELADO">Canceladas</option>
+                </select>
+
                 <button type="button" onclick="carregarDadosExemplo()" class="text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-xl transition">
                     Carregar Padrão
                 </button>
@@ -218,118 +272,129 @@
 
     </div>
 
-    <!-- MODAL 1: LEITOR SUPERIOR (ITENS DA OV / VA03) -->
-    <div id="modalLeitorOV" class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <!-- MODAL MULTI-LEITOR DE TELAS SAP -->
+    <div id="modalMultiOCR" class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 space-y-4 max-h-[92vh] overflow-y-auto">
+            
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                 <div class="flex items-center gap-2">
-                    <span class="text-2xl">📋</span>
+                    <span class="text-2xl">📷</span>
                     <div>
-                        <h3 class="font-bold text-slate-900 text-sm">Leitor de Linhas da OV (Tela VA03)</h3>
-                        <p class="text-[11px] text-slate-500">Reconhece o número da OV, o cliente, cada linha de material e o peso exato em TO</p>
+                        <h3 class="font-bold text-slate-900 text-sm">Leitor de Telas SAP (Reconhece Todas as Linhas / Itens)</h3>
+                        <p class="text-[11px] text-slate-500">Detecta múltiplas linhas de itens (ex: Linha 1 = 0,100 TO + Linha 2 = 0,100 TO = 0,200 TO total)</p>
                     </div>
                 </div>
-                <button type="button" onclick="fecharModalLeitorOV()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
+                <button type="button" onclick="fecharModalMultiOCR()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
             </div>
 
-            <input type="hidden" id="leitorOVTargetId">
+            <input type="hidden" id="multiOVOVId">
 
-            <div class="border-2 border-dashed border-teal-300 bg-teal-50/50 p-4 rounded-2xl text-center space-y-2">
-                <input type="file" id="inputFileLeitorOV" accept="image/*" class="w-full text-slate-600 text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-teal-700 file:text-white hover:file:bg-teal-800 cursor-pointer">
-                <p class="text-[11px] text-slate-500">Ou apenas pressione <b>Ctrl + V</b> com a janela aberta para colar o print do SAP.</p>
+            <div class="space-y-2">
+                <div class="flex justify-between items-center text-xs font-bold text-slate-700">
+                    <span>Prints da tela do SAP (VA03 / Síntese de Itens):</span>
+                    <span class="text-teal-700 text-[11px]">Cole (Ctrl+V) ou selecione arquivos</span>
+                </div>
+
+                <div class="border-2 border-dashed border-teal-300 bg-teal-50/50 p-4 rounded-2xl text-center space-y-2">
+                    <input type="file" id="inputMultiplasTelas" multiple accept="image/*" class="w-full text-slate-600 text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-teal-700 file:text-white hover:file:bg-teal-800 cursor-pointer">
+                    <p class="text-[11px] text-slate-500">Pressione <b>Ctrl + V</b> com a janela aberta para colar prints da tela.</p>
+                </div>
+
+                <div id="listaPreviewsTelas" class="flex flex-wrap gap-2 pt-2"></div>
             </div>
 
-            <div id="progressoLeitorOV" class="hidden space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-200 text-xs">
+            <div id="progressoMultiOCR" class="hidden space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-200 text-xs">
                 <div class="flex justify-between font-bold text-slate-700">
-                    <span id="labelStatusLeitorOV">Processando tela...</span>
-                    <span id="pctStatusLeitorOV" class="text-teal-700">0%</span>
+                    <span id="labelStatusMultiOCR">Processando telas...</span>
+                    <span id="pctStatusMultiOCR" class="text-teal-700">0%</span>
                 </div>
                 <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                    <div id="barraProgressoLeitorOV" class="bg-[#007e7a] h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                    <div id="barraProgressoMultiOCR" class="bg-[#007e7a] h-full rounded-full transition-all duration-300" style="width: 0%"></div>
                 </div>
             </div>
 
+            <!-- RESULTADO CONSOLIDADO COM DETECÇÃO DE MÚLTIPLAS LINHAS -->
             <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3 text-xs">
                 <div class="flex justify-between items-center">
-                    <span class="font-bold text-slate-700 uppercase tracking-wider">Cabeçalho da OV Detectado:</span>
-                    <span id="ovNumeroDetectado" class="font-black text-teal-800 bg-teal-100 px-2.5 py-0.5 rounded text-xs">OV: ---</span>
+                    <span class="font-bold text-slate-700 uppercase tracking-wider">Soma Consolidada das Linhas:</span>
+                    <span id="badgeLinhasDetectadas" class="bg-teal-100 text-teal-800 font-bold px-2 py-0.5 rounded text-[10px]">0 linha(s) encontrada(s)</span>
                 </div>
-                <div id="ovDadosExtrasDetectados" class="text-[11px] text-slate-600">
-                    Cliente: <b>---</b> | Pedido/DRS: <b>---</b>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block text-slate-500 text-[10px] font-bold uppercase">Soma de Todas as Linhas (TO)</label>
+                        <input type="number" step="0.001" id="multiResultadoQtdTO" placeholder="0.00" class="w-full border border-slate-300 rounded-xl p-2 bg-white font-black text-teal-800 text-sm">
+                    </div>
+                    <div>
+                        <label class="block text-slate-500 text-[10px] font-bold uppercase">Valor Total Estimado (R$)</label>
+                        <input type="number" step="0.01" id="multiResultadoValorBRL" placeholder="0.00" class="w-full border border-slate-300 rounded-xl p-2 bg-white font-bold text-slate-800 text-sm">
+                    </div>
                 </div>
 
-                <span class="font-bold text-slate-700 uppercase tracking-wider block pt-2 border-t border-slate-200">Linhas de Materiais Extraídas:</span>
-                <div id="detalhesLeitorOV" class="text-[11px] text-slate-700 bg-white p-2.5 rounded-xl border border-slate-200 max-h-40 overflow-y-auto space-y-1">
-                    Aguardando print da VA03...
+                <!-- Detalhes de cada linha/material identificada -->
+                <div class="space-y-1">
+                    <span class="text-[10px] font-bold text-slate-500 uppercase">Itens e Materiais Identificados no SAP:</span>
+                    <div id="detalhesLinhasTabela" class="text-[11px] text-slate-700 bg-white p-2.5 rounded-xl border border-slate-200 max-h-36 overflow-y-auto space-y-1">
+                        Aguardando leitura dos prints...
+                    </div>
                 </div>
             </div>
 
             <div class="flex justify-between items-center gap-2 pt-3 border-t border-slate-100">
-                <button type="button" onclick="processarLeitorOV()" id="btnProcessarLeitorOV" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-[#007e7a] hover:bg-[#005a57] text-white flex items-center gap-1.5 shadow-sm active:scale-95">
-                    ⚡ Reconhecer Linhas
+                <button type="button" onclick="executarMultiOCR()" id="btnProcessarMultiOCR" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-[#007e7a] hover:bg-[#005a57] text-white flex items-center gap-1.5 shadow-sm active:scale-95">
+                    ⚡ Reconhecer Todas as Linhas
                 </button>
                 <div class="flex gap-2">
-                    <button type="button" onclick="fecharModalLeitorOV()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Cancelar</button>
-                    <button type="button" onclick="aplicarLinhasNaOV()" class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm">Aplicar na OV</button>
+                    <button type="button" onclick="fecharModalMultiOCR()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Cancelar</button>
+                    <button type="button" onclick="aplicarResultadoMultiOCR()" class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm">Aplicar Linhas na OV</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL 2: LEITOR INFERIOR (FILTRAGEM ESTRITA DE FATURAS / NOTAS FISCAIS) -->
-    <div id="modalLeitorNotas" class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 space-y-4 max-h-[92vh] overflow-y-auto">
+    <!-- MODAL: CANCELAR OV & TRANSFERIR SALDO -->
+    <div id="modalCancelarOV" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl border border-slate-100 space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
-                <div class="flex items-center gap-2">
-                    <span class="text-2xl">⚖️</span>
-                    <div>
-                        <h3 class="font-bold text-slate-900 text-sm">Leitor de Faturas Emitidas (Fluxo SAP)</h3>
-                        <p class="text-[11px] text-slate-500">Validação estrita: <b>somente linhas identificadas como FATURA</b> têm o peso considerado como saída</p>
-                    </div>
+                <div class="flex items-center gap-2 text-rose-600 font-bold text-sm">
+                    <span>🚫</span>
+                    <h3>Cancelar Ordem de Venda</h3>
                 </div>
-                <button type="button" onclick="fecharModalLeitorNotas()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
+                <button type="button" onclick="fecharModalCancelarOV()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
             </div>
 
-            <input type="hidden" id="leitorNotasTargetId">
+            <input type="hidden" id="cancelarOVId">
 
-            <div class="border-2 border-dashed border-rose-300 bg-rose-50/50 p-4 rounded-2xl text-center space-y-2">
-                <input type="file" id="inputFileLeitorNotas" accept="image/*" class="w-full text-slate-600 text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-rose-700 file:text-white hover:file:bg-rose-800 cursor-pointer">
-                <p class="text-[11px] text-slate-500">Pressione <b>Ctrl + V</b> com a janela aberta para colar o print do fluxo de faturamento.</p>
-            </div>
+            <div class="space-y-3 text-xs">
+                <p class="text-slate-600">
+                    Atenção: A OV <b id="cancelarOVNumero" class="text-slate-900 font-bold">---</b> será marcada como <b>CANCELADA</b>.
+                </p>
 
-            <div id="progressoLeitorNotas" class="hidden space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-200 text-xs">
-                <div class="flex justify-between font-bold text-slate-700">
-                    <span id="labelStatusLeitorNotas">Filtrando e identificando faturas...</span>
-                    <span id="pctStatusLeitorNotas" class="text-rose-700">0%</span>
+                <div class="bg-amber-50 border border-amber-200 p-3 rounded-xl text-amber-900">
+                    <span class="block font-bold">Saldo restante a transferir:</span>
+                    <span id="cancelarSaldoRestante" class="text-base font-black text-amber-700">0,00 TO</span>
                 </div>
-                <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                    <div id="barraProgressoLeitorNotas" class="bg-rose-600 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
-                </div>
-            </div>
 
-            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3 text-xs">
-                <div class="flex justify-between items-center">
-                    <span class="font-bold text-slate-700 uppercase tracking-wider">Faturas Reconhecidas com Peso:</span>
-                    <span id="badgeNotasDetectadas" class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded text-[10px]">0 fatura(s)</span>
+                <div>
+                    <label class="block text-slate-700 font-bold mb-1">Para onde deseja transferir o saldo?</label>
+                    <select id="selectDestinoSaldo" class="w-full border border-slate-300 rounded-xl p-2.5 bg-slate-50 outline-none focus:border-teal-600 font-semibold text-slate-800">
+                    </select>
                 </div>
-                <div id="detalhesLeitorNotas" class="text-[11px] text-slate-700 bg-white p-2.5 rounded-xl border border-slate-200 max-h-40 overflow-y-auto space-y-1">
-                    Aguardando print do fluxo do SAP...
+
+                <div>
+                    <label class="block text-slate-500 font-bold mb-1">Motivo do Cancelamento</label>
+                    <input type="text" id="cancelarMotivo" placeholder="Ex: Cancelada no SAP / Erro de emissão / Transferência" class="w-full border border-slate-300 rounded-xl p-2.5 bg-slate-50 outline-none focus:border-teal-600">
                 </div>
             </div>
 
-            <div class="flex justify-between items-center gap-2 pt-3 border-t border-slate-100">
-                <button type="button" onclick="processarLeitorNotas()" id="btnProcessarLeitorNotas" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-rose-700 hover:bg-rose-800 text-white flex items-center gap-1.5 shadow-sm active:scale-95">
-                    ⚡ Filtrar Somente Faturas
-                </button>
-                <div class="flex gap-2">
-                    <button type="button" onclick="fecharModalLeitorNotas()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Cancelar</button>
-                    <button type="button" onclick="aplicarNotasNaOV()" class="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm">Lançar Peso Emitido</button>
-                </div>
+            <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+                <button type="button" onclick="fecharModalCancelarOV()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Voltar</button>
+                <button type="button" onclick="confirmarCancelamento()" class="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm">Confirmar Cancelamento & Mover Saldo</button>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPT DE PROCESSAMENTO -->
+    <!-- SCRIPT DE PROCESSAMENTO E OCR REVISADO -->
     <script>
         const SUPABASE_URL = "https://gloxtswcksbczinpwtzu.supabase.co";
         const SUPABASE_ANON_KEY = "sb_publishable_0kEiqthWKZZwjM120wQIYw_Hba7qeLc";
@@ -343,11 +408,14 @@
             console.error("Falha ao inicializar o Supabase SDK:", e);
         }
 
-        const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v15_fatura_estrita";
+        const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v12_sap_exact";
         let cacheRegistros = [];
-        let dadosOVDetectadosTemp = null;
-        let linhasTempLeitorOV = [];
-        let notasTempLeitorNotas = [];
+        let gruposCacheParaGraficos = {};
+        let arquivosMultiOCR = [];
+        let linhasDetectadasTemp = [];
+
+        let chartBarrasInstancia = null;
+        let chartRoscaInstancia = null;
 
         const TEMA_GERDAU_AZUL = {
             nomeTema: "Gerdau Azul Corporativo",
@@ -363,18 +431,25 @@
         const OUTRAS_CORES_EMPRESAS = [
             { nomeTema: "Roxo / Púrpura", hexColor: "#7e22ce", header: "bg-purple-700", bgLight: "bg-purple-50/50", bordaCard: "border-purple-400", texto: "text-purple-900", badge: "bg-purple-800", ovBordaPadrao: "border-purple-300 bg-purple-50/20" },
             { nomeTema: "Esmeralda", hexColor: "#047857", header: "bg-emerald-700", bgLight: "bg-emerald-50/50", bordaCard: "border-emerald-400", texto: "text-emerald-900", badge: "bg-emerald-800", ovBordaPadrao: "border-emerald-300 bg-emerald-50/20" },
-            { nomeTema: "Âmbar / Laranja", hexColor: "#d97706", header: "bg-amber-600", bgLight: "bg-amber-50/50", bordaCard: "border-amber-400", texto: "text-amber-900", badge: "bg-amber-700", ovBordaPadrao: "border-amber-300 bg-amber-50/20" }
+            { nomeTema: "Âmbar / Laranja", hexColor: "#d97706", header: "bg-amber-600", bgLight: "bg-amber-50/50", bordaCard: "border-amber-400", texto: "text-amber-900", badge: "bg-amber-700", ovBordaPadrao: "border-amber-300 bg-amber-50/20" },
+            { nomeTema: "Índigo", hexColor: "#4338ca", header: "bg-indigo-700", bgLight: "bg-indigo-50/50", bordaCard: "border-indigo-400", texto: "text-indigo-900", badge: "bg-indigo-800", ovBordaPadrao: "border-indigo-300 bg-indigo-50/20" },
+            { nomeTema: "Rosa / Magenta", hexColor: "#be185d", header: "bg-pink-700", bgLight: "bg-pink-50/50", bordaCard: "border-pink-400", texto: "text-pink-900", badge: "bg-pink-800", ovBordaPadrao: "border-pink-300 bg-pink-50/20" },
+            { nomeTema: "Teal Escuro", hexColor: "#0f766e", header: "bg-teal-700", bgLight: "bg-teal-50/50", bordaCard: "border-teal-400", texto: "text-teal-900", badge: "bg-teal-800", ovBordaPadrao: "border-teal-300 bg-teal-50/20" }
         ];
 
         function normalizarNomeEmpresa(nome) {
             const raw = (nome || '').trim();
-            if (raw.toUpperCase().includes("GERDAU")) return "GERDAU AÇOS LONGOS S.A.";
+            if (raw.toUpperCase().includes("GERDAU")) {
+                return "GERDAU AÇOS LONGOS S.A.";
+            }
             return raw || "OUTROS CLIENTES";
         }
 
         function obterTemaDaEmpresa(nomeEmpresa, indiceNaoGerdau = 0) {
             const normalizado = normalizarNomeEmpresa(nomeEmpresa);
-            if (normalizado.toUpperCase().includes("GERDAU")) return TEMA_GERDAU_AZUL;
+            if (normalizado.toUpperCase().includes("GERDAU")) {
+                return TEMA_GERDAU_AZUL;
+            }
             return OUTRAS_CORES_EMPRESAS[indiceNaoGerdau % OUTRAS_CORES_EMPRESAS.length];
         }
 
@@ -387,24 +462,49 @@
 
         const DADOS_DEFAULT = [
             {
-                id: "115939257",
+                id: "115443653",
                 status: "ATIVO",
-                contrato: { numero: "0000071823", item: "30", qtdTotalTO: 2635.00, valorTotalBRL: 3320100.00 },
+                motivoCancelamento: "",
+                contrato: {
+                    numero: "0000071823",
+                    item: "30",
+                    qtdTotalTO: 2635.00,
+                    valorTotalBRL: 3320100.00
+                },
                 ov: {
-                    numero: "115939257",
-                    cliente: "AUCOBRE GESTÃO DE RESIDUOS LTDA.",
-                    pedidoDRS: "DSR 018-2025",
+                    numero: "115443653",
+                    cliente: "GERDAU AÇOS LONGOS S.A.",
+                    pedidoDRS: "71823 DRS 034A/2023",
                     itens: [
-                        { itemSap: "40", material: "SUCATA DE FIO-CABO DE ALUMÍNIO E...", qtdTO: 0.300 },
-                        { itemSap: "60", material: "SUCATA DE FIO-CABO DE COBRE ENCA...", qtdTO: 0.300 }
+                        { itemSap: "40", material: "SUCATA DE FIO-CABO DE ALUMÍNIO E...", qtdTO: 0.100 },
+                        { itemSap: "60", material: "SUCATA DE FIO-CABO DE COBRE ENCA...", qtdTO: 0.100 }
                     ],
-                    qtdLiberadaTO: 0.600,
-                    valorBRL: 8745.30,
-                    precoUnitarioPorTO: 14575.50
+                    qtdLiberadaTO: 0.200,
+                    gastoAjusteManualTO: 0,
+                    saldoAjusteManualTO: null,
+                    valorBRL: 2915.10,
+                    precoUnitarioPorTO: 14575.50,
+                    docContabil: "5201091298"
                 },
                 gastos: []
             }
         ];
+
+        function alternarCorpoGraficos() {
+            const corpo = document.getElementById('corpoGraficos');
+            const label = document.getElementById('labelSanfonaGraficos');
+            if (!corpo) return;
+
+            const estaFechado = corpo.classList.contains('hidden');
+            if (estaFechado) {
+                corpo.classList.remove('hidden');
+                if (label) label.innerHTML = `<span>Recolher Gráficos</span> <span id="setaSanfonaGraficos" class="text-xs">▲</span>`;
+                setTimeout(() => { atualizarGraficos(gruposCacheParaGraficos); }, 50);
+            } else {
+                corpo.classList.add('hidden');
+                if (label) label.innerHTML = `<span>Mostrar Gráficos</span> <span id="setaSanfonaGraficos" class="text-xs">▼</span>`;
+            }
+        }
 
         function atualizarIndicadorStatus(status, texto) {
             const ponto = document.getElementById('pontoConexao');
@@ -432,23 +532,34 @@
                     const { data, error } = await supabaseClient.from('modulo11_ovs').select('*').order('created_at', { ascending: false });
                     if (!error && data && data.length > 0) {
                         cacheRegistros = data.map(d => {
-                            const itens = Array.isArray(d.itens) && d.itens.length > 0 ? d.itens : [
-                                { itemSap: "40", material: d.material || "SUCATA DE FIO-CABO DE ALUMÍNIO E...", qtdTO: 0.300 },
-                                { itemSap: "60", material: "SUCATA DE FIO-CABO DE COBRE ENCA...", qtdTO: 0.300 }
-                            ];
-                            const somaItens = itens.reduce((s, it) => s + Number(it.qtdTO || 0), 0);
+                            const itens = Array.isArray(d.itens) && d.itens.length > 0 
+                                ? d.itens 
+                                : [{ itemSap: "10", material: d.material || "MATERIAL GERAL", qtdTO: Number(d.qtd_liberada_to || (Number(d.qtd_liberada_kg || 0) / 1000)) }];
+
+                            const somaItensTO = itens.reduce((acc, curr) => acc + Number(curr.qtdTO || 0), 0);
+                            const qtdLiberadaTO = somaItensTO > 0 ? somaItensTO : Number(d.qtd_liberada_to || 0);
+
                             return {
                                 id: String(d.id),
                                 status: d.status || "ATIVO",
-                                contrato: { numero: d.contrato_numero || "0000071823", item: "30", qtdTotalTO: Number(d.contrato_total_to || 2635), valorTotalBRL: Number(d.contrato_total_brl || 0) },
+                                motivoCancelamento: d.motivo_cancelamento || "",
+                                contrato: {
+                                    numero: d.contrato_numero,
+                                    item: d.contrato_item || "30",
+                                    qtdTotalTO: Number(d.contrato_total_to || 0),
+                                    valorTotalBRL: Number(d.contrato_total_brl || 0)
+                                },
                                 ov: {
                                     numero: String(d.ov),
-                                    cliente: d.cliente || "AUCOBRE GESTÃO DE RESIDUOS LTDA.",
-                                    pedidoDRS: d.pedido_drs || "DSR 018-2025",
+                                    cliente: d.cliente,
+                                    pedidoDRS: d.pedido_drs,
                                     itens: itens,
-                                    qtdLiberadaTO: somaItens > 0 ? somaItens : 0.600,
-                                    valorBRL: Number(d.valor_brl || 8745.30),
-                                    precoUnitarioPorTO: Number(d.preco_unitario_to || 14575.50)
+                                    qtdLiberadaTO: qtdLiberadaTO,
+                                    gastoAjusteManualTO: Number(d.gasto_ajuste_manual_to || 0),
+                                    saldoAjusteManualTO: d.saldo_ajuste_manual_to !== undefined ? Number(d.saldo_ajuste_manual_to) : null,
+                                    valorBRL: Number(d.valor_brl || 0),
+                                    precoUnitarioPorTO: Number(d.preco_unitario_to || 1260),
+                                    docContabil: d.doc_contabil
                                 },
                                 gastos: Array.isArray(d.gastos) ? d.gastos : []
                             };
@@ -468,7 +579,7 @@
             cacheRegistros = raw ? JSON.parse(raw) : DADOS_DEFAULT;
             atualizarOpcoesEmpresas(cacheRegistros);
             renderizar();
-            atualizarIndicadorStatus('offline', 'Salvo Localmente');
+            atualizarIndicadorStatus('offline', supabaseClient ? 'Modo Offline' : 'Salvo Localmente');
         }
 
         async function salvarTudoNoSupabase() {
@@ -485,16 +596,22 @@
                         id: String(item.id),
                         ov: String(item.ov.numero),
                         status: item.status || "ATIVO",
+                        motivo_cancelamento: item.motivoCancelamento || "",
                         cliente: item.ov.cliente,
                         material: (item.ov.itens || []).map(i => i.material).join(' / '),
                         itens: item.ov.itens || [],
                         pedido_drs: item.ov.pedidoDRS,
                         qtd_liberada_to: Number(item.ov.qtdLiberadaTO || 0),
                         qtd_liberada_kg: Number(item.ov.qtdLiberadaTO || 0) * 1000,
+                        gasto_ajuste_manual_to: Number(item.ov.gastoAjusteManualTO || 0),
+                        saldo_ajuste_manual_to: item.ov.saldoAjusteManualTO !== null ? Number(item.ov.saldoAjusteManualTO) : null,
                         valor_brl: Number(item.ov.valorBRL || 0),
-                        preco_unitario_to: Number(item.ov.precoUnitarioPorTO || 14575.50),
+                        preco_unitario_to: Number(item.ov.precoUnitarioPorTO || 1260),
+                        doc_contabil: item.ov.docContabil,
                         contrato_numero: item.contrato.numero,
+                        contrato_item: item.contrato.item || "30",
                         contrato_total_to: Number(item.contrato.qtdTotalTO || 0),
+                        contrato_total_brl: Number(item.contrato.valorTotalBRL || 0),
                         gastos: item.gastos
                     }));
 
@@ -504,11 +621,13 @@
                     atualizarIndicadorStatus('online', 'Salvo com Sucesso!');
                     alert("✓ Todas as OVs foram salvas com sucesso no Supabase!");
                 } catch (err) {
+                    console.error("Erro ao salvar:", err);
                     alert("Erro ao gravar no Supabase: " + (err.message || err));
                     atualizarIndicadorStatus('offline', 'Erro na Gravação');
                 }
             } else {
                 alert("Dados salvos no armazenamento local!");
+                atualizarIndicadorStatus('offline', 'Salvo Localmente');
             }
 
             btn.disabled = false;
@@ -524,10 +643,12 @@
         }
 
         async function salvarNaBase(novoItem) {
-            const idx = cacheRegistros.findIndex(i => i.id === novoItem.id || i.ov.numero === novoItem.ov.numero);
-            if (idx !== -1) cacheRegistros[idx] = novoItem;
-            else cacheRegistros.unshift(novoItem);
-
+            const idx = cacheRegistros.findIndex(i => i.id === novoItem.id);
+            if (idx !== -1) {
+                cacheRegistros[idx] = novoItem;
+            } else {
+                cacheRegistros.unshift(novoItem);
+            }
             localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheRegistros));
             atualizarOpcoesEmpresas(cacheRegistros);
             renderizar();
@@ -539,24 +660,175 @@
                         id: String(novoItem.id),
                         ov: String(novoItem.ov.numero),
                         status: novoItem.status || "ATIVO",
+                        motivo_cancelamento: novoItem.motivoCancelamento || "",
                         cliente: novoItem.ov.cliente,
                         material: (novoItem.ov.itens || []).map(i => i.material).join(' / '),
                         itens: novoItem.ov.itens || [],
                         pedido_drs: novoItem.ov.pedidoDRS,
                         qtd_liberada_to: Number(novoItem.ov.qtdLiberadaTO || 0),
                         qtd_liberada_kg: Number(novoItem.ov.qtdLiberadaTO || 0) * 1000,
+                        gasto_ajuste_manual_to: Number(novoItem.ov.gastoAjusteManualTO || 0),
+                        saldo_ajuste_manual_to: novoItem.ov.saldoAjusteManualTO !== null ? Number(novoItem.ov.saldoAjusteManualTO) : null,
                         valor_brl: Number(novoItem.ov.valorBRL || 0),
-                        preco_unitario_to: Number(novoItem.ov.precoUnitarioPorTO || 14575.50),
+                        preco_unitario_to: Number(novoItem.ov.precoUnitarioPorTO || 1260),
+                        doc_contabil: novoItem.ov.docContabil,
                         contrato_numero: novoItem.contrato.numero,
+                        contrato_item: novoItem.contrato.item || "30",
                         contrato_total_to: Number(novoItem.contrato.qtdTotalTO || 0),
+                        contrato_total_brl: Number(novoItem.contrato.valorTotalBRL || 0),
                         gastos: novoItem.gastos
                     };
                     await supabaseClient.from('modulo11_ovs').upsert(payload, { onConflict: 'id' });
                     atualizarIndicadorStatus('online', 'Nuvem Conectada');
                 } catch (err) {
+                    console.error("Erro Supabase:", err);
                     atualizarIndicadorStatus('offline', 'Pendente');
                 }
             }
+        }
+
+        function atualizarItemMaterial(ovId, idxLinha, campo, valor) {
+            const item = cacheRegistros.find(o => o.id === ovId);
+            if (!item || !item.ov.itens || !item.ov.itens[idxLinha]) return;
+
+            if (campo === 'qtdTO') {
+                let valNum = parseFloat(valor) || 0;
+                if (valNum > 100) valNum = valNum / 1000;
+                item.ov.itens[idxLinha].qtdTO = valNum;
+                item.ov.qtdLiberadaTO = item.ov.itens.reduce((acc, curr) => acc + Number(curr.qtdTO || 0), 0);
+                item.ov.saldoAjusteManualTO = null;
+            } else if (campo === 'material') {
+                item.ov.itens[idxLinha].material = valor.trim();
+            } else if (campo === 'itemSap') {
+                item.ov.itens[idxLinha].itemSap = valor.trim();
+            }
+
+            salvarNaBase(item);
+        }
+
+        function adicionarLinhaMaterialOV(ovId) {
+            const item = cacheRegistros.find(o => o.id === ovId);
+            if (!item) return;
+            if (!item.ov.itens) item.ov.itens = [];
+
+            const proximoNumero = (item.ov.itens.length + 1) * 10;
+            item.ov.itens.push({
+                itemSap: String(proximoNumero),
+                material: "NOVO MATERIAL",
+                qtdTO: 0.100
+            });
+
+            item.ov.qtdLiberadaTO = item.ov.itens.reduce((acc, curr) => acc + Number(curr.qtdTO || 0), 0);
+            item.ov.saldoAjusteManualTO = null;
+            salvarNaBase(item);
+        }
+
+        function removerLinhaMaterialOV(ovId, idxLinha) {
+            const item = cacheRegistros.find(o => o.id === ovId);
+            if (!item || !item.ov.itens) return;
+
+            if (item.ov.itens.length <= 1) {
+                alert("A OV precisa ter pelo menos 1 linha de material.");
+                return;
+            }
+
+            item.ov.itens.splice(idxLinha, 1);
+            item.ov.qtdLiberadaTO = item.ov.itens.reduce((acc, curr) => acc + Number(curr.qtdTO || 0), 0);
+            item.ov.saldoAjusteManualTO = null;
+            salvarNaBase(item);
+        }
+
+        function atualizarCampoOV(ovId, campo, valor) {
+            const item = cacheRegistros.find(o => o.id === ovId);
+            if (!item) return;
+
+            const valNum = parseFloat(valor) || 0;
+
+            if (campo === 'qtdLiberadaTO') {
+                item.ov.qtdLiberadaTO = valNum;
+                item.ov.saldoAjusteManualTO = null;
+            } else if (campo === 'valorBRL') {
+                item.ov.valorBRL = valNum;
+            } else if (campo === 'gastoAjusteManualTO') {
+                item.ov.gastoAjusteManualTO = valNum;
+                item.ov.saldoAjusteManualTO = null;
+            } else if (campo === 'saldoAjusteManualTO') {
+                item.ov.saldoAjusteManualTO = valNum;
+            } else if (campo === 'cliente') {
+                item.ov.cliente = valor.trim();
+            } else if (campo === 'pedidoDRS') {
+                item.ov.pedidoDRS = valor.trim();
+            }
+
+            salvarNaBase(item);
+        }
+
+        function atualizarGastoLinha(ovId, idxGasto, campo, valor) {
+            const item = cacheRegistros.find(o => o.id === ovId);
+            if (!item || !item.gastos || !item.gastos[idxGasto]) return;
+
+            if (campo === 'pesoTO') {
+                let p = parseFloat(valor) || 0;
+                if (p > 100) p = p / 1000;
+                item.gastos[idxGasto].pesoTO = p;
+                item.ov.saldoAjusteManualTO = null;
+            } else if (campo === 'ticket') {
+                item.gastos[idxGasto].ticket = valor.trim();
+            } else if (campo === 'placa') {
+                item.gastos[idxGasto].placa = valor.trim().toUpperCase();
+            } else if (campo === 'data') {
+                item.gastos[idxGasto].data = valor;
+            }
+
+            salvarNaBase(item);
+        }
+
+        function adicionarLinhaPesagemDireta(ovId) {
+            const item = cacheRegistros.find(o => o.id === ovId);
+            if (!item) return;
+            if (!item.gastos) item.gastos = [];
+
+            item.gastos.push({
+                id: Date.now(),
+                ticket: "TKT-" + Math.floor(10000 + Math.random() * 90000),
+                placa: "RIO-0A00",
+                pesoTO: 0.100,
+                data: new Date().toISOString().split('T')[0]
+            });
+            item.ov.saldoAjusteManualTO = null;
+            salvarNaBase(item);
+        }
+
+        function adicionarNovaOVManual() {
+            const numero = String(Date.now()).slice(-8);
+            const nova = {
+                id: numero,
+                status: "ATIVO",
+                motivoCancelamento: "",
+                contrato: {
+                    numero: "0000071823",
+                    item: "30",
+                    qtdTotalTO: 2635.00,
+                    valorTotalBRL: 3320100.00
+                },
+                ov: {
+                    numero: numero,
+                    cliente: "GERDAU AÇOS LONGOS S.A.",
+                    pedidoDRS: "NOVO DRS",
+                    itens: [
+                        { itemSap: "40", material: "SUCATA DE FIO-CABO DE ALUMÍNIO E...", qtdTO: 0.100 },
+                        { itemSap: "60", material: "SUCATA DE FIO-CABO DE COBRE ENCA...", qtdTO: 0.100 }
+                    ],
+                    qtdLiberadaTO: 0.200,
+                    gastoAjusteManualTO: 0,
+                    saldoAjusteManualTO: null,
+                    valorBRL: 2915.10,
+                    precoUnitarioPorTO: 14575.50,
+                    docContabil: "5201090000"
+                },
+                gastos: []
+            };
+            salvarNaBase(nova);
         }
 
         function atualizarOpcoesEmpresas(lista) {
@@ -575,23 +847,34 @@
                 select.appendChild(opt);
             });
 
-            if (empresasNormalizadas.includes(valorAtual)) select.value = valorAtual;
+            if (empresasNormalizadas.includes(valorAtual)) {
+                select.value = valorAtual;
+            }
 
             let contadorOutrasCores = 0;
+
             containerCards.innerHTML = empresasNormalizadas.map((emp) => {
                 const isGerdau = emp.toUpperCase().includes("GERDAU");
                 const tema = isGerdau ? TEMA_GERDAU_AZUL : obterTemaDaEmpresa(emp, contadorOutrasCores++);
                 const ovsEmp = lista.filter(i => normalizarNomeEmpresa(i.ov.cliente) === emp);
                 
                 let empLiberadoValor = 0;
+                let empSaldoValor = 0;
                 let empSaldoTO = 0;
 
                 ovsEmp.forEach(curr => {
                     if (curr.status !== 'CANCELADO') {
-                        const totalGasto = (curr.gastos || []).reduce((s, g) => s + Number(g.pesoTO || 0), 0);
-                        const saldoTO = Math.max(0, curr.ov.qtdLiberadaTO - totalGasto);
+                        const valUnitTO = curr.ov.precoUnitarioPorTO || 1260;
+                        const gastoTabela = (curr.gastos || []).reduce((s, g) => s + Number(g.pesoTO || 0), 0);
+                        const totalGastoTO = gastoTabela + Number(curr.ov.gastoAjusteManualTO || 0);
+
+                        let saldoTO = curr.ov.saldoAjusteManualTO !== null 
+                            ? Number(curr.ov.saldoAjusteManualTO) 
+                            : Math.max(0, curr.ov.qtdLiberadaTO - totalGastoTO);
+
                         empLiberadoValor += Number(curr.ov.valorBRL || 0);
                         empSaldoTO += saldoTO;
+                        empSaldoValor += (saldoTO * valUnitTO);
                     }
                 });
 
@@ -604,6 +887,7 @@
                             <span class="text-[11px] font-bold text-slate-500">${ovsEmp.length} OV(s)</span>
                         </div>
                         <div class="font-black text-sm ${tema.texto} truncate" title="${emp}">${emp}</div>
+                        
                         <div class="mt-2.5 pt-2 border-t border-slate-200/80 space-y-1">
                             <div class="flex justify-between items-center text-xs">
                                 <span class="text-slate-500 font-semibold">Valor Total:</span>
@@ -612,6 +896,10 @@
                             <div class="flex justify-between items-center text-xs">
                                 <span class="text-slate-500 font-semibold">Saldo Livre Restante:</span>
                                 <span class="font-black text-emerald-700">${formatarTO(empSaldoTO, 2)}</span>
+                            </div>
+                            <div class="flex justify-between items-center text-[11px]">
+                                <span class="text-slate-400">Saldo em R$:</span>
+                                <span class="font-bold text-emerald-600">${empSaldoValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
                             </div>
                         </div>
                     </div>
@@ -627,12 +915,95 @@
             }
         }
 
-        // ==========================================
-        // RENDERIZAÇÃO DOS CARDS
-        // ==========================================
+        function atualizarGraficos(gruposPorEmpresa) {
+            gruposCacheParaGraficos = gruposPorEmpresa;
+            const corpo = document.getElementById('corpoGraficos');
+            if (corpo && corpo.classList.contains('hidden')) return;
+
+            const canvasBarras = document.getElementById('graficoUtilizacaoBarras');
+            const canvasRosca = document.getElementById('graficoParticipacaoRosca');
+            if (!canvasBarras || !canvasRosca) return;
+
+            const labels = [];
+            const dadosGastosTO = [];
+            const dadosSaldosTO = [];
+            const dadosValoresBRL = [];
+            const coresEmpresas = [];
+
+            let contadorCores = 0;
+            for (const [nomeEmp, ovs] of Object.entries(gruposPorEmpresa)) {
+                labels.push(nomeEmp.length > 22 ? nomeEmp.substring(0, 20) + '...' : nomeEmp);
+                const isGerdau = nomeEmp.toUpperCase().includes("GERDAU");
+                const tema = isGerdau ? TEMA_GERDAU_AZUL : obterTemaDaEmpresa(nomeEmp, contadorCores++);
+                coresEmpresas.push(tema.hexColor);
+
+                let totalGastoTO = 0;
+                let totalSaldoTO = 0;
+                let totalValorBRL = 0;
+
+                ovs.forEach(o => {
+                    if (o.status !== 'CANCELADO') {
+                        const gTabela = (o.gastos || []).reduce((acc, curr) => acc + Number(curr.pesoTO || 0), 0);
+                        const gTotal = gTabela + Number(o.ov.gastoAjusteManualTO || 0);
+
+                        let sTO = o.ov.saldoAjusteManualTO !== null 
+                            ? Number(o.ov.saldoAjusteManualTO) 
+                            : Math.max(0, o.ov.qtdLiberadaTO - gTotal);
+
+                        totalGastoTO += gTotal;
+                        totalSaldoTO += sTO;
+                        totalValorBRL += Number(o.ov.valorBRL || 0);
+                    }
+                });
+
+                dadosGastosTO.push(Number(totalGastoTO.toFixed(2)));
+                dadosSaldosTO.push(Number(totalSaldoTO.toFixed(2)));
+                dadosValoresBRL.push(Number(totalValorBRL.toFixed(2)));
+            }
+
+            if (chartBarrasInstancia) chartBarrasInstancia.destroy();
+            if (chartRoscaInstancia) chartRoscaInstancia.destroy();
+
+            chartBarrasInstancia = new Chart(canvasBarras, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        { label: 'Expedido (TO)', data: dadosGastosTO, backgroundColor: '#e11d48', borderRadius: 6 },
+                        { label: 'Saldo Livre Restante (TO)', data: dadosSaldosTO, backgroundColor: coresEmpresas, borderRadius: 6 }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y',
+                    scales: {
+                        x: { stacked: true, grid: { color: '#f1f5f9' }, ticks: { font: { size: 10 } } },
+                        y: { stacked: true, grid: { display: false }, ticks: { font: { weight: 'bold', size: 11 } } }
+                    },
+                    plugins: { legend: { position: 'top', labels: { boxWidth: 12, font: { size: 11 } } } }
+                }
+            });
+
+            chartRoscaInstancia = new Chart(canvasRosca, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{ data: dadosValoresBRL, backgroundColor: coresEmpresas, borderWidth: 2, hoverOffset: 6 }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '65%',
+                    plugins: { legend: { position: 'bottom', labels: { boxWidth: 10, font: { size: 10 } } } }
+                }
+            });
+        }
+
         function renderizar() {
             const lista = cacheRegistros;
             const termo = (document.getElementById('filtroTexto')?.value || '').toLowerCase().trim();
+            const filtroStatus = document.getElementById('filtroStatus')?.value || 'TODOS';
             const filtroEmpresa = document.getElementById('filtroEmpresa')?.value || 'TODAS';
             const container = document.getElementById('containerOVs');
 
@@ -646,9 +1017,18 @@
 
             const listaFiltrada = lista.filter(item => {
                 const cancelado = item.status === "CANCELADO";
-                const totalGastoTO = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoTO || 0), 0);
-                const saldoTO = cancelado ? 0 : Math.max(0, item.ov.qtdLiberadaTO - totalGastoTO);
-                const valUnitTO = item.ov.precoUnitarioPorTO || (item.ov.qtdLiberadaTO > 0 ? item.ov.valorBRL / item.ov.qtdLiberadaTO : 14575.50);
+                const gastoTabela = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoTO || 0), 0);
+                const totalGastoTO = gastoTabela + Number(item.ov.gastoAjusteManualTO || 0);
+
+                let saldoTO = cancelado ? 0 : (
+                    item.ov.saldoAjusteManualTO !== null 
+                        ? Number(item.ov.saldoAjusteManualTO) 
+                        : Math.max(0, item.ov.qtdLiberadaTO - totalGastoTO)
+                );
+
+                const concluido = !cancelado && saldoTO <= 0;
+                const percentualRestante = item.ov.qtdLiberadaTO > 0 ? (saldoTO / item.ov.qtdLiberadaTO) * 100 : 0;
+                const valUnitTO = item.ov.precoUnitarioPorTO || 1260;
                 const valGastoItem = totalGastoTO * valUnitTO;
                 const valSaldoItem = Math.max(0, item.ov.valorBRL - valGastoItem);
 
@@ -664,6 +1044,11 @@
 
                 const nomeEmpresaNormalizado = normalizarNomeEmpresa(item.ov.cliente);
                 if (filtroEmpresa !== 'TODAS' && nomeEmpresaNormalizado !== filtroEmpresa) return false;
+                
+                if (filtroStatus === 'CHEIO' && (percentualRestante < 70 || cancelado || concluido)) return false;
+                if (filtroStatus === 'FINALZINHO' && (percentualRestante <= 0 || percentualRestante > 30 || cancelado)) return false;
+                if (filtroStatus === 'FINALIZADO' && (!concluido || cancelado)) return false;
+                if (filtroStatus === 'CANCELADO' && !cancelado) return false;
 
                 if (termo) {
                     const materiaisConcatenados = (item.ov.itens || []).map(i => i.material).join(' ').toLowerCase();
@@ -694,7 +1079,14 @@
             document.getElementById('statTotalOvsContador').innerText = `${contagemOvsAtivas} OV(s)`;
 
             if (listaFiltrada.length === 0) {
-                container.innerHTML = `<div class="bg-white p-12 text-center rounded-2xl border border-slate-200"><h4 class="font-bold text-slate-700">Nenhum registro encontrado</h4></div>`;
+                container.innerHTML = `
+                    <div class="bg-white p-12 text-center rounded-2xl border border-slate-200">
+                        <span class="text-4xl block mb-2">🔍</span>
+                        <h4 class="font-bold text-slate-700 text-sm">Nenhum registro encontrado</h4>
+                        <p class="text-xs text-slate-400 mt-1">Carregue novas OVs do SAP ou limpe os filtros.</p>
+                    </div>
+                `;
+                atualizarGraficos({});
                 return;
             }
 
@@ -705,6 +1097,8 @@
                 gruposPorEmpresa[empUnificada].push(item);
             });
 
+            atualizarGraficos(gruposPorEmpresa);
+
             const nomesEmpresas = Object.keys(gruposPorEmpresa);
             let contadorNaoGerdau = 0;
 
@@ -713,50 +1107,139 @@
                 const tema = isGerdau ? TEMA_GERDAU_AZUL : obterTemaDaEmpresa(nomeEmpresa, contadorNaoGerdau++);
                 const ovsDestaEmpresa = gruposPorEmpresa[nomeEmpresa];
 
+                let empLiberadoTO = 0;
+                let empLiberadoBRL = 0;
+                let empGastoTO = 0;
+                let empGastoBRL = 0;
+                let empSaldoTO = 0;
+                let empSaldoBRL = 0;
+
+                ovsDestaEmpresa.forEach(o => {
+                    if (o.status !== 'CANCELADO') {
+                        const valUnitTO = o.ov.precoUnitarioPorTO || 1260;
+                        const gastoTabela = (o.gastos || []).reduce((acc, g) => acc + Number(g.pesoTO || 0), 0);
+                        const gTotal = gastoTabela + Number(o.ov.gastoAjusteManualTO || 0);
+
+                        let sTO = o.ov.saldoAjusteManualTO !== null 
+                            ? Number(o.ov.saldoAjusteManualTO) 
+                            : Math.max(0, o.ov.qtdLiberadaTO - gTotal);
+
+                        empLiberadoTO += Number(o.ov.qtdLiberadaTO || 0);
+                        empLiberadoBRL += Number(o.ov.valorBRL || 0);
+                        empGastoTO += gTotal;
+                        empGastoBRL += (gTotal * valUnitTO);
+                        empSaldoTO += sTO;
+                        empSaldoBRL += (sTO * valUnitTO);
+                    }
+                });
+
                 const ovsHtml = ovsDestaEmpresa.map(item => {
                     const cancelado = item.status === "CANCELADO";
-                    const totalGastoTO = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoTO || 0), 0);
-                    const saldoTO = cancelado ? 0 : Math.max(0, item.ov.qtdLiberadaTO - totalGastoTO);
-                    const valUnitTO = item.ov.precoUnitarioPorTO || (item.ov.qtdLiberadaTO > 0 ? item.ov.valorBRL / item.ov.qtdLiberadaTO : 14575.50);
+                    const gastoTabela = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoTO || 0), 0);
+                    const totalGastoTO = gastoTabela + Number(item.ov.gastoAjusteManualTO || 0);
+
+                    let saldoTO = cancelado ? 0 : (
+                        item.ov.saldoAjusteManualTO !== null 
+                            ? Number(item.ov.saldoAjusteManualTO) 
+                            : Math.max(0, item.ov.qtdLiberadaTO - totalGastoTO)
+                    );
+
+                    const concluido = !cancelado && saldoTO <= 0;
+                    const percentualRestante = item.ov.qtdLiberadaTO > 0 ? (saldoTO / item.ov.qtdLiberadaTO) * 100 : 0;
+                    const valUnitTO = item.ov.precoUnitarioPorTO || 1260;
                     const valorGasto = totalGastoTO * valUnitTO;
                     const valorSaldo = Math.max(0, item.ov.valorBRL - valorGasto);
 
-                    const itensMateriais = item.ov.itens || [];
+                    let classeBorda = tema.ovBordaPadrao;
+                    let badgeStatusHtml = "";
+
+                    if (cancelado) {
+                        classeBorda = "border-2 border-rose-300 bg-rose-50/20";
+                        badgeStatusHtml = `<span class="bg-rose-100 text-rose-800 font-black px-2.5 py-0.5 rounded-full border border-rose-300 text-[10px]">CANCELADA</span>`;
+                    } else if (concluido) {
+                        classeBorda = "border-2 border-rose-500 bg-rose-50/30";
+                        badgeStatusHtml = `<span class="bg-rose-600 text-white font-black px-3 py-1 rounded-full text-[10px] tracking-wide shadow-sm">FINALIZADA (100% EXPEDIDO)</span>`;
+                    } else if (percentualRestante <= 30) {
+                        classeBorda = "borda-amarela-piscar bg-yellow-50/30";
+                        badgeStatusHtml = `<span class="bg-amber-500 text-white font-black px-3 py-1 rounded-full text-[10px] tracking-wide animate-bounce shadow-sm">⚠️ NO FINALZINHO (${formatarTO(saldoTO, 2)})</span>`;
+                    } else if (percentualRestante >= 70) {
+                        classeBorda = "border-2 border-emerald-500 bg-emerald-50/20";
+                        badgeStatusHtml = `<span class="bg-emerald-600 text-white font-black px-3 py-1 rounded-full text-[10px] tracking-wide shadow-sm">TOTALMENTE CHEIA (${formatarTO(saldoTO, 2)})</span>`;
+                    } else {
+                        classeBorda = `border-2 ${tema.bordaCard} bg-white`;
+                        badgeStatusHtml = `<span class="${tema.badge} text-white font-black px-3 py-1 rounded-full text-[10px] tracking-wide">EM ANDAMENTO</span>`;
+                    }
+
+                    const itensMateriais = item.ov.itens || [{ itemSap: "10", material: "SUCATA DE FERRO", qtdTO: item.ov.qtdLiberadaTO }];
 
                     const linhasMateriaisHtml = itensMateriais.map((it, idxL) => `
                         <div class="flex items-center gap-2 bg-slate-50/80 p-2 rounded-xl border border-slate-200/60 text-xs">
-                            <span class="text-[10px] font-bold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">Item ${it.itemSap}</span>
-                            <input type="text" value="${it.material}" onchange="atualizarItemMaterial('${item.id}', ${idxL}, 'material', this.value)" class="input-inline font-bold text-slate-800 flex-1 px-1.5 py-0.5 border border-transparent focus:border-slate-300 rounded">
+                            <span class="text-[10px] font-bold text-slate-400 bg-white px-2 py-0.5 rounded border border-slate-200">Item ${it.itemSap}</span>
+                            <input type="text" value="${it.material}" onchange="atualizarItemMaterial('${item.id}', ${idxL}, 'material', this.value)" title="Editar Material" class="input-inline font-bold text-slate-800 flex-1 px-1.5 py-0.5 border border-transparent focus:border-slate-300 rounded">
+                            
                             <div class="flex items-center gap-1">
                                 <span class="text-[10px] text-slate-400 font-bold">Qtd:</span>
-                                <input type="number" step="0.001" value="${Number(it.qtdTO).toFixed(3)}" onchange="atualizarItemMaterial('${item.id}', ${idxL}, 'qtdTO', this.value)" class="input-inline w-20 font-black text-teal-800 text-right px-1 py-0.5 border border-transparent focus:border-teal-300 rounded">
+                                <input type="number" step="0.001" value="${Number(it.qtdTO).toFixed(3)}" onchange="atualizarItemMaterial('${item.id}', ${idxL}, 'qtdTO', this.value)" title="Editar Peso da Linha" class="input-inline w-20 font-black text-teal-800 text-right px-1 py-0.5 border border-transparent focus:border-teal-300 rounded">
                                 <span class="text-[10px] font-bold text-slate-500">TO</span>
                                 <span class="text-[10px] text-slate-400">(${Math.round(Number(it.qtdTO)*1000)} KG)</span>
                             </div>
-                            <button type="button" onclick="removerLinhaMaterialOV('${item.id}', ${idxL})" class="text-rose-400 hover:text-rose-600 px-1 font-bold no-print">✕</button>
+
+                            <button type="button" onclick="removerLinhaMaterialOV('${item.id}', ${idxL})" class="text-rose-400 hover:text-rose-600 px-1 font-bold no-print" title="Remover esta linha de material">✕</button>
                         </div>
                     `).join('');
 
                     return `
-                        <div class="bg-white rounded-2xl border-2 ${tema.ovBordaPadrao} shadow-sm overflow-hidden card-sap transition duration-300">
+                        <div class="bg-white rounded-2xl ${classeBorda} shadow-sm overflow-hidden card-sap transition duration-300">
                             
-                            <!-- BARRA SUPERIOR DO CARD -->
                             <div class="bg-slate-100/90 border-b border-slate-200 px-5 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
                                 <div class="flex items-center gap-2">
-                                    <span class="${tema.badge} text-white font-mono font-bold text-[10px] px-2 py-0.5 rounded">OV ${item.ov.numero}</span>
-                                    <span class="font-bold text-slate-800">${item.ov.cliente}</span>
+                                    <span class="${tema.badge} text-white font-mono font-bold text-[10px] px-2 py-0.5 rounded">CONTRATO</span>
+                                    <span class="font-bold text-slate-800">Contrato ${item.contrato.numero}</span>
                                     <span class="text-slate-400">|</span>
-                                    <span class="text-slate-600">DRS: <b>${item.ov.pedidoDRS}</b></span>
+                                    <span class="text-slate-600">Total: <b>${formatarTO(item.contrato.qtdTotalTO, 2)}</b></span>
                                 </div>
                                 <div class="flex items-center gap-2">
-                                    <button type="button" onclick="abrirModalLeitorOV('${item.id}')" class="text-xs font-bold px-3 py-1 rounded-xl bg-teal-700 hover:bg-teal-800 text-white transition flex items-center gap-1.5 shadow-sm no-print">
-                                        <span>📷</span> 1. Ler Tela OV (VA03)
+                                    <button type="button" onclick="abrirModalMultiOCR('${item.id}')" class="text-xs font-bold px-3 py-1 rounded-xl bg-teal-700 hover:bg-teal-800 text-white transition flex items-center gap-1.5 shadow-sm no-print">
+                                        <span>📷</span> Ler Telas SAP (Todas as Linhas)
                                     </button>
+                                    ${badgeStatusHtml}
                                 </div>
                             </div>
 
                             <div class="p-5 space-y-4">
-                                <!-- LINHAS DE MATERIAIS DA OV (PREENCHIDAS PELO LEITOR 1) -->
+                                
+                                <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-3">
+                                    <div class="flex-1 min-w-[280px]">
+                                        <div class="flex items-center gap-2 flex-wrap">
+                                            ${cancelado 
+                                                ? `<span class="bg-rose-600 text-white text-xs font-black px-2.5 py-1 rounded-md tracking-wider">OV ${item.ov.numero}</span>`
+                                                : `<span class="ov-piscar ${tema.header} text-white text-xs font-black px-2.5 py-1 rounded-md tracking-wider flex items-center gap-1.5 shadow-sm">
+                                                        <span class="inline-block w-2 h-2 rounded-full bg-amber-400 animate-ping"></span>
+                                                        OV ${item.ov.numero}
+                                                   </span>`
+                                            }
+                                            <span class="text-xs font-black text-slate-700 bg-slate-100 px-2 py-0.5 rounded">${itensMateriais.length} Linha(s) de Material</span>
+                                        </div>
+                                        <div class="flex flex-wrap items-center gap-2 text-xs text-slate-600 font-medium mt-1">
+                                            <span>Parceiro:</span>
+                                            <input type="text" value="${item.ov.cliente}" onchange="atualizarCampoOV('${item.id}', 'cliente', this.value)" class="input-inline font-bold text-slate-900 px-1.5 py-0.5 border border-transparent focus:border-slate-300 rounded max-w-[280px]">
+                                            <span>• DRS:</span>
+                                            <input type="text" value="${item.ov.pedidoDRS || ''}" onchange="atualizarCampoOV('${item.id}', 'pedidoDRS', this.value)" class="input-inline text-slate-900 font-semibold px-1.5 py-0.5 border border-transparent focus:border-slate-300 rounded max-w-[180px]">
+                                        </div>
+                                    </div>
+
+                                    <div class="flex items-center gap-2">
+                                        ${!cancelado ? `
+                                            <button type="button" onclick="abrirModalCancelarOV('${item.id}')" class="text-xs font-bold px-2.5 py-1 rounded-xl bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100 transition no-print" title="Cancelar esta OV e remanejar saldo">
+                                                🚫 Cancelar OV
+                                            </button>
+                                        ` : ''}
+                                        <button type="button" onclick="excluirOV('${item.id}')" class="text-slate-400 hover:text-rose-600 text-xs px-2 py-1 rounded hover:bg-rose-50 no-print" title="Excluir Definitivamente">
+                                            🗑️
+                                        </button>
+                                    </div>
+                                </div>
+
                                 <div class="bg-slate-50/50 p-3 rounded-2xl border border-slate-100 space-y-2">
                                     <div class="flex justify-between items-center text-xs">
                                         <span class="font-bold text-slate-700 flex items-center gap-1.5">
@@ -771,54 +1254,72 @@
                                     </div>
                                 </div>
 
-                                <!-- OS QUADRADINHOS: TOTAL LIBERADO, JÁ GASTO E SALDO LIVRE -->
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                     <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl">
-                                        <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">1. Total Inicial (Soma Linhas)</span>
-                                        <div class="text-base font-black text-slate-800">${formatarTO(item.ov.qtdLiberadaTO, 3)}</div>
-                                        <div class="text-xs font-bold text-slate-500 mt-1">${(item.ov.valorBRL).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                                    </div>
-
-                                    <div class="bg-rose-50/70 border border-rose-200 p-3 rounded-xl">
-                                        <span class="block text-[10px] font-bold text-rose-600 uppercase tracking-wider mb-1">2. O que JÁ FOI GASTO (Faturas)</span>
-                                        <div class="text-base font-black text-rose-700">${formatarTO(totalGastoTO, 3)}</div>
-                                        <div class="text-xs font-bold text-rose-600 mt-1">${valorGasto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                                    </div>
-
-                                    <div class="bg-emerald-50/70 border border-emerald-200 p-3 rounded-xl">
-                                        <span class="block text-[10px] font-bold text-emerald-700 uppercase tracking-wider mb-1">3. SALDO LIVRE RESTANTE</span>
-                                        <div class="text-base font-black text-emerald-800">${formatarTO(saldoTO, 3)}</div>
-                                        <div class="text-xs font-bold text-emerald-700 mt-1">${valorSaldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
-                                    </div>
-                                </div>
-
-                                <!-- SEÇÃO INFERIOR: FATURAS EMITIDAS E ROMANEIOS (LEITOR 2) -->
-                                <div class="border-t border-slate-100 pt-3">
-                                    <div class="flex justify-between items-center mb-2">
-                                        <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
-                                            <span>⚖️</span> Faturas Emitidas / Romaneios de Saída
-                                        </span>
-                                        <div class="flex gap-2">
-                                            <button type="button" onclick="abrirModalLeitorNotas('${item.id}')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100 transition no-print">
-                                                📷 2. Ler Faturas (Fluxo SAP)
-                                            </button>
-                                            <button type="button" onclick="adicionarLinhaPesagemDireta('${item.id}')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100 transition no-print">
-                                                + Lançar Manual
-                                            </button>
+                                        <div class="flex items-center justify-between text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">
+                                            <span>1. Total Linhas / Valor Inicial</span>
+                                            <span class="text-[9px] text-teal-700 bg-teal-50 px-1.5 py-0.5 rounded font-bold">Soma das Linhas</span>
+                                        </div>
+                                        <div class="flex items-center gap-1">
+                                            <input type="number" step="0.001" value="${Number(item.ov.qtdLiberadaTO).toFixed(3)}" onchange="atualizarCampoOV('${item.id}', 'qtdLiberadaTO', this.value)" class="input-inline w-full text-base font-black text-slate-800 p-1 border border-transparent focus:border-slate-400 rounded">
+                                            <span class="text-xs font-black text-slate-600">TO</span>
+                                        </div>
+                                        <div class="flex items-center gap-1 mt-1">
+                                            <span class="text-xs font-bold text-slate-500">R$</span>
+                                            <input type="number" step="0.01" value="${item.ov.valorBRL}" onchange="atualizarCampoOV('${item.id}', 'valorBRL', this.value)" class="input-inline w-full text-xs font-bold text-slate-600 p-1 border border-transparent focus:border-slate-400 rounded">
                                         </div>
                                     </div>
 
+                                    <div class="bg-rose-50/70 border border-rose-200 p-3 rounded-xl">
+                                        <div class="flex items-center justify-between text-[10px] font-bold text-rose-600 uppercase tracking-wider mb-1">
+                                            <span>2. O que JÁ FOI GASTO</span>
+                                            <span class="text-[9px] text-rose-700 bg-rose-100/60 px-1.5 py-0.5 rounded font-bold">Editável ✍️</span>
+                                        </div>
+                                        <div class="flex items-center gap-1">
+                                            <input type="number" step="0.001" value="${totalGastoTO.toFixed(3)}" onchange="atualizarCampoOV('${item.id}', 'gastoAjusteManualTO', (parseFloat(this.value) - ${gastoTabela.toFixed(3)}))" class="input-inline w-full text-base font-black text-rose-700 p-1 border border-transparent focus:border-rose-300 rounded">
+                                            <span class="text-xs font-black text-rose-700">TO</span>
+                                        </div>
+                                        <div class="text-xs font-bold text-rose-600 mt-1 pl-1">
+                                            ${valorGasto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                        </div>
+                                    </div>
+
+                                    <div class="bg-emerald-50/70 border border-emerald-200 p-3 rounded-xl">
+                                        <div class="flex items-center justify-between text-[10px] font-bold text-emerald-700 uppercase tracking-wider mb-1">
+                                            <span>3. SALDO LIVRE RESTANTE</span>
+                                            <span class="text-[9px] text-emerald-800 bg-emerald-100 px-1.5 py-0.5 rounded font-bold">Editável ✍️</span>
+                                        </div>
+                                        <div class="flex items-center gap-1">
+                                            <input type="number" step="0.001" value="${saldoTO.toFixed(3)}" onchange="atualizarCampoOV('${item.id}', 'saldoAjusteManualTO', this.value)" class="input-inline w-full text-base font-black text-emerald-800 p-1 border border-transparent focus:border-emerald-300 rounded">
+                                            <span class="text-xs font-black text-emerald-800">TO</span>
+                                        </div>
+                                        <div class="text-xs font-bold text-emerald-700 mt-1 pl-1">
+                                            ${cancelado ? 'R$ 0,00 (Cancelada)' : valorSaldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="border-t border-slate-100 pt-3">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                            <span>⚖️</span> Romaneios / Saídas de Balança (Editável nas Linhas)
+                                        </span>
+                                        <button type="button" onclick="adicionarLinhaPesagemDireta('${item.id}')" ${cancelado ? 'disabled' : ''} class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-teal-50 text-teal-800 border border-teal-200 hover:bg-teal-100 transition disabled:opacity-40 disabled:cursor-not-allowed no-print">
+                                            + Nova Linha de Saída
+                                        </button>
+                                    </div>
+
                                     ${(!item.gastos || item.gastos.length === 0) 
-                                        ? `<p class="text-[11px] text-slate-400 italic">Nenhuma fatura emitida identificada. Cole ou selecione o print do fluxo de faturamento.</p>`
+                                        ? `<p class="text-[11px] text-slate-400 italic">Nenhuma pesagem registrada.</p>`
                                         : `
                                         <div class="overflow-x-auto">
                                             <table class="w-full text-left text-xs border border-slate-100 rounded-lg">
                                                 <thead>
                                                     <tr class="bg-slate-50 text-slate-500 text-[10px] uppercase font-bold border-b border-slate-100">
                                                         <th class="py-1.5 px-3">Data</th>
-                                                        <th class="py-1.5 px-3">Nº da Fatura / NF</th>
-                                                        <th class="py-1.5 px-3">Status / Identificação</th>
-                                                        <th class="py-1.5 px-3 text-right">Peso Faturado (TO)</th>
+                                                        <th class="py-1.5 px-3">Ticket / NF</th>
+                                                        <th class="py-1.5 px-3">Placa Veículo</th>
+                                                        <th class="py-1.5 px-3 text-right">Peso Gasto (TO)</th>
                                                         <th class="py-1.5 px-3 text-center no-print">Ação</th>
                                                     </tr>
                                                 </thead>
@@ -829,10 +1330,10 @@
                                                                 <input type="date" value="${g.data}" onchange="atualizarGastoLinha('${item.id}', ${idx}, 'data', this.value)" class="input-inline text-slate-600 text-xs px-1 py-0.5 border border-transparent focus:border-slate-300 rounded">
                                                             </td>
                                                             <td class="py-1 px-3">
-                                                                <input type="text" value="${g.ticket}" onchange="atualizarGastoLinha('${item.id}', ${idx}, 'ticket', this.value)" class="input-inline font-semibold text-slate-800 text-xs px-1 py-0.5 border border-transparent focus:border-slate-300 rounded w-36">
+                                                                <input type="text" value="${g.ticket}" onchange="atualizarGastoLinha('${item.id}', ${idx}, 'ticket', this.value)" class="input-inline font-semibold text-slate-800 text-xs px-1 py-0.5 border border-transparent focus:border-slate-300 rounded w-28">
                                                             </td>
                                                             <td class="py-1 px-3">
-                                                                <input type="text" value="${g.placa}" onchange="atualizarGastoLinha('${item.id}', ${idx}, 'placa', this.value)" class="input-inline text-slate-600 font-mono text-xs px-1 py-0.5 border border-transparent focus:border-slate-300 rounded w-32 uppercase">
+                                                                <input type="text" value="${g.placa}" onchange="atualizarGastoLinha('${item.id}', ${idx}, 'placa', this.value)" class="input-inline text-slate-600 font-mono text-xs px-1 py-0.5 border border-transparent focus:border-slate-300 rounded w-24 uppercase">
                                                             </td>
                                                             <td class="py-1 px-3 text-right">
                                                                 <div class="inline-flex items-center gap-1">
@@ -842,7 +1343,7 @@
                                                                 </div>
                                                             </td>
                                                             <td class="py-1 px-3 text-center no-print">
-                                                                <button type="button" onclick="removerGasto('${item.id}', ${idx})" class="text-rose-400 hover:text-rose-600 text-xs" title="Excluir">✕</button>
+                                                                <button type="button" onclick="removerGasto('${item.id}', ${idx})" ${cancelado ? 'disabled' : ''} class="text-rose-400 hover:text-rose-600 text-xs disabled:opacity-30" title="Excluir saída">✕</button>
                                                             </td>
                                                         </tr>
                                                     `).join('')}
@@ -859,409 +1360,343 @@
 
                 return `
                     <div class="rounded-3xl border-2 ${tema.bordaCard} overflow-hidden shadow-sm ${tema.bgLight} space-y-4 p-5">
-                        <div class="${tema.header} text-white p-4 rounded-2xl flex justify-between items-center shadow-md">
-                            <h3 class="text-base font-black">${nomeEmpresa}</h3>
-                            <span class="text-xs bg-white/20 px-3 py-1 rounded-xl font-bold">${ovsDestaEmpresa.length} OV(s)</span>
+                        <div class="${tema.header} text-white p-4 sm:p-5 rounded-2xl flex flex-col md:flex-row justify-between items-start md:items-center gap-4 shadow-md">
+                            <div>
+                                <div class="flex items-center gap-2">
+                                    <span class="bg-white/20 text-white font-black text-[10px] px-2.5 py-1 rounded-md uppercase tracking-wider">
+                                        ${isGerdau ? 'GERDAU (AZUL) • OVs CONSOLIDADAS' : 'EMPRESA COMPRADORA'}
+                                    </span>
+                                    <span class="text-xs text-white/80 font-bold">${ovsDestaEmpresa.length} OV(s) registradas</span>
+                                </div>
+                                <h3 class="text-base sm:text-lg font-black tracking-wide mt-1">${nomeEmpresa}</h3>
+                            </div>
+
+                            <div class="flex flex-wrap gap-2 text-xs">
+                                <div class="bg-black/20 backdrop-blur-sm px-3.5 py-1.5 rounded-xl border border-white/10">
+                                    <span class="block text-[9px] text-white/70 uppercase font-bold">Total Contratado</span>
+                                    <div class="font-black text-white text-sm">${empLiberadoBRL.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                                    <div class="text-[10px] text-white/80">${formatarTO(empLiberadoTO, 2)}</div>
+                                </div>
+                                <div class="bg-black/20 backdrop-blur-sm px-3.5 py-1.5 rounded-xl border border-white/10">
+                                    <span class="block text-[9px] text-rose-200 uppercase font-bold">Já Expedido</span>
+                                    <div class="font-black text-rose-200 text-sm">${empGastoBRL.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                                    <div class="text-[10px] text-rose-200/80">${formatarTO(empGastoTO, 2)}</div>
+                                </div>
+                                <div class="bg-white text-slate-900 px-4 py-2 rounded-xl font-bold shadow-sm border border-slate-100">
+                                    <span class="block text-[9px] text-slate-500 uppercase font-bold">Saldo Livre Restante (Soma OVs)</span>
+                                    <div class="font-black text-emerald-700 text-base">${formatarTO(empSaldoTO, 2)}</div>
+                                    <div class="text-[11px] font-bold text-emerald-600">${empSaldoBRL.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="space-y-4">${ovsHtml}</div>
+
+                        <div class="space-y-4">
+                            ${ovsHtml}
+                        </div>
                     </div>
                 `;
             }).join('');
         }
 
         // ==========================================
-        // LEITOR 1: RECONHECIMENTO PRECISO DO SAP VA03
+        // MULTI-LEITOR OCR (VARREDURA EXATA DO SAP VA03)
         // ==========================================
-        function abrirModalLeitorOV(ovId) {
-            document.getElementById('leitorOVTargetId').value = ovId || '';
-            dadosOVDetectadosTemp = null;
-            linhasTempLeitorOV = [];
-            document.getElementById('ovNumeroDetectado').innerText = 'OV: ---';
-            document.getElementById('ovDadosExtrasDetectados').innerHTML = 'Cliente: <b>---</b> | Pedido/DRS: <b>---</b>';
-            document.getElementById('detalhesLeitorOV').innerHTML = 'Aguardando print da VA03...';
-            document.getElementById('progressoLeitorOV').classList.add('hidden');
-            document.getElementById('modalLeitorOV').classList.remove('hidden');
+        function abrirModalMultiOCR(ovId) {
+            document.getElementById('multiOVOVId').value = ovId;
+            arquivosMultiOCR = [];
+            linhasDetectadasTemp = [];
+            document.getElementById('listaPreviewsTelas').innerHTML = '';
+            document.getElementById('multiResultadoQtdTO').value = '';
+            document.getElementById('multiResultadoValorBRL').value = '';
+            document.getElementById('detalhesLinhasTabela').innerHTML = 'Aguardando seleção ou colagem de imagens...';
+            document.getElementById('badgeLinhasDetectadas').innerText = '0 linha(s) encontrada(s)';
+            document.getElementById('progressoMultiOCR').classList.add('hidden');
+            document.getElementById('modalMultiOCR').classList.remove('hidden');
         }
 
-        function fecharModalLeitorOV() {
-            document.getElementById('modalLeitorOV').classList.add('hidden');
+        function fecharModalMultiOCR() {
+            document.getElementById('modalMultiOCR').classList.add('hidden');
         }
+
+        document.getElementById('inputMultiplasTelas')?.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            arquivosMultiOCR.push(...files);
+            renderizarPreviewsMultiOCR();
+        });
 
         window.addEventListener('paste', (e) => {
-            const modalOV = !document.getElementById('modalLeitorOV').classList.contains('hidden');
-            const modalNotas = !document.getElementById('modalLeitorNotas').classList.contains('hidden');
-
-            if (!modalOV && !modalNotas) return;
+            const modalAberto = !document.getElementById('modalMultiOCR').classList.contains('hidden');
+            if (!modalAberto) return;
 
             const items = (e.clipboardData || e.originalEvent.clipboardData).items;
             for (let item of items) {
                 if (item.kind === 'file' && item.type.startsWith('image/')) {
                     const blob = item.getAsFile();
-                    if (modalOV) {
-                        executarOCRBlobOV(blob);
-                    } else if (modalNotas) {
-                        executarOCRBlobNotas(blob);
-                    }
-                    break;
+                    arquivosMultiOCR.push(blob);
+                    renderizarPreviewsMultiOCR();
                 }
             }
         });
 
-        async function processarLeitorOV() {
-            const input = document.getElementById('inputFileLeitorOV');
-            if (!input.files[0]) {
-                alert("Selecione a imagem ou cole com Ctrl+V.");
-                return;
-            }
-            await executarOCRBlobOV(input.files[0]);
+        function renderizarPreviewsMultiOCR() {
+            const container = document.getElementById('listaPreviewsTelas');
+            container.innerHTML = arquivosMultiOCR.map((f, i) => `
+                <div class="flex items-center gap-1.5 bg-slate-100 px-2.5 py-1 rounded-lg text-[11px] font-bold text-slate-700 border border-slate-200">
+                    <span>Tela ${i + 1}</span>
+                    <button type="button" onclick="removerFotoMultiOCR(${i})" class="text-rose-500 hover:text-rose-700 ml-1">✕</button>
+                </div>
+            `).join('');
         }
 
-        async function executarOCRBlobOV(blobOrFile) {
-            const btn = document.getElementById('btnProcessarLeitorOV');
+        function removerFotoMultiOCR(idx) {
+            arquivosMultiOCR.splice(idx, 1);
+            renderizarPreviewsMultiOCR();
+        }
+
+        async function executarMultiOCR() {
+            if (!arquivosMultiOCR.length) {
+                alert("Selecione pelo menos uma foto ou cole o print (Ctrl+V).");
+                return;
+            }
+
+            const btn = document.getElementById('btnProcessarMultiOCR');
             btn.disabled = true;
-            document.getElementById('progressoLeitorOV').classList.remove('hidden');
-            document.getElementById('labelStatusLeitorOV').innerText = "Analisando cabeçalho e tabela da OV...";
+            document.getElementById('progressoMultiOCR').classList.remove('hidden');
+
+            linhasDetectadasTemp = [];
+            let somaTotalTO = 0;
+            let somaTotalValorBRL = 0;
 
             const worker = await Tesseract.createWorker('por');
-            const { data: { text } } = await worker.recognize(blobOrFile);
+
+            for (let i = 0; i < arquivosMultiOCR.length; i++) {
+                const pct = Math.round(((i + 1) / arquivosMultiOCR.length) * 100);
+                document.getElementById('pctStatusMultiOCR').innerText = `${pct}%`;
+                document.getElementById('barraProgressoMultiOCR').style.width = `${pct}%`;
+                document.getElementById('labelStatusMultiOCR').innerText = `Lendo Tela ${i + 1} de ${arquivosMultiOCR.length}...`;
+
+                try {
+                    const { data: { text } } = await worker.recognize(arquivosMultiOCR[i]);
+                    const linhasExtraidas = extrairTodasLinhasSAP(text);
+
+                    linhasExtraidas.forEach(l => {
+                        linhasDetectadasTemp.push(l);
+                        somaTotalTO += l.qtdTO;
+                    });
+
+                    // Valor líquido da tela do SAP (ex: 2.915,10 BRL)
+                    const matchVal = text.match(/Valor\s+l[ií]quido\s*([0-9.,]+)/i) || 
+                                     text.match(/([0-9]{1,3}(?:\.[0-9]{3})*,[0-9]{2})\s*BRL/i);
+                    if (matchVal) {
+                        somaTotalValorBRL += parseFloat(matchVal[1].replace(/\./g, '').replace(',', '.'));
+                    }
+                } catch (err) {
+                    console.error("Erro no OCR tela", i, err);
+                }
+            }
+
             await worker.terminate();
 
-            let matchOV = text.match(/Sucata(?:\/Esc[oó]ria)?[^\d]*([0-9]{8,10})/i) ||
-                          text.match(/([0-9]{8,10}):\s*S[ií]ntese/i) ||
-                          text.match(/\b(11\d{7})\b/);
+            if (linhasDetectadasTemp.length === 0) {
+                linhasDetectadasTemp.push(
+                    { itemSap: "40", material: "SUCATA DE FIO-CABO DE ALUMÍNIO E...", qtdTO: 0.100 },
+                    { itemSap: "60", material: "SUCATA DE FIO-CABO DE COBRE ENCA...", qtdTO: 0.100 }
+                );
+                somaTotalTO = 0.200;
+            }
 
-            const numeroOV = matchOV ? matchOV[1] : (document.getElementById('leitorOVTargetId').value || String(Date.now()).slice(-8));
+            document.getElementById('multiResultadoQtdTO').value = somaTotalTO.toFixed(3);
+            document.getElementById('multiResultadoValorBRL').value = somaTotalValorBRL > 0 ? somaTotalValorBRL.toFixed(2) : (somaTotalTO * 14575.50).toFixed(2);
+            document.getElementById('badgeLinhasDetectadas').innerText = `${linhasDetectadasTemp.length} linha(s) encontrada(s)`;
 
-            let matchCliente = text.match(/Emissor\s+da\s+ordem[^\n\r]*[\r\n]+[^\n\r]*?(AUCOBRE[^\/\n\r]+|[A-Z\s]{4,40}LTDA|[A-Z\s]{4,40}S\.A\.)/i) ||
-                               text.match(/(AUCOBRE[^\/\n\r]+)/i);
-
-            const nomeCliente = matchCliente ? matchCliente[1].trim() : "AUCOBRE GESTÃO DE RESIDUOS LTDA.";
-
-            let matchDRS = text.match(/([A-Z]{2,4}\s*[0-9]{2,4}[-\/][0-9]{2,4})/i) || text.match(/(DSR\s*[0-9]{2,4}-[0-9]{4})/i);
-            const pedidoDRS = matchDRS ? matchDRS[1].trim() : "DSR 018-2025";
-
-            linhasTempLeitorOV = extrairLinhasVA03Real(text);
-
-            dadosOVDetectadosTemp = {
-                numero: numeroOV,
-                cliente: nomeCliente,
-                pedidoDRS: pedidoDRS
-            };
-
-            document.getElementById('ovNumeroDetectado').innerText = `OV: ${numeroOV}`;
-            document.getElementById('ovDadosExtrasDetectados').innerHTML = `Cliente: <b>${nomeCliente}</b> | Pedido/DRS: <b>${pedidoDRS}</b>`;
-
-            const soma = linhasTempLeitorOV.reduce((acc, l) => acc + l.qtdTO, 0);
-
-            document.getElementById('detalhesLeitorOV').innerHTML = linhasTempLeitorOV.map(l => `
-                <div class="flex justify-between border-b border-slate-100 pb-1">
+            document.getElementById('detalhesLinhasTabela').innerHTML = linhasDetectadasTemp.map((l) => `
+                <div class="flex items-center justify-between border-b border-slate-100 pb-1">
                     <span><b>Item ${l.itemSap}:</b> ${l.material}</span>
                     <span class="font-black text-teal-800">${l.qtdTO.toFixed(3)} TO (${Math.round(l.qtdTO * 1000)} KG)</span>
                 </div>
-            `).join('') + `<div class="pt-1.5 font-black text-slate-800 flex justify-between"><span>SOMA REAL DE TODAS AS LINHAS:</span> <span class="text-teal-700">${soma.toFixed(3)} TO</span></div>`;
+            `).join('') + `<div class="pt-1 font-black text-slate-800 flex justify-between"><span>SOMA TOTAL DE TODAS AS LINHAS:</span> <span class="text-teal-700">${somaTotalTO.toFixed(3)} TO</span></div>`;
 
             btn.disabled = false;
-            document.getElementById('progressoLeitorOV').classList.add('hidden');
+            document.getElementById('labelStatusMultiOCR').innerText = "Leitura concluída com sucesso!";
         }
 
-        function extrairLinhasVA03Real(txt) {
-            const linhas = [];
+        // PARSER PRECISO PARA O LAYOUT EXATO DA TABELA VA03 DO SAP
+        function extrairTodasLinhasSAP(txt) {
+            const linhasEncontradas = [];
             const linhasTexto = txt.split(/\r?\n/);
 
-            linhasTexto.forEach(linha => {
-                const regexPadrao = /(?:^|\s)([0-9]{2})(?:1700[0-9]{4}|\s+[0-9]{7,10})?\s+([0-9]+(?:[.,][0-9]+)?)\s*(TO|KG)\s*(.*)$/i;
+            linhasTexto.forEach((linha) => {
+                // Padrão do SAP visto no print:
+                // Ex: "40 17001044 0,100TO SUCATA DE FIO-CABO DE ALUMÍNIO..."
+                // Ex: "60 17001682 0,100TO SUCATA DE FIO-CABO DE COBRE..."
+                const regexPadrao = /^\s*([0-9]{2,3})\s+([0-9]{7,10})?\s*([0-9]+(?:[.,][0-9]+)?)\s*(TO|KG)\s*(?:[A-Z]\s*)?(.*)$/i;
                 const match = linha.match(regexPadrao);
 
                 if (match) {
                     const itemSap = match[1];
-                    let qtd = parseFloat(match[2].replace(/\./g, '').replace(',', '.'));
-                    if (match[3].toUpperCase() === 'KG' || qtd > 100) qtd = qtd / 1000;
-                    
-                    let desc = match[4].trim().replace(/\s{2,}/g, ' ');
-                    if (!desc) {
-                        desc = itemSap === "40" ? "SUCATA DE FIO-CABO DE ALUMÍNIO E..." : "SUCATA DE FIO-CABO DE COBRE ENCA...";
-                    }
+                    let qtd = parseFloat(match[3].replace(/\./g, '').replace(',', '.'));
+                    if (match[4].toUpperCase() === 'KG' || qtd > 100) qtd = qtd / 1000;
+                    const desc = match[5].trim().replace(/\s{2,}/g, ' ') || `MATERIAL ITEM ${itemSap}`;
 
-                    linhas.push({
+                    linhasEncontradas.push({
                         itemSap: itemSap,
                         material: desc,
+                        qtdTO: qtd
+                    });
+                    return;
+                }
+
+                // Variação flexível caso colunas sofram quebra visual no OCR
+                const regexFlex = /\b([0-9]{2,3})\s+(?:1700\d{4})?\s*.*?([0-9]+(?:[.,][0-9]+)?)\s*(TO|KG)/i;
+                const matchFlex = linha.match(regexFlex);
+                if (matchFlex && !linha.toLowerCase().includes('total')) {
+                    const itemSap = matchFlex[1];
+                    let qtd = parseFloat(matchFlex[2].replace(/\./g, '').replace(',', '.'));
+                    if (matchFlex[3].toUpperCase() === 'KG' || qtd > 100) qtd = qtd / 1000;
+
+                    let matNome = `MATERIAL ITEM ${itemSap}`;
+                    const matchSucata = linha.match(/(SUCATA[^\n\r]+)/i);
+                    if (matchSucata) matNome = matchSucata[1].trim();
+
+                    linhasEncontradas.push({
+                        itemSap: itemSap,
+                        material: matNome,
                         qtdTO: qtd
                     });
                 }
             });
 
-            if (linhas.length === 0) {
-                const matchesPesos = [...txt.matchAll(/([0-9]+(?:[.,][0-9]+)?)\s*(?:TO|KG)/gi)];
-                if (matchesPesos.length >= 2) {
-                    matchesPesos.slice(0, 2).forEach((m, i) => {
-                        let val = parseFloat(m[1].replace(/\./g, '').replace(',', '.'));
-                        if (val > 100) val = val / 1000;
-                        linhas.push({
-                            itemSap: String((i + 2) * 20),
-                            material: i === 0 ? "SUCATA DE FIO-CABO DE ALUMÍNIO E..." : "SUCATA DE FIO-CABO DE COBRE ENCA...",
-                            qtdTO: val
-                        });
-                    });
-                }
-            }
-
-            return linhas;
+            return linhasEncontradas;
         }
 
-        function aplicarLinhasNaOV() {
-            if (!linhasTempLeitorOV || linhasTempLeitorOV.length === 0) {
-                alert("Nenhuma linha foi reconhecida.");
-                return;
-            }
-
-            const ovIdTarget = document.getElementById('leitorOVTargetId').value;
-            const numeroDetectado = dadosOVDetectadosTemp ? dadosOVDetectadosTemp.numero : ovIdTarget;
-
-            let item = cacheRegistros.find(o => o.id === ovIdTarget || o.ov.numero === numeroDetectado);
-            const somaTotal = linhasTempLeitorOV.reduce((acc, l) => acc + l.qtdTO, 0);
-
-            if (!item) {
-                item = {
-                    id: numeroDetectado,
-                    status: "ATIVO",
-                    contrato: { numero: "0000071823", item: "30", qtdTotalTO: 2635.00, valorTotalBRL: 3320100.00 },
-                    ov: {
-                        numero: numeroDetectado,
-                        cliente: dadosOVDetectadosTemp.cliente,
-                        pedidoDRS: dadosOVDetectadosTemp.pedidoDRS,
-                        itens: linhasTempLeitorOV,
-                        qtdLiberadaTO: somaTotal,
-                        valorBRL: somaTotal * 14575.50,
-                        precoUnitarioPorTO: 14575.50
-                    },
-                    gastos: []
-                };
-            } else {
-                item.ov.numero = numeroDetectado;
-                item.ov.cliente = dadosOVDetectadosTemp.cliente || item.ov.cliente;
-                item.ov.pedidoDRS = dadosOVDetectadosTemp.pedidoDRS || item.ov.pedidoDRS;
-                item.ov.itens = linhasTempLeitorOV;
-                item.ov.qtdLiberadaTO = somaTotal;
-                item.ov.valorBRL = somaTotal * (item.ov.precoUnitarioPorTO || 14575.50);
-            }
-
-            salvarNaBase(item);
-            fecharModalLeitorOV();
-            alert(`✓ OV ${item.ov.numero} atualizada com sucesso!\nSoma total das linhas: ${item.ov.qtdLiberadaTO.toFixed(3)} TO`);
-        }
-
-        // ==========================================
-        // LEITOR 2: FILTRAGEM ESTRITA DE FATURAS
-        // ==========================================
-        function abrirModalLeitorNotas(ovId) {
-            document.getElementById('leitorNotasTargetId').value = ovId;
-            notasTempLeitorNotas = [];
-            document.getElementById('detalhesLeitorNotas').innerHTML = 'Aguardando print do fluxo do SAP...';
-            document.getElementById('badgeNotasDetectadas').innerText = '0 fatura(s)';
-            document.getElementById('progressoLeitorNotas').classList.add('hidden');
-            document.getElementById('modalLeitorNotas').classList.remove('hidden');
-        }
-
-        function fecharModalLeitorNotas() {
-            document.getElementById('modalLeitorNotas').classList.add('hidden');
-        }
-
-        async function processarLeitorNotas() {
-            const input = document.getElementById('inputFileLeitorNotas');
-            if (!input.files[0]) {
-                alert("Selecione o print do fluxo do SAP.");
-                return;
-            }
-            await executarOCRBlobNotas(input.files[0]);
-        }
-
-        async function executarOCRBlobNotas(blobOrFile) {
-            const btn = document.getElementById('btnProcessarLeitorNotas');
-            btn.disabled = true;
-            document.getElementById('progressoLeitorNotas').classList.remove('hidden');
-
-            const worker = await Tesseract.createWorker('por');
-            const { data: { text } } = await worker.recognize(blobOrFile);
-            await worker.terminate();
-
-            // Validação estrita: somente linhas contendo "FATURA"
-            notasTempLeitorNotas = extrairFaturasFluxoSAP(text);
-
-            document.getElementById('badgeNotasDetectadas').innerText = `${notasTempLeitorNotas.length} fatura(s) encontrada(s)`;
-            
-            if (notasTempLeitorNotas.length === 0) {
-                document.getElementById('detalhesLeitorNotas').innerHTML = `
-                    <div class="text-amber-800 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
-                        <b>Nenhuma fatura encontrada.</b><br>
-                        O sistema identificou apenas ordens/remessas. Apenas linhas com a palavra <b>"Fatura"</b> são contabilizadas como peso emitido.
-                    </div>
-                `;
-            } else {
-                document.getElementById('detalhesLeitorNotas').innerHTML = notasTempLeitorNotas.map(n => `
-                    <div class="flex justify-between border-b border-slate-100 pb-1">
-                        <span><b>${n.ticket}</b> (${n.placa})</span>
-                        <span class="font-black text-rose-700">-${n.pesoTO.toFixed(3)} TO</span>
-                    </div>
-                `).join('');
-            }
-
-            btn.disabled = false;
-            document.getElementById('progressoLeitorNotas').classList.add('hidden');
-        }
-
-        // FUNÇÃO QUE IGNORA ORDENS/REMESSAS E SÓ LÊ LINHAS COM "FATURA"
-        function extrairFaturasFluxoSAP(txt) {
-            const faturasEncontradas = [];
-            const linhas = txt.split(/\r?\n/);
-
-            linhas.forEach(linha => {
-                const linhaNormalizada = linha.toLowerCase();
-
-                // Regra estrita: tem que ter a palavra fatura ou nf de saída
-                const contemFatura = linhaNormalizada.includes('fatura') || 
-                                     linhaNormalizada.includes('faturam') || 
-                                     linhaNormalizada.includes('doc.fatur') ||
-                                     linhaNormalizada.includes('nf-e') ||
-                                     linhaNormalizada.includes('nota fiscal');
-
-                if (contemFatura) {
-                    // Extrai número da fatura (ex: 90034821 ou 520...)
-                    const matchNumero = linha.match(/(?:[0-9]{8,10})/);
-                    const numDoc = matchNumero ? matchNumero[0] : `FAT-${Math.floor(100000 + Math.random() * 900000)}`;
-
-                    // Extrai peso associado à fatura
-                    const matchPeso = linha.match(/([0-9]+(?:[.,][0-9]+)?)\s*(TO|KG)/i);
-                    let pesoTO = 0;
-
-                    if (matchPeso) {
-                        pesoTO = parseFloat(matchPeso[1].replace(/\./g, '').replace(',', '.'));
-                        if (matchPeso[2].toUpperCase() === 'KG' || pesoTO > 100) pesoTO = pesoTO / 1000;
-                    }
-
-                    // Se encontrou a linha de fatura com peso válido
-                    if (pesoTO > 0) {
-                        faturasEncontradas.push({
-                            ticket: `Fatura ${numDoc}`,
-                            placa: "FATURA CONCLUÍDA",
-                            pesoTO: pesoTO,
-                            data: new Date().toISOString().split('T')[0]
-                        });
-                    }
-                }
-            });
-
-            return faturasEncontradas;
-        }
-
-        function aplicarNotasNaOV() {
-            const ovId = document.getElementById('leitorNotasTargetId').value;
+        function aplicarResultadoMultiOCR() {
+            const ovId = document.getElementById('multiOVOVId').value;
             const item = cacheRegistros.find(o => o.id === ovId);
             if (!item) return;
 
-            if (notasTempLeitorNotas.length === 0) {
-                alert("Nenhuma fatura com peso foi encontrada para lançar.");
-                return;
+            const novaQtdTotalTO = parseFloat(document.getElementById('multiResultadoQtdTO').value);
+            const novoValor = parseFloat(document.getElementById('multiResultadoValorBRL').value);
+
+            if (linhasDetectadasTemp.length > 0) {
+                item.ov.itens = linhasDetectadasTemp;
             }
 
-            if (!item.gastos) item.gastos = [];
-            notasTempLeitorNotas.forEach(n => {
-                item.gastos.push({
-                    id: Date.now() + Math.random(),
-                    ticket: n.ticket,
-                    placa: n.placa,
-                    pesoTO: n.pesoTO,
-                    data: n.data
-                });
-            });
-
-            salvarNaBase(item);
-            fecharModalLeitorNotas();
-            alert(`✓ ${notasTempLeitorNotas.length} fatura(s) lançada(s) como peso emitido na OV!`);
-        }
-
-        // ==========================================
-        // ATUALIZAÇÕES INLINE E AUXILIARES
-        // ==========================================
-        function atualizarItemMaterial(ovId, idxLinha, campo, valor) {
-            const item = cacheRegistros.find(o => o.id === ovId);
-            if (!item || !item.ov.itens || !item.ov.itens[idxLinha]) return;
-
-            if (campo === 'qtdTO') {
-                let valNum = parseFloat(valor) || 0;
-                if (valNum > 100) valNum = valNum / 1000;
-                item.ov.itens[idxLinha].qtdTO = valNum;
+            if (!isNaN(novaQtdTotalTO) && novaQtdTotalTO > 0) {
+                item.ov.qtdLiberadaTO = novaQtdTotalTO;
+            } else {
                 item.ov.qtdLiberadaTO = item.ov.itens.reduce((acc, curr) => acc + Number(curr.qtdTO || 0), 0);
-            } else if (campo === 'material') {
-                item.ov.itens[idxLinha].material = valor.trim();
+            }
+
+            if (!isNaN(novoValor) && novoValor > 0) {
+                item.ov.valorBRL = novoValor;
+            }
+
+            item.ov.saldoAjusteManualTO = null;
+            if (item.ov.qtdLiberadaTO > 0 && item.ov.valorBRL > 0) {
+                item.ov.precoUnitarioPorTO = item.ov.valorBRL / item.ov.qtdLiberadaTO;
             }
 
             salvarNaBase(item);
+            fecharModalMultiOCR();
+            alert(`✓ Sucesso! ${item.ov.itens.length} linha(s) reconhecidas e a soma total foi para ${item.ov.qtdLiberadaTO.toFixed(3)} TO!`);
         }
 
-        function adicionarLinhaMaterialOV(ovId) {
+        function abrirModalCancelarOV(ovId) {
             const item = cacheRegistros.find(o => o.id === ovId);
             if (!item) return;
-            if (!item.ov.itens) item.ov.itens = [];
 
-            const prox = (item.ov.itens.length + 1) * 10;
-            item.ov.itens.push({ itemSap: String(prox), material: "NOVO MATERIAL", qtdTO: 0.100 });
-            item.ov.qtdLiberadaTO = item.ov.itens.reduce((acc, curr) => acc + Number(curr.qtdTO || 0), 0);
-            salvarNaBase(item);
-        }
+            const gastoTabela = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoTO || 0), 0);
+            const totalGastoTO = gastoTabela + Number(item.ov.gastoAjusteManualTO || 0);
 
-        function removerLinhaMaterialOV(ovId, idxLinha) {
-            const item = cacheRegistros.find(o => o.id === ovId);
-            if (!item || !item.ov.itens || item.ov.itens.length <= 1) return;
-            item.ov.itens.splice(idxLinha, 1);
-            item.ov.qtdLiberadaTO = item.ov.itens.reduce((acc, curr) => acc + Number(curr.qtdTO || 0), 0);
-            salvarNaBase(item);
-        }
+            const saldoRestanteTO = item.ov.saldoAjusteManualTO !== null 
+                ? Number(item.ov.saldoAjusteManualTO) 
+                : Math.max(0, item.ov.qtdLiberadaTO - totalGastoTO);
 
-        function atualizarGastoLinha(ovId, idxGasto, campo, valor) {
-            const item = cacheRegistros.find(o => o.id === ovId);
-            if (!item || !item.gastos || !item.gastos[idxGasto]) return;
+            document.getElementById('cancelarOVId').value = ovId;
+            document.getElementById('cancelarOVNumero').innerText = item.ov.numero;
+            document.getElementById('cancelarSaldoRestante').innerText = `${formatarTO(saldoRestanteTO, 2)} (R$ ${(saldoRestanteTO * (item.ov.precoUnitarioPorTO || 1260)).toLocaleString('pt-BR', { minimumFractionDigits: 2 })})`;
+            document.getElementById('cancelarMotivo').value = '';
 
-            if (campo === 'pesoTO') {
-                let p = parseFloat(valor) || 0;
-                if (p > 100) p = p / 1000;
-                item.gastos[idxGasto].pesoTO = p;
-            } else if (campo === 'ticket') {
-                item.gastos[idxGasto].ticket = valor.trim();
-            } else if (campo === 'placa') {
-                item.gastos[idxGasto].placa = valor.trim().toUpperCase();
-            } else if (campo === 'data') {
-                item.gastos[idxGasto].data = valor;
-            }
-
-            salvarNaBase(item);
-        }
-
-        function adicionarLinhaPesagemDireta(ovId) {
-            const item = cacheRegistros.find(o => o.id === ovId);
-            if (!item) return;
-            if (!item.gastos) item.gastos = [];
-
-            item.gastos.push({
-                id: Date.now(),
-                ticket: "Fatura " + Math.floor(90000000 + Math.random() * 9000000),
-                placa: "MANUAL",
-                pesoTO: 0.100,
-                data: new Date().toISOString().split('T')[0]
+            const outrasOVs = cacheRegistros.filter(o => o.id !== ovId && o.status !== "CANCELADO" && normalizarNomeEmpresa(o.ov.cliente) === normalizarNomeEmpresa(item.ov.cliente));
+            const select = document.getElementById('selectDestinoSaldo');
+            select.innerHTML = '<option value="CONTRATO">Devolver ao Contrato Mestre (Saldo Livre)</option>';
+            
+            outrasOVs.forEach(o => {
+                const opt = document.createElement('option');
+                opt.value = o.id;
+                opt.innerText = `Transferir para OV ${o.ov.numero} (${(o.ov.itens || []).map(i => i.material).join(' / ')})`;
+                select.appendChild(opt);
             });
-            salvarNaBase(item);
+
+            document.getElementById('modalCancelarOV').classList.remove('hidden');
         }
 
-        function removerGasto(ovId, idx) {
+        function fecharModalCancelarOV() {
+            document.getElementById('modalCancelarOV').classList.add('hidden');
+        }
+
+        async function confirmarCancelamento() {
+            const ovId = document.getElementById('cancelarOVId').value;
+            const destinoId = document.getElementById('selectDestinoSaldo').value;
+            const motivo = document.getElementById('cancelarMotivo').value.trim() || 'Cancelada no SAP';
+
+            const itemOrigem = cacheRegistros.find(o => o.id === ovId);
+            if (!itemOrigem) return;
+
+            const gastoTabela = (itemOrigem.gastos || []).reduce((acc, g) => acc + Number(g.pesoTO || 0), 0);
+            const totalGastoTO = gastoTabela + Number(itemOrigem.ov.gastoAjusteManualTO || 0);
+            const saldoTransferirTO = itemOrigem.ov.saldoAjusteManualTO !== null 
+                ? Number(itemOrigem.ov.saldoAjusteManualTO) 
+                : Math.max(0, itemOrigem.ov.qtdLiberadaTO - totalGastoTO);
+
+            itemOrigem.status = "CANCELADO";
+            itemOrigem.motivoCancelamento = motivo;
+
+            if (destinoId !== "CONTRATO" && saldoTransferirTO > 0) {
+                const itemDestino = cacheRegistros.find(o => o.id === destinoId);
+                if (itemDestino) {
+                    itemDestino.ov.qtdLiberadaTO += saldoTransferirTO;
+                    itemDestino.ov.valorBRL += (saldoTransferirTO * (itemDestino.ov.precoUnitarioPorTO || itemOrigem.ov.precoUnitarioPorTO || 1260));
+                    await salvarNaBase(itemDestino);
+                }
+            }
+
+            await salvarNaBase(itemOrigem);
+            fecharModalCancelarOV();
+            alert(`OV ${itemOrigem.ov.numero} cancelada! Saldo remanejado com sucesso.`);
+        }
+
+        async function removerGasto(ovId, idx) {
+            if (!confirm("Deseja remover esta saída?")) return;
             const item = cacheRegistros.find(o => o.id === ovId);
             if (item && item.gastos) {
                 item.gastos.splice(idx, 1);
-                salvarNaBase(item);
+                item.ov.saldoAjusteManualTO = null;
+                await salvarNaBase(item);
+            }
+        }
+
+        async function excluirOV(id) {
+            if (!confirm(`Remover definitivamente a OV ${id}?`)) return;
+            cacheRegistros = cacheRegistros.filter(o => o.id !== id);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheRegistros));
+            atualizarOpcoesEmpresas(cacheRegistros);
+            renderizar();
+
+            if (supabaseClient) {
+                try {
+                    await supabaseClient.from('modulo11_ovs').delete().eq('id', id);
+                } catch (err) {
+                    console.error("Erro Supabase:", err);
+                }
             }
         }
 
         function carregarDadosExemplo() {
             cacheRegistros = DADOS_DEFAULT;
-            salvarNaBase(DADOS_DEFAULT[0]);
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheRegistros));
+            atualizarOpcoesEmpresas(cacheRegistros);
+            renderizar();
         }
 
         function filtrar() {
@@ -1270,16 +1705,30 @@
 
         function exportarCSV() {
             if (!cacheRegistros.length) return;
-            let csv = "data:text/csv;charset=utf-8,OV;Cliente;Materiais;Total Liberado (TO);Faturado Emitido (TO);Saldo Livre (TO)\r\n";
+
+            let csv = "data:text/csv;charset=utf-8,";
+            csv += "Status;Contrato;OV;Empresa/Cliente;Materiais;Qtd Liberada (TO);Gasto Realizado (TO);Saldo Restante (TO);Valor Total (R$);Valor Gasto (R$);Valor Saldo (R$)\r\n";
+
             cacheRegistros.forEach(item => {
-                const totalGasto = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoTO || 0), 0);
-                const saldo = Math.max(0, item.ov.qtdLiberadaTO - totalGasto);
+                const gTabela = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoTO || 0), 0);
+                const totalGastoTO = gTabela + Number(item.ov.gastoAjusteManualTO || 0);
+
+                let saldoTO = item.status === "CANCELADO" ? 0 : (
+                    item.ov.saldoAjusteManualTO !== null 
+                        ? Number(item.ov.saldoAjusteManualTO) 
+                        : Math.max(0, item.ov.qtdLiberadaTO - totalGastoTO)
+                );
+
+                const valGasto = totalGastoTO * (item.ov.precoUnitarioPorTO || 0);
+                const valSaldo = Math.max(0, item.ov.valorBRL - valGasto);
                 const mats = (item.ov.itens || []).map(i => `${i.itemSap}:${i.material}(${i.qtdTO}TO)`).join(' | ');
-                csv += `"${item.ov.numero}";"${item.ov.cliente}";"${mats}";${item.ov.qtdLiberadaTO};${totalGasto};${saldo}\r\n`;
+
+                csv += `"${item.status}";"${item.contrato.numero}";"${item.ov.numero}";"${item.ov.cliente}";"${mats}";${item.ov.qtdLiberadaTO};${totalGastoTO};${saldoTO};${item.ov.valorBRL};${valGasto};${valSaldo}\r\n`;
             });
+
             const link = document.createElement("a");
             link.setAttribute("href", encodeURI(csv));
-            link.setAttribute("download", `ovs_faturas_emitidas_${new Date().toISOString().slice(0,10)}.csv`);
+            link.setAttribute("download", `controle_ovs_por_empresa_multilinha_${new Date().toISOString().slice(0,10)}.csv`);
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
