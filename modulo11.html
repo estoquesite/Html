@@ -24,7 +24,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1e293
     <span class="text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200 px-2.5 py-1 rounded-lg">Módulo 11 • OVs & Saldos</span>
   </div>
   <div class="flex flex-wrap items-center gap-2">
-    <span id="badgeConexao" class="text-[11px] font-bold px-2.5 py-1.5 rounded-xl border flex items-center gap-1.5 bg-slate-100 text-slate-600 border-slate-200"><span id="pontoConexao" class="w-2 h-2 rounded-full bg-slate-400"></span><span id="textoConexao">Iniciando...</span></span>
+    <span id="badgeConexao" class="text-[11px] font-bold px-2.5 py-1.5 rounded-xl border flex items-center gap-1.5 bg-slate-100 text-slate-600 border-slate-200"><span id="pontoConexao" class="w-2 h-2 rounded-full bg-slate-400"></span><span id="textoConexao">A iniciar...</span></span>
     <button onclick="abrir('ov','')" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white">📷 Ler Nova OV (VA03)</button>
     <button id="btnSalvar" onclick="salvarTudo()" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50">💾 Salvar na Nuvem</button>
     <button onclick="sincronizar()" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white"><span id="iconeSync" class="inline-block">🔄</span> Sincronizar</button>
@@ -70,7 +70,6 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1e293
 <div id="containerOVs" class="space-y-8"></div>
 </div>
 
-<!-- MODAL ÚNICO: leitor de OV (VA03) ou de faturas (fluxo de documentos) -->
 <div id="modal" class="fixed inset-0 bg-slate-950/75 z-50 hidden items-center justify-center p-4">
   <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
     <div class="flex justify-between items-start border-b pb-3">
@@ -80,7 +79,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1e293
     <input type="hidden" id="mAlvo">
     <div class="border-2 border-dashed border-teal-300 bg-teal-50/50 p-4 rounded-2xl text-center space-y-2">
       <input type="file" id="mArq" accept="image/*" onchange="if(this.files[0])ocr(this.files[0]);this.value=''" class="w-full text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:font-bold file:bg-teal-700 file:text-white cursor-pointer">
-      <p class="text-[11px] text-slate-500">Escolha o ficheiro de imagem ou faça captura com <b>Win+Shift+S</b> e utilize <b>Ctrl+V</b> nesta janela.</p>
+      <p class="text-[11px] text-slate-500">Selecione o ficheiro ou prima <b>Win+Shift+S</b> e use <b>Ctrl+V</b> nesta janela.</p>
     </div>
     <div id="mProg" class="hidden bg-slate-50 p-3 rounded-2xl border text-xs space-y-1.5">
       <div class="flex justify-between font-bold"><span id="mProgTxt">A ler...</span><span id="mProgPct" class="text-teal-700">0%</span></div>
@@ -99,10 +98,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1e293
 const SB_URL="https://gloxtswcksbczinpwtzu.supabase.co",SB_KEY="sb_publishable_0kEiqthWKZZwjM120wQIYw_Hba7qeLc";
 const KEY="vale_modulo11_sap_ovs_v16_leitor_va03_fluxo",PRECO=14575.5,TABELA='modulo11_ovs';
 const $=i=>document.getElementById(i);
-let sb=null;try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){console.error(e)}
+let sb=null;try{if(window.supabase)sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){}
 let dados=[],modo='ov',tmp=null,busy=false,tt;const pend=new Map();
 
-/* ---------- utilitários ---------- */
 const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const num=v=>Number(v)||0;
 const TO=(v,c=2)=>num(v).toLocaleString('pt-BR',{minimumFractionDigits:c,maximumFractionDigits:c})+' TO';
@@ -133,7 +131,7 @@ function status(s,txt){
 
 const DEFAULT=()=>({id:'115939257',status:'ATIVO',contrato:{numero:'0000071823',item:'30',qtdTotalTO:2635,valorTotalBRL:3320100},
  ov:{numero:'115939257',cliente:'AUCOBRE GESTÃO DE RESIDUOS LTDA.',pedidoDRS:'DSR 018-2025',
- itens:[{itemSap:'40',material:'SUCATA DE FIO-CABO DE ALUMÍNIO',qtdTO:0.3},{itemSap:'60',material:'SUCATA DE FIO-CABO DE COBRE',qtdTO:0.3}],
+ itens:[{itemSap:'40',material:'SUCATA DE FIO-CABO DE ALUMÍNIO E...',qtdTO:0.3},{itemSap:'60',material:'SUCATA DE FIO-CABO DE COBRE ENCA...',qtdTO:0.3}],
  qtdLiberadaTO:0.6,valorBRL:8745.3,precoUnitarioPorTO:PRECO},gastos:[]});
 
 function calc(i){
@@ -146,30 +144,41 @@ function totais(list){const t={n:0,lib:0,libV:0,gas:0,gasV:0,sal:0,salV:0};
  (list||[]).forEach(i=>{const c=calc(i);if(c.canc)return;t.n++;t.lib+=c.lib;t.libV+=num(i.ov?i.ov.valorBRL:0);t.gas+=c.gasto;t.gasV+=c.vg;t.sal+=c.saldo;t.salV+=c.vs});return t}
 const pct=t=>t.lib>0?Math.round(t.sal/t.lib*100):0;
 
-/* ---------- Supabase / armazenamento ---------- */
 const payload=i=>({id:String(i.id),ov:String(i.ov.numero),status:i.status||'ATIVO',cliente:i.ov.cliente,material:(i.ov.itens||[]).map(x=>x.material).join(' / '),itens:i.ov.itens||[],pedido_drs:i.ov.pedidoDRS,qtd_liberada_to:num(i.ov.qtdLiberadaTO),qtd_liberada_kg:num(i.ov.qtdLiberadaTO)*1000,valor_brl:num(i.ov.valorBRL),preco_unitario_to:num(i.ov.precoUnitarioPorTO)||PRECO,contrato_numero:i.contrato?i.contrato.numero:'',contrato_total_to:num(i.contrato?i.contrato.qtdTotalTO:0),gastos:i.gastos||[]});
 const fromRow=d=>{const it=Array.isArray(d.itens)?d.itens:[],soma=it.reduce((s,x)=>s+num(x.qtdTO),0),q=soma||num(d.qtd_liberada_to),v=num(d.valor_brl);
  return{id:String(d.id),status:d.status||'ATIVO',contrato:{numero:d.contrato_numero||'0000071823',item:'30',qtdTotalTO:num(d.contrato_total_to)||2635,valorTotalBRL:num(d.contrato_total_brl)},
  ov:{numero:String(d.ov),cliente:d.cliente||'',pedidoDRS:d.pedido_drs||'',itens:it,qtdLiberadaTO:q,valorBRL:v,precoUnitarioPorTO:num(d.preco_unitario_to)||(q>0&&v>0?v/q:PRECO)},gastos:Array.isArray(d.gastos)?d.gastos:[]}};
 
 async function carregar(){
- if(sb){try{status('gravando','A sincronizar...');
-  const{data,error}=await sb.from(TABELA).select('*').order('created_at',{ascending:false});
-  if(!error&&data&&data.length){dados=data.map(fromRow);loc();render();status('online','Nuvem Conectada');return true}
- }catch(e){console.warn(e)}}
  try{
    const raw=JSON.parse(localStorage.getItem(KEY));
-   if(Array.isArray(raw)&&raw.length>0&&raw[0].ov){dados=raw}else{dados=[DEFAULT()]}
+   if(Array.isArray(raw)&&raw.length&&raw[0].ov){dados=raw}else{dados=[DEFAULT()]}
  }catch(e){dados=[DEFAULT()]}
- render();status('offline','Salvo localmente');return false}
+ render();
+ status('offline','Salvo localmente');
+
+ if(sb){
+   try{
+     const{data,error}=await sb.from(TABELA).select('*').order('created_at',{ascending:false});
+     if(!error&&data&&data.length){
+       dados=data.map(fromRow);
+       loc();
+       render();
+       status('online','Nuvem Conectada');
+       return true;
+     }
+   }catch(e){}
+ }
+ return false;
+}
 
 async function salvarTudo(){
- const b=$('btnSalvar');b.disabled=true;loc();
- if(!sb){aviso('Guardado no armazenamento local.');b.disabled=false;return}
+ const b=$('btnSalvar');if(b)b.disabled=true;loc();
+ if(!sb){aviso('Guardado no armazenamento local.');if(b)b.disabled=false;return}
  status('gravando','A gravar...');
- try{const{error}=await sb.from(TABELA).upsert(dados.map(payload),{onConflict:'id'});if(error)throw error;status('online','Guardado com sucesso');aviso('✓ Todas as OVs foram guardadas na nuvem.')}
+ try{const{error}=await sb.from(TABELA).upsert(dados.map(payload),{onConflict:'id'});if(error)throw error;status('online','Guardado com sucesso');aviso('✓ Todas as OVs foram salvas na nuvem.')}
  catch(e){status('offline','Erro na gravação');aviso('Erro ao gravar: '+(e.message||e))}
- b.disabled=false}
+ if(b)b.disabled=false}
 
 async function sincronizar(){
  const i=$('iconeSync');if(i)i.classList.add('animate-spin');
@@ -184,13 +193,12 @@ function persistir(i){
   try{status('gravando','A gravar...');const{error}=await sb.from(TABELA).upsert(payload(i),{onConflict:'id'});if(error)throw error;status('online','Nuvem Conectada')}
   catch(e){status('offline','Pendente de envio')}},600))}
 
-/* ---------- renderização defensiva ---------- */
 const mini=(rot,cls,t)=>`<div class="${cls} border rounded-xl p-2.5"><span class="block text-[10px] font-bold uppercase opacity-70">${rot}</span><div class="text-sm font-black">${TO(t[0],2)}</div><div class="text-[11px] font-bold opacity-80">${BRL(t[1])}</div></div>`;
 
 function render(){
  try {
    const q=($('filtroTexto')?$('filtroTexto').value||'':'').toLowerCase().trim();
-   const emps=[...new Set(dados.map(i=>norm(i.ov?i.ov.cliente:'')))].filter(Boolean);
+   const emps=[...new Set(dados.map(i=>(i&&i.ov)?norm(i.ov.cliente):''))].filter(Boolean);
    const tm=temas(emps);
    const sel=$('filtroEmpresa');
    if(sel){
@@ -256,7 +264,7 @@ function render(){
        <div class="space-y-4">${grupos[e].map(i=>cardOV(i,t)).join('')}</div></div>`}).join('');
    }
  } catch(err) {
-   console.error("Erro no render:", err);
+   console.error("Erro render:", err);
  }
 }
 
@@ -275,7 +283,7 @@ function cardOV(i,t){
   <td class="px-3 text-right"><span class="text-rose-500 font-bold">-</span><input type="number" step="0.001" class="in w-24 text-right font-black text-rose-600" value="${num(g.pesoTO).toFixed(3)}" onchange="editGasto('${id}',${k},'pesoTO',this.value)"></td>
   <td class="px-3 text-right font-bold text-rose-600">${BRL(num(g.pesoTO)*c.unit)}</td>
   <td class="px-3 np"><button class="text-rose-500" onclick="delGasto('${id}',${k})">✕</button></td></tr>`).join('')+`</tbody></table></div>`
-  :'<p class="text-[11px] text-slate-400 italic">Nenhuma fatura emitida ainda: o saldo está integral. Leia a captura do fluxo de documentos ou registe manualmente.</p>';
+  :'<p class="text-[11px] text-slate-400 italic">Nenhuma fatura emitida ainda: o saldo está integral. Leia o fluxo de documentos ou lance manualmente.</p>';
  return`<div class="bg-white rounded-2xl border-2 ${t.o} shadow-sm overflow-hidden ${c.canc?'opacity-60':''}">
  <div class="bg-slate-100 border-b px-5 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
   <div class="flex flex-wrap items-center gap-2"><span class="${t.d} text-white font-mono font-bold text-[10px] px-2 py-0.5 rounded">OV ${esc(i.ov.numero)}</span>${c.canc?'<span class="bg-rose-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">CANCELADA</span>':''}<span class="font-bold">${esc(i.ov.cliente)}</span><span class="text-slate-600">DRS: <b>${esc(i.ov.pedidoDRS)}</b></span><span class="text-slate-500">Contrato: <b>${esc(i.contrato?i.contrato.numero:'')}</b></span></div>
@@ -292,28 +300,26 @@ function cardOV(i,t){
 
 function filtrarEmpresa(e){if($('filtroEmpresa'))$('filtroEmpresa').value=e;render()}
 
-/* ---------- edições ---------- */
 const achar=id=>dados.find(o=>sid(o.id)===id);
 const somar=i=>{i.ov.qtdLiberadaTO=(i.ov.itens||[]).reduce((s,x)=>s+num(x.qtdTO),0);i.ov.valorBRL=i.ov.qtdLiberadaTO*(num(i.ov.precoUnitarioPorTO)||PRECO)};
 const kgParaTO=v=>{v=num(v);return v>100?v/1000:v};
 function editMat(id,k,campo,v){const i=achar(id);if(!i||!i.ov.itens[k])return;
  if(campo==='qtdTO'){i.ov.itens[k].qtdTO=kgParaTO(v);somar(i)}else i.ov.itens[k].material=String(v).trim();persistir(i)}
 function addMat(id){const i=achar(id);if(!i)return;i.ov.itens=i.ov.itens||[];i.ov.itens.push({itemSap:String((i.ov.itens.length+1)*10),material:'NOVO MATERIAL',qtdTO:0.1});somar(i);persistir(i)}
-function delMat(id,k){const i=achar(id);if(!i||(i.ov.itens||[]).length<=1)return aviso('A OV precisa ter pelo menos uma linha.');if(!confirm('Eliminar esta linha de material?'))return;i.ov.itens.splice(k,1);somar(i);persistir(i)}
+function delMat(id,k){const i=achar(id);if(!i||(i.ov.itens||[]).length<=1)return aviso('A OV precisa ter pelo menos uma linha.');if(!confirm('Eliminar esta linha?'))return;i.ov.itens.splice(k,1);somar(i);persistir(i)}
 function editGasto(id,k,campo,v){const i=achar(id);if(!i||!i.gastos[k])return;
  i.gastos[k][campo]=campo==='pesoTO'?kgParaTO(v):campo==='placa'?String(v).trim().toUpperCase():campo==='ticket'?String(v).trim():v;persistir(i)}
 function addGasto(id){const i=achar(id);if(!i)return;(i.gastos=i.gastos||[]).push({id:Date.now(),ticket:'Fatura manual',placa:'MANUAL',pesoTO:0.1,data:hoje()});persistir(i)}
 function delGasto(id,k){const i=achar(id);if(!i||!confirm('Eliminar esta fatura?'))return;i.gastos.splice(k,1);persistir(i)}
-function toggleCancel(id){const i=achar(id);if(!i)return;const c=i.status==='CANCELADO';if(!confirm(c?'Reativar esta OV?':'Cancelar esta OV? Deixará de contar nos totais.'))return;i.status=c?'ATIVO':'CANCELADO';persistir(i)}
-function carregarExemplo(){if(!confirm('Inserir a OV de exemplo? As restantes OVs não serão apagadas.'))return;const d=DEFAULT();const e=dados.find(x=>x.id===d.id);if(e)return aviso('A OV de exemplo já existe.');persistir(d)}
+function toggleCancel(id){const i=achar(id);if(!i)return;const c=i.status==='CANCELADO';if(!confirm(c?'Reativar esta OV?':'Cancelar esta OV?'))return;i.status=c?'ATIVO':'CANCELADO';persistir(i)}
+function carregarExemplo(){if(!confirm('Inserir a OV de exemplo?'))return;const d=DEFAULT();const e=dados.find(x=>x.id===d.id);if(e)return aviso('A OV de exemplo já existe.');persistir(d)}
 
-/* ---------- leitores (OCR) ---------- */
 function abrir(m,id){
  modo=m;tmp=null;$('mAlvo').value=id\vert{}\vert{}'';$('mProg').classList.add('hidden');
  const ov=m==='ov';
- $('mTitulo').textContent=ov?'📋 Leitor da OV (tela VA03 — "exibir Venda Sucata/Escória: Síntese")':'⚖️ Leitor de Faturas (tela "Fluxo de documentos")';
- $('mSub').innerHTML=ov?'Lê nº da OV, cliente, pedido/DRS, <b>valor líquido</b> e as linhas de material com a quantidade em TO':'Apenas linhas <b>Fatura</b> abaixo da sua OV contam como saída. Pré-pagamento, remessa e adiantamento são ignorados';
- $('mAplicar').textContent=ov?'Aplicar na OV':'Registar faturas';$('mRes').textContent=ov?'A aguardar imagem da VA03...':'A aguardar imagem do fluxo de documentos do SAP...';
+ $('mTitulo').textContent=ov?'📋 Leitor da OV (tela VA03)':'⚖️ Leitor de Faturas (Fluxo SAP)';
+ $('mSub').innerHTML=ov?'Lê OV, cliente, DRS, <b>valor líquido</b> e itens em TO':'Apenas linhas <b>Fatura</b> abaixo da OV contam como saída';
+ $('mAplicar').textContent=ov?'Aplicar na OV':'Registar faturas';$('mRes').textContent=ov?'A aguardar imagem da VA03...':'A aguardar imagem do fluxo de documentos...';
  $('modal').classList.remove('hidden');$('modal').classList.add('flex')}
 function fecharModal(){$('modal').classList.add('hidden');$('modal').classList.remove('flex')}
 const prog=(p,t)=>{$('mBarra').style.width=p+'%';$('mProgPct').textContent=p+'\%';$('mProgTxt').textContent=t};
@@ -342,12 +348,12 @@ async function preparar(blob){
 
 async function ocr(blob){
  if(busy)return aviso('Aguarde: leitura em curso...');
- if(typeof Tesseract==='undefined')return aviso('Leitor de imagem não carregou. Verifique a internet.');
+ if(typeof Tesseract==='undefined')return aviso('Leitor de imagem não carregou. Verifique a sua ligação.');
  busy=true;$('mProg').classList.remove('hidden');prog(0,'A preparar imagem...');
  const parser=modo==='ov'?parseOV:parseFluxo;
  try{
   const img=await preparar(blob);let passo='';
-  const w=await Tesseract.createWorker('por',1,{logger:m=>{if(m.status==='recognizing text')prog(Math.round(m.progress*100),'A ler imagem'+passo+'...')}});
+  const w=await Tesseract.createWorker('por',1,{logger:m=>{if(m.status==='recognizing text')prog(Math.round(m.progress*100),'A processar'+passo+'...')}});
   let res=null;
   for(const psm of['6','4','3']){
    passo=psm==='6'?'':' (tentativa '+(psm==='4'?2:3)+')';
@@ -406,16 +412,16 @@ function mostrarOV(r){
  const cmp='w-full border rounded-lg px-2 py-1 text-xs font-bold text-slate-800 bg-white';
  const valor=r.valor>0?r.valor.toLocaleString('pt-BR',{minimumFractionDigits:2}):'';
  let chk='';
- if(r.pesoTO>0)chk=Math.abs(soma-r.pesoTO)<0.0005?`<div class="text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg p-2">✓ A soma das linhas (${soma.toFixed(3)} TO) confere com o <b>Peso total</b> da OV.</div>`:`<div class="text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-2">⚠ A soma das linhas (${soma.toFixed(3)} TO) diverge do <b>Peso total</b> da OV (${r.pesoTO.toFixed(3)} TO). Verifique os valores abaixo.</div>`;
+ if(r.pesoTO>0)chk=Math.abs(soma-r.pesoTO)<0.0005?`<div class="text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg p-2">✓ A soma das linhas (${soma.toFixed(3)} TO) confere com o <b>Peso total</b> da OV.</div>`:`<div class="text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-2">⚠ A soma das linhas (${soma.toFixed(3)} TO) diverge do <b>Peso total</b> (${r.pesoTO.toFixed(3)} TO). Verifique os valores abaixo.</div>`;
  const aviso1=[!r.numero&&'Número da OV não detetado.',!r.cliente&&'Cliente não detetado.',!(r.valor>0)&&'Valor líquido não detetado: introduza o valor manualmente.'].filter(Boolean).join(' ');
  $('mRes').innerHTML=`<div class="grid grid-cols-3 gap-2">
   <label class="text-[10px] font-bold text-slate-500 uppercase">OV<input id="mNum" class="${cmp}" value="${esc(r.numero||(alvo?alvo.ov.numero:''))}"></label>
-  <label class="col-span-2 text-[10px] font-bold text-slate-500 uppercase">Cliente (Emissor da ordem)<input id="mCli" class="${cmp}" value="${esc(r.cliente||(alvo?alvo.ov.cliente:''))}"></label>
+  <label class="col-span-2 text-[10px] font-bold text-slate-500 uppercase">Cliente<input id="mCli" class="${cmp}" value="${esc(r.cliente||(alvo?alvo.ov.cliente:''))}"></label>
   <label class="col-span-2 text-[10px] font-bold text-slate-500 uppercase">Pedido / DRS<input id="mDrs" class="${cmp}" value="${esc(r.drs||(alvo?alvo.ov.pedidoDRS:''))}"></label>
   <label class="text-[10px] font-bold text-slate-500 uppercase">Valor líquido (R$)<input id="mVal" class="${cmp}" value="${esc(valor||(alvo?num(alvo.ov.valorBRL).toLocaleString('pt-BR',{minimumFractionDigits:2}):''))}"></label></div>
   ${aviso1?`<p class="text-[11px] text-amber-700 font-bold">${esc(aviso1)}</p>`:''}${chk}
-  <div class="bg-white p-2.5 rounded-xl border max-h-52 overflow-y-auto space-y-1.5">${r.linhas.length?r.linhas.map(l=>`<div class="mLin flex items-center gap-2 border-b pb-1.5" data-item="${esc(l.itemSap)}"><b class="text-[10px] bg-slate-100 px-1.5 rounded">Item ${esc(l.itemSap)}</b><input class="lm ${cmp} flex-1" value="${esc(l.material)}"><input class="lq ${cmp} w-24 text-right text-teal-800" value="${l.qtdTO.toFixed(3)}"><b class="text-[10px] text-slate-500">TO</b></div>`).join('')+`<div class="pt-1 font-black flex justify-between"><span>SOMA DAS LINHAS</span><span class="text-teal-700">${soma.toFixed(3)} TO</span></div>`:'<span class="text-amber-800">Nenhuma linha reconhecida. Experimente uma captura mais nítida com a tabela "Todos os itens" visível.</span>'}</div>
-  <p class="text-[10px] text-slate-500">Pode corrigir qualquer campo acima antes de aplicar (quantidade em <b>TO</b>).</p>`}
+  <div class="bg-white p-2.5 rounded-xl border max-h-52 overflow-y-auto space-y-1.5">${r.linhas.length?r.linhas.map(l=>`<div class="mLin flex items-center gap-2 border-b pb-1.5" data-item="${esc(l.itemSap)}"><b class="text-[10px] bg-slate-100 px-1.5 rounded">Item ${esc(l.itemSap)}</b><input class="lm ${cmp} flex-1" value="${esc(l.material)}"><input class="lq ${cmp} w-24 text-right text-teal-800" value="${l.qtdTO.toFixed(3)}"><b class="text-[10px] text-slate-500">TO</b></div>`).join('')+`<div class="pt-1 font-black flex justify-between"><span>SOMA DAS LINHAS</span><span class="text-teal-700">${soma.toFixed(3)} TO</span></div>`:'<span class="text-amber-800">Nenhuma linha reconhecida.</span>'}</div>`
+}
 
 function aplicarOV(){
  const ls=[...document.querySelectorAll('#mRes .mLin')].map(el=>({itemSap:el.dataset.item,material:el.querySelector('.lm').value.trim()||'MATERIAL',qtdTO:BR(el.querySelector('.lq').value)})).filter(l=>l.qtdTO>0);
@@ -423,7 +429,7 @@ function aplicarOV(){
  const numOV=sid($('mNum').value.trim());if(!numOV)return aviso('Informe o número da OV.');
  const cli=$('mCli').value.trim()||'OUTROS CLIENTES',drs=$('mDrs').value.trim(),valor=BR($('mVal').value);
  let i=achar($('mAlvo').value);
- if(i&&sz(i.ov.numero)!==sz(numOV)&&!confirm(`Esta captura pertence à OV ${numOV}, mas abriu o leitor na OV ${i.ov.numero}.\nPretende atualizar a OV ${i.ov.numero} com estes dados?`))return;
+ if(i&&sz(i.ov.numero)!==sz(numOV)&&!confirm(`Esta captura pertence à OV ${numOV}, mas abriu na OV ${i.ov.numero}.\nAtualizar mesmo assim?`))return;
  if(!i)i=dados.find(o=>sz(o.ov.numero)===sz(numOV));
  if(!i)i={id:numOV,status:'ATIVO',contrato:{numero:tmp.contrato||'0000071823',item:'30',qtdTotalTO:2635,valorTotalBRL:3320100},ov:{numero:numOV,cliente:cli,pedidoDRS:drs,itens:[],qtdLiberadaTO:0,valorBRL:0,precoUnitarioPorTO:PRECO},gastos:[]};
  const soma=ls.reduce((s,l)=>s+l.qtdTO,0),preco=valor>0&&soma>0?valor/soma:(num(i.ov.precoUnitarioPorTO)||PRECO);
@@ -451,17 +457,17 @@ function mostrarNotas(r){
  r.minhas=erradoOV?[]:r.faturas.filter(f=>f.ov===meu||(f.ov==null&&r.vendas.length===0));
  const outras=r.faturas.length-r.minhas.length;
  let h='';
- if(r.vendas.length)h+=`<div class="text-[11px]">OV(s) detetada(s) no ecrã: ${r.vendas.map(v=>`<b class="px-1.5 py-0.5 rounded ${v===meu?'bg-emerald-100 text-emerald-800':'bg-slate-200 text-slate-700'}">${esc(v)}</b>`).join(' ')} • OV selecionada: <b>${esc(meu)}</b></div>`;
- if(erradoOV)h+=`<div class="text-rose-800 bg-rose-50 border border-rose-200 rounded-lg p-2"><b>Esta captura não pertence à OV ${esc(meu)}.</b> Abra o leitor no cartão correspondente.</div>`;
+ if(r.vendas.length)h+=`<div class="text-[11px]">OV(s) detetada(s): ${r.vendas.map(v=>`<b class="px-1.5 py-0.5 rounded ${v===meu?'bg-emerald-100 text-emerald-800':'bg-slate-200 text-slate-700'}">${esc(v)}</b>`).join(' ')} • OV atual: <b>${esc(meu)}</b></div>`;
+ if(erradoOV)h+=`<div class="text-rose-800 bg-rose-50 border border-rose-200 rounded-lg p-2"><b>A captura não pertence à OV ${esc(meu)}.</b></div>`;
  if(r.contrato)h+=`<div class="bg-white border rounded-lg p-2 flex justify-between"><span>Contrato <b>${esc(r.contrato.numero)}</b></span><span><b>${TO(r.contrato.qtdTO,0)}</b> • ${BRL(r.contrato.valor)}</span></div>`;
  if(!erradoOV)h+=r.minhas.length?`<div class="flex justify-between font-bold"><span>Faturas da OV ${esc(meu)}</span><span class="bg-rose-100 text-rose-800 px-2 rounded">${r.minhas.length}</span></div><div class="bg-white p-2.5 rounded-xl border max-h-40 overflow-y-auto space-y-1">`+r.minhas.map(n=>`<div class="flex justify-between border-b pb-1"><span><b>${esc(n.ticket)}</b> <span class="text-slate-400">${esc(n.data)}</span></span><b class="text-rose-700">-${n.pesoTO.toFixed(3)} TO</b></div>`).join('')+'</div>'
-  :'<div class="text-emerald-800 bg-emerald-50 p-2.5 rounded-xl border border-emerald-200"><b>Nenhuma fatura emitida nesta OV.</b><br>O fluxo apresenta apenas venda/pré-pagamento. O saldo livre permanece integral.</div>';
+  :'<div class="text-emerald-800 bg-emerald-50 p-2.5 rounded-xl border border-emerald-200"><b>Nenhuma fatura emitida nesta OV.</b><br>Saldo livre integral.</div>';
  if(outras>0&&!erradoOV)h+=`<p class="text-[11px] text-slate-500">${outras} fatura(s) de outras OVs foram ignoradas.</p>`;
  $('mRes').innerHTML=h}
 
 function aplicarNotas(){
  const i=achar($('mAlvo').value);if(!i)return;
- if(tmp.vendas.length&&!tmp.vendas.includes(sz(i.ov.numero)))return aviso('Esta captura pertence a outra OV.');
+ if(tmp.vendas.length&&!tmp.vendas.includes(sz(i.ov.numero)))return aviso('Captura de outra OV.');
  let msg='';
  if(tmp.contrato&&tmp.contrato.qtdTO>0){const k=sz(tmp.contrato.numero);
   dados.filter(o=>sz(o.contrato.numero)===k).forEach(o=>{o.contrato.qtdTotalTO=tmp.contrato.qtdTO;if(tmp.contrato.valor>0)o.contrato.valorTotalBRL=tmp.contrato.valor;if(o!==i)persistir(o)});msg=' • contrato atualizado'}
