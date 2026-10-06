@@ -191,8 +191,7 @@
                 </span>
                 <button type="button" onclick="filtrarPorEmpresaCard('TODAS')" class="text-[11px] font-bold text-teal-700 hover:underline">Ver Todas as Empresas</button>
             </div>
-            <div id="containerCardsEmpresas" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5">
-            </div>
+            <div id="containerCardsEmpresas" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5"></div>
         </div>
 
         <!-- FILTROS -->
@@ -241,17 +240,17 @@
 
             <div id="progressoLeitorOV" class="hidden space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-200 text-xs">
                 <div class="flex justify-between font-bold text-slate-700">
-                    <span id="labelStatusLeitorOV">Processando tela...</span>
-                    <span id="pctStatusLeitorOV" class="text-teal-700">0%</span>
+                    <span id="labelStatusLeitorOV">Processando imagem e executando OCR...</span>
+                    <span id="pctStatusLeitorOV" class="text-teal-700 animate-pulse">Aguarde...</span>
                 </div>
                 <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                    <div id="barraProgressoLeitorOV" class="bg-[#007e7a] h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                    <div id="barraProgressoLeitorOV" class="bg-[#007e7a] h-full rounded-full transition-all duration-300 w-full animate-pulse"></div>
                 </div>
             </div>
 
             <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3 text-xs">
                 <span class="font-bold text-slate-700 uppercase tracking-wider block">Linhas Identificadas na OV:</span>
-                <div id="detalhesLeitorOV" class="text-[11px] text-slate-700 bg-white p-2.5 rounded-xl border border-slate-200 max-h-40 overflow-y-auto space-y-1">
+                <div id="detalhesLeitorOV" class="text-[11px] text-slate-700 bg-white p-2.5 rounded-xl border border-slate-200 max-h-48 overflow-y-auto space-y-1">
                     Aguardando print da VA03...
                 </div>
             </div>
@@ -291,11 +290,11 @@
 
             <div id="progressoLeitorNotas" class="hidden space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-200 text-xs">
                 <div class="flex justify-between font-bold text-slate-700">
-                    <span id="labelStatusLeitorNotas">Lendo notas fiscais...</span>
-                    <span id="pctStatusLeitorNotas" class="text-rose-700">0%</span>
+                    <span id="labelStatusLeitorNotas">Processando imagem e extraindo notas...</span>
+                    <span id="pctStatusLeitorNotas" class="text-rose-700 animate-pulse">Aguarde...</span>
                 </div>
                 <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                    <div id="barraProgressoLeitorNotas" class="bg-rose-600 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                    <div id="barraProgressoLeitorNotas" class="bg-rose-600 h-full rounded-full transition-all duration-300 w-full animate-pulse"></div>
                 </div>
             </div>
 
@@ -304,7 +303,7 @@
                     <span class="font-bold text-slate-700 uppercase tracking-wider">Notas / Saídas Encontradas:</span>
                     <span id="badgeNotasDetectadas" class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded text-[10px]">0 nota(s)</span>
                 </div>
-                <div id="detalhesLeitorNotas" class="text-[11px] text-slate-700 bg-white p-2.5 rounded-xl border border-slate-200 max-h-40 overflow-y-auto space-y-1">
+                <div id="detalhesLeitorNotas" class="text-[11px] text-slate-700 bg-white p-2.5 rounded-xl border border-slate-200 max-h-48 overflow-y-auto space-y-1">
                     Aguardando print do fluxo de notas fiscais...
                 </div>
             </div>
@@ -335,7 +334,7 @@
             console.error("Falha ao inicializar o Supabase SDK:", e);
         }
 
-        const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v13_leitores_separados";
+        const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v14_otimizado";
         let cacheRegistros = [];
         let linhasTempLeitorOV = [];
         let notasTempLeitorNotas = [];
@@ -374,6 +373,64 @@
                 minimumFractionDigits: casas,
                 maximumFractionDigits: casas
             }) + " TO";
+        }
+
+        // ==========================================
+        // TRATAMENTO NUMÉRICO & PRÉ-PROCESSAMENTO OCR
+        // ==========================================
+        function converterQtdSapParaTO(valorStr, unidade = 'TO') {
+            if (!valorStr) return 0;
+            let limpo = valorStr.trim().replace(/\s+/g, '');
+
+            if (limpo.includes('.') && limpo.includes(',')) {
+                limpo = limpo.replace(/\./g, '').replace(',', '.');
+            } else if (limpo.includes(',')) {
+                limpo = limpo.replace(',', '.');
+            }
+
+            let num = parseFloat(limpo) || 0;
+            const u = (unidade || '').toUpperCase().trim();
+            if (u === 'KG') {
+                num = num / 1000;
+            } else if (u === 'G') {
+                num = num / 1000000;
+            }
+            return Number(num);
+        }
+
+        function preProcessarImagemParaOCR(arquivoImagem) {
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        ctx.drawImage(img, 0, 0);
+
+                        const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+                        const data = imgData.data;
+
+                        // Aumenta o contraste das linhas do SAP
+                        for (let i = 0; i < data.length; i += 4) {
+                            const r = data[i], g = data[i+1], b = data[i+2];
+                            const cinza = 0.299 * r + 0.587 * g + 0.114 * b;
+                            const threshold = 175;
+                            const val = cinza > threshold ? 255 : 0;
+                            data[i] = val;
+                            data[i+1] = val;
+                            data[i+2] = val;
+                        }
+
+                        ctx.putImageData(imgData, 0, 0);
+                        resolve(canvas.toDataURL('image/png'));
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(arquivoImagem);
+            });
         }
 
         const DADOS_DEFAULT = [
@@ -550,6 +607,31 @@
             }
         }
 
+        function adicionarNovaOVManual() {
+            const novaId = prompt("Informe o Número da Nova OV:", "1159" + Math.floor(10000 + Math.random() * 90000));
+            if (!novaId) return;
+
+            const novoItem = {
+                id: String(novaId).trim(),
+                status: "ATIVO",
+                contrato: { numero: "0000071823", item: "30", qtdTotalTO: 2635.00, valorTotalBRL: 3320100.00 },
+                ov: {
+                    numero: String(novaId).trim(),
+                    cliente: "NOVO CLIENTE S.A.",
+                    pedidoDRS: "DRS 000-2026",
+                    itens: [
+                        { itemSap: "10", material: "MATERIAL PADRÃO", qtdTO: 1.000 }
+                    ],
+                    qtdLiberadaTO: 1.000,
+                    valorBRL: 14575.50,
+                    precoUnitarioPorTO: 14575.50
+                },
+                gastos: []
+            };
+
+            salvarNaBase(novoItem);
+        }
+
         function atualizarOpcoesEmpresas(lista) {
             const select = document.getElementById('filtroEmpresa');
             const containerCards = document.getElementById('containerCardsEmpresas');
@@ -722,7 +804,7 @@
                                 <span class="text-[10px] text-slate-400 font-bold">Qtd:</span>
                                 <input type="number" step="0.001" value="${Number(it.qtdTO).toFixed(3)}" onchange="atualizarItemMaterial('${item.id}', ${idxL}, 'qtdTO', this.value)" class="input-inline w-20 font-black text-teal-800 text-right px-1 py-0.5 border border-transparent focus:border-teal-300 rounded">
                                 <span class="text-[10px] font-bold text-slate-500">TO</span>
-                                <span class="text-[10px] text-slate-400">(${Math.round(Number(it.qtdTO)*1000)} KG)</span>
+                                <span class="text-[10px] text-slate-400">(${(Number(it.qtdTO)*1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} KG)</span>
                             </div>
                             <button type="button" onclick="removerLinhaMaterialOV('${item.id}', ${idxL})" class="text-rose-400 hover:text-rose-600 px-1 font-bold no-print">✕</button>
                         </div>
@@ -752,7 +834,7 @@
                                 <div class="bg-slate-50/50 p-3 rounded-2xl border border-slate-100 space-y-2">
                                     <div class="flex justify-between items-center text-xs">
                                         <span class="font-bold text-slate-700 flex items-center gap-1.5">
-                                            <span>📋</span> Materiais da OV (Soma de Todas as Linhas = ${formatarTO(item.ov.qtdLiberadaTO, 3)}):
+                                            <span>📋</span> Materiais da OV (Soma = ${formatarTO(item.ov.qtdLiberadaTO, 3)}):
                                         </span>
                                         <button type="button" onclick="adicionarLinhaMaterialOV('${item.id}')" class="text-[11px] font-bold text-teal-700 hover:underline no-print">
                                             + Adicionar Outra Linha de Material
@@ -763,7 +845,7 @@
                                     </div>
                                 </div>
 
-                                <!-- OS QUADRADINHOS: TOTAL LIBERADO, JÁ GASTO E SALDO LIVRE -->
+                                <!-- QUADRADINHOS: LIBERADO, GASTO E SALDO -->
                                 <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                     <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl">
                                         <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">1. Total Inicial (Soma Linhas)</span>
@@ -863,7 +945,7 @@
         }
 
         // ==========================================
-        // LEITOR 1: LINHAS DA OV (VA03)
+        // LEITOR 1: LINHAS DA OV (VA03) COM CANVAS
         // ==========================================
         function abrirModalLeitorOV(ovId) {
             document.getElementById('leitorOVTargetId').value = ovId;
@@ -888,46 +970,72 @@
             btn.disabled = true;
             document.getElementById('progressoLeitorOV').classList.remove('hidden');
 
-            const worker = await Tesseract.createWorker('por');
-            const { data: { text } } = await worker.recognize(input.files[0]);
-            await worker.terminate();
+            try {
+                const imagemOtimizada = await preProcessarImagemParaOCR(input.files[0]);
 
-            linhasTempLeitorOV = extrairLinhasVA03(text);
+                const worker = await Tesseract.createWorker('por');
+                await worker.setParameters({
+                    tessedit_char_whitelist: '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyzÁÉÍÓÚáéíóúÃÕãõÇç.,-/ '
+                });
 
-            if (linhasTempLeitorOV.length === 0) {
-                linhasTempLeitorOV = [
-                    { itemSap: "40", material: "SUCATA DE FIO-CABO DE ALUMÍNIO E...", qtdTO: 0.100 },
-                    { itemSap: "60", material: "SUCATA DE FIO-CABO DE COBRE ENCA...", qtdTO: 0.100 }
-                ];
+                const { data: { text } } = await worker.recognize(imagemOtimizada);
+                await worker.terminate();
+
+                linhasTempLeitorOV = extrairLinhasVA03(text);
+
+                if (linhasTempLeitorOV.length === 0) {
+                    document.getElementById('detalhesLeitorOV').innerHTML = `
+                        <div class="text-rose-600 font-semibold p-2">Não foi possível identificar as linhas automaticamente. Verifique se o cabeçalho e colunas do SAP estão visíveis.</div>
+                    `;
+                    btn.disabled = false;
+                    return;
+                }
+
+                const soma = linhasTempLeitorOV.reduce((acc, l) => acc + l.qtdTO, 0);
+
+                document.getElementById('detalhesLeitorOV').innerHTML = linhasTempLeitorOV.map(l => `
+                    <div class="flex justify-between border-b border-slate-100 py-1 items-center">
+                        <span><b>Item ${l.itemSap}:</b> ${l.material}</span>
+                        <span class="font-black text-teal-800">${l.qtdTO.toFixed(3)} TO (${(l.qtdTO * 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} KG)</span>
+                    </div>
+                `).join('') + `
+                    <div class="pt-2 font-bold text-slate-800 flex justify-between border-t border-slate-300 mt-2">
+                        <span>TOTAL RECONHECIDO:</span> 
+                        <span class="text-teal-700 text-sm font-black">${soma.toFixed(3)} TO</span>
+                    </div>
+                `;
+            } catch (err) {
+                console.error(err);
+                alert("Falha no OCR: " + err.message);
+            } finally {
+                btn.disabled = false;
             }
-
-            const soma = linhasTempLeitorOV.reduce((acc, l) => acc + l.qtdTO, 0);
-
-            document.getElementById('detalhesLeitorOV').innerHTML = linhasTempLeitorOV.map(l => `
-                <div class="flex justify-between border-b border-slate-100 pb-1">
-                    <span><b>Item ${l.itemSap}:</b> ${l.material}</span>
-                    <span class="font-bold text-teal-800">${l.qtdTO.toFixed(3)} TO (${Math.round(l.qtdTO * 1000)} KG)</span>
-                </div>
-            `).join('') + `<div class="pt-1 font-bold text-slate-800 flex justify-between"><span>TOTAL OV:</span> <span class="text-teal-700">${soma.toFixed(3)} TO</span></div>`;
-
-            btn.disabled = false;
         }
 
         function extrairLinhasVA03(txt) {
             const linhas = [];
             const linhasTexto = txt.split(/\r?\n/);
 
+            // Item (10, 20...), Código de material opcional, Quantidade com decimal e Unidade
+            const regexVA03 = /(?:^|\s)([0-9]{2,3})\s+(?:([0-9]{6,12})\s+)?([0-9]+(?:[.,][0-9]{1,4})?)\s*(TO|KG|TON|T)\b(?:\s*[A-Z]\b)?\s*(.*)$/i;
+
             linhasTexto.forEach(linha => {
-                const regex = /^\s*([0-9]{2,3})\s+([0-9]{7,10})?\s*([0-9]+(?:[.,][0-9]+)?)\s*(TO|KG)\s*(?:[A-Z]\s*)?(.*)$/i;
-                const match = linha.match(regex);
+                const match = linha.match(regexVA03);
                 if (match) {
-                    let qtd = parseFloat(match[3].replace(/\./g, '').replace(',', '.'));
-                    if (match[4].toUpperCase() === 'KG' || qtd > 100) qtd = qtd / 1000;
-                    linhas.push({
-                        itemSap: match[1],
-                        material: match[5].trim().replace(/\s{2,}/g, ' ') || `MATERIAL ITEM ${match[1]}`,
-                        qtdTO: qtd
-                    });
+                    const itemNum = match[1];
+                    const qtdStr = match[3];
+                    const unidade = match[4];
+                    const descMaterial = (match[5] || '').trim().replace(/\s{2,}/g, ' ');
+
+                    const qtdConvertidaTO = converterQtdSapParaTO(qtdStr, unidade);
+
+                    if (qtdConvertidaTO > 0) {
+                        linhas.push({
+                            itemSap: itemNum,
+                            material: descMaterial || `MATERIAL ITEM ${itemNum}`,
+                            qtdTO: qtdConvertidaTO
+                        });
+                    }
                 }
             });
             return linhas;
@@ -946,7 +1054,7 @@
         }
 
         // ==========================================
-        // LEITOR 2: NOTAS FISCAIS / FLUXO SAP
+        // LEITOR 2: NOTAS FISCAIS / FLUXO SAP COM CANVAS
         // ==========================================
         function abrirModalLeitorNotas(ovId) {
             document.getElementById('leitorNotasTargetId').value = ovId;
@@ -972,44 +1080,66 @@
             btn.disabled = true;
             document.getElementById('progressoLeitorNotas').classList.remove('hidden');
 
-            const worker = await Tesseract.createWorker('por');
-            const { data: { text } } = await worker.recognize(input.files[0]);
-            await worker.terminate();
+            try {
+                const imagemOtimizada = await preProcessarImagemParaOCR(input.files[0]);
 
-            notasTempLeitorNotas = extrairNotasFluxoSAP(text);
+                const worker = await Tesseract.createWorker('por');
+                const { data: { text } } = await worker.recognize(imagemOtimizada);
+                await worker.terminate();
 
-            if (notasTempLeitorNotas.length === 0) {
-                notasTempLeitorNotas = [
-                    { ticket: "NF-10492", placa: "RIO-2A45", pesoTO: 0.100, data: new Date().toISOString().split('T')[0] }
-                ];
+                notasTempLeitorNotas = extrairNotasFluxoSAP(text);
+                document.getElementById('badgeNotasDetectadas').innerText = `${notasTempLeitorNotas.length} nota(s) encontrada(s)`;
+
+                if (notasTempLeitorNotas.length === 0) {
+                    document.getElementById('detalhesLeitorNotas').innerHTML = `
+                        <div class="text-rose-600 font-semibold p-2">Nenhuma nota ou quantidade identificada no print.</div>
+                    `;
+                    btn.disabled = false;
+                    return;
+                }
+
+                const totalNotasTO = notasTempLeitorNotas.reduce((acc, n) => acc + n.pesoTO, 0);
+
+                document.getElementById('detalhesLeitorNotas').innerHTML = notasTempLeitorNotas.map(n => `
+                    <div class="flex justify-between border-b border-slate-100 py-1">
+                        <span><b>${n.ticket}</b> (Placa: ${n.placa})</span>
+                        <span class="font-bold text-rose-700">-${n.pesoTO.toFixed(3)} TO</span>
+                    </div>
+                `).join('') + `
+                    <div class="pt-2 font-bold text-slate-800 flex justify-between border-t border-slate-300 mt-2">
+                        <span>TOTAL SAÍDAS:</span> 
+                        <span class="text-rose-700 text-sm font-black">-${totalNotasTO.toFixed(3)} TO</span>
+                    </div>
+                `;
+            } catch (err) {
+                console.error(err);
+                alert("Falha no OCR de Notas: " + err.message);
+            } finally {
+                btn.disabled = false;
             }
-
-            document.getElementById('badgeNotasDetectadas').innerText = `${notasTempLeitorNotas.length} nota(s) encontrada(s)`;
-            document.getElementById('detalhesLeitorNotas').innerHTML = notasTempLeitorNotas.map(n => `
-                <div class="flex justify-between border-b border-slate-100 pb-1">
-                    <span><b>${n.ticket}</b> (Placa: ${n.placa})</span>
-                    <span class="font-bold text-rose-700">-${n.pesoTO.toFixed(3)} TO</span>
-                </div>
-            `).join('');
-
-            btn.disabled = false;
         }
 
         function extrairNotasFluxoSAP(txt) {
             const notas = [];
-            const matchesNF = [...txt.matchAll(/(?:NF|Nota|Fatura|Doc)[^\d]*([0-9]{5,10})[^\n\r]*?([0-9]+(?:[.,][0-9]+)?)\s*(TO|KG)/gi)];
+            const regexNota = /(?:NF|Nota|Fatura|Doc|Remessa|[0-9]{9,10})[^\d]*([0-9]{4,10})[^\n\r]*?([0-9]+(?:[.,][0-9]{1,3})?)\s*(TO|KG|TON|T)/gi;
+            
+            let match;
+            let index = 1;
+            while ((match = regexNota.exec(txt)) !== null) {
+                const numDoc = match[1];
+                const qtdStr = match[2];
+                const unidade = match[3];
+                const pesoTO = converterQtdSapParaTO(qtdStr, unidade);
 
-            matchesNF.forEach((m, idx) => {
-                let peso = parseFloat(m[2].replace(/\./g, '').replace(',', '.'));
-                if (m[3].toUpperCase() === 'KG' || peso > 100) peso = peso / 1000;
-                notas.push({
-                    ticket: `NF-${m[1]}`,
-                    placa: `VEIC-${idx+1}`,
-                    pesoTO: peso,
-                    data: new Date().toISOString().split('T')[0]
-                });
-            });
-
+                if (pesoTO > 0) {
+                    notas.push({
+                        ticket: `NF-${numDoc}`,
+                        placa: `VEIC-${index++}`,
+                        pesoTO: pesoTO,
+                        data: new Date().toISOString().split('T')[0]
+                    });
+                }
+            }
             return notas;
         }
 
@@ -1035,16 +1165,14 @@
         }
 
         // ==========================================
-        // ATUALIZAÇÕES INLINE E SUPORTE
+        // ATUALIZAÇÕES INLINE E OPERAÇÕES AUXILIARES
         // ==========================================
         function atualizarItemMaterial(ovId, idxLinha, campo, valor) {
             const item = cacheRegistros.find(o => o.id === ovId);
             if (!item || !item.ov.itens || !item.ov.itens[idxLinha]) return;
 
             if (campo === 'qtdTO') {
-                let valNum = parseFloat(valor) || 0;
-                if (valNum > 100) valNum = valNum / 1000;
-                item.ov.itens[idxLinha].qtdTO = valNum;
+                item.ov.itens[idxLinha].qtdTO = converterQtdSapParaTO(String(valor), 'TO');
                 item.ov.qtdLiberadaTO = item.ov.itens.reduce((acc, curr) => acc + Number(curr.qtdTO || 0), 0);
             } else if (campo === 'material') {
                 item.ov.itens[idxLinha].material = valor.trim();
@@ -1077,9 +1205,7 @@
             if (!item || !item.gastos || !item.gastos[idxGasto]) return;
 
             if (campo === 'pesoTO') {
-                let p = parseFloat(valor) || 0;
-                if (p > 100) p = p / 1000;
-                item.gastos[idxGasto].pesoTO = p;
+                item.gastos[idxGasto].pesoTO = converterQtdSapParaTO(String(valor), 'TO');
             } else if (campo === 'ticket') {
                 item.gastos[idxGasto].ticket = valor.trim();
             } else if (campo === 'placa') {
@@ -1139,6 +1265,32 @@
             link.click();
             document.body.removeChild(link);
         }
+
+        // Listener de Colagem (Ctrl+V) direto na área dos modais
+        window.addEventListener('paste', e => {
+            const clipboardItems = e.clipboardData.items;
+            for (let i = 0; i < clipboardItems.length; i++) {
+                if (clipboardItems[i].type.indexOf('image') !== -1) {
+                    const blob = clipboardItems[i].getAsFile();
+                    const modalOVVisivel = !document.getElementById('modalLeitorOV').classList.contains('hidden');
+                    const modalNotasVisivel = !document.getElementById('modalLeitorNotas').classList.contains('hidden');
+
+                    const dt = new DataTransfer();
+                    dt.items.add(blob);
+
+                    if (modalOVVisivel) {
+                        const fileInput = document.getElementById('inputFileLeitorOV');
+                        fileInput.files = dt.files;
+                        processarLeitorOV();
+                    } else if (modalNotasVisivel) {
+                        const fileInput = document.getElementById('inputFileLeitorNotas');
+                        fileInput.files = dt.files;
+                        processarLeitorNotas();
+                    }
+                    break;
+                }
+            }
+        });
 
         window.addEventListener('DOMContentLoaded', () => {
             carregarRegistros();
