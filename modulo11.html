@@ -80,7 +80,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1e293
     <input type="hidden" id="mAlvo">
     <div class="border-2 border-dashed border-teal-300 bg-teal-50/50 p-4 rounded-2xl text-center space-y-2">
       <input type="file" id="mArq" accept="image/*" onchange="if(this.files[0])ocr(this.files[0]);this.value=''" class="w-full text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:font-bold file:bg-teal-700 file:text-white cursor-pointer">
-      <p class="text-[11px] text-slate-500">Escolha o print (a leitura começa sozinha) ou use <b>Ctrl+V</b> com esta janela aberta.</p>
+      <p class="text-[11px] text-slate-500">Escolha o print ou capture com <b>Win+Shift+S</b> e pressione <b>Ctrl+V</b> nesta tela.</p>
     </div>
     <div id="mProg" class="hidden bg-slate-50 p-3 rounded-2xl border text-xs space-y-1.5">
       <div class="flex justify-between font-bold"><span id="mProgTxt">Lendo...</span><span id="mProgPct" class="text-teal-700">0%</span></div>
@@ -109,14 +109,13 @@ const TO=(v,c=2)=>num(v).toLocaleString('pt-BR',{minimumFractionDigits:c,maximum
 const BRL=v=>num(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
 const sid=s=>String(s).replace(/[^\w-]/g,'');
 const hoje=()=>new Date().toISOString().slice(0,10);
-const sz=s=>String(s==null?'':s).replace(/^0+/,'');          /* tira zeros à esquerda (0115443653 -> 115443653) */
+const sz=s=>String(s==null?'':s).replace(/^0+/,'');
 const norm=n=>{n=(n||'').trim();return /gerdau/i.test(n)?'GERDAU AÇOS LONGOS S.A.':(n||'OUTROS CLIENTES')};
 const aviso=m=>{const t=$('toast');t.textContent=m;t.style.opacity=1;clearTimeout(tt);tt=setTimeout(()=>t.style.opacity=0,3800)};
 const loc=()=>{try{localStorage.setItem(KEY,JSON.stringify(dados))}catch(e){}};
-/* número no padrão brasileiro: "6.300,00" -> 6300 | "5.000" -> 5000 | "0,3" -> 0.3 | "5.000" digitado em campo TO com ponto decimal também funciona */
 const BR=s=>{s=String(s==null?'':s).trim();if(s.indexOf(',')>=0)s=s.replace(/\./g,'').replace(',','.');return parseFloat(s)||0};
-/* quantidade + unidade -> toneladas (KG divide por 1000; TO mantém) */
 const qTO=(n,u)=>{if(/KG/i.test(u))return(parseFloat(String(n).replace(/\./g,'').replace(',','.'))||0)/1000;return BR(n)};
+
 const T=[
  {h:'bg-blue-700',l:'bg-blue-50/50',b:'border-blue-400',t:'text-blue-900',d:'bg-blue-800',o:'border-blue-300'},
  {h:'bg-purple-700',l:'bg-purple-50/50',b:'border-purple-400',t:'text-purple-900',d:'bg-purple-800',o:'border-purple-300'},
@@ -131,11 +130,10 @@ const DEFAULT=()=>({id:'115939257',status:'ATIVO',contrato:{numero:'0000071823',
  itens:[{itemSap:'40',material:'SUCATA DE FIO-CABO DE ALUMÍNIO E...',qtdTO:.3},{itemSap:'60',material:'SUCATA DE FIO-CABO DE COBRE ENCA...',qtdTO:.3}],
  qtdLiberadaTO:.6,valorBRL:8745.3,precoUnitarioPorTO:PRECO},gastos:[]});
 
-/* cálculo de uma OV: liberado (TO), faturado (TO e R$), saldo livre (TO e R$) */
 function calc(i){const canc=i.status==='CANCELADO',lib=num(i.ov.qtdLiberadaTO),gasto=(i.gastos||[]).reduce((s,g)=>s+num(g.pesoTO),0),
  unit=num(i.ov.precoUnitarioPorTO)||(lib>0?num(i.ov.valorBRL)/lib:PRECO),vg=gasto*unit;
  return{canc,lib,gasto,unit,vg,saldo:canc?0:Math.max(0,lib-gasto),vs:canc?0:Math.max(0,num(i.ov.valorBRL)-vg)}}
-/* soma de uma lista de OVs (ignora canceladas) */
+
 function totais(list){const t={n:0,lib:0,libV:0,gas:0,gasV:0,sal:0,salV:0};
  list.forEach(i=>{const c=calc(i);if(c.canc)return;t.n++;t.lib+=c.lib;t.libV+=num(i.ov.valorBRL);t.gas+=c.gasto;t.gasV+=c.vg;t.sal+=c.saldo;t.salV+=c.vs});return t}
 const pct=t=>t.lib>0?Math.round(t.sal/t.lib*100):0;
@@ -186,15 +184,11 @@ function render(){
  sel.value=emps.includes(atual)?atual:'TODAS';
  const fe=sel.value;
 
- /* TOTAL GERAL: respeita a empresa escolhida (por fornecedor). Sem filtro = consolidado de todas */
  const escopo=fe==='TODAS'?dados:dados.filter(i=>norm(i.ov.cliente)===fe),G=totais(escopo);
  $('tTitulo').textContent=fe==='TODAS'?'📊 Total Geral Consolidado (todas as empresas)':'📊 Total Geral — '+fe;
- $('tLib').textContent=TO(G.lib);$('tLibV').textContent=BRL(G.libV);$('tGas').textContent=TO(G.gas);$('tGasV').textContent=BRL(G.gasV);
- $('tSal').textContent=TO(G.sal);$('tSalV').textContent=BRL(G.salV)+' livre';$('tPct').textContent=pct(G)+'% livre';
- $('hCount').textContent=G.n+' OV(s)';$('hSal').textContent=TO(G.sal);$('hSalV').textContent=BRL(G.salV);
- $('hEsc').textContent=fe==='TODAS'?'Saldo Livre Geral':'Saldo Livre • '+fe.split(' ')[0];
+ $('tLib').textContent=TO(G.lib);$('tLibV').textContent=BRL(G.libV);$('tGas').textContent=TO(G.gas);$('tGasV').textContent=BRL(G.gasV);$('tSal').textContent=TO(G.sal);$('tSalV').textContent=BRL(G.salV)+' livre';$('tPct').textContent=pct(G)+'% livre';
+ $('hCount').textContent=G.n+' OV(s)';$('hSal').textContent=TO(G.sal);$('hSalV').textContent=BRL(G.salV);$('hEsc').textContent=fe==='TODAS'?'Saldo Livre Geral':'Saldo Livre • '+fe.split(' ')[0];
 
- /* cards por empresa: total das OVs, faturado e saldo (TO e R$) */
  $('cardsEmp').innerHTML=emps.map(e=>{const t=tm[e],p=totais(dados.filter(i=>norm(i.ov.cliente)===e)),total=dados.filter(i=>norm(i.ov.cliente)===e).length;
   return`<div data-emp="${esc(e)}" onclick="filtrarEmpresa(this.dataset.emp)" class="cursor-pointer border-2 ${t.b} ${t.l} rounded-2xl p-3.5 shadow-sm hover:-translate-y-1 transition ${fe===e?'ring-2 ring-teal-500':''}">
   <div class="flex justify-between mb-2"><span class="${t.d} text-white text-[10px] font-black px-2.5 py-0.5 rounded-md">EMPRESA</span><span class="text-[11px] font-bold text-slate-500">${p.n} OV(s) ativa(s)${total>p.n?' • '+(total-p.n)+' cancelada(s)':''}</span></div>
@@ -205,7 +199,6 @@ function render(){
  if(!lista.length){$('containerOVs').innerHTML='<div class="bg-white p-12 text-center rounded-2xl border font-bold text-slate-700">Nenhum registro encontrado</div>';return}
  const grupos={};lista.forEach(i=>(grupos[norm(i.ov.cliente)]=grupos[norm(i.ov.cliente)]||[]).push(i));
  $('containerOVs').innerHTML=Object.keys(grupos).map(e=>{const t=tm[e],all=dados.filter(i=>norm(i.ov.cliente)===e),p=totais(all);
-  /* contrato(s) da empresa: total do contrato x quanto já foi aberto em OVs */
   const ct={};all.forEach(i=>{if(i.status==='CANCELADO')return;const k=i.contrato.numero;ct[k]=ct[k]||{tot:num(i.contrato.qtdTotalTO),lib:0};ct[k].lib+=num(i.ov.qtdLiberadaTO)});
   const ctx=Object.keys(ct).map(k=>`<span class="bg-white/15 px-2 py-0.5 rounded-lg">Contrato ${esc(k)}: ${TO(ct[k].tot,0)} • em OVs ${TO(ct[k].lib)} • sem OV ${TO(Math.max(0,ct[k].tot-ct[k].lib))}</span>`).join(' ');
   return`<div class="rounded-3xl border-2 ${t.b} ${t.l} space-y-4 p-5"><div class="${t.h} text-white p-4 rounded-2xl space-y-3">
@@ -264,7 +257,7 @@ function carregarExemplo(){if(!confirm('Inserir a OV de exemplo? As demais OVs n
 
 /* ---------- leitores (OCR) ---------- */
 function abrir(m,id){
- modo=m;tmp=null;$('mAlvo').value=id||'';$('mProg').classList.add('hidden');
+ modo=m;tmp=null;$('mAlvo').value=id\vert{}\vert{}'';$('mProg').classList.add('hidden');
  const ov=m==='ov';
  $('mTitulo').textContent=ov?'📋 Leitor da OV (tela VA03 — "exibir Venda Sucata/Escória: Síntese")':'⚖️ Leitor de Faturas (tela "Fluxo de documentos")';
  $('mSub').innerHTML=ov?'Lê nº da OV, cliente, pedido/DRS, <b>valor líquido</b> e as linhas de material com a quantidade em TO':'Só linhas <b>Fatura</b> abaixo da sua OV contam como saída. Pré-pagamento, remessa e adiantamento são ignorados';
@@ -272,14 +265,30 @@ function abrir(m,id){
  $('mRes').textContent=ov?'Aguardando print da VA03...':'Aguardando print do fluxo de documentos do SAP...';
  $('modal').classList.remove('hidden');$('modal').classList.add('flex')}
 function fecharModal(){$('modal').classList.add('hidden');$('modal').classList.remove('flex')}
-const prog=(p,t)=>{$('mBarra').style.width=p+'%';$('mProgPct').textContent=p+'%';$('mProgTxt').textContent=t};
+const prog=(p,t)=>{$('mBarra').style.width=p+'%';$('mProgPct').textContent=p+'\%';$('mProgTxt').textContent=t};
 
-/* amplia o print (melhora muito o OCR de texto pequeno do SAP) */
+/* Prepara a imagem: escala e binariza preto/branco para contraste das fontes finas do SAP */
 async function preparar(blob){
- try{const b=await createImageBitmap(blob),f=Math.max(1,Math.min(3,2600/b.width)),c=document.createElement('canvas');
-  c.width=Math.round(b.width*f);c.height=Math.round(b.height*f);
-  const x=c.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(b,0,0,c.width,c.height);
-  return await new Promise(r=>c.toBlob(r,'image/png'))}catch(e){return blob}}
+ try{
+  const b=await createImageBitmap(blob);
+  const f=Math.max(1.5,Math.min(3,2800/b.width));
+  const c=document.createElement('canvas');
+  c.width=Math.round(b.width*f);
+  c.height=Math.round(b.height*f);
+  const ctx=c.getContext('2d',{willReadFrequently:true});
+  ctx.imageSmoothingQuality='high';
+  ctx.drawImage(b,0,0,c.width,c.height);
+
+  const imgData=ctx.getImageData(0,0,c.width,c.height);
+  const d=imgData.data;
+  for(let i=0;i<d.length;i+=4){
+   const v=(d[i]*0.299+d[i+1]*0.587+d[i+2]*0.114);
+   const cor=v<145?0:255;
+   d[i]=d[i+1]=d[i+2]=cor;
+  }
+  ctx.putImageData(imgData,0,0);
+  return await new Promise(r=>c.toBlob(r,'image/png'));
+ }catch(e){return blob}}
 
 async function ocr(blob){
  if(busy)return aviso('Aguarde: leitura em andamento...');
@@ -289,7 +298,6 @@ async function ocr(blob){
  try{
   const img=await preparar(blob);let passo='';
   const w=await Tesseract.createWorker('por',1,{logger:m=>{if(m.status==='recognizing text')prog(Math.round(m.progress*100),'Lendo imagem'+passo+'...')}});
-  /* tenta modos de leitura de página até o resultado fazer sentido (6 = bloco/linhas de tabela, 4 = colunas, 3 = automático) */
   let res=null;
   for(const psm of['6','4','3']){
    passo=psm==='6'?'':' (tentativa '+(psm==='4'?2:3)+')';
@@ -301,32 +309,48 @@ async function ocr(blob){
  }catch(e){console.error(e);aviso('Falha ao ler a imagem. Tente outro print.')}
  finally{busy=false;$('mProg').classList.add('hidden')}}
 
-/* limpa o nome do material ("☐ SUCATA DE FERRO ZVSU 0 D 29." -> "SUCATA DE FERRO") */
 function limpaMat(s){
- s=String(s||'').replace(/^[^A-Za-zÀ-ú]+/,'').replace(/^[A-Za-z]\s+(?=[A-ZÀ-Ú]{3})/,'');
- s=s.split(/\s{2,}|\b(?:ZVSU|ZV[A-Z]{2})\b/)[0].replace(/[^A-Za-zÀ-ú0-9\/\.\-\(\) ].*$/,'').trim();
- return s||'MATERIAL (conferir)'}
+ if(!s)return'MATERIAL';
+ return s.replace(/^[^A-Za-zÀ-ú]+/g,'')
+  .split(/\s{2,}|\b(?:ZVSU|ZV[A-Z]{2})\b/i)[0]
+  .replace(/[^A-Za-zÀ-ú0-9\/\.\-\(\) ]+$/g,'')
+  .trim()||'MATERIAL'}
 
-/* ----- VA03: "exibir Venda Sucata/Escória 115443653: Síntese" ----- */
+/* Parser específico para tela VA03 (Exibir Venda Sucata/Escória) */
 function parseOV(text){
- const flat=text.replace(/\r/g,'').replace(/\s+/g,' ');
- const mo=flat.match(/Venda\s+Sucata[^\d]{0,15}(\d{8,10})/i)||flat.match(/(\d{8,10})\s*:\s*S[ií]ntese/i)||flat.match(/\b(11\d{7})\b/);
- const mc=flat.match(/Emissor\s+da\s+ordem\s+\d{4,10}\s+(.{4,70}?)\s*(?:\/|$)/i)||flat.match(/Receb\.?\s*mercad\.?\s+\d{4,10}\s+(.{4,70}?)\s*(?:\/|$)/i)||flat.match(/Parceiro\s+de\s+neg[oó]cios\s+\d{4,10}\s+(.{4,70}?)(?:\s+Material|$)/i)||flat.match(/(GERDAU[^\/]{0,30}?S\.?\s?A\.?)/i);
- const md=flat.match(/(D[RS]{2}\s*[0-9]{1,4}[A-Z]?\s*[-\/]\s*[0-9]{2,4})/i);
- const mp=flat.match(/N[ºo°]?\s*do\s*pedido\s+(\d{4,10})\s+D/i);
- const mv=flat.match(/Valor\s+l[ií]quido\D{0,25}([0-9][0-9.]*,[0-9]{2})/i);
+ const flat=text.replace(/\r/g,' ').replace(/\s+/g,' ');
+ const mo=flat.match(/(?:Venda\s+Sucata\/?Esc[oó]ria|Venda\s+Sucata)\s*(\d{8,10})/i)||
+          flat.match(/(\d{8,10})\s*:\s*S[ií]ntese/i)||
+          flat.match(/\b(11\d{7})\b/);
+ const mc=flat.match(/Emissor\s+da\s+ordem\s+\d{3,10}\s+([^/\n\r]+?)(?:\s*\/|\s+Receb|$)/i)||
+          flat.match(/(AUCOBRE[^\n\r/]+)/i)||
+          flat.match(/(GERDAU[^\n\r/]+)/i);
+ const md=flat.match(/(D[RS]{2}\s*[0-9]{1,4}[A-Z]?\s*[-/]\s*[0-9]{2,4})/i)||
+          flat.match(/N[ºo°]?\s*do\s*pedido\s+([^\s]+)/i);
+ const mv=flat.match(/Valor\s+l[ií]quido\D{0,20}([0-9]{1,3}(?:\.[0-9]{3})*,[0-9]{2})/i)||
+          flat.match(/Valor\s+l[ií]quido\D{0,20}([0-9]+,[0-9]{2})/i);
  const mw=flat.match(/Peso\s+total\D{0,25}([0-9][0-9.,]*)\s*(KG|T[O0])/i);
+
  const linhas=[];
  text.split(/\r?\n/).forEach(l=>{
-  const m=l.match(/(?:^|\s)(\d{2})\s?0*(\d{7,12})\s+(\d+(?:[.,]\d+)?)\s*(KG|T[O0])\b\s*(.*)$/i);
-  if(m)linhas.push({itemSap:m[1],material:limpaMat(m[5]),qtdTO:qTO(m[3],m[4])})});
- if(!linhas.length)text.split(/\r?\n/).forEach(l=>{
-  const m=l.match(/(?:^|\s)(\d{2})\s+(\d+(?:[.,]\d+)?)\s*(KG|T[O0])\b\s*(.*)$/i);
-  if(m&&/[A-Za-z]{4}/.test(m[4]))linhas.push({itemSap:m[1],material:limpaMat(m[4]),qtdTO:qTO(m[2],m[3])})});
- return{ok:linhas.length>0,linhas,
-  numero:mo?sz(mo[1]):'',cliente:mc?mc[1].replace(/\s+/g,' ').trim():'',
-  drs:md?md[1].replace(/\s*([\/-])\s*/,'$1').replace(/\s+/g,' ').toUpperCase():'',
-  contrato:mp?mp[1].padStart(10,'0'):'',valor:mv?BR(mv[1]):0,pesoTO:mw?qTO(mw[1],mw[2]):0}}
+  const m=l.match(/(?:^|\s)(\d{1,3})\s+(?:0*(\d{7,10})\s+)?([0-9]+(?:[.,][0-9]+)?)\s*(TO|KG)\b(?:\s+[A-Z0-9])?\s*(.*)$/i);
+  if(m){
+   const qtd=qTO(m[3],m[4]);
+   if(qtd>0)linhas.push({itemSap:m[1],material:limpaMat(m[5]),qtdTO:qtd});
+  }
+ });
+
+ return{
+  ok:linhas.length>0||!!mo,
+  linhas,
+  numero:mo?sz(mo[1]):'',
+  cliente:mc?mc[1].replace(/\s+/g,' ').trim():'',
+  drs:md?md[1].replace(/\s*([/-])\s*/,'$1').toUpperCase():'',
+  contrato:'',
+  valor:mv?BR(mv[1]):0,
+  pesoTO:mw?qTO(mw[1],mw[2]):0
+ };
+}
 
 function mostrarOV(r){
  tmp=r;const alvo=achar($('mAlvo').value),soma=r.linhas.reduce((s,l)=>s+l.qtdTO,0);
@@ -361,7 +385,7 @@ function aplicarOV(){
 function parseFluxo(text){
  const QTY=/([0-9]{1,3}(?:\.[0-9]{3})*(?:,[0-9]+)?|[0-9]+(?:,[0-9]+)?)\s*(KG|T[O0])\b/i;
  let cur=null,contrato=null;const vendas=[],faturas=[];
- text.split(/\r?\n/).forEach((l,ix)=>{
+ text.split(/\r?\n/).forEach((l)=>{
   const mc=l.match(/Contr\w*\.?\s+Sucata\S*\s+(\d{8,10})\s*\/\s*(\d+)/i);
   if(mc){const q=l.slice(mc.index+mc[0].length).match(QTY),v=l.match(/([0-9][0-9.]*,[0-9]{2})\s*BRL/i);
    contrato={numero:mc[1],qtdTO:q?qTO(q[1],q[2]):0,valor:v?BR(v[1]):0};return}
