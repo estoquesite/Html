@@ -132,7 +132,7 @@
                         <h1 class="text-lg font-extrabold tracking-wide">Painel de OVs por Empresa & Saldos</h1>
                         <span class="bg-blue-600 text-white font-black text-[10px] px-2.5 py-0.5 rounded shadow-sm">GERDAU AZUL</span>
                     </div>
-                    <p class="text-xs text-teal-100/90 mt-1">Leitor otimizado para o padrão VA03: Item, Qtd, Unidade e Denominação</p>
+                    <p class="text-xs text-teal-100/90 mt-1">Validação automática de OV e edição completa de itens com o lápis ✏️</p>
                 </div>
 
                 <div class="flex flex-wrap gap-2 text-right">
@@ -142,7 +142,7 @@
                     </div>
                     <div class="bg-emerald-900/30 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-emerald-400/30 text-left">
                         <div class="text-[10px] text-emerald-200 font-bold uppercase tracking-wider">Saldo Livre Restante (Geral)</div>
-                        <div id="statSaldoTopResumo" class="text-lg font-black text-emerald-300 leading-tight">0,00 TO</div>
+                        <div id="statSaldoTopResumo" class="text-lg font-black text-emerald-300 leading-tight">0,000 TO</div>
                         <div id="statSaldoTopValor" class="text-[10px] font-bold text-emerald-100/90">R$ 0,00</div>
                     </div>
                 </div>
@@ -162,13 +162,13 @@
             <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 text-xs">
                 <div class="bg-slate-50 border border-slate-200/80 p-3.5 rounded-xl space-y-1">
                     <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Liberado</span>
-                    <div id="totalGeralLiberadoTO" class="text-lg font-black text-slate-800">0,00 TO</div>
+                    <div id="totalGeralLiberadoTO" class="text-lg font-black text-slate-800">0,000 TO</div>
                     <div id="totalGeralLiberadoValor" class="text-xs font-bold text-slate-600">R$ 0,00</div>
                 </div>
 
                 <div class="bg-rose-50/70 border border-rose-200/80 p-3.5 rounded-xl space-y-1">
                     <span class="block text-[10px] font-bold text-rose-600 uppercase tracking-wider">Total Já Expedido (Notas / Balança)</span>
-                    <div id="totalGeralGastoTO" class="text-lg font-black text-rose-700">0,00 TO</div>
+                    <div id="totalGeralGastoTO" class="text-lg font-black text-rose-700">0,000 TO</div>
                     <div id="totalGeralGastoValor" class="text-xs font-bold text-rose-600">R$ 0,00</div>
                 </div>
 
@@ -177,7 +177,7 @@
                         <span>Saldo Livre Restante</span>
                         <span id="badgePctSaldoGeral" class="bg-emerald-600 text-white font-black px-2 py-0.5 rounded-md text-[9px]">100%</span>
                     </span>
-                    <div id="totalGeralSaldoTO" class="text-xl font-black text-emerald-800">0,00 TO</div>
+                    <div id="totalGeralSaldoTO" class="text-xl font-black text-emerald-800">0,000 TO</div>
                     <div id="totalGeralSaldoValor" class="text-xs font-extrabold text-emerald-700">R$ 0,00 restante</div>
                 </div>
             </div>
@@ -217,15 +217,15 @@
 
     </div>
 
-    <!-- MODAL 1: LEITOR SUPERIOR (ITENS DA OV / VA03) -->
+    <!-- MODAL 1: LEITOR SUPERIOR (ITENS DA OV / VA03 COM LÁPIS DE EDIÇÃO E VALIDAÇÃO) -->
     <div id="modalLeitorOV" class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 space-y-4 max-h-[92vh] overflow-y-auto">
+        <div class="bg-white rounded-3xl max-w-3xl w-full p-6 shadow-2xl border border-slate-100 space-y-4 max-h-[92vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
                 <div class="flex items-center gap-2">
                     <span class="text-2xl">📋</span>
                     <div>
                         <h3 class="font-bold text-slate-900 text-sm">Leitor de Linhas da OV (Tela VA03)</h3>
-                        <p class="text-[11px] text-slate-500">Lê o Item, Quantidade, Unidade e Denominação exatos do print</p>
+                        <p class="text-[11px] text-slate-500">Valida o número da OV e permite editar o nome completo dos materiais com o lápis ✏️</p>
                     </div>
                 </div>
                 <button type="button" onclick="fecharModalLeitorOV()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
@@ -233,15 +233,18 @@
 
             <input type="hidden" id="leitorOVTargetId">
 
+            <!-- Alerta de Validação da OV -->
+            <div id="alertaComparacaoOV" class="hidden p-3 rounded-xl text-xs font-bold transition flex items-center gap-2"></div>
+
             <div class="border-2 border-dashed border-teal-300 bg-teal-50/50 p-4 rounded-2xl text-center space-y-2">
                 <input type="file" id="inputFileLeitorOV" accept="image/*" class="w-full text-slate-600 text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-teal-700 file:text-white hover:file:bg-teal-800 cursor-pointer">
-                <p class="text-[11px] text-slate-500">Pressione <b>Ctrl + V</b> com a janela aberta para colar o print da VA03.</p>
+                <p class="text-[11px] text-slate-500">Pressione <b>Ctrl + V</b> com esta janela aberta para colar o print do ecrã da VA03.</p>
             </div>
 
             <div id="progressoLeitorOV" class="hidden space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-200 text-xs">
                 <div class="flex justify-between font-bold text-slate-700">
-                    <span id="labelStatusLeitorOV">Processando imagem em alto contraste...</span>
-                    <span id="pctStatusLeitorOV" class="text-teal-700 animate-pulse">Lendo...</span>
+                    <span id="labelStatusLeitorOV">Lendo imagem e validando OV...</span>
+                    <span id="pctStatusLeitorOV" class="text-teal-700 animate-pulse">Aguarde...</span>
                 </div>
                 <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
                     <div id="barraProgressoLeitorOV" class="bg-[#007e7a] h-full rounded-full transition-all duration-300 w-full animate-pulse"></div>
@@ -249,8 +252,11 @@
             </div>
 
             <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3 text-xs">
-                <span class="font-bold text-slate-700 uppercase tracking-wider block">Linhas Identificadas na OV:</span>
-                <div id="detalhesLeitorOV" class="text-[11px] text-slate-700 bg-white p-2.5 rounded-xl border border-slate-200 max-h-52 overflow-y-auto space-y-1">
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-slate-700 uppercase tracking-wider block">Linhas Reconhecidas (Clique no ✏️ para editar qualquer campo):</span>
+                    <button type="button" onclick="adicionarLinhaManualNoLeitor()" class="text-[11px] font-bold text-teal-700 hover:underline">+ Adicionar Item Manual</button>
+                </div>
+                <div id="detalhesLeitorOV" class="text-[11px] text-slate-700 bg-white p-2.5 rounded-xl border border-slate-200 max-h-60 overflow-y-auto space-y-2">
                     Aguardando print da VA03...
                 </div>
             </div>
@@ -261,13 +267,13 @@
                 </button>
                 <div class="flex gap-2">
                     <button type="button" onclick="fecharModalLeitorOV()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Cancelar</button>
-                    <button type="button" onclick="aplicarLinhasNaOV()" class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm">Aplicar na OV</button>
+                    <button type="button" onclick="aplicarLinhasNaOV()" id="btnAplicarLeitorOV" class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm">Aplicar na OV</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL 2: LEITOR INFERIOR (NOTAS FISCAIS EMITIDAS / FLUXO / ROMANEIOS) -->
+    <!-- MODAL 2: LEITOR INFERIOR (NOTAS FISCAIS / FLUXO / ROMANEIOS COM EDIÇÃO) -->
     <div id="modalLeitorNotas" class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 space-y-4 max-h-[92vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -275,7 +281,7 @@
                     <span class="text-2xl">⚖️</span>
                     <div>
                         <h3 class="font-bold text-slate-900 text-sm">Leitor de Notas Fiscais e Saídas (Fluxo SAP)</h3>
-                        <p class="text-[11px] text-slate-500">Lê o print do fluxo de documentos / faturas e gera os romaneios de saída</p>
+                        <p class="text-[11px] text-slate-500">Lê o print do fluxo de documentos / faturas e permite editar as saídas com o lápis ✏️</p>
                     </div>
                 </div>
                 <button type="button" onclick="fecharModalLeitorNotas()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
@@ -303,7 +309,7 @@
                     <span class="font-bold text-slate-700 uppercase tracking-wider">Notas / Saídas Encontradas:</span>
                     <span id="badgeNotasDetectadas" class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded text-[10px]">0 nota(s)</span>
                 </div>
-                <div id="detalhesLeitorNotas" class="text-[11px] text-slate-700 bg-white p-2.5 rounded-xl border border-slate-200 max-h-52 overflow-y-auto space-y-1">
+                <div id="detalhesLeitorNotas" class="text-[11px] text-slate-700 bg-white p-2.5 rounded-xl border border-slate-200 max-h-52 overflow-y-auto space-y-2">
                     Aguardando print do fluxo de notas fiscais...
                 </div>
             </div>
@@ -334,10 +340,11 @@
             console.error("Falha ao inicializar o Supabase SDK:", e);
         }
 
-        const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v15_va03_corrigido";
+        const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v17_edicao_lapis";
         let cacheRegistros = [];
         let linhasTempLeitorOV = [];
         let notasTempLeitorNotas = [];
+        let ovLidaDoPrint = null;
 
         const TEMA_GERDAU_AZUL = {
             nomeTema: "Gerdau Azul Corporativo",
@@ -375,14 +382,26 @@
             }) + " TO";
         }
 
-        // ==========================================
-        // PARSER PRECISO DE NÚMEROS SAP & CANVAS
-        // ==========================================
+        function copiarNumeroOV(numeroOV, btnElement) {
+            navigator.clipboard.writeText(String(numeroOV).trim()).then(() => {
+                const originalHtml = btnElement.innerHTML;
+                btnElement.innerHTML = `✓ Copiado!`;
+                btnElement.classList.replace('bg-slate-200', 'bg-emerald-200');
+                btnElement.classList.replace('text-slate-700', 'text-emerald-800');
+
+                setTimeout(() => {
+                    btnElement.innerHTML = originalHtml;
+                    btnElement.classList.replace('bg-emerald-200', 'bg-slate-200');
+                    btnElement.classList.replace('text-emerald-800', 'text-slate-700');
+                }, 1500);
+            }).catch(() => {
+                prompt("Copie o número da OV abaixo:", numeroOV);
+            });
+        }
+
         function parseNumeroSap(str) {
             if (!str) return 0;
             let limpo = String(str).trim().replace(/\s+/g, '');
-
-            // Trata formatos brasileiros e padrão SAP: "0,300" ou "1.250,00"
             if (limpo.includes('.') && limpo.includes(',')) {
                 limpo = limpo.replace(/\./g, '').replace(',', '.');
             } else if (limpo.includes(',')) {
@@ -400,7 +419,6 @@
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
                         
-                        // Escala proporcional para aumentar resolução dos caracteres finos do SAP
                         const fator = 1.5;
                         canvas.width = img.width * fator;
                         canvas.height = img.height * fator;
@@ -412,7 +430,6 @@
                         for (let i = 0; i < data.length; i += 4) {
                             const r = data[i], g = data[i+1], b = data[i+2];
                             const cinza = 0.299 * r + 0.587 * g + 0.114 * b;
-                            // Limiar ótimo para texto azul escuro/preto da interface SAP
                             const val = cinza > 165 ? 255 : 0;
                             data[i] = val;
                             data[i+1] = val;
@@ -615,7 +632,7 @@
                     cliente: "NOVO CLIENTE S.A.",
                     pedidoDRS: "DRS 018-2025",
                     itens: [
-                        { itemSap: "40", material: "MATERIAL PADRÃO", qtdTO: 0.300 }
+                        { itemSap: "40", material: "NOVO MATERIAL", qtdTO: 0.300 }
                     ],
                     qtdLiberadaTO: 0.300,
                     valorBRL: 4372.65,
@@ -794,14 +811,14 @@
                     const linhasMateriaisHtml = itensMateriais.map((it, idxL) => `
                         <div class="flex items-center gap-2 bg-slate-50/80 p-2 rounded-xl border border-slate-200/60 text-xs">
                             <span class="text-[10px] font-bold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">Item ${it.itemSap}</span>
-                            <input type="text" value="${it.material}" onchange="atualizarItemMaterial('${item.id}', ${idxL}, 'material', this.value)" class="input-inline font-bold text-slate-800 flex-1 px-1.5 py-0.5 border border-transparent focus:border-slate-300 rounded">
+                            <input type="text" value="${it.material}" onchange="atualizarItemMaterial('${item.id}', ${idxL}, 'material', this.value)" class="input-inline font-bold text-slate-800 flex-1 px-1.5 py-0.5 border border-transparent focus:border-slate-300 rounded" title="Clique para editar a descrição do material">
                             <div class="flex items-center gap-1">
                                 <span class="text-[10px] text-slate-400 font-bold">Qtd:</span>
                                 <input type="number" step="0.001" value="${Number(it.qtdTO).toFixed(3)}" onchange="atualizarItemMaterial('${item.id}', ${idxL}, 'qtdTO', this.value)" class="input-inline w-20 font-black text-teal-800 text-right px-1 py-0.5 border border-transparent focus:border-teal-300 rounded">
                                 <span class="text-[10px] font-bold text-slate-500">TO</span>
-                                <span class="text-[10px] text-slate-400">(${(Number(it.qtdTO)*1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} KG)</span>
+                                <span class="text-[10px] text-slate-400">(${Math.round(Number(it.qtdTO)*1000)} KG)</span>
                             </div>
-                            <button type="button" onclick="removerLinhaMaterialOV('${item.id}', ${idxL})" class="text-rose-400 hover:text-rose-600 px-1 font-bold no-print">✕</button>
+                            <button type="button" onclick="removerLinhaMaterialOV('${item.id}', ${idxL})" class="text-rose-400 hover:text-rose-600 px-1 font-bold no-print" title="Remover item">✕</button>
                         </div>
                     `).join('');
 
@@ -811,7 +828,12 @@
                             <div class="bg-slate-100/90 border-b border-slate-200 px-5 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
                                 <div class="flex items-center gap-2">
                                     <span class="${tema.badge} text-white font-mono font-bold text-[10px] px-2 py-0.5 rounded">OV ${item.ov.numero}</span>
-                                    <span class="font-bold text-slate-800">${item.ov.cliente}</span>
+                                    
+                                    <button type="button" onclick="copiarNumeroOV('${item.ov.numero}', this)" title="Copiar apenas o número da OV" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-0.5 rounded font-mono text-[10px] font-bold flex items-center gap-1 transition shadow-xs">
+                                        <span>📋</span> Copiar
+                                    </button>
+
+                                    <span class="font-bold text-slate-800 ml-1">${item.ov.cliente}</span>
                                     <span class="text-slate-400">|</span>
                                     <span class="text-slate-600">DRS: <b>${item.ov.pedidoDRS}</b></span>
                                 </div>
@@ -934,11 +956,17 @@
         }
 
         // ==========================================
-        // LEITOR 1: VA03 (Item, Qtd, UV, Denominação)
+        // LEITOR 1: VA03 (LÁPIS DE EDIÇÃO E RECONHECIMENTO)
         // ==========================================
         function abrirModalLeitorOV(ovId) {
             document.getElementById('leitorOVTargetId').value = ovId;
             linhasTempLeitorOV = [];
+            ovLidaDoPrint = null;
+
+            const alertaBox = document.getElementById('alertaComparacaoOV');
+            alertaBox.className = 'hidden';
+            alertaBox.innerHTML = '';
+
             document.getElementById('detalhesLeitorOV').innerHTML = 'Aguardando print da VA03...';
             document.getElementById('progressoLeitorOV').classList.add('hidden');
             document.getElementById('modalLeitorOV').classList.remove('hidden');
@@ -956,6 +984,9 @@
             }
 
             const btn = document.getElementById('btnProcessarLeitorOV');
+            const targetId = document.getElementById('leitorOVTargetId').value;
+            const itemEsperado = cacheRegistros.find(o => o.id === targetId);
+
             btn.disabled = true;
             document.getElementById('progressoLeitorOV').classList.remove('hidden');
 
@@ -970,37 +1001,37 @@
                 const { data: { text } } = await worker.recognize(imagemOtimizada);
                 await worker.terminate();
 
+                ovLidaDoPrint = extrairNumeroOVDoTexto(text);
+
+                const alertaBox = document.getElementById('alertaComparacaoOV');
+                if (ovLidaDoPrint && itemEsperado) {
+                    alertaBox.classList.remove('hidden');
+                    if (ovLidaDoPrint === itemEsperado.ov.numero) {
+                        alertaBox.className = 'p-3 rounded-xl text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300 flex items-center gap-2';
+                        alertaBox.innerHTML = `<span>✓</span> Tela confirmada: OV ${ovLidaDoPrint} coincide com a OV selecionada.`;
+                    } else {
+                        alertaBox.className = 'p-3 rounded-xl text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-2';
+                        alertaBox.innerHTML = `<span>⚠️</span> ATENÇÃO: A tela lida indica a <b>OV ${ovLidaDoPrint}</b>, mas você abriu a <b>OV ${itemEsperado.ov.numero}</b>. Verifique o print.`;
+                    }
+                } else {
+                    alertaBox.classList.add('hidden');
+                }
+
                 linhasTempLeitorOV = extrairLinhasVA03(text);
 
                 if (linhasTempLeitorOV.length === 0) {
                     document.getElementById('detalhesLeitorOV').innerHTML = `
                         <div class="text-rose-600 font-semibold p-2">
-                            Não foi possível extrair automaticamente. O print precisa estar legível e conter as colunas de Quantidade e Denominação.
+                            Não foi possível extrair as linhas automaticamente. Você pode clicar em <b>+ Adicionar Item Manual</b> ou colar uma captura com a tabela visível.
                         </div>
                     `;
                     btn.disabled = false;
                     return;
                 }
 
-                const soma = linhasTempLeitorOV.reduce((acc, l) => acc + l.qtdTO, 0);
+                // Renderiza as linhas identificadas com o lápis de edição
+                renderizarLinhasDoLeitorOV();
 
-                document.getElementById('detalhesLeitorOV').innerHTML = linhasTempLeitorOV.map(l => `
-                    <div class="flex justify-between border-b border-slate-100 py-1.5 items-center text-xs">
-                        <div>
-                            <span class="font-bold text-slate-800">Item ${l.itemSap}:</span>
-                            <span class="text-slate-600 ml-1">${l.material}</span>
-                        </div>
-                        <div class="text-right">
-                            <span class="font-black text-teal-800">${l.qtdTO.toFixed(3)} TO</span>
-                            <span class="text-[10px] text-slate-400 block">(${Math.round(l.qtdTO * 1000)} KG)</span>
-                        </div>
-                    </div>
-                `).join('') + `
-                    <div class="pt-2 font-bold text-slate-800 flex justify-between border-t border-slate-300 mt-2">
-                        <span>TOTAL DA ORDEM RECONHECIDO:</span> 
-                        <span class="text-teal-700 text-sm font-black">${soma.toFixed(3)} TO (${Math.round(soma * 1000)} KG)</span>
-                    </div>
-                `;
             } catch (err) {
                 console.error(err);
                 alert("Falha no OCR: " + err.message);
@@ -1009,16 +1040,120 @@
             }
         }
 
-        // Reconhecimento estruturado de acordo com o print real da VA03
+        // Renderiza a lista de itens com botão de lápis (✏️) para edição inline
+        function renderizarLinhasDoLeitorOV() {
+            const container = document.getElementById('detalhesLeitorOV');
+            if (!linhasTempLeitorOV || linhasTempLeitorOV.length === 0) {
+                container.innerHTML = 'Nenhum item adicionado.';
+                return;
+            }
+
+            const soma = linhasTempLeitorOV.reduce((acc, l) => acc + Number(l.qtdTO || 0), 0);
+
+            container.innerHTML = linhasTempLeitorOV.map((l, idx) => {
+                if (l.emEdicao) {
+                    // MODO EDIÇÃO ATIVADO PELO LÁPIS
+                    return `
+                        <div class="bg-amber-50/70 p-2.5 rounded-xl border border-amber-300 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-amber-800 text-[11px]">Editando Item #${idx + 1}</span>
+                                <button type="button" onclick="alternarEdicaoLinhaLeitor(${idx})" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2 py-0.5 rounded shadow-xs">
+                                    Concluir
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
+                                <div class="sm:col-span-2">
+                                    <label class="text-[10px] text-slate-500 font-bold block">Item SAP</label>
+                                    <input type="text" value="${l.itemSap}" oninput="alterarLinhaTemp(${idx}, 'itemSap', this.value)" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs font-bold text-slate-800">
+                                </div>
+                                <div class="sm:col-span-7">
+                                    <label class="text-[10px] text-slate-500 font-bold block">Descrição do Material Completa</label>
+                                    <input type="text" value="${l.material}" oninput="alterarLinhaTemp(${idx}, 'material', this.value)" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs font-bold text-slate-800" placeholder="Nome inteiro do material...">
+                                </div>
+                                <div class="sm:col-span-3">
+                                    <label class="text-[10px] text-slate-500 font-bold block">Qtd (TO)</label>
+                                    <input type="number" step="0.001" value="${Number(l.qtdTO).toFixed(3)}" oninput="alterarLinhaTemp(${idx}, 'qtdTO', this.value)" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs font-black text-teal-800 text-right">
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                // MODO EXIBIÇÃO COM BOTÃO DE LÁPIS
+                return `
+                    <div class="flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-200/80 hover:bg-teal-50/40 transition">
+                        <div class="flex items-center gap-2 flex-1 pr-2">
+                            <button type="button" onclick="alternarEdicaoLinhaLeitor(${idx})" title="Editar o nome ou dados deste item" class="bg-white hover:bg-slate-200 text-slate-700 border border-slate-300 p-1 rounded-lg text-xs transition shadow-xs flex items-center justify-center">
+                                ✏️
+                            </button>
+                            <div>
+                                <span class="font-bold text-slate-800">Item ${l.itemSap}:</span>
+                                <span class="text-slate-700 ml-1 font-semibold">${l.material}</span>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-3 text-right">
+                            <div>
+                                <span class="font-black text-teal-800 text-xs">${Number(l.qtdTO).toFixed(3)} TO</span>
+                                <span class="text-[10px] text-slate-400 block">(${Math.round(Number(l.qtdTO) * 1000)} KG)</span>
+                            </div>
+                            <button type="button" onclick="removerLinhaDoLeitor(${idx})" class="text-rose-400 hover:text-rose-600 font-bold text-xs" title="Remover item">✕</button>
+                        </div>
+                    </div>
+                `;
+            }).join('') + `
+                <div class="pt-2 font-bold text-slate-800 flex justify-between border-t border-slate-300 mt-2">
+                    <span>TOTAL DA ORDEM:</span> 
+                    <span class="text-teal-700 text-sm font-black">${soma.toFixed(3)} TO (${Math.round(soma * 1000)} KG)</span>
+                </div>
+            `;
+        }
+
+        function alternarEdicaoLinhaLeitor(idx) {
+            if (linhasTempLeitorOV[idx]) {
+                linhasTempLeitorOV[idx].emEdicao = !linhasTempLeitorOV[idx].emEdicao;
+                renderizarLinhasDoLeitorOV();
+            }
+        }
+
+        function alterarLinhaTemp(idx, campo, valor) {
+            if (!linhasTempLeitorOV[idx]) return;
+            if (campo === 'qtdTO') {
+                linhasTempLeitorOV[idx].qtdTO = parseNumeroSap(valor);
+            } else {
+                linhasTempLeitorOV[idx][campo] = valor;
+            }
+        }
+
+        function removerLinhaDoLeitor(idx) {
+            linhasTempLeitorOV.splice(idx, 1);
+            renderizarLinhasDoLeitorOV();
+        }
+
+        function adicionarLinhaManualNoLeitor() {
+            const prox = (linhasTempLeitorOV.length + 1) * 10;
+            linhasTempLeitorOV.push({
+                itemSap: String(prox),
+                material: "DIGITE O NOME COMPLETO DO MATERIAL",
+                qtdTO: 0.300,
+                emEdicao: true
+            });
+            renderizarLinhasDoLeitorOV();
+        }
+
+        function extrairNumeroOVDoTexto(txt) {
+            const regexOV = /(?:Sucata(?:\/Escoria)?|Venda|Ordem|OV)[\s\:\-]+([0-9]{8,10})\b/i;
+            const match = txt.match(regexOV);
+            if (match) return match[1];
+
+            const matchGeral = txt.match(/\b(115[0-9]{6})\b/);
+            return matchGeral ? matchGeral[1] : null;
+        }
+
         function extrairLinhasVA03(txt) {
             const linhas = [];
             const linhasTexto = txt.split(/\r?\n/);
 
-            // Regex 1: Padrão SAP estrito com as colunas em sequência:
-            // [Item (ex: 40|60)] [Material (ex: 17001044)] [Qtd (ex: 0,300)] [UV (TO|KG)] [Denominação]
             const regexPadrao = /(?:^|\s)([0-9]{2,3})\s+([0-9]{7,10})\s+([0-9]+(?:[.,][0-9]{1,3})?)\s*(TO|KG|TON)?\s*(?:[A-Z]\s*)?(SUCATA[^\n\r]*|FIO-CABO[^\n\r]*|[A-Z0-9\-\.\s]{5,})/i;
-
-            // Regex 2: Formato flexível caso o OCR junte a quantidade e a unidade (ex: 0,300TO)
             const regexFlexivel = /([0-9]{2,3})[^\d]+([0-9]+(?:[.,][0-9]{1,3})?)\s*(TO|KG|TON)\b\s*(?:[A-Z]\s*)?(.*)/i;
 
             linhasTexto.forEach(linha => {
@@ -1030,7 +1165,7 @@
                     if (unidade === 'KG') qtd = qtd / 1000;
 
                     let mat = (match[5] || '').trim().replace(/\s{2,}/g, ' ');
-                    linhas.push({ itemSap: item, material: mat || `ITEM ${item}`, qtdTO: qtd });
+                    linhas.push({ itemSap: item, material: mat || `ITEM ${item}`, qtdTO: qtd, emEdicao: false });
                     return;
                 }
 
@@ -1042,7 +1177,7 @@
                     if (unidade === 'KG') qtd = qtd / 1000;
 
                     let mat = (match[4] || '').trim().replace(/\s{2,}/g, ' ');
-                    linhas.push({ itemSap: item, material: mat || `ITEM ${item}`, qtdTO: qtd });
+                    linhas.push({ itemSap: item, material: mat || `ITEM ${item}`, qtdTO: qtd, emEdicao: false });
                 }
             });
 
@@ -1054,10 +1189,20 @@
             const item = cacheRegistros.find(o => o.id === ovId);
             if (!item || linhasTempLeitorOV.length === 0) return;
 
-            item.ov.itens = linhasTempLeitorOV;
-            item.ov.qtdLiberadaTO = linhasTempLeitorOV.reduce((acc, l) => acc + l.qtdTO, 0);
+            if (ovLidaDoPrint && ovLidaDoPrint !== item.ov.numero) {
+                const confirma = confirm(`Atenção: A tela lida indicou a OV ${ovLidaDoPrint}, mas você está a atualizar a OV ${item.ov.numero}. Deseja prosseguir mesmo assim?`);
+                if (!confirma) return;
+            }
+
+            // Normaliza as linhas removendo flags de edição
+            item.ov.itens = linhasTempLeitorOV.map(l => ({
+                itemSap: l.itemSap,
+                material: l.material,
+                qtdTO: Number(l.qtdTO)
+            }));
+
+            item.ov.qtdLiberadaTO = item.ov.itens.reduce((acc, l) => acc + l.qtdTO, 0);
             
-            // Recalcula o valor monetário caso exista preço unitário cadastrado
             if (item.ov.precoUnitarioPorTO) {
                 item.ov.valorBRL = item.ov.qtdLiberadaTO * item.ov.precoUnitarioPorTO;
             }
@@ -1068,7 +1213,7 @@
         }
 
         // ==========================================
-        // LEITOR 2: FLUXO DE NOTAS / FATURAMENTO
+        // LEITOR 2: FLUXO DE NOTAS / FATURAMENTO COM EDIÇÃO
         // ==========================================
         function abrirModalLeitorNotas(ovId) {
             document.getElementById('leitorNotasTargetId').value = ovId;
@@ -1112,24 +1257,80 @@
                     return;
                 }
 
-                const totalNotasTO = notasTempLeitorNotas.reduce((acc, n) => acc + n.pesoTO, 0);
+                renderizarNotasDoLeitor();
 
-                document.getElementById('detalhesLeitorNotas').innerHTML = notasTempLeitorNotas.map(n => `
-                    <div class="flex justify-between border-b border-slate-100 py-1">
-                        <span><b>${n.ticket}</b> (Placa: ${n.placa})</span>
-                        <span class="font-bold text-rose-700">-${n.pesoTO.toFixed(3)} TO</span>
-                    </div>
-                `).join('') + `
-                    <div class="pt-2 font-bold text-slate-800 flex justify-between border-t border-slate-300 mt-2">
-                        <span>TOTAL SAÍDAS:</span> 
-                        <span class="text-rose-700 text-sm font-black">-${totalNotasTO.toFixed(3)} TO</span>
-                    </div>
-                `;
             } catch (err) {
                 console.error(err);
                 alert("Falha no OCR de Notas: " + err.message);
             } finally {
                 btn.disabled = false;
+            }
+        }
+
+        function renderizarNotasDoLeitor() {
+            const container = document.getElementById('detalhesLeitorNotas');
+            const totalNotasTO = notasTempLeitorNotas.reduce((acc, n) => acc + n.pesoTO, 0);
+
+            container.innerHTML = notasTempLeitorNotas.map((n, idx) => {
+                if (n.emEdicao) {
+                    return `
+                        <div class="bg-rose-50/70 p-2.5 rounded-xl border border-rose-300 space-y-2">
+                            <div class="flex items-center justify-between">
+                                <span class="font-bold text-rose-800 text-[11px]">Editando Nota #${idx + 1}</span>
+                                <button type="button" onclick="alternarEdicaoNotaLeitor(${idx})" class="text-xs bg-rose-700 hover:bg-rose-800 text-white font-bold px-2 py-0.5 rounded shadow-xs">
+                                    Concluir
+                                </button>
+                            </div>
+                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                                <div class="sm:col-span-5">
+                                    <label class="text-[10px] text-slate-500 font-bold block">Nº Documento / NF</label>
+                                    <input type="text" value="${n.ticket}" oninput="alterarNotaTemp(${idx}, 'ticket', this.value)" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs font-bold text-slate-800">
+                                </div>
+                                <div class="sm:col-span-4">
+                                    <label class="text-[10px] text-slate-500 font-bold block">Placa / Remessa</label>
+                                    <input type="text" value="${n.placa}" oninput="alterarNotaTemp(${idx}, 'placa', this.value)" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs font-mono uppercase text-slate-800">
+                                </div>
+                                <div class="sm:col-span-3">
+                                    <label class="text-[10px] text-slate-500 font-bold block">Peso (TO)</label>
+                                    <input type="number" step="0.001" value="${Number(n.pesoTO).toFixed(3)}" oninput="alterarNotaTemp(${idx}, 'pesoTO', this.value)" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs font-black text-rose-700 text-right">
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                return `
+                    <div class="flex justify-between items-center border-b border-slate-100 py-1">
+                        <div class="flex items-center gap-2">
+                            <button type="button" onclick="alternarEdicaoNotaLeitor(${idx})" title="Editar esta nota" class="bg-white hover:bg-slate-200 text-slate-700 border border-slate-300 p-1 rounded-lg text-xs shadow-xs">
+                                ✏️
+                            </button>
+                            <span><b>${n.ticket}</b> (Placa: ${n.placa})</span>
+                        </div>
+                        <span class="font-bold text-rose-700">-${Number(n.pesoTO).toFixed(3)} TO</span>
+                    </div>
+                `;
+            }).join('') + `
+                <div class="pt-2 font-bold text-slate-800 flex justify-between border-t border-slate-300 mt-2">
+                    <span>TOTAL SAÍDAS:</span> 
+                    <span class="text-rose-700 text-sm font-black">-${totalNotasTO.toFixed(3)} TO</span>
+                </div>
+            `;
+        }
+
+        function alternarEdicaoNotaLeitor(idx) {
+            if (notasTempLeitorNotas[idx]) {
+                notasTempLeitorNotas[idx].emEdicao = !notasTempLeitorNotas[idx].emEdicao;
+                renderizarNotasDoLeitor();
+            }
+        }
+
+        function alterarNotaTemp(idx, campo, valor) {
+            if (!notasTempLeitorNotas[idx]) return;
+            if (campo === 'pesoTO') {
+                notasTempLeitorNotas[idx].pesoTO = parseNumeroSap(valor);
+            } else {
+                notasTempLeitorNotas[idx][campo] = valor;
             }
         }
 
@@ -1150,7 +1351,8 @@
                         ticket: `NF-${numDoc}`,
                         placa: `VEIC-${index++}`,
                         pesoTO: peso,
-                        data: new Date().toISOString().split('T')[0]
+                        data: new Date().toISOString().split('T')[0],
+                        emEdicao: false
                     });
                 }
             }
@@ -1168,8 +1370,8 @@
                     id: Date.now() + Math.random(),
                     ticket: n.ticket,
                     placa: n.placa,
-                    pesoTO: n.pesoTO,
-                    data: n.data
+                    pesoTO: Number(n.pesoTO),
+                    data: n.data || new Date().toISOString().split('T')[0]
                 });
             });
 
@@ -1179,7 +1381,7 @@
         }
 
         // ==========================================
-        // ATUALIZAÇÕES MANUAIS INLINE
+        // ATUALIZAÇÕES MANUAIS INLINE NA TABELA PRINCIPAL
         // ==========================================
         function atualizarItemMaterial(ovId, idxLinha, campo, valor) {
             const item = cacheRegistros.find(o => o.id === ovId);
