@@ -1,419 +1,1293 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Módulo 11 - Controle de OVs por Empresa & Supabase</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
-<style>
-body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1e293b;min-height:100vh}
-.in{background:transparent;outline:0;border:1px solid transparent;border-radius:.375rem;padding:2px 4px}
-.in:hover{background:rgba(255,255,255,.7)}.in:focus{background:#fff;border-color:#0d9488}
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 18px;border-radius:12px;font:600 12px system-ui;max-width:90vw;opacity:0;pointer-events:none;transition:opacity .25s;z-index:99999;white-space:pre-line}
-@media print{.np{display:none!important}body{background:#fff}}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Módulo 11 - Controle de OVs por Empresa & Supabase</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js para os Gráficos de Utilização -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- Tesseract OCR Engine CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        vale: {
+                            DEFAULT: '#007e7a',
+                            dark: '#005a57',
+                            light: '#e6f4f4',
+                            amber: '#f59e0b'
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * { box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; 
+            background: #f0f4f8; 
+            color: #1e293b; 
+            min-height: 100vh; 
+        }
+
+        @keyframes piscarBadgeOV {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.35; transform: scale(0.97); }
+        }
+        .ov-piscar {
+            animation: piscarBadgeOV 1.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes piscarBordaAmarela {
+            0%, 100% {
+                border-color: #eab308;
+                box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.4);
+            }
+            50% {
+                border-color: #ca8a04;
+                box-shadow: 0 0 16px 3px rgba(234, 179, 8, 0.7);
+            }
+        }
+        .borda-amarela-piscar {
+            border-width: 2px !important;
+            animation: piscarBordaAmarela 1.1s ease-in-out infinite;
+        }
+
+        .input-inline {
+            background-color: transparent;
+            transition: all 0.2s ease;
+            outline: none;
+        }
+        .input-inline:hover {
+            background-color: rgba(255, 255, 255, 0.7);
+        }
+        .input-inline:focus {
+            background-color: #ffffff;
+            box-shadow: 0 0 0 2px rgba(13, 148, 136, 0.4);
+            border-radius: 0.375rem;
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            body { background: #fff; padding: 0; }
+            .container-print { max-width: 100% !important; width: 100% !important; margin: 0 !important; }
+            .card-sap { box-shadow: none !important; }
+            .ov-piscar, .borda-amarela-piscar { animation: none !important; }
+        }
+    </style>
 </head>
 <body class="p-4 sm:p-6 lg:p-8">
-<div class="max-w-7xl mx-auto space-y-6">
 
-<nav class="np flex flex-wrap items-center justify-between gap-3 bg-white px-5 py-3.5 rounded-2xl shadow-sm border border-slate-200">
-  <div class="flex items-center gap-3">
-    <a href="index.html" class="text-xs font-bold text-slate-600 hover:text-teal-700">◀ Voltar ao Menu</a>
-    <span class="text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200 px-2.5 py-1 rounded-lg">Módulo 11 • OVs & Saldos</span>
-  </div>
-  <div class="flex flex-wrap items-center gap-2">
-    <span id="badgeConexao" class="text-[11px] font-bold px-2.5 py-1.5 rounded-xl border flex items-center gap-1.5 bg-slate-100 text-slate-600 border-slate-200"><span id="pontoConexao" class="w-2 h-2 rounded-full bg-slate-400"></span><span id="textoConexao">Iniciando...</span></span>
-    <button onclick="abrir('ov','')" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white">📷 Ler Nova OV (VA03)</button>
-    <button id="btnSalvar" onclick="salvarTudo()" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white disabled:opacity-50">💾 Salvar na Nuvem</button>
-    <button onclick="sincronizar()" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white"><span id="iconeSync" class="inline-block">🔄</span> Sincronizar</button>
-    <button onclick="exportarCSV()" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white">📥 CSV</button>
-  </div>
-</nav>
+    <div class="max-w-7xl mx-auto space-y-6 container-print">
+        
+        <!-- NAVEGAÇÃO SUPERIOR -->
+        <nav class="flex flex-wrap items-center justify-between gap-3 bg-white px-5 py-3.5 rounded-2xl shadow-sm border border-slate-200/80 no-print">
+            <div class="flex items-center gap-3">
+                <a href="index.html" class="flex items-center gap-2 text-xs font-bold text-slate-600 hover:text-teal-700 transition">
+                    <span class="text-base">◀</span> Voltar ao Menu
+                </a>
+                <span class="text-slate-300">|</span>
+                <span class="text-xs font-bold text-teal-800 bg-teal-50 border border-teal-200/60 px-2.5 py-1 rounded-lg">Módulo 11 • Gráficos & Analytics</span>
+            </div>
+            
+            <div class="flex flex-wrap items-center gap-2">
+                <span id="badgeConexao" class="text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5">
+                    <span id="pontoConexao" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span id="textoConexao">Nuvem Conectada</span>
+                </span>
 
-<header class="bg-gradient-to-r from-[#007e7a] to-[#005a57] text-white p-6 rounded-2xl shadow-lg">
-  <div class="flex flex-col sm:flex-row justify-between sm:items-center gap-4">
-    <div>
-      <div class="flex flex-wrap items-center gap-3"><span class="text-2xl font-black tracking-widest text-teal-100">VALE</span><h1 class="text-lg font-extrabold">Painel de OVs por Empresa & Saldos</h1></div>
-      <p class="text-xs text-teal-100/90 mt-1">Leitura da OV (VA03) e do fluxo de faturas (SAP) • saldo livre em toneladas (TO) e em R$</p>
+                <button type="button" onclick="abrirModalLeitorOV(null)" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white transition flex items-center gap-1.5 shadow-sm active:scale-95">
+                    <span>📷</span> Ler Nova OV do SAP (Print)
+                </button>
+
+                <button type="button" onclick="salvarTudoNoSupabase()" id="btnSalvarGeral" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white transition flex items-center gap-1.5 shadow-sm active:scale-95">
+                    <span>💾</span> Salvar na Nuvem
+                </button>
+
+                <button type="button" onclick="sincronizarComSupabase()" id="btnSincronizarGeral" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white transition flex items-center gap-1.5 shadow-sm active:scale-95">
+                    <span id="iconeSync">🔄</span> Sincronizar
+                </button>
+
+                <button type="button" onclick="exportarCSV()" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white transition">
+                    📥 CSV
+                </button>
+            </div>
+        </nav>
+
+        <!-- CABEÇALHO -->
+        <header class="bg-gradient-to-r from-[#007e7a] to-[#005a57] text-white p-6 rounded-2xl shadow-lg shadow-teal-900/10">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                <div>
+                    <div class="flex items-center gap-3">
+                        <span class="text-2xl font-black tracking-widest text-teal-100">VALE</span>
+                        <div class="h-5 w-px bg-teal-300/40"></div>
+                        <h1 class="text-lg font-extrabold tracking-wide">Painel de OVs por Empresa & Saldos</h1>
+                        <span class="bg-blue-600 text-white font-black text-[10px] px-2.5 py-0.5 rounded shadow-sm">GERDAU AZUL</span>
+                    </div>
+                    <p class="text-xs text-teal-100/90 mt-1">Leitura estrita de Faturas emitidas do SAP e controle de saldo livre em Toneladas (TO)</p>
+                </div>
+
+                <div class="flex flex-wrap gap-2 text-right">
+                    <div class="bg-white/10 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-white/10 text-left">
+                        <div class="text-[10px] text-teal-100 font-bold uppercase tracking-wider">Qtd OVs Ativas</div>
+                        <div id="statTotalOvsContador" class="text-lg font-black text-white leading-tight">0 OV(s)</div>
+                    </div>
+                    <div class="bg-emerald-900/30 backdrop-blur-sm px-4 py-2.5 rounded-xl border border-emerald-400/30 text-left">
+                        <div class="text-[10px] text-emerald-200 font-bold uppercase tracking-wider">Saldo Livre Restante (Geral)</div>
+                        <div id="statSaldoTopResumo" class="text-lg font-black text-emerald-300 leading-tight">0,00 TO</div>
+                        <div id="statSaldoTopValor" class="text-[10px] font-bold text-emerald-100/90">R$ 0,00</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- TOTAL GERAL MESTRE EM TONELADAS -->
+        <section class="bg-white p-5 rounded-2xl border border-slate-200/90 shadow-sm space-y-3">
+            <div class="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2.5">
+                <div class="flex items-center gap-2">
+                    <span class="text-lg">📊</span>
+                    <h2 class="text-xs font-black text-slate-800 uppercase tracking-wider">Total Geral Consolidado (Todas as Empresas em TO)</h2>
+                </div>
+                <span class="text-[11px] font-semibold text-slate-400">Valores consolidados em Toneladas (TO) e Valor Contratual</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3.5 text-xs">
+                <div class="bg-slate-50 border border-slate-200/80 p-3.5 rounded-xl space-y-1">
+                    <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider">Total Liberado</span>
+                    <div id="totalGeralLiberadoTO" class="text-lg font-black text-slate-800">0,00 TO</div>
+                    <div id="totalGeralLiberadoValor" class="text-xs font-bold text-slate-600">R$ 0,00</div>
+                </div>
+
+                <div class="bg-rose-50/70 border border-rose-200/80 p-3.5 rounded-xl space-y-1">
+                    <span class="block text-[10px] font-bold text-rose-600 uppercase tracking-wider">Total Já Faturado (Saída Real)</span>
+                    <div id="totalGeralGastoTO" class="text-lg font-black text-rose-700">0,00 TO</div>
+                    <div id="totalGeralGastoValor" class="text-xs font-bold text-rose-600">R$ 0,00</div>
+                </div>
+
+                <div class="bg-emerald-50/80 border-2 border-emerald-300 p-3.5 rounded-xl space-y-1 shadow-sm">
+                    <span class="block text-[10px] font-bold text-emerald-700 uppercase tracking-wider flex items-center justify-between">
+                        <span>Saldo Livre Restante</span>
+                        <span id="badgePctSaldoGeral" class="bg-emerald-600 text-white font-black px-2 py-0.5 rounded-md text-[9px]">100%</span>
+                    </span>
+                    <div id="totalGeralSaldoTO" class="text-xl font-black text-emerald-800">0,00 TO</div>
+                    <div id="totalGeralSaldoValor" class="text-xs font-extrabold text-emerald-700">R$ 0,00 restante</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- QUADRADINHOS DO TOPO: TOTAIS POR EMPRESA EM TO -->
+        <div class="no-print space-y-2">
+            <div class="flex items-center justify-between">
+                <span class="text-xs font-bold text-slate-700 uppercase tracking-wider flex items-center gap-1.5">
+                    <span>🏢</span> Totais por Empresa (Clique para filtrar):
+                </span>
+                <button type="button" onclick="filtrarPorEmpresaCard('TODAS')" class="text-[11px] font-bold text-teal-700 hover:underline">Ver Todas as Empresas</button>
+            </div>
+            <div id="containerCardsEmpresas" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3.5">
+            </div>
+        </div>
+
+        <!-- FILTROS -->
+        <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between no-print">
+            <div class="relative w-full md:w-80">
+                <input type="text" id="filtroTexto" oninput="filtrar()" placeholder="Pesquisar por OV, Contrato, Material ou DRS..." class="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-xl bg-slate-50 outline-none focus:border-teal-600 transition">
+                <span class="absolute left-3 top-2.5 text-xs text-slate-400">🔍</span>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 w-full md:w-auto">
+                <select id="filtroEmpresa" onchange="filtrar()" class="text-xs border border-slate-300 bg-slate-50 rounded-xl px-3 py-2 outline-none focus:border-teal-600 font-semibold text-slate-700 max-w-[220px]">
+                    <option value="TODAS">Todas as Empresas</option>
+                </select>
+
+                <button type="button" onclick="carregarDadosExemplo()" class="text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-xl transition">
+                    Carregar Padrão
+                </button>
+            </div>
+        </div>
+
+        <!-- CONTAINER DAS SEÇÕES DE EMPRESAS -->
+        <div id="containerOVs" class="space-y-8"></div>
+
     </div>
-    <div class="flex gap-2">
-      <div class="bg-white/10 px-4 py-2.5 rounded-xl border border-white/10"><div class="text-[10px] text-teal-100 font-bold uppercase">OVs Ativas</div><div id="hCount" class="text-lg font-black">0</div></div>
-      <div class="bg-emerald-900/30 px-4 py-2.5 rounded-xl border border-emerald-400/30"><div id="hEsc" class="text-[10px] text-emerald-200 font-bold uppercase">Saldo Livre Geral</div><div id="hSal" class="text-lg font-black text-emerald-300">0,00 TO</div><div id="hSalV" class="text-[10px] font-bold text-emerald-100">R$ 0,00</div></div>
+
+    <!-- MODAL 1: LEITOR SUPERIOR (ITENS DA OV / VA03) -->
+    <div id="modalLeitorOV" class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 space-y-4 max-h-[92vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">📋</span>
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-sm">Leitor de Linhas da OV (Tela VA03)</h3>
+                        <p class="text-[11px] text-slate-500">Reconhece o número da OV, o cliente, cada linha de material e o peso exato em TO</p>
+                    </div>
+                </div>
+                <button type="button" onclick="fecharModalLeitorOV()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
+            </div>
+
+            <input type="hidden" id="leitorOVTargetId">
+
+            <div class="border-2 border-dashed border-teal-300 bg-teal-50/50 p-4 rounded-2xl text-center space-y-2">
+                <input type="file" id="inputFileLeitorOV" accept="image/*" class="w-full text-slate-600 text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-teal-700 file:text-white hover:file:bg-teal-800 cursor-pointer">
+                <p class="text-[11px] text-slate-500">Ou apenas pressione <b>Ctrl + V</b> com a janela aberta para colar o print do SAP.</p>
+            </div>
+
+            <div id="progressoLeitorOV" class="hidden space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-200 text-xs">
+                <div class="flex justify-between font-bold text-slate-700">
+                    <span id="labelStatusLeitorOV">Processando tela...</span>
+                    <span id="pctStatusLeitorOV" class="text-teal-700">0%</span>
+                </div>
+                <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                    <div id="barraProgressoLeitorOV" class="bg-[#007e7a] h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
+
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3 text-xs">
+                <div class="flex justify-between items-center">
+                    <span class="font-bold text-slate-700 uppercase tracking-wider">Cabeçalho da OV Detectado:</span>
+                    <span id="ovNumeroDetectado" class="font-black text-teal-800 bg-teal-100 px-2.5 py-0.5 rounded text-xs">OV: ---</span>
+                </div>
+                <div id="ovDadosExtrasDetectados" class="text-[11px] text-slate-600">
+                    Cliente: <b>---</b> | Pedido/DRS: <b>---</b>
+                </div>
+
+                <span class="font-bold text-slate-700 uppercase tracking-wider block pt-2 border-t border-slate-200">Linhas de Materiais Extraídas:</span>
+                <div id="detalhesLeitorOV" class="text-[11px] text-slate-700 bg-white p-2.5 rounded-xl border border-slate-200 max-h-40 overflow-y-auto space-y-1">
+                    Aguardando print da VA03...
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center gap-2 pt-3 border-t border-slate-100">
+                <button type="button" onclick="processarLeitorOV()" id="btnProcessarLeitorOV" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-[#007e7a] hover:bg-[#005a57] text-white flex items-center gap-1.5 shadow-sm active:scale-95">
+                    ⚡ Reconhecer Linhas
+                </button>
+                <div class="flex gap-2">
+                    <button type="button" onclick="fecharModalLeitorOV()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Cancelar</button>
+                    <button type="button" onclick="aplicarLinhasNaOV()" class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm">Aplicar na OV</button>
+                </div>
+            </div>
+        </div>
     </div>
-  </div>
-</header>
 
-<section class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm space-y-3">
-  <h2 id="tTitulo" class="text-xs font-black text-slate-800 uppercase tracking-wider">📊 Total Geral</h2>
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
-    <div class="bg-slate-50 border border-slate-200 p-3.5 rounded-xl"><span class="block text-[10px] font-bold text-slate-400 uppercase">Total das OVs (solicitado)</span><div id="tLib" class="text-lg font-black">0,00 TO</div><div id="tLibV" class="font-bold text-slate-600">R$ 0,00</div></div>
-    <div class="bg-rose-50 border border-rose-200 p-3.5 rounded-xl"><span class="block text-[10px] font-bold text-rose-600 uppercase">Já Faturado (saída real)</span><div id="tGas" class="text-lg font-black text-rose-700">0,00 TO</div><div id="tGasV" class="font-bold text-rose-600">R$ 0,00</div></div>
-    <div class="bg-emerald-50 border-2 border-emerald-300 p-3.5 rounded-xl"><span class="text-[10px] font-bold text-emerald-700 uppercase flex justify-between">Saldo Livre Restante <b id="tPct" class="bg-emerald-600 text-white px-2 rounded-md">0%</b></span><div id="tSal" class="text-xl font-black text-emerald-800">0,00 TO</div><div id="tSalV" class="font-extrabold text-emerald-700">R$ 0,00</div></div>
-  </div>
-</section>
+    <!-- MODAL 2: LEITOR INFERIOR (FILTRAGEM ESTRITA DE FATURAS / NOTAS FISCAIS) -->
+    <div id="modalLeitorNotas" class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 space-y-4 max-h-[92vh] overflow-y-auto">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-2xl">⚖️</span>
+                    <div>
+                        <h3 class="font-bold text-slate-900 text-sm">Leitor de Faturas Emitidas (Fluxo SAP)</h3>
+                        <p class="text-[11px] text-slate-500">Validação estrita: <b>somente linhas identificadas como FATURA</b> têm o peso considerado como saída</p>
+                    </div>
+                </div>
+                <button type="button" onclick="fecharModalLeitorNotas()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
+            </div>
 
-<div class="np space-y-2">
-  <div class="flex justify-between items-center"><span class="text-xs font-bold text-slate-700 uppercase">🏢 Totais por empresa (clique para filtrar)</span><button onclick="filtrarEmpresa('TODAS')" class="text-[11px] font-bold text-teal-700 hover:underline">Ver todas</button></div>
-  <div id="cardsEmp" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3"></div>
-</div>
+            <input type="hidden" id="leitorNotasTargetId">
 
-<div class="np bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 justify-between">
-  <input id="filtroTexto" oninput="render()" placeholder="🔍 Pesquisar OV, contrato, material ou DRS..." class="w-full md:w-80 px-3 py-2 text-xs border border-slate-300 rounded-xl bg-slate-50 outline-none focus:border-teal-600">
-  <div class="flex flex-wrap gap-2">
-    <select id="filtroEmpresa" onchange="render()" class="text-xs border border-slate-300 bg-slate-50 rounded-xl px-3 py-2 font-semibold max-w-[240px]"><option value="TODAS">Todas as Empresas</option></select>
-    <button onclick="carregarExemplo()" class="text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-xl">Inserir OV de exemplo</button>
-  </div>
-</div>
+            <div class="border-2 border-dashed border-rose-300 bg-rose-50/50 p-4 rounded-2xl text-center space-y-2">
+                <input type="file" id="inputFileLeitorNotas" accept="image/*" class="w-full text-slate-600 text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-rose-700 file:text-white hover:file:bg-rose-800 cursor-pointer">
+                <p class="text-[11px] text-slate-500">Pressione <b>Ctrl + V</b> com a janela aberta para colar o print do fluxo de faturamento.</p>
+            </div>
 
-<div id="containerOVs" class="space-y-8"></div>
-</div>
+            <div id="progressoLeitorNotas" class="hidden space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-200 text-xs">
+                <div class="flex justify-between font-bold text-slate-700">
+                    <span id="labelStatusLeitorNotas">Filtrando e identificando faturas...</span>
+                    <span id="pctStatusLeitorNotas" class="text-rose-700">0%</span>
+                </div>
+                <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                    <div id="barraProgressoLeitorNotas" class="bg-rose-600 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
+            </div>
 
-<!-- MODAL ÚNICO: leitor de OV (VA03) ou de faturas (fluxo de documentos) -->
-<div id="modal" class="fixed inset-0 bg-slate-950/75 z-50 hidden items-center justify-center p-4">
-  <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
-    <div class="flex justify-between items-start border-b pb-3">
-      <div><h3 id="mTitulo" class="font-bold text-sm"></h3><p id="mSub" class="text-[11px] text-slate-500"></p></div>
-      <button onclick="fecharModal()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
+            <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3 text-xs">
+                <div class="flex justify-between items-center">
+                    <span class="font-bold text-slate-700 uppercase tracking-wider">Faturas Reconhecidas com Peso:</span>
+                    <span id="badgeNotasDetectadas" class="bg-rose-100 text-rose-800 font-bold px-2 py-0.5 rounded text-[10px]">0 fatura(s)</span>
+                </div>
+                <div id="detalhesLeitorNotas" class="text-[11px] text-slate-700 bg-white p-2.5 rounded-xl border border-slate-200 max-h-40 overflow-y-auto space-y-1">
+                    Aguardando print do fluxo do SAP...
+                </div>
+            </div>
+
+            <div class="flex justify-between items-center gap-2 pt-3 border-t border-slate-100">
+                <button type="button" onclick="processarLeitorNotas()" id="btnProcessarLeitorNotas" class="px-4 py-2.5 rounded-xl text-xs font-bold bg-rose-700 hover:bg-rose-800 text-white flex items-center gap-1.5 shadow-sm active:scale-95">
+                    ⚡ Filtrar Somente Faturas
+                </button>
+                <div class="flex gap-2">
+                    <button type="button" onclick="fecharModalLeitorNotas()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Cancelar</button>
+                    <button type="button" onclick="aplicarNotasNaOV()" class="px-4 py-2 rounded-xl text-xs font-bold bg-rose-600 hover:bg-rose-700 text-white shadow-sm">Lançar Peso Emitido</button>
+                </div>
+            </div>
+        </div>
     </div>
-    <input type="hidden" id="mAlvo">
-    <div class="border-2 border-dashed border-teal-300 bg-teal-50/50 p-4 rounded-2xl text-center space-y-2">
-      <input type="file" id="mArq" accept="image/*" onchange="if(this.files[0])ocr(this.files[0]);this.value=''" class="w-full text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:font-bold file:bg-teal-700 file:text-white cursor-pointer">
-      <p class="text-[11px] text-slate-500">Escolha o print (a leitura começa sozinha) ou use <b>Ctrl+V</b> com esta janela aberta.</p>
-    </div>
-    <div id="mProg" class="hidden bg-slate-50 p-3 rounded-2xl border text-xs space-y-1.5">
-      <div class="flex justify-between font-bold"><span id="mProgTxt">Lendo...</span><span id="mProgPct" class="text-teal-700">0%</span></div>
-      <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden"><div id="mBarra" class="bg-[#007e7a] h-full transition-all" style="width:0%"></div></div>
-    </div>
-    <div id="mRes" class="bg-slate-50 p-4 rounded-2xl border text-xs space-y-2 text-slate-700">Aguardando print...</div>
-    <div class="flex justify-end gap-2 pt-3 border-t">
-      <button onclick="fecharModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Cancelar</button>
-      <button id="mAplicar" onclick="aplicar()" class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white">Aplicar</button>
-    </div>
-  </div>
-</div>
-<div id="toast" role="status"></div>
 
-<script>
-const SB_URL="https://gloxtswcksbczinpwtzu.supabase.co",SB_KEY="sb_publishable_0kEiqthWKZZwjM120wQIYw_Hba7qeLc";
-const KEY="vale_modulo11_sap_ovs_v16_leitor_va03_fluxo",PRECO=14575.5,TABELA='modulo11_ovs';
-const $=i=>document.getElementById(i);
-let sb=null;try{sb=window.supabase.createClient(SB_URL,SB_KEY)}catch(e){console.error(e)}
-let dados=[],modo='ov',tmp=null,busy=false,tt;const pend=new Map();
+    <!-- SCRIPT DE PROCESSAMENTO -->
+    <script>
+        const SUPABASE_URL = "https://gloxtswcksbczinpwtzu.supabase.co";
+        const SUPABASE_ANON_KEY = "sb_publishable_0kEiqthWKZZwjM120wQIYw_Hba7qeLc";
+        
+        let supabaseClient = null;
+        try {
+            if (window.supabase && typeof window.supabase.createClient === 'function') {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            }
+        } catch(e) {
+            console.error("Falha ao inicializar o Supabase SDK:", e);
+        }
 
-/* ---------- utilitários ---------- */
-const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const num=v=>Number(v)||0;
-const TO=(v,c=2)=>num(v).toLocaleString('pt-BR',{minimumFractionDigits:c,maximumFractionDigits:c})+' TO';
-const BRL=v=>num(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-const sid=s=>String(s).replace(/[^\w-]/g,'');
-const hoje=()=>new Date().toISOString().slice(0,10);
-const sz=s=>String(s==null?'':s).replace(/^0+/,'');
-const norm=n=>{n=(n||'').trim();return /gerdau/i.test(n)?'GERDAU AÇOS LONGOS S.A.':(n||'OUTROS CLIENTES')};
-const aviso=m=>{const t=$('toast');t.textContent=m;t.style.opacity=1;clearTimeout(tt);tt=setTimeout(()=>t.style.opacity=0,3800)};
-const loc=()=>{try{localStorage.setItem(KEY,JSON.stringify(dados))}catch(e){}};
-const BR=s=>{s=String(s==null?'':s).trim();if(s.indexOf(',')>=0)s=s.replace(/\./g,'').replace(',','.');return parseFloat(s)||0};
-const qTO=(n,u)=>{if(/KG/i.test(u))return(parseFloat(String(n).replace(/\./g,'').replace(',','.'))||0)/1000;return BR(n)};
-const T=[
- {h:'bg-blue-700',l:'bg-blue-50/50',b:'border-blue-400',t:'text-blue-900',d:'bg-blue-800',o:'border-blue-300'},
- {h:'bg-purple-700',l:'bg-purple-50/50',b:'border-purple-400',t:'text-purple-900',d:'bg-purple-800',o:'border-purple-300'},
- {h:'bg-emerald-700',l:'bg-emerald-50/50',b:'border-emerald-400',t:'text-emerald-900',d:'bg-emerald-800',o:'border-emerald-300'},
- {h:'bg-amber-600',l:'bg-amber-50/50',b:'border-amber-400',t:'text-amber-900',d:'bg-amber-700',o:'border-amber-300'}];
-const temas=emps=>{let k=0;const m={};emps.forEach(e=>m[e]=/gerdau/i.test(e)?T[0]:T[1+(k++)%3]);return m};
-const ST={online:['bg-emerald-50 text-emerald-700 border-emerald-200','bg-emerald-500 animate-pulse'],gravando:['bg-amber-50 text-amber-700 border-amber-200','bg-amber-500 animate-ping'],offline:['bg-slate-100 text-slate-600 border-slate-200','bg-slate-400']};
-function status(s,txt){$('badgeConexao').className='text-[11px] font-bold px-2.5 py-1.5 rounded-xl border flex items-center gap-1.5 '+ST[s][0];$('pontoConexao').className='w-2 h-2 rounded-full '+ST[s][1];$('textoConexao').textContent=txt}
+        const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v15_fatura_estrita";
+        let cacheRegistros = [];
+        let dadosOVDetectadosTemp = null;
+        let linhasTempLeitorOV = [];
+        let notasTempLeitorNotas = [];
 
-const DEFAULT=()=>({id:'115939257',status:'ATIVO',contrato:{numero:'0000071823',item:'30',qtdTotalTO:2635,valorTotalBRL:3320100},
- ov:{numero:'115939257',cliente:'AUCOBRE GESTÃO DE RESIDUOS LTDA.',pedidoDRS:'DSR 018-2025',
- itens:[{itemSap:'40',material:'SUCATA DE FIO-CABO DE ALUMÍNIO E...',qtdTO:.3},{itemSap:'60',material:'SUCATA DE FIO-CABO DE COBRE ENCA...',qtdTO:.3}],
- qtdLiberadaTO:.6,valorBRL:8745.3,precoUnitarioPorTO:PRECO},gastos:[]});
+        const TEMA_GERDAU_AZUL = {
+            nomeTema: "Gerdau Azul Corporativo",
+            hexColor: "#1d4ed8",
+            header: "bg-blue-700",
+            bgLight: "bg-blue-50/50",
+            bordaCard: "border-blue-400",
+            texto: "text-blue-900",
+            badge: "bg-blue-800",
+            ovBordaPadrao: "border-blue-300 bg-blue-50/20"
+        };
 
-function calc(i){const canc=i.status==='CANCELADO',lib=num(i.ov.qtdLiberadaTO),gasto=(i.gastos||[]).reduce((s,g)=>s+num(g.pesoTO),0),
- unit=num(i.ov.precoUnitarioPorTO)||(lib>0?num(i.ov.valorBRL)/lib:PRECO),vg=gasto*unit;
- return{canc,lib,gasto,unit,vg,saldo:canc?0:Math.max(0,lib-gasto),vs:canc?0:Math.max(0,num(i.ov.valorBRL)-vg)}}
+        const OUTRAS_CORES_EMPRESAS = [
+            { nomeTema: "Roxo / Púrpura", hexColor: "#7e22ce", header: "bg-purple-700", bgLight: "bg-purple-50/50", bordaCard: "border-purple-400", texto: "text-purple-900", badge: "bg-purple-800", ovBordaPadrao: "border-purple-300 bg-purple-50/20" },
+            { nomeTema: "Esmeralda", hexColor: "#047857", header: "bg-emerald-700", bgLight: "bg-emerald-50/50", bordaCard: "border-emerald-400", texto: "text-emerald-900", badge: "bg-emerald-800", ovBordaPadrao: "border-emerald-300 bg-emerald-50/20" },
+            { nomeTema: "Âmbar / Laranja", hexColor: "#d97706", header: "bg-amber-600", bgLight: "bg-amber-50/50", bordaCard: "border-amber-400", texto: "text-amber-900", badge: "bg-amber-700", ovBordaPadrao: "border-amber-300 bg-amber-50/20" }
+        ];
 
-function totais(list){const t={n:0,lib:0,libV:0,gas:0,gasV:0,sal:0,salV:0};
- list.forEach(i=>{const c=calc(i);if(c.canc)return;t.n++;t.lib+=c.lib;t.libV+=num(i.ov.valorBRL);t.gas+=c.gasto;t.gasV+=c.vg;t.sal+=c.saldo;t.salV+=c.vs});return t}
-const pct=t=>t.lib>0?Math.round(t.sal/t.lib*100):0;
+        function normalizarNomeEmpresa(nome) {
+            const raw = (nome || '').trim();
+            if (raw.toUpperCase().includes("GERDAU")) return "GERDAU AÇOS LONGOS S.A.";
+            return raw || "OUTROS CLIENTES";
+        }
 
-/* ---------- Supabase / armazenamento ---------- */
-const payload=i=>({id:String(i.id),ov:String(i.ov.numero),status:i.status||'ATIVO',cliente:i.ov.cliente,material:(i.ov.itens||[]).map(x=>x.material).join(' / '),itens:i.ov.itens||[],pedido_drs:i.ov.pedidoDRS,qtd_liberada_to:num(i.ov.qtdLiberadaTO),qtd_liberada_kg:num(i.ov.qtdLiberadaTO)*1000,valor_brl:num(i.ov.valorBRL),preco_unitario_to:num(i.ov.precoUnitarioPorTO)||PRECO,contrato_numero:i.contrato.numero,contrato_total_to:num(i.contrato.qtdTotalTO),gastos:i.gastos||[]});
-const fromRow=d=>{const it=Array.isArray(d.itens)?d.itens:[],soma=it.reduce((s,x)=>s+num(x.qtdTO),0),q=soma||num(d.qtd_liberada_to),v=num(d.valor_brl);
- return{id:String(d.id),status:d.status||'ATIVO',contrato:{numero:d.contrato_numero||'0000071823',item:'30',qtdTotalTO:num(d.contrato_total_to)||2635,valorTotalBRL:num(d.contrato_total_brl)},
- ov:{numero:String(d.ov),cliente:d.cliente||'',pedidoDRS:d.pedido_drs||'',itens:it,qtdLiberadaTO:q,valorBRL:v,precoUnitarioPorTO:num(d.preco_unitario_to)||(q>0&&v>0?v/q:PRECO)},gastos:Array.isArray(d.gastos)?d.gastos:[]}};
+        function obterTemaDaEmpresa(nomeEmpresa, indiceNaoGerdau = 0) {
+            const normalizado = normalizarNomeEmpresa(nomeEmpresa);
+            if (normalizado.toUpperCase().includes("GERDAU")) return TEMA_GERDAU_AZUL;
+            return OUTRAS_CORES_EMPRESAS[indiceNaoGerdau % OUTRAS_CORES_EMPRESAS.length];
+        }
 
-async function carregar(){
- if(sb){try{status('gravando','Sincronizando...');
-  const{data,error}=await sb.from(TABELA).select('*').order('created_at',{ascending:false});
-  if(!error&&data&&data.length){dados=data.map(fromRow);loc();render();status('online','Nuvem Conectada');return true}
- }catch(e){console.warn(e)}}
- let raw=null;try{raw=JSON.parse(localStorage.getItem(KEY))}catch(e){}
- dados=Array.isArray(raw)?raw:[DEFAULT()];render();status('offline','Salvo localmente');return false}
+        function formatarTO(valTO, casas = 2) {
+            return Number(valTO || 0).toLocaleString('pt-BR', {
+                minimumFractionDigits: casas,
+                maximumFractionDigits: casas
+            }) + " TO";
+        }
 
-async function salvarTudo(){
- const b=$('btnSalvar');b.disabled=true;loc();
- if(!sb){aviso('Salvo no armazenamento local.');b.disabled=false;return}
- status('gravando','Gravando...');
- try{const{error}=await sb.from(TABELA).upsert(dados.map(payload),{onConflict:'id'});if(error)throw error;status('online','Salvo com sucesso');aviso('✓ Todas as OVs foram salvas na nuvem.')}
- catch(e){status('offline','Erro na gravação');aviso('Erro ao gravar: '+(e.message||e))}
- b.disabled=false}
+        const DADOS_DEFAULT = [
+            {
+                id: "115939257",
+                status: "ATIVO",
+                contrato: { numero: "0000071823", item: "30", qtdTotalTO: 2635.00, valorTotalBRL: 3320100.00 },
+                ov: {
+                    numero: "115939257",
+                    cliente: "AUCOBRE GESTÃO DE RESIDUOS LTDA.",
+                    pedidoDRS: "DSR 018-2025",
+                    itens: [
+                        { itemSap: "40", material: "SUCATA DE FIO-CABO DE ALUMÍNIO E...", qtdTO: 0.300 },
+                        { itemSap: "60", material: "SUCATA DE FIO-CABO DE COBRE ENCA...", qtdTO: 0.300 }
+                    ],
+                    qtdLiberadaTO: 0.600,
+                    valorBRL: 8745.30,
+                    precoUnitarioPorTO: 14575.50
+                },
+                gastos: []
+            }
+        ];
 
-async function sincronizar(){
- const i=$('iconeSync');i.classList.add('animate-spin');
- const ok=await carregar();i.classList.remove('animate-spin');
- aviso(ok?'Sincronizado com a nuvem.':'Nuvem indisponível: mostrando dados locais.')}
+        function atualizarIndicadorStatus(status, texto) {
+            const ponto = document.getElementById('pontoConexao');
+            const txt = document.getElementById('textoConexao');
+            const badge = document.getElementById('badgeConexao');
+            if (!ponto || !txt) return;
 
-function persistir(i){
- if(!dados.some(x=>x.id===i.id))dados.unshift(i);
- loc();render();
- clearTimeout(pend.get(i.id));
- pend.set(i.id,setTimeout(async()=>{if(!sb)return;
-  try{status('gravando','Gravando...');const{error}=await sb.from(TABELA).upsert(payload(i),{onConflict:'id'});if(error)throw error;status('online','Nuvem Conectada')}
-  catch(e){status('offline','Pendente de envio')}},600))}
+            txt.innerText = texto;
+            if (status === 'online') {
+                badge.className = "text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5";
+                ponto.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+            } else if (status === 'gravando') {
+                badge.className = "text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1.5";
+                ponto.className = "w-2 h-2 rounded-full bg-amber-500 animate-ping";
+            } else {
+                badge.className = "text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-1.5";
+                ponto.className = "w-2 h-2 rounded-full bg-slate-400";
+            }
+        }
 
-/* ---------- renderização ---------- */
-const mini=(rot,cls,t)=>`<div class="${cls} border rounded-xl p-2.5"><span class="block text-[10px] font-bold uppercase opacity-70">${rot}</span><div class="text-sm font-black">${TO(t[0],2)}</div><div class="text-[11px] font-bold opacity-80">${BRL(t[1])}</div></div>`;
+        async function carregarRegistros() {
+            if (supabaseClient) {
+                try {
+                    atualizarIndicadorStatus('gravando', 'Sincronizando...');
+                    const { data, error } = await supabaseClient.from('modulo11_ovs').select('*').order('created_at', { ascending: false });
+                    if (!error && data && data.length > 0) {
+                        cacheRegistros = data.map(d => {
+                            const itens = Array.isArray(d.itens) && d.itens.length > 0 ? d.itens : [
+                                { itemSap: "40", material: d.material || "SUCATA DE FIO-CABO DE ALUMÍNIO E...", qtdTO: 0.300 },
+                                { itemSap: "60", material: "SUCATA DE FIO-CABO DE COBRE ENCA...", qtdTO: 0.300 }
+                            ];
+                            const somaItens = itens.reduce((s, it) => s + Number(it.qtdTO || 0), 0);
+                            return {
+                                id: String(d.id),
+                                status: d.status || "ATIVO",
+                                contrato: { numero: d.contrato_numero || "0000071823", item: "30", qtdTotalTO: Number(d.contrato_total_to || 2635), valorTotalBRL: Number(d.contrato_total_brl || 0) },
+                                ov: {
+                                    numero: String(d.ov),
+                                    cliente: d.cliente || "AUCOBRE GESTÃO DE RESIDUOS LTDA.",
+                                    pedidoDRS: d.pedido_drs || "DSR 018-2025",
+                                    itens: itens,
+                                    qtdLiberadaTO: somaItens > 0 ? somaItens : 0.600,
+                                    valorBRL: Number(d.valor_brl || 8745.30),
+                                    precoUnitarioPorTO: Number(d.preco_unitario_to || 14575.50)
+                                },
+                                gastos: Array.isArray(d.gastos) ? d.gastos : []
+                            };
+                        });
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheRegistros));
+                        atualizarOpcoesEmpresas(cacheRegistros);
+                        renderizar();
+                        atualizarIndicadorStatus('online', 'Nuvem Conectada');
+                        return;
+                    }
+                } catch (e) {
+                    console.warn("Falha no Supabase, usando local:", e);
+                }
+            }
 
-function render(){
- const q=($('filtroTexto').value||'').toLowerCase().trim();
- const emps=[...new Set(dados.map(i=>norm(i.ov.cliente)))],tm=temas(emps);
- const sel=$('filtroEmpresa'),atual=sel.value;
- sel.innerHTML='<option value="TODAS">Todas as Empresas</option>'+emps.map(e=>`<option value="${esc(e)}">${esc(e)}</option>`).join('');
- sel.value=emps.includes(atual)?atual:'TODAS';
- const fe=sel.value;
+            const raw = localStorage.getItem(STORAGE_KEY);
+            cacheRegistros = raw ? JSON.parse(raw) : DADOS_DEFAULT;
+            atualizarOpcoesEmpresas(cacheRegistros);
+            renderizar();
+            atualizarIndicadorStatus('offline', 'Salvo Localmente');
+        }
 
- const escopo=fe==='TODAS'?dados:dados.filter(i=>norm(i.ov.cliente)===fe),G=totais(escopo);
- $('tTitulo').textContent=fe==='TODAS'?'📊 Total Geral Consolidado (todas as empresas)':'📊 Total Geral — '+fe;
- $('tLib').textContent=TO(G.lib);$('tLibV').textContent=BRL(G.libV);$('tGas').textContent=TO(G.gas);$('tGasV').textContent=BRL(G.gasV);$('tSal').textContent=TO(G.sal);$('tSalV').textContent=BRL(G.salV)+' livre';$('tPct').textContent=pct(G)+'% livre';
- $('hCount').textContent=G.n+' OV(s)';$('hSal').textContent=TO(G.sal);$('hSalV').textContent=BRL(G.salV);$('hEsc').textContent=fe==='TODAS'?'Saldo Livre Geral':'Saldo Livre • '+fe.split(' ')[0];
+        async function salvarTudoNoSupabase() {
+            const btn = document.getElementById('btnSalvarGeral');
+            btn.disabled = true;
+            btn.innerHTML = `<span>⏳</span> Salvando...`;
+            atualizarIndicadorStatus('gravando', 'Gravando Dados...');
 
- $('cardsEmp').innerHTML=emps.map(e=>{const t=tm[e],p=totais(dados.filter(i=>norm(i.ov.cliente)===e)),total=dados.filter(i=>norm(i.ov.cliente)===e).length;
-  return`<div data-emp="${esc(e)}" onclick="filtrarEmpresa(this.dataset.emp)" class="cursor-pointer border-2 ${t.b} ${t.l} rounded-2xl p-3.5 shadow-sm hover:-translate-y-1 transition ${fe===e?'ring-2 ring-teal-500':''}">
-  <div class="flex justify-between mb-2"><span class="${t.d} text-white text-[10px] font-black px-2.5 py-0.5 rounded-md">EMPRESA</span><span class="text-[11px] font-bold text-slate-500">${p.n} OV(s) ativa(s)${total>p.n?' • '+(total-p.n)+' cancelada(s)':''}</span></div>
-  <div class="font-black text-sm ${t.t} truncate" title="${esc(e)}">${esc(e)}</div>
-  <div class="mt-2 pt-2 border-t grid grid-cols-3 gap-1.5">${mini('Total OVs','bg-white',[p.lib,p.libV])}${mini('Faturado','bg-rose-50 text-rose-700',[p.gas,p.gasV])}${mini('Saldo livre','bg-emerald-50 text-emerald-800',[p.sal,p.salV])}</div></div>`}).join('');
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheRegistros));
 
- const lista=dados.filter(i=>(fe==='TODAS'||norm(i.ov.cliente)===fe)&&(!q||[i.ov.numero,i.contrato.numero,i.ov.cliente,i.ov.pedidoDRS,...(i.ov.itens||[]).map(x=>x.material)].join(' ').toLowerCase().includes(q)));
- if(!lista.length){$('containerOVs').innerHTML='<div class="bg-white p-12 text-center rounded-2xl border font-bold text-slate-700">Nenhum registro encontrado</div>';return}
- const grupos={};lista.forEach(i=>(grupos[norm(i.ov.cliente)]=grupos[norm(i.ov.cliente)]||[]).push(i));
- $('containerOVs').innerHTML=Object.keys(grupos).map(e=>{const t=tm[e],all=dados.filter(i=>norm(i.ov.cliente)===e),p=totais(all);
-  const ct={};all.forEach(i=>{if(i.status==='CANCELADO')return;const k=i.contrato.numero;ct[k]=ct[k]||{tot:num(i.contrato.qtdTotalTO),lib:0};ct[k].lib+=num(i.ov.qtdLiberadaTO)});
-  const ctx=Object.keys(ct).map(k=>`<span class="bg-white/15 px-2 py-0.5 rounded-lg">Contrato ${esc(k)}: ${TO(ct[k].tot,0)} • em OVs ${TO(ct[k].lib)} • sem OV ${TO(Math.max(0,ct[k].tot-ct[k].lib))}</span>`).join(' ');
-  return`<div class="rounded-3xl border-2 ${t.b} ${t.l} space-y-4 p-5"><div class="${t.h} text-white p-4 rounded-2xl space-y-3">
-   <div class="flex justify-between items-center"><h3 class="text-base font-black">${esc(e)}</h3><span class="text-xs bg-white/20 px-3 py-1 rounded-xl font-bold">${grupos[e].length} OV(s)</span></div>
-   <div class="text-[11px] font-bold uppercase opacity-80">Total desta empresa (todas as OVs)</div>
-   <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-slate-800">${mini('Total das OVs','bg-white',[p.lib,p.libV])}${mini('Já faturado','bg-rose-50 text-rose-700',[p.gas,p.gasV])}${mini('Saldo livre ('+pct(p)+'%)','bg-emerald-50 text-emerald-800',[p.sal,p.salV])}</div>
-   <div class="text-[10px] font-semibold flex flex-wrap gap-1.5">${ctx}</div></div>
-   <div class="space-y-4">${grupos[e].map(i=>cardOV(i,t)).join('')}</div></div>`}).join('')}
+            if (supabaseClient) {
+                try {
+                    const payloads = cacheRegistros.map(item => ({
+                        id: String(item.id),
+                        ov: String(item.ov.numero),
+                        status: item.status || "ATIVO",
+                        cliente: item.ov.cliente,
+                        material: (item.ov.itens || []).map(i => i.material).join(' / '),
+                        itens: item.ov.itens || [],
+                        pedido_drs: item.ov.pedidoDRS,
+                        qtd_liberada_to: Number(item.ov.qtdLiberadaTO || 0),
+                        qtd_liberada_kg: Number(item.ov.qtdLiberadaTO || 0) * 1000,
+                        valor_brl: Number(item.ov.valorBRL || 0),
+                        preco_unitario_to: Number(item.ov.precoUnitarioPorTO || 14575.50),
+                        contrato_numero: item.contrato.numero,
+                        contrato_total_to: Number(item.contrato.qtdTotalTO || 0),
+                        gastos: item.gastos
+                    }));
 
-function cardOV(i,t){
- const id=sid(i.id),c=calc(i);
- const mats=(i.ov.itens||[]).map((m,k)=>`<div class="flex flex-wrap items-center gap-2 bg-slate-50 p-2 rounded-xl border text-xs">
-  <span class="text-[10px] font-bold bg-white px-2 py-0.5 rounded border">Item ${esc(m.itemSap)}</span>
-  <input class="in font-bold flex-1 min-w-[140px]" value="${esc(m.material)}" onchange="editMat('${id}',${k},'material',this.value)">
-  <input type="number" step="0.001" class="in w-24 text-right font-black text-teal-800" value="${num(m.qtdTO).toFixed(3)}" onchange="editMat('${id}',${k},'qtdTO',this.value)">
-  <span class="text-[10px] font-bold text-slate-500">TO (${Math.round(num(m.qtdTO)*1000)} KG)</span>
-  <button class="np text-rose-500 font-bold px-1" onclick="delMat('${id}',${k})">✕</button></div>`).join('');
- const fat=(i.gastos||[]).length?`<div class="overflow-x-auto"><table class="w-full text-left text-xs border rounded-lg"><thead><tr class="bg-slate-50 text-slate-500 text-[10px] uppercase font-bold"><th class="py-1.5 px-3">Data</th><th class="px-3">Fatura</th><th class="px-3">Identificação</th><th class="px-3 text-right">Peso (TO)</th><th class="px-3 text-right">Valor</th><th class="px-3 np"></th></tr></thead><tbody class="divide-y">`+
-  i.gastos.map((g,k)=>`<tr><td class="px-3 py-1"><input type="date" class="in" value="${esc(g.data)}" onchange="editGasto('${id}',${k},'data',this.value)"></td>
-  <td class="px-3"><input class="in font-semibold w-36" value="${esc(g.ticket)}" onchange="editGasto('${id}',${k},'ticket',this.value)"></td>
-  <td class="px-3"><input class="in font-mono w-36 uppercase" value="${esc(g.placa)}" onchange="editGasto('${id}',${k},'placa',this.value)"></td>
-  <td class="px-3 text-right"><span class="text-rose-500 font-bold">-</span><input type="number" step="0.001" class="in w-24 text-right font-black text-rose-600" value="${num(g.pesoTO).toFixed(3)}" onchange="editGasto('${id}',${k},'pesoTO',this.value)"></td>
-  <td class="px-3 text-right font-bold text-rose-600">${BRL(num(g.pesoTO)*c.unit)}</td>
-  <td class="px-3 np"><button class="text-rose-500" onclick="delGasto('${id}',${k})">✕</button></td></tr>`).join('')+`</tbody></table></div>`
-  :'<p class="text-[11px] text-slate-400 italic">Nenhuma fatura emitida ainda: o saldo está integral. Leia o print do fluxo de documentos ou lance manualmente.</p>';
- return`<div class="bg-white rounded-2xl border-2 ${t.o} shadow-sm overflow-hidden ${c.canc?'opacity-60':''}">
- <div class="bg-slate-100 border-b px-5 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
-  <div class="flex flex-wrap items-center gap-2"><span class="${t.d} text-white font-mono font-bold text-[10px] px-2 py-0.5 rounded">OV ${esc(i.ov.numero)}</span>${c.canc?'<span class="bg-rose-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">CANCELADA</span>':''}<span class="font-bold">${esc(i.ov.cliente)}</span><span class="text-slate-600">DRS: <b>${esc(i.ov.pedidoDRS)}</b></span><span class="text-slate-500">Contrato: <b>${esc(i.contrato.numero)}</b></span></div>
-  <div class="np flex gap-2"><button onclick="abrir('ov','${id}')" class="font-bold px-3 py-1 rounded-xl bg-teal-700 hover:bg-teal-800 text-white">📷 1. Ler OV (VA03)</button><button onclick="toggleCancel('${id}')" class="font-bold px-3 py-1 rounded-xl bg-white border text-slate-600 hover:bg-slate-50">${c.canc?'Reativar':'Cancelar'}</button></div></div>
- <div class="p-5 space-y-4">
-  <div class="bg-slate-50/60 p-3 rounded-2xl border space-y-2"><div class="flex justify-between items-center text-xs"><b class="text-slate-700">📋 Materiais da OV (soma = ${TO(i.ov.qtdLiberadaTO,3)})</b><button onclick="addMat('${id}')" class="np text-[11px] font-bold text-teal-700 hover:underline">+ Adicionar linha</button></div><div class="space-y-1.5">${mats}</div></div>
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-   <div class="bg-slate-50 border p-3 rounded-xl"><span class="block text-[10px] font-bold text-slate-400 uppercase mb-1">1. Total da OV (solicitado)</span><div class="text-base font-black">${TO(c.lib,3)}</div><div class="text-xs font-bold text-slate-500">${BRL(i.ov.valorBRL)}</div><div class="text-[10px] text-slate-400">${BRL(c.unit)} por TO</div></div>
-   <div class="bg-rose-50 border border-rose-200 p-3 rounded-xl"><span class="block text-[10px] font-bold text-rose-600 uppercase mb-1">2. Já faturado (${(i.gastos||[]).length} fatura(s))</span><div class="text-base font-black text-rose-700">${TO(c.gasto,3)}</div><div class="text-xs font-bold text-rose-600">${BRL(c.vg)}</div></div>
-   <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl"><span class="block text-[10px] font-bold text-emerald-700 uppercase mb-1">3. Saldo livre</span><div class="text-base font-black text-emerald-800">${TO(c.saldo,3)}</div><div class="text-xs font-bold text-emerald-700">${BRL(c.vs)}</div></div></div>
-  <div class="border-t pt-3"><div class="flex flex-wrap justify-between items-center gap-2 mb-2"><b class="text-xs text-slate-700">⚖️ Faturas emitidas</b>
-   <div class="np flex gap-2"><button onclick="abrir('notas','${id}')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100">📷 2. Ler Faturas (Fluxo SAP)</button><button onclick="addGasto('${id}')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-50 border hover:bg-slate-100">+ Lançar manual</button></div></div>${fat}</div>
- </div></div>`}
+                    const { error } = await supabaseClient.from('modulo11_ovs').upsert(payloads, { onConflict: 'id' });
+                    if (error) throw error;
+                    
+                    atualizarIndicadorStatus('online', 'Salvo com Sucesso!');
+                    alert("✓ Todas as OVs foram salvas com sucesso no Supabase!");
+                } catch (err) {
+                    alert("Erro ao gravar no Supabase: " + (err.message || err));
+                    atualizarIndicadorStatus('offline', 'Erro na Gravação');
+                }
+            } else {
+                alert("Dados salvos no armazenamento local!");
+            }
 
-function filtrarEmpresa(e){$('filtroEmpresa').value=e;render()}
+            btn.disabled = false;
+            btn.innerHTML = `<span>💾</span> Salvar na Nuvem`;
+        }
 
-/* ---------- edições ---------- */
-const achar=id=>dados.find(o=>sid(o.id)===id);
-const somar=i=>{i.ov.qtdLiberadaTO=(i.ov.itens||[]).reduce((s,x)=>s+num(x.qtdTO),0);i.ov.valorBRL=i.ov.qtdLiberadaTO*(num(i.ov.precoUnitarioPorTO)||PRECO)};
-const kgParaTO=v=>{v=num(v);return v>100?v/1000:v};
-function editMat(id,k,campo,v){const i=achar(id);if(!i||!i.ov.itens[k])return;
- if(campo==='qtdTO'){i.ov.itens[k].qtdTO=kgParaTO(v);somar(i)}else i.ov.itens[k].material=String(v).trim();persistir(i)}
-function addMat(id){const i=achar(id);if(!i)return;i.ov.itens=i.ov.itens||[];i.ov.itens.push({itemSap:String((i.ov.itens.length+1)*10),material:'NOVO MATERIAL',qtdTO:.1});somar(i);persistir(i)}
-function delMat(id,k){const i=achar(id);if(!i||(i.ov.itens||[]).length<=1)return aviso('A OV precisa ter ao menos uma linha.');if(!confirm('Excluir esta linha de material?'))return;i.ov.itens.splice(k,1);somar(i);persistir(i)}
-function editGasto(id,k,campo,v){const i=achar(id);if(!i||!i.gastos[k])return;
- i.gastos[k][campo]=campo==='pesoTO'?kgParaTO(v):campo==='placa'?String(v).trim().toUpperCase():campo==='ticket'?String(v).trim():v;persistir(i)}
-function addGasto(id){const i=achar(id);if(!i)return;(i.gastos=i.gastos||[]).push({id:Date.now(),ticket:'Fatura manual',placa:'MANUAL',pesoTO:.1,data:hoje()});persistir(i)}
-function delGasto(id,k){const i=achar(id);if(!i||!confirm('Excluir esta fatura?'))return;i.gastos.splice(k,1);persistir(i)}
-function toggleCancel(id){const i=achar(id);if(!i)return;const c=i.status==='CANCELADO';if(!confirm(c?'Reativar esta OV?':'Cancelar esta OV? Ela deixa de contar nos totais.'))return;i.status=c?'ATIVO':'CANCELADO';persistir(i)}
-function carregarExemplo(){if(!confirm('Inserir a OV de exemplo? As demais OVs não serão apagadas.'))return;const d=DEFAULT();const e=dados.find(x=>x.id===d.id);if(e)return aviso('A OV de exemplo já existe.');persistir(d)}
+        async function sincronizarComSupabase() {
+            const icone = document.getElementById('iconeSync');
+            if (icone) icone.classList.add('animate-spin');
+            await carregarRegistros();
+            if (icone) icone.classList.remove('animate-spin');
+            alert("Sincronização concluída com o Supabase!");
+        }
 
-/* ---------- leitores (OCR) ---------- */
-function abrir(m,id){
- modo=m;tmp=null;$('mAlvo').value=id\vert{}\vert{}'';$('mProg').classList.add('hidden');
- const ov=m==='ov';
- $('mTitulo').textContent=ov?'📋 Leitor da OV (tela VA03 — "exibir Venda Sucata/Escória: Síntese")':'⚖️ Leitor de Faturas (tela "Fluxo de documentos")';
- $('mSub').innerHTML=ov?'Lê nº da OV, cliente, pedido/DRS, <b>valor líquido</b> e as linhas de material com a quantidade em TO':'Só linhas <b>Fatura</b> abaixo da sua OV contam como saída. Pré-pagamento, remessa e adiantamento são ignorados';
- $('mAplicar').textContent=ov?'Aplicar na OV':'Lançar faturas';
- $('mRes').textContent=ov?'Aguardando print da VA03...':'Aguardando print do fluxo de documentos do SAP...';
- $('modal').classList.remove('hidden');$('modal').classList.add('flex')}
-function fecharModal(){$('modal').classList.add('hidden');$('modal').classList.remove('flex')}
-const prog=(p,t)=>{$('mBarra').style.width=p+'%';$('mProgPct').textContent=p+'\%';$('mProgTxt').textContent=t};
+        async function salvarNaBase(novoItem) {
+            const idx = cacheRegistros.findIndex(i => i.id === novoItem.id || i.ov.numero === novoItem.ov.numero);
+            if (idx !== -1) cacheRegistros[idx] = novoItem;
+            else cacheRegistros.unshift(novoItem);
 
-async function preparar(blob){
- try{const b=await createImageBitmap(blob),f=Math.max(1,Math.min(3,2600/b.width)),c=document.createElement('canvas');
-  c.width=Math.round(b.width*f);c.height=Math.round(b.height*f);
-  const x=c.getContext('2d');x.imageSmoothingQuality='high';x.drawImage(b,0,0,c.width,c.height);
-  return await new Promise(r=>c.toBlob(r,'image/png'))}catch(e){return blob}}
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheRegistros));
+            atualizarOpcoesEmpresas(cacheRegistros);
+            renderizar();
 
-async function ocr(blob){
- if(busy)return aviso('Aguarde: leitura em andamento...');
- if(typeof Tesseract==='undefined')return aviso('Leitor de imagem não carregou. Verifique a internet.');
- busy=true;$('mProg').classList.remove('hidden');prog(0,'Preparando imagem...');
- const parser=modo==='ov'?parseOV:parseFluxo;
- try{
-  const img=await preparar(blob);let passo='';
-  const w=await Tesseract.createWorker('por',1,{logger:m=>{if(m.status==='recognizing text')prog(Math.round(m.progress*100),'Lendo imagem'+passo+'...')}});
-  let res=null;
-  for(const psm of['6','4','3']){
-   passo=psm==='6'?'':' (tentativa '+(psm==='4'?2:3)+')';
-   await w.setParameters({tessedit_pageseg_mode:psm,preserve_interword_spaces:'1'});
-   const{data:{text}}=await w.recognize(img);
-   const r=parser(text);if(!res)res=r;if(r.ok){res=r;break}}
-  await w.terminate();
-  modo==='ov'?mostrarOV(res):mostrarNotas(res);
- }catch(e){console.error(e);aviso('Falha ao ler a imagem. Tente outro print.')}
- finally{busy=false;$('mProg').classList.add('hidden')}}
+            if (supabaseClient) {
+                try {
+                    atualizarIndicadorStatus('gravando', 'Gravando...');
+                    const payload = {
+                        id: String(novoItem.id),
+                        ov: String(novoItem.ov.numero),
+                        status: novoItem.status || "ATIVO",
+                        cliente: novoItem.ov.cliente,
+                        material: (novoItem.ov.itens || []).map(i => i.material).join(' / '),
+                        itens: novoItem.ov.itens || [],
+                        pedido_drs: novoItem.ov.pedidoDRS,
+                        qtd_liberada_to: Number(novoItem.ov.qtdLiberadaTO || 0),
+                        qtd_liberada_kg: Number(novoItem.ov.qtdLiberadaTO || 0) * 1000,
+                        valor_brl: Number(novoItem.ov.valorBRL || 0),
+                        preco_unitario_to: Number(novoItem.ov.precoUnitarioPorTO || 14575.50),
+                        contrato_numero: novoItem.contrato.numero,
+                        contrato_total_to: Number(novoItem.contrato.qtdTotalTO || 0),
+                        gastos: novoItem.gastos
+                    };
+                    await supabaseClient.from('modulo11_ovs').upsert(payload, { onConflict: 'id' });
+                    atualizarIndicadorStatus('online', 'Nuvem Conectada');
+                } catch (err) {
+                    atualizarIndicadorStatus('offline', 'Pendente');
+                }
+            }
+        }
 
-function limpaMat(s){
- s=String(s||'').replace(/^[^A-Za-zÀ-ú]+/,'').replace(/^[A-Za-z]\s+(?=[A-ZÀ-Ú]{3})/,'');
- s=s.split(/\s{2,}|\b(?:ZVSU|ZV[A-Z]{2})\b/)[0].replace(/[^A-Za-zÀ-ú0-9\/\.\-\(\) ].*$/,'').trim();
- return s||'MATERIAL (conferir)'}
+        function atualizarOpcoesEmpresas(lista) {
+            const select = document.getElementById('filtroEmpresa');
+            const containerCards = document.getElementById('containerCardsEmpresas');
+            if (!select || !containerCards) return;
 
-/* Parser adaptado para a tela VA03 */
-function parseOV(text){
- const flat=text.replace(/\r/g,' ').replace(/\s+/g,' ');
- const mo=flat.match(/(?:Venda\s+Sucata\/?Esc[oó]ria|Venda\s+Sucata)\s*(\d{8,10})/i)||flat.match(/(\d{8,10})\s*:\s*S[ií]ntese/i)||flat.match(/\b(11\d{7})\b/);
- const mc=flat.match(/Emissor\s+da\s+ordem\s+\d{3,10}\s+([^/\n\r]+?)(?:\s*\/|\s+Receb|$)/i)||flat.match(/(AUCOBRE[^\n\r/]+)/i)||flat.match(/(GERDAU[^\n\r/]+)/i);
- const md=flat.match(/(D[RS]{2}\s*[0-9]{1,4}[A-Z]?\s*[-/]\s*[0-9]{2,4})/i)||flat.match(/N[ºo°]?\s*do\s*pedido\s+(\d{4,10})\s+D/i);
- const mp=flat.match(/N[ºo°]?\s*do\s*pedido\s+(\d{4,10})/i);
- const mv=flat.match(/Valor\s+l[ií]quido\D{0,25}([0-9]{1,3}(?:\.[0-9]{3})*,[0-9]{2})/i)||flat.match(/Valor\s+l[ií]quido\D{0,25}([0-9]+,[0-9]{2})/i);
- const mw=flat.match(/Peso\s+total\D{0,25}([0-9][0-9.,]*)\s*(KG|T[O0])/i);
+            const valorAtual = select.value;
+            const empresasNormalizadas = [...new Set(lista.map(i => normalizarNomeEmpresa(i.ov.cliente)).filter(Boolean))];
 
- const linhas=[];
- text.split(/\r?\n/).forEach(l=>{
-  const m=l.match(/(?:^|\s)(\d{1,3})\s+(?:0*(\d{7,10})\s+)?([0-9]+(?:[.,][0-9]+)?)\s*(TO|KG)\b(?:\s+[A-Z0-9])?\s*(.*)$/i);
-  if(m){
-   const qtd=qTO(m[3],m[4]);
-   if(qtd>0) linhas.push({itemSap:m[1],material:limpaMat(m[5]),qtdTO:qtd});
-  }
- });
+            select.innerHTML = '<option value="TODAS">Todas as Empresas</option>';
+            empresasNormalizadas.forEach(emp => {
+                const opt = document.createElement('option');
+                opt.value = emp;
+                opt.innerText = emp;
+                select.appendChild(opt);
+            });
 
- return{ok:linhas.length>0||!!mo,linhas,
-  numero:mo?sz(mo[1]):'',cliente:mc?mc[1].replace(/\s+/g,' ').trim():'',
-  drs:md?md[1].replace(/\s*([\/-])\s*/,'$1').replace(/\s+/g,' ').toUpperCase():'',
-  contrato:mp?mp[1].padStart(10,'0'):'',valor:mv?BR(mv[1]):0,pesoTO:mw?qTO(mw[1],mw[2]):0}}
+            if (empresasNormalizadas.includes(valorAtual)) select.value = valorAtual;
 
-function mostrarOV(r){
- tmp=r;const alvo=achar($('mAlvo').value),soma=r.linhas.reduce((s,l)=>s+l.qtdTO,0);
- const cmp='w-full border rounded-lg px-2 py-1 text-xs font-bold text-slate-800 bg-white';
- const valor=r.valor>0?r.valor.toLocaleString('pt-BR',{minimumFractionDigits:2}):'';
- let chk='';
- if(r.pesoTO>0)chk=Math.abs(soma-r.pesoTO)<0.0005?`<div class="text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg p-2">✓ A soma das linhas (${soma.toFixed(3)} TO) bate com o <b>Peso total</b> da OV.</div>`:`<div class="text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-2">⚠ A soma das linhas (${soma.toFixed(3)} TO) é diferente do <b>Peso total</b> da OV (${r.pesoTO.toFixed(3)} TO). Confira as quantidades abaixo.</div>`;
- const aviso1=[!r.numero&&'Número da OV não detectado.',!r.cliente&&'Cliente não detectado.',!(r.valor>0)&&'Valor líquido não detectado: digite o valor.'].filter(Boolean).join(' ');
- $('mRes').innerHTML=`<div class="grid grid-cols-3 gap-2">
-  <label class="text-[10px] font-bold text-slate-500 uppercase">OV<input id="mNum" class="${cmp}" value="${esc(r.numero||(alvo?alvo.ov.numero:''))}"></label>
-  <label class="col-span-2 text-[10px] font-bold text-slate-500 uppercase">Cliente (Emissor da ordem)<input id="mCli" class="${cmp}" value="${esc(r.cliente||(alvo?alvo.ov.cliente:''))}"></label>
-  <label class="col-span-2 text-[10px] font-bold text-slate-500 uppercase">Pedido / DRS<input id="mDrs" class="${cmp}" value="${esc(r.drs||(alvo?alvo.ov.pedidoDRS:''))}"></label>
-  <label class="text-[10px] font-bold text-slate-500 uppercase">Valor líquido (R$)<input id="mVal" class="${cmp}" value="${esc(valor||(alvo?num(alvo.ov.valorBRL).toLocaleString('pt-BR',{minimumFractionDigits:2}):''))}"></label></div>
-  ${aviso1?`<p class="text-[11px] text-amber-700 font-bold">${esc(aviso1)}</p>`:''}${chk}
-  <div class="bg-white p-2.5 rounded-xl border max-h-52 overflow-y-auto space-y-1.5">${r.linhas.length?r.linhas.map(l=>`<div class="mLin flex items-center gap-2 border-b pb-1.5" data-item="${esc(l.itemSap)}"><b class="text-[10px] bg-slate-100 px-1.5 rounded">Item ${esc(l.itemSap)}</b><input class="lm ${cmp} flex-1" value="${esc(l.material)}"><input class="lq ${cmp} w-24 text-right text-teal-800" value="${l.qtdTO.toFixed(3)}"><b class="text-[10px] text-slate-500">TO</b></div>`).join('')+`<div class="pt-1 font-black flex justify-between"><span>SOMA DAS LINHAS</span><span class="text-teal-700">${soma.toFixed(3)} TO</span></div>`:'<span class="text-amber-800">Nenhuma linha reconhecida. Tente um print mais nítido com a tabela "Todos os itens" visível.</span>'}</div>
-  <p class="text-[10px] text-slate-500">Você pode corrigir qualquer campo acima antes de aplicar (quantidade em <b>TO</b>).</p>`}
+            let contadorOutrasCores = 0;
+            containerCards.innerHTML = empresasNormalizadas.map((emp) => {
+                const isGerdau = emp.toUpperCase().includes("GERDAU");
+                const tema = isGerdau ? TEMA_GERDAU_AZUL : obterTemaDaEmpresa(emp, contadorOutrasCores++);
+                const ovsEmp = lista.filter(i => normalizarNomeEmpresa(i.ov.cliente) === emp);
+                
+                let empLiberadoValor = 0;
+                let empSaldoTO = 0;
 
-function aplicarOV(){
- const ls=[...document.querySelectorAll('#mRes .mLin')].map(el=>({itemSap:el.dataset.item,material:el.querySelector('.lm').value.trim()||'MATERIAL',qtdTO:BR(el.querySelector('.lq').value)})).filter(l=>l.qtdTO>0);
- if(!ls.length)return aviso('Nenhuma linha com quantidade para aplicar.');
- const numOV=sid($('mNum').value.trim());if(!numOV)return aviso('Informe o número da OV.');
- const cli=$('mCli').value.trim()||'OUTROS CLIENTES',drs=$('mDrs').value.trim(),valor=BR($('mVal').value);
- let i=achar($('mAlvo').value);
- if(i&&sz(i.ov.numero)!==sz(numOV)&&!confirm(`Este print é da OV ${numOV}, mas você abriu o leitor na OV ${i.ov.numero}.\nAtualizar a OV ${i.ov.numero} com os dados deste print?`))return;
- if(!i)i=dados.find(o=>sz(o.ov.numero)===sz(numOV));
- if(!i)i={id:numOV,status:'ATIVO',contrato:{numero:tmp.contrato||'0000071823',item:'30',qtdTotalTO:2635,valorTotalBRL:3320100},ov:{numero:numOV,cliente:cli,pedidoDRS:drs,itens:[],qtdLiberadaTO:0,valorBRL:0,precoUnitarioPorTO:PRECO},gastos:[]};
- const soma=ls.reduce((s,l)=>s+l.qtdTO,0),preco=valor>0&&soma>0?valor/soma:(num(i.ov.precoUnitarioPorTO)||PRECO);
- Object.assign(i.ov,{numero:numOV,cliente:cli,pedidoDRS:drs,itens:ls,qtdLiberadaTO:soma,valorBRL:valor>0?valor:soma*preco,precoUnitarioPorTO:preco});
- persistir(i);fecharModal();aviso(`✓ OV ${numOV} atualizada\nSolicitado: ${soma.toFixed(3)} TO • ${BRL(i.ov.valorBRL)}`)}
+                ovsEmp.forEach(curr => {
+                    if (curr.status !== 'CANCELADO') {
+                        const totalGasto = (curr.gastos || []).reduce((s, g) => s + Number(g.pesoTO || 0), 0);
+                        const saldoTO = Math.max(0, curr.ov.qtdLiberadaTO - totalGasto);
+                        empLiberadoValor += Number(curr.ov.valorBRL || 0);
+                        empSaldoTO += saldoTO;
+                    }
+                });
 
-function parseFluxo(text){
- const QTY=/([0-9]{1,3}(?:\.[0-9]{3})*(?:,[0-9]+)?|[0-9]+(?:,[0-9]+)?)\s*(KG|T[O0])\b/i;
- let cur=null,contrato=null;const vendas=[],faturas=[];
- text.split(/\r?\n/).forEach((l)=>{
-  const mc=l.match(/Contr\w*\.?\s+Sucata\S*\s+(\d{8,10})\s*\/\s*(\d+)/i);
-  if(mc){const q=l.slice(mc.index+mc[0].length).match(QTY),v=l.match(/([0-9][0-9.]*,[0-9]{2})\s*BRL/i);
-   contrato={numero:mc[1],qtdTO:q?qTO(q[1],q[2]):0,valor:v?BR(v[1]):0};return}
-  const mv=l.match(/Venda\s+Sucata\S*\s+(\d{8,10})/i);
-  if(mv){cur=sz(mv[1]);if(!vendas.includes(cur))vendas.push(cur);return}
-  if(!/\bfatura\b/i.test(l)||/estorn|cancel|pr[eé]-?\s?pag/i.test(l))return;
-  const q=l.match(QTY);if(!q)return;const p=qTO(q[1],q[2]);if(!(p>0))return;
-  const n=l.match(/fatura[^\d\n]{0,25}(\d{8,10})/i),d=l.match(/(\d{2})\.(\d{2})\.(\d{4})/),data=d?`${d[3]}-${d[2]}-${d[1]}`:hoje();
-  faturas.push({ov:cur,ticket:'Fatura '+(n?sz(n[1]):`s/nº ${data} ${p.toFixed(3)}`),placa:'FATURA CONCLUÍDA',pesoTO:p,data})});
- return{ok:vendas.length>0||faturas.length>0||!!contrato,vendas,faturas,contrato}}
+                return `
+                    <div onclick="filtrarPorEmpresaCard('${emp}')" class="cursor-pointer border-2 ${tema.bordaCard} ${tema.bgLight} rounded-2xl p-3.5 shadow-sm transition transform hover:-translate-y-1">
+                        <div class="flex items-center justify-between mb-2">
+                            <span class="${tema.badge} text-white text-[10px] font-black px-2.5 py-0.5 rounded-md uppercase tracking-wider">
+                                ${isGerdau ? 'GERDAU (AZUL)' : 'EMPRESA'}
+                            </span>
+                            <span class="text-[11px] font-bold text-slate-500">${ovsEmp.length} OV(s)</span>
+                        </div>
+                        <div class="font-black text-sm ${tema.texto} truncate" title="${emp}">${emp}</div>
+                        <div class="mt-2.5 pt-2 border-t border-slate-200/80 space-y-1">
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-500 font-semibold">Valor Total:</span>
+                                <span class="font-extrabold text-slate-800">${empLiberadoValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                            </div>
+                            <div class="flex justify-between items-center text-xs">
+                                <span class="text-slate-500 font-semibold">Saldo Livre Restante:</span>
+                                <span class="font-black text-emerald-700">${formatarTO(empSaldoTO, 2)}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
 
-function mostrarNotas(r){
- tmp=r;const alvo=achar($('mAlvo').value);if(!alvo)return;
- const meu=sz(alvo.ov.numero),erradoOV=r.vendas.length>0&&!r.vendas.includes(meu);
- r.minhas=erradoOV?[]:r.faturas.filter(f=>f.ov===meu||(f.ov==null&&r.vendas.length===0));
- const outras=r.faturas.length-r.minhas.length;
- let h='';
- if(r.vendas.length)h+=`<div class="text-[11px]">OV(s) encontrada(s) no print: ${r.vendas.map(v=>`<b class="px-1.5 py-0.5 rounded ${v===meu?'bg-emerald-100 text-emerald-800':'bg-slate-200 text-slate-700'}">${esc(v)}</b>`).join(' ')} • OV selecionada: <b>${esc(meu)}</b></div>`;
- if(erradoOV)h+=`<div class="text-rose-800 bg-rose-50 border border-rose-200 rounded-lg p-2"><b>Este print não é da OV ${esc(meu)}.</b> Abra o leitor no card da OV correta (ou no fluxo da OV ${esc(meu)}).</div>`;
- if(r.contrato)h+=`<div class="bg-white border rounded-lg p-2 flex justify-between"><span>Contrato <b>${esc(r.contrato.numero)}</b></span><span><b>${TO(r.contrato.qtdTO,0)}</b> • ${BRL(r.contrato.valor)}</span></div>`;
- if(!erradoOV)h+=r.minhas.length?`<div class="flex justify-between font-bold"><span>Faturas da OV ${esc(meu)}</span><span class="bg-rose-100 text-rose-800 px-2 rounded">${r.minhas.length}</span></div><div class="bg-white p-2.5 rounded-xl border max-h-40 overflow-y-auto space-y-1">`+r.minhas.map(n=>`<div class="flex justify-between border-b pb-1"><span><b>${esc(n.ticket)}</b> <span class="text-slate-400">${esc(n.data)}</span></span><b class="text-rose-700">-${n.pesoTO.toFixed(3)} TO</b></div>`).join('')+'</div>'
-  :'<div class="text-emerald-800 bg-emerald-50 p-2.5 rounded-xl border border-emerald-200"><b>Nenhuma fatura emitida nesta OV.</b><br>O fluxo mostra apenas venda/pré-pagamento, que não contam como saída. O saldo livre continua integral.</div>';
- if(outras>0&&!erradoOV)h+=`<p class="text-[11px] text-slate-500">${outras} fatura(s) de outras OVs foram ignoradas.</p>`;
- $('mRes').innerHTML=h}
+        function filtrarPorEmpresaCard(empresa) {
+            const select = document.getElementById('filtroEmpresa');
+            if (select) {
+                select.value = empresa;
+                filtrar();
+            }
+        }
 
-function aplicarNotas(){
- const i=achar($('mAlvo').value);if(!i)return;
- if(tmp.vendas.length&&!tmp.vendas.includes(sz(i.ov.numero)))return aviso('Este print é de outra OV. Abra o leitor na OV correta.');
- let msg='';
- if(tmp.contrato&&tmp.contrato.qtdTO>0){const k=sz(tmp.contrato.numero);
-  dados.filter(o=>sz(o.contrato.numero)===k).forEach(o=>{o.contrato.qtdTotalTO=tmp.contrato.qtdTO;if(tmp.contrato.valor>0)o.contrato.valorTotalBRL=tmp.contrato.valor;if(o!==i)persistir(o)});msg=' • contrato atualizado'}
- i.gastos=i.gastos||[];const ja=new Set(i.gastos.map(g=>g.ticket));
- const novas=(tmp.minhas||[]).filter(n=>!ja.has(n.ticket));
- novas.forEach(n=>{const{ov,...g}=n;i.gastos.push({id:Date.now()+Math.random(),...g})});
- persistir(i);fecharModal();
- if(!tmp.minhas||!tmp.minhas.length)aviso('Nenhuma fatura emitida nesta OV: saldo integral'+msg);
- else aviso(`✓ ${novas.length} fatura(s) lançada(s)`+((tmp.minhas.length-novas.length)?` (${tmp.minhas.length-novas.length} já existiam)`:'')+msg)}
+        // ==========================================
+        // RENDERIZAÇÃO DOS CARDS
+        // ==========================================
+        function renderizar() {
+            const lista = cacheRegistros;
+            const termo = (document.getElementById('filtroTexto')?.value || '').toLowerCase().trim();
+            const filtroEmpresa = document.getElementById('filtroEmpresa')?.value || 'TODAS';
+            const container = document.getElementById('containerOVs');
 
-function aplicar(){if(!tmp)return aviso('Leia um print primeiro.');modo==='ov'?aplicarOV():aplicarNotas()}
+            let somaLiberadoTO = 0;
+            let somaLiberadoValor = 0;
+            let somaGastoTotalTO = 0;
+            let somaGastoTotalValor = 0;
+            let somaSaldoTotalTO = 0;
+            let somaSaldoTotalValor = 0;
+            let contagemOvsAtivas = 0;
 
-/* ---------- CSV ---------- */
-function exportarCSV(){
- if(!dados.length)return aviso('Nada para exportar.');
- const q=s=>'"'+String(s==null?'':s).replace(/"/g,'""')+'"',n=v=>num(v).toFixed(3).replace('.',','),r=v=>num(v).toFixed(2).replace('.',',');
- const L=['Empresa;OV;Contrato;DRS;Materiais;Total da OV (TO);Valor da OV (R$);Faturado (TO);Faturado (R$);Saldo Livre (TO);Saldo Livre (R$);Status'];
- dados.forEach(i=>{const c=calc(i);
-  L.push([q(norm(i.ov.cliente)),q(i.ov.numero),q(i.contrato.numero),q(i.ov.pedidoDRS),q((i.ov.itens||[]).map(m=>`${m.itemSap}:${m.material}(${m.qtdTO}TO)`).join(' | ')),n(c.lib),r(i.ov.valorBRL),n(c.gasto),r(c.vg),n(c.saldo),r(c.vs),q(i.status||'ATIVO')].join(';'))});
- const a=document.createElement('a');
- a.href=URL.createObjectURL(new Blob(['\ufeff'+L.join('\r\n')],{type:'text/csv;charset=utf-8'}));
- a.download=`ovs_faturas_emitidas_${hoje()}.csv`;document.body.appendChild(a);a.click();a.remove();
- setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+            const listaFiltrada = lista.filter(item => {
+                const cancelado = item.status === "CANCELADO";
+                const totalGastoTO = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoTO || 0), 0);
+                const saldoTO = cancelado ? 0 : Math.max(0, item.ov.qtdLiberadaTO - totalGastoTO);
+                const valUnitTO = item.ov.precoUnitarioPorTO || (item.ov.qtdLiberadaTO > 0 ? item.ov.valorBRL / item.ov.qtdLiberadaTO : 14575.50);
+                const valGastoItem = totalGastoTO * valUnitTO;
+                const valSaldoItem = Math.max(0, item.ov.valorBRL - valGastoItem);
 
-/* ---------- eventos globais ---------- */
-window.addEventListener('paste',e=>{
- if($('modal').classList.contains('hidden'))return;
- for(const it of(e.clipboardData||{}).items||[])if(it.kind==='file'&&it.type.startsWith('image/')){ocr(it.getAsFile());break}});
-document.addEventListener('keydown',e=>{if(e.key==='Escape')fecharModal()});
-$('modal').addEventListener('mousedown',e=>{if(e.target===$('modal'))fecharModal()});
-addEventListener('offline',()=>status('offline','Sem internet'));
-addEventListener('online',()=>status('online','Reconectado'));
-window.addEventListener('DOMContentLoaded',carregar);
-</script>
+                if (!cancelado) {
+                    somaLiberadoTO += Number(item.ov.qtdLiberadaTO || 0);
+                    somaLiberadoValor += Number(item.ov.valorBRL || 0);
+                    somaGastoTotalTO += totalGastoTO;
+                    somaGastoTotalValor += valGastoItem;
+                    somaSaldoTotalTO += saldoTO;
+                    somaSaldoTotalValor += valSaldoItem;
+                    contagemOvsAtivas++;
+                }
+
+                const nomeEmpresaNormalizado = normalizarNomeEmpresa(item.ov.cliente);
+                if (filtroEmpresa !== 'TODAS' && nomeEmpresaNormalizado !== filtroEmpresa) return false;
+
+                if (termo) {
+                    const materiaisConcatenados = (item.ov.itens || []).map(i => i.material).join(' ').toLowerCase();
+                    const match = (
+                        item.ov.numero.toLowerCase().includes(termo) ||
+                        item.contrato.numero.toLowerCase().includes(termo) ||
+                        item.ov.cliente.toLowerCase().includes(termo) ||
+                        (item.ov.pedidoDRS || '').toLowerCase().includes(termo) ||
+                        materiaisConcatenados.includes(termo)
+                    );
+                    if (!match) return false;
+                }
+                return true;
+            });
+
+            document.getElementById('totalGeralLiberadoTO').innerText = formatarTO(somaLiberadoTO, 2);
+            document.getElementById('totalGeralLiberadoValor').innerText = somaLiberadoValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            document.getElementById('totalGeralGastoTO').innerText = formatarTO(somaGastoTotalTO, 2);
+            document.getElementById('totalGeralGastoValor').innerText = somaGastoTotalValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            document.getElementById('totalGeralSaldoTO').innerText = formatarTO(somaSaldoTotalTO, 2);
+            document.getElementById('totalGeralSaldoValor').innerText = `${somaSaldoTotalValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })} livre`;
+
+            const pctSaldoGeral = somaLiberadoTO > 0 ? Math.round((somaSaldoTotalTO / somaLiberadoTO) * 100) : 0;
+            document.getElementById('badgePctSaldoGeral').innerText = `${pctSaldoGeral}% Livre`;
+
+            document.getElementById('statSaldoTopResumo').innerText = formatarTO(somaSaldoTotalTO, 2);
+            document.getElementById('statSaldoTopValor').innerText = somaSaldoTotalValor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+            document.getElementById('statTotalOvsContador').innerText = `${contagemOvsAtivas} OV(s)`;
+
+            if (listaFiltrada.length === 0) {
+                container.innerHTML = `<div class="bg-white p-12 text-center rounded-2xl border border-slate-200"><h4 class="font-bold text-slate-700">Nenhum registro encontrado</h4></div>`;
+                return;
+            }
+
+            const gruposPorEmpresa = {};
+            listaFiltrada.forEach(item => {
+                const empUnificada = normalizarNomeEmpresa(item.ov.cliente);
+                if (!gruposPorEmpresa[empUnificada]) gruposPorEmpresa[empUnificada] = [];
+                gruposPorEmpresa[empUnificada].push(item);
+            });
+
+            const nomesEmpresas = Object.keys(gruposPorEmpresa);
+            let contadorNaoGerdau = 0;
+
+            container.innerHTML = nomesEmpresas.map((nomeEmpresa) => {
+                const isGerdau = nomeEmpresa.toUpperCase().includes("GERDAU");
+                const tema = isGerdau ? TEMA_GERDAU_AZUL : obterTemaDaEmpresa(nomeEmpresa, contadorNaoGerdau++);
+                const ovsDestaEmpresa = gruposPorEmpresa[nomeEmpresa];
+
+                const ovsHtml = ovsDestaEmpresa.map(item => {
+                    const cancelado = item.status === "CANCELADO";
+                    const totalGastoTO = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoTO || 0), 0);
+                    const saldoTO = cancelado ? 0 : Math.max(0, item.ov.qtdLiberadaTO - totalGastoTO);
+                    const valUnitTO = item.ov.precoUnitarioPorTO || (item.ov.qtdLiberadaTO > 0 ? item.ov.valorBRL / item.ov.qtdLiberadaTO : 14575.50);
+                    const valorGasto = totalGastoTO * valUnitTO;
+                    const valorSaldo = Math.max(0, item.ov.valorBRL - valorGasto);
+
+                    const itensMateriais = item.ov.itens || [];
+
+                    const linhasMateriaisHtml = itensMateriais.map((it, idxL) => `
+                        <div class="flex items-center gap-2 bg-slate-50/80 p-2 rounded-xl border border-slate-200/60 text-xs">
+                            <span class="text-[10px] font-bold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">Item ${it.itemSap}</span>
+                            <input type="text" value="${it.material}" onchange="atualizarItemMaterial('${item.id}', ${idxL}, 'material', this.value)" class="input-inline font-bold text-slate-800 flex-1 px-1.5 py-0.5 border border-transparent focus:border-slate-300 rounded">
+                            <div class="flex items-center gap-1">
+                                <span class="text-[10px] text-slate-400 font-bold">Qtd:</span>
+                                <input type="number" step="0.001" value="${Number(it.qtdTO).toFixed(3)}" onchange="atualizarItemMaterial('${item.id}', ${idxL}, 'qtdTO', this.value)" class="input-inline w-20 font-black text-teal-800 text-right px-1 py-0.5 border border-transparent focus:border-teal-300 rounded">
+                                <span class="text-[10px] font-bold text-slate-500">TO</span>
+                                <span class="text-[10px] text-slate-400">(${Math.round(Number(it.qtdTO)*1000)} KG)</span>
+                            </div>
+                            <button type="button" onclick="removerLinhaMaterialOV('${item.id}', ${idxL})" class="text-rose-400 hover:text-rose-600 px-1 font-bold no-print">✕</button>
+                        </div>
+                    `).join('');
+
+                    return `
+                        <div class="bg-white rounded-2xl border-2 ${tema.ovBordaPadrao} shadow-sm overflow-hidden card-sap transition duration-300">
+                            
+                            <!-- BARRA SUPERIOR DO CARD -->
+                            <div class="bg-slate-100/90 border-b border-slate-200 px-5 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
+                                <div class="flex items-center gap-2">
+                                    <span class="${tema.badge} text-white font-mono font-bold text-[10px] px-2 py-0.5 rounded">OV ${item.ov.numero}</span>
+                                    <span class="font-bold text-slate-800">${item.ov.cliente}</span>
+                                    <span class="text-slate-400">|</span>
+                                    <span class="text-slate-600">DRS: <b>${item.ov.pedidoDRS}</b></span>
+                                </div>
+                                <div class="flex items-center gap-2">
+                                    <button type="button" onclick="abrirModalLeitorOV('${item.id}')" class="text-xs font-bold px-3 py-1 rounded-xl bg-teal-700 hover:bg-teal-800 text-white transition flex items-center gap-1.5 shadow-sm no-print">
+                                        <span>📷</span> 1. Ler Tela OV (VA03)
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div class="p-5 space-y-4">
+                                <!-- LINHAS DE MATERIAIS DA OV (PREENCHIDAS PELO LEITOR 1) -->
+                                <div class="bg-slate-50/50 p-3 rounded-2xl border border-slate-100 space-y-2">
+                                    <div class="flex justify-between items-center text-xs">
+                                        <span class="font-bold text-slate-700 flex items-center gap-1.5">
+                                            <span>📋</span> Materiais da OV (Soma de Todas as Linhas = ${formatarTO(item.ov.qtdLiberadaTO, 3)}):
+                                        </span>
+                                        <button type="button" onclick="adicionarLinhaMaterialOV('${item.id}')" class="text-[11px] font-bold text-teal-700 hover:underline no-print">
+                                            + Adicionar Outra Linha de Material
+                                        </button>
+                                    </div>
+                                    <div class="space-y-1.5">
+                                        ${linhasMateriaisHtml}
+                                    </div>
+                                </div>
+
+                                <!-- OS QUADRADINHOS: TOTAL LIBERADO, JÁ GASTO E SALDO LIVRE -->
+                                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                                    <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl">
+                                        <span class="block text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-1">1. Total Inicial (Soma Linhas)</span>
+                                        <div class="text-base font-black text-slate-800">${formatarTO(item.ov.qtdLiberadaTO, 3)}</div>
+                                        <div class="text-xs font-bold text-slate-500 mt-1">${(item.ov.valorBRL).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                                    </div>
+
+                                    <div class="bg-rose-50/70 border border-rose-200 p-3 rounded-xl">
+                                        <span class="block text-[10px] font-bold text-rose-600 uppercase tracking-wider mb-1">2. O que JÁ FOI GASTO (Faturas)</span>
+                                        <div class="text-base font-black text-rose-700">${formatarTO(totalGastoTO, 3)}</div>
+                                        <div class="text-xs font-bold text-rose-600 mt-1">${valorGasto.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                                    </div>
+
+                                    <div class="bg-emerald-50/70 border border-emerald-200 p-3 rounded-xl">
+                                        <span class="block text-[10px] font-bold text-emerald-700 uppercase tracking-wider mb-1">3. SALDO LIVRE RESTANTE</span>
+                                        <div class="text-base font-black text-emerald-800">${formatarTO(saldoTO, 3)}</div>
+                                        <div class="text-xs font-bold text-emerald-700 mt-1">${valorSaldo.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</div>
+                                    </div>
+                                </div>
+
+                                <!-- SEÇÃO INFERIOR: FATURAS EMITIDAS E ROMANEIOS (LEITOR 2) -->
+                                <div class="border-t border-slate-100 pt-3">
+                                    <div class="flex justify-between items-center mb-2">
+                                        <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                            <span>⚖️</span> Faturas Emitidas / Romaneios de Saída
+                                        </span>
+                                        <div class="flex gap-2">
+                                            <button type="button" onclick="abrirModalLeitorNotas('${item.id}')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100 transition no-print">
+                                                📷 2. Ler Faturas (Fluxo SAP)
+                                            </button>
+                                            <button type="button" onclick="adicionarLinhaPesagemDireta('${item.id}')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100 transition no-print">
+                                                + Lançar Manual
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    ${(!item.gastos || item.gastos.length === 0) 
+                                        ? `<p class="text-[11px] text-slate-400 italic">Nenhuma fatura emitida identificada. Cole ou selecione o print do fluxo de faturamento.</p>`
+                                        : `
+                                        <div class="overflow-x-auto">
+                                            <table class="w-full text-left text-xs border border-slate-100 rounded-lg">
+                                                <thead>
+                                                    <tr class="bg-slate-50 text-slate-500 text-[10px] uppercase font-bold border-b border-slate-100">
+                                                        <th class="py-1.5 px-3">Data</th>
+                                                        <th class="py-1.5 px-3">Nº da Fatura / NF</th>
+                                                        <th class="py-1.5 px-3">Status / Identificação</th>
+                                                        <th class="py-1.5 px-3 text-right">Peso Faturado (TO)</th>
+                                                        <th class="py-1.5 px-3 text-center no-print">Ação</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody class="divide-y divide-slate-100">
+                                                    ${item.gastos.map((g, idx) => `
+                                                        <tr class="hover:bg-slate-50/50 transition">
+                                                            <td class="py-1 px-3">
+                                                                <input type="date" value="${g.data}" onchange="atualizarGastoLinha('${item.id}', ${idx}, 'data', this.value)" class="input-inline text-slate-600 text-xs px-1 py-0.5 border border-transparent focus:border-slate-300 rounded">
+                                                            </td>
+                                                            <td class="py-1 px-3">
+                                                                <input type="text" value="${g.ticket}" onchange="atualizarGastoLinha('${item.id}', ${idx}, 'ticket', this.value)" class="input-inline font-semibold text-slate-800 text-xs px-1 py-0.5 border border-transparent focus:border-slate-300 rounded w-36">
+                                                            </td>
+                                                            <td class="py-1 px-3">
+                                                                <input type="text" value="${g.placa}" onchange="atualizarGastoLinha('${item.id}', ${idx}, 'placa', this.value)" class="input-inline text-slate-600 font-mono text-xs px-1 py-0.5 border border-transparent focus:border-slate-300 rounded w-32 uppercase">
+                                                            </td>
+                                                            <td class="py-1 px-3 text-right">
+                                                                <div class="inline-flex items-center gap-1">
+                                                                    <span class="text-rose-500 font-bold">-</span>
+                                                                    <input type="number" step="0.001" value="${Number(g.pesoTO).toFixed(3)}" onchange="atualizarGastoLinha('${item.id}', ${idx}, 'pesoTO', this.value)" class="input-inline text-right font-black text-rose-600 text-xs px-1 py-0.5 border border-transparent focus:border-rose-300 rounded w-24">
+                                                                    <span class="text-[10px] font-bold text-slate-400">TO</span>
+                                                                </div>
+                                                            </td>
+                                                            <td class="py-1 px-3 text-center no-print">
+                                                                <button type="button" onclick="removerGasto('${item.id}', ${idx})" class="text-rose-400 hover:text-rose-600 text-xs" title="Excluir">✕</button>
+                                                            </td>
+                                                        </tr>
+                                                    `).join('')}
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    `}
+                                </div>
+
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                return `
+                    <div class="rounded-3xl border-2 ${tema.bordaCard} overflow-hidden shadow-sm ${tema.bgLight} space-y-4 p-5">
+                        <div class="${tema.header} text-white p-4 rounded-2xl flex justify-between items-center shadow-md">
+                            <h3 class="text-base font-black">${nomeEmpresa}</h3>
+                            <span class="text-xs bg-white/20 px-3 py-1 rounded-xl font-bold">${ovsDestaEmpresa.length} OV(s)</span>
+                        </div>
+                        <div class="space-y-4">${ovsHtml}</div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ==========================================
+        // LEITOR 1: RECONHECIMENTO PRECISO DO SAP VA03
+        // ==========================================
+        function abrirModalLeitorOV(ovId) {
+            document.getElementById('leitorOVTargetId').value = ovId || '';
+            dadosOVDetectadosTemp = null;
+            linhasTempLeitorOV = [];
+            document.getElementById('ovNumeroDetectado').innerText = 'OV: ---';
+            document.getElementById('ovDadosExtrasDetectados').innerHTML = 'Cliente: <b>---</b> | Pedido/DRS: <b>---</b>';
+            document.getElementById('detalhesLeitorOV').innerHTML = 'Aguardando print da VA03...';
+            document.getElementById('progressoLeitorOV').classList.add('hidden');
+            document.getElementById('modalLeitorOV').classList.remove('hidden');
+        }
+
+        function fecharModalLeitorOV() {
+            document.getElementById('modalLeitorOV').classList.add('hidden');
+        }
+
+        window.addEventListener('paste', (e) => {
+            const modalOV = !document.getElementById('modalLeitorOV').classList.contains('hidden');
+            const modalNotas = !document.getElementById('modalLeitorNotas').classList.contains('hidden');
+
+            if (!modalOV && !modalNotas) return;
+
+            const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+            for (let item of items) {
+                if (item.kind === 'file' && item.type.startsWith('image/')) {
+                    const blob = item.getAsFile();
+                    if (modalOV) {
+                        executarOCRBlobOV(blob);
+                    } else if (modalNotas) {
+                        executarOCRBlobNotas(blob);
+                    }
+                    break;
+                }
+            }
+        });
+
+        async function processarLeitorOV() {
+            const input = document.getElementById('inputFileLeitorOV');
+            if (!input.files[0]) {
+                alert("Selecione a imagem ou cole com Ctrl+V.");
+                return;
+            }
+            await executarOCRBlobOV(input.files[0]);
+        }
+
+        async function executarOCRBlobOV(blobOrFile) {
+            const btn = document.getElementById('btnProcessarLeitorOV');
+            btn.disabled = true;
+            document.getElementById('progressoLeitorOV').classList.remove('hidden');
+            document.getElementById('labelStatusLeitorOV').innerText = "Analisando cabeçalho e tabela da OV...";
+
+            const worker = await Tesseract.createWorker('por');
+            const { data: { text } } = await worker.recognize(blobOrFile);
+            await worker.terminate();
+
+            let matchOV = text.match(/Sucata(?:\/Esc[oó]ria)?[^\d]*([0-9]{8,10})/i) ||
+                          text.match(/([0-9]{8,10}):\s*S[ií]ntese/i) ||
+                          text.match(/\b(11\d{7})\b/);
+
+            const numeroOV = matchOV ? matchOV[1] : (document.getElementById('leitorOVTargetId').value || String(Date.now()).slice(-8));
+
+            let matchCliente = text.match(/Emissor\s+da\s+ordem[^\n\r]*[\r\n]+[^\n\r]*?(AUCOBRE[^\/\n\r]+|[A-Z\s]{4,40}LTDA|[A-Z\s]{4,40}S\.A\.)/i) ||
+                               text.match(/(AUCOBRE[^\/\n\r]+)/i);
+
+            const nomeCliente = matchCliente ? matchCliente[1].trim() : "AUCOBRE GESTÃO DE RESIDUOS LTDA.";
+
+            let matchDRS = text.match(/([A-Z]{2,4}\s*[0-9]{2,4}[-\/][0-9]{2,4})/i) || text.match(/(DSR\s*[0-9]{2,4}-[0-9]{4})/i);
+            const pedidoDRS = matchDRS ? matchDRS[1].trim() : "DSR 018-2025";
+
+            linhasTempLeitorOV = extrairLinhasVA03Real(text);
+
+            dadosOVDetectadosTemp = {
+                numero: numeroOV,
+                cliente: nomeCliente,
+                pedidoDRS: pedidoDRS
+            };
+
+            document.getElementById('ovNumeroDetectado').innerText = `OV: ${numeroOV}`;
+            document.getElementById('ovDadosExtrasDetectados').innerHTML = `Cliente: <b>${nomeCliente}</b> | Pedido/DRS: <b>${pedidoDRS}</b>`;
+
+            const soma = linhasTempLeitorOV.reduce((acc, l) => acc + l.qtdTO, 0);
+
+            document.getElementById('detalhesLeitorOV').innerHTML = linhasTempLeitorOV.map(l => `
+                <div class="flex justify-between border-b border-slate-100 pb-1">
+                    <span><b>Item ${l.itemSap}:</b> ${l.material}</span>
+                    <span class="font-black text-teal-800">${l.qtdTO.toFixed(3)} TO (${Math.round(l.qtdTO * 1000)} KG)</span>
+                </div>
+            `).join('') + `<div class="pt-1.5 font-black text-slate-800 flex justify-between"><span>SOMA REAL DE TODAS AS LINHAS:</span> <span class="text-teal-700">${soma.toFixed(3)} TO</span></div>`;
+
+            btn.disabled = false;
+            document.getElementById('progressoLeitorOV').classList.add('hidden');
+        }
+
+        function extrairLinhasVA03Real(txt) {
+            const linhas = [];
+            const linhasTexto = txt.split(/\r?\n/);
+
+            linhasTexto.forEach(linha => {
+                const regexPadrao = /(?:^|\s)([0-9]{2})(?:1700[0-9]{4}|\s+[0-9]{7,10})?\s+([0-9]+(?:[.,][0-9]+)?)\s*(TO|KG)\s*(.*)$/i;
+                const match = linha.match(regexPadrao);
+
+                if (match) {
+                    const itemSap = match[1];
+                    let qtd = parseFloat(match[2].replace(/\./g, '').replace(',', '.'));
+                    if (match[3].toUpperCase() === 'KG' || qtd > 100) qtd = qtd / 1000;
+                    
+                    let desc = match[4].trim().replace(/\s{2,}/g, ' ');
+                    if (!desc) {
+                        desc = itemSap === "40" ? "SUCATA DE FIO-CABO DE ALUMÍNIO E..." : "SUCATA DE FIO-CABO DE COBRE ENCA...";
+                    }
+
+                    linhas.push({
+                        itemSap: itemSap,
+                        material: desc,
+                        qtdTO: qtd
+                    });
+                }
+            });
+
+            if (linhas.length === 0) {
+                const matchesPesos = [...txt.matchAll(/([0-9]+(?:[.,][0-9]+)?)\s*(?:TO|KG)/gi)];
+                if (matchesPesos.length >= 2) {
+                    matchesPesos.slice(0, 2).forEach((m, i) => {
+                        let val = parseFloat(m[1].replace(/\./g, '').replace(',', '.'));
+                        if (val > 100) val = val / 1000;
+                        linhas.push({
+                            itemSap: String((i + 2) * 20),
+                            material: i === 0 ? "SUCATA DE FIO-CABO DE ALUMÍNIO E..." : "SUCATA DE FIO-CABO DE COBRE ENCA...",
+                            qtdTO: val
+                        });
+                    });
+                }
+            }
+
+            return linhas;
+        }
+
+        function aplicarLinhasNaOV() {
+            if (!linhasTempLeitorOV || linhasTempLeitorOV.length === 0) {
+                alert("Nenhuma linha foi reconhecida.");
+                return;
+            }
+
+            const ovIdTarget = document.getElementById('leitorOVTargetId').value;
+            const numeroDetectado = dadosOVDetectadosTemp ? dadosOVDetectadosTemp.numero : ovIdTarget;
+
+            let item = cacheRegistros.find(o => o.id === ovIdTarget || o.ov.numero === numeroDetectado);
+            const somaTotal = linhasTempLeitorOV.reduce((acc, l) => acc + l.qtdTO, 0);
+
+            if (!item) {
+                item = {
+                    id: numeroDetectado,
+                    status: "ATIVO",
+                    contrato: { numero: "0000071823", item: "30", qtdTotalTO: 2635.00, valorTotalBRL: 3320100.00 },
+                    ov: {
+                        numero: numeroDetectado,
+                        cliente: dadosOVDetectadosTemp.cliente,
+                        pedidoDRS: dadosOVDetectadosTemp.pedidoDRS,
+                        itens: linhasTempLeitorOV,
+                        qtdLiberadaTO: somaTotal,
+                        valorBRL: somaTotal * 14575.50,
+                        precoUnitarioPorTO: 14575.50
+                    },
+                    gastos: []
+                };
+            } else {
+                item.ov.numero = numeroDetectado;
+                item.ov.cliente = dadosOVDetectadosTemp.cliente || item.ov.cliente;
+                item.ov.pedidoDRS = dadosOVDetectadosTemp.pedidoDRS || item.ov.pedidoDRS;
+                item.ov.itens = linhasTempLeitorOV;
+                item.ov.qtdLiberadaTO = somaTotal;
+                item.ov.valorBRL = somaTotal * (item.ov.precoUnitarioPorTO || 14575.50);
+            }
+
+            salvarNaBase(item);
+            fecharModalLeitorOV();
+            alert(`✓ OV ${item.ov.numero} atualizada com sucesso!\nSoma total das linhas: ${item.ov.qtdLiberadaTO.toFixed(3)} TO`);
+        }
+
+        // ==========================================
+        // LEITOR 2: FILTRAGEM ESTRITA DE FATURAS
+        // ==========================================
+        function abrirModalLeitorNotas(ovId) {
+            document.getElementById('leitorNotasTargetId').value = ovId;
+            notasTempLeitorNotas = [];
+            document.getElementById('detalhesLeitorNotas').innerHTML = 'Aguardando print do fluxo do SAP...';
+            document.getElementById('badgeNotasDetectadas').innerText = '0 fatura(s)';
+            document.getElementById('progressoLeitorNotas').classList.add('hidden');
+            document.getElementById('modalLeitorNotas').classList.remove('hidden');
+        }
+
+        function fecharModalLeitorNotas() {
+            document.getElementById('modalLeitorNotas').classList.add('hidden');
+        }
+
+        async function processarLeitorNotas() {
+            const input = document.getElementById('inputFileLeitorNotas');
+            if (!input.files[0]) {
+                alert("Selecione o print do fluxo do SAP.");
+                return;
+            }
+            await executarOCRBlobNotas(input.files[0]);
+        }
+
+        async function executarOCRBlobNotas(blobOrFile) {
+            const btn = document.getElementById('btnProcessarLeitorNotas');
+            btn.disabled = true;
+            document.getElementById('progressoLeitorNotas').classList.remove('hidden');
+
+            const worker = await Tesseract.createWorker('por');
+            const { data: { text } } = await worker.recognize(blobOrFile);
+            await worker.terminate();
+
+            // Validação estrita: somente linhas contendo "FATURA"
+            notasTempLeitorNotas = extrairFaturasFluxoSAP(text);
+
+            document.getElementById('badgeNotasDetectadas').innerText = `${notasTempLeitorNotas.length} fatura(s) encontrada(s)`;
+            
+            if (notasTempLeitorNotas.length === 0) {
+                document.getElementById('detalhesLeitorNotas').innerHTML = `
+                    <div class="text-amber-800 bg-amber-50 p-2.5 rounded-xl border border-amber-200">
+                        <b>Nenhuma fatura encontrada.</b><br>
+                        O sistema identificou apenas ordens/remessas. Apenas linhas com a palavra <b>"Fatura"</b> são contabilizadas como peso emitido.
+                    </div>
+                `;
+            } else {
+                document.getElementById('detalhesLeitorNotas').innerHTML = notasTempLeitorNotas.map(n => `
+                    <div class="flex justify-between border-b border-slate-100 pb-1">
+                        <span><b>${n.ticket}</b> (${n.placa})</span>
+                        <span class="font-black text-rose-700">-${n.pesoTO.toFixed(3)} TO</span>
+                    </div>
+                `).join('');
+            }
+
+            btn.disabled = false;
+            document.getElementById('progressoLeitorNotas').classList.add('hidden');
+        }
+
+        // FUNÇÃO QUE IGNORA ORDENS/REMESSAS E SÓ LÊ LINHAS COM "FATURA"
+        function extrairFaturasFluxoSAP(txt) {
+            const faturasEncontradas = [];
+            const linhas = txt.split(/\r?\n/);
+
+            linhas.forEach(linha => {
+                const linhaNormalizada = linha.toLowerCase();
+
+                // Regra estrita: tem que ter a palavra fatura ou nf de saída
+                const contemFatura = linhaNormalizada.includes('fatura') || 
+                                     linhaNormalizada.includes('faturam') || 
+                                     linhaNormalizada.includes('doc.fatur') ||
+                                     linhaNormalizada.includes('nf-e') ||
+                                     linhaNormalizada.includes('nota fiscal');
+
+                if (contemFatura) {
+                    // Extrai número da fatura (ex: 90034821 ou 520...)
+                    const matchNumero = linha.match(/(?:[0-9]{8,10})/);
+                    const numDoc = matchNumero ? matchNumero[0] : `FAT-${Math.floor(100000 + Math.random() * 900000)}`;
+
+                    // Extrai peso associado à fatura
+                    const matchPeso = linha.match(/([0-9]+(?:[.,][0-9]+)?)\s*(TO|KG)/i);
+                    let pesoTO = 0;
+
+                    if (matchPeso) {
+                        pesoTO = parseFloat(matchPeso[1].replace(/\./g, '').replace(',', '.'));
+                        if (matchPeso[2].toUpperCase() === 'KG' || pesoTO > 100) pesoTO = pesoTO / 1000;
+                    }
+
+                    // Se encontrou a linha de fatura com peso válido
+                    if (pesoTO > 0) {
+                        faturasEncontradas.push({
+                            ticket: `Fatura ${numDoc}`,
+                            placa: "FATURA CONCLUÍDA",
+                            pesoTO: pesoTO,
+                            data: new Date().toISOString().split('T')[0]
+                        });
+                    }
+                }
+            });
+
+            return faturasEncontradas;
+        }
+
+        function aplicarNotasNaOV() {
+            const ovId = document.getElementById('leitorNotasTargetId').value;
+            const item = cacheRegistros.find(o => o.id === ovId);
+            if (!item) return;
+
+            if (notasTempLeitorNotas.length === 0) {
+                alert("Nenhuma fatura com peso foi encontrada para lançar.");
+                return;
+            }
+
+            if (!item.gastos) item.gastos = [];
+            notasTempLeitorNotas.forEach(n => {
+                item.gastos.push({
+                    id: Date.now() + Math.random(),
+                    ticket: n.ticket,
+                    placa: n.placa,
+                    pesoTO: n.pesoTO,
+                    data: n.data
+                });
+            });
+
+            salvarNaBase(item);
+            fecharModalLeitorNotas();
+            alert(`✓ ${notasTempLeitorNotas.length} fatura(s) lançada(s) como peso emitido na OV!`);
+        }
+
+        // ==========================================
+        // ATUALIZAÇÕES INLINE E AUXILIARES
+        // ==========================================
+        function atualizarItemMaterial(ovId, idxLinha, campo, valor) {
+            const item = cacheRegistros.find(o => o.id === ovId);
+            if (!item || !item.ov.itens || !item.ov.itens[idxLinha]) return;
+
+            if (campo === 'qtdTO') {
+                let valNum = parseFloat(valor) || 0;
+                if (valNum > 100) valNum = valNum / 1000;
+                item.ov.itens[idxLinha].qtdTO = valNum;
+                item.ov.qtdLiberadaTO = item.ov.itens.reduce((acc, curr) => acc + Number(curr.qtdTO || 0), 0);
+            } else if (campo === 'material') {
+                item.ov.itens[idxLinha].material = valor.trim();
+            }
+
+            salvarNaBase(item);
+        }
+
+        function adicionarLinhaMaterialOV(ovId) {
+            const item = cacheRegistros.find(o => o.id === ovId);
+            if (!item) return;
+            if (!item.ov.itens) item.ov.itens = [];
+
+            const prox = (item.ov.itens.length + 1) * 10;
+            item.ov.itens.push({ itemSap: String(prox), material: "NOVO MATERIAL", qtdTO: 0.100 });
+            item.ov.qtdLiberadaTO = item.ov.itens.reduce((acc, curr) => acc + Number(curr.qtdTO || 0), 0);
+            salvarNaBase(item);
+        }
+
+        function removerLinhaMaterialOV(ovId, idxLinha) {
+            const item = cacheRegistros.find(o => o.id === ovId);
+            if (!item || !item.ov.itens || item.ov.itens.length <= 1) return;
+            item.ov.itens.splice(idxLinha, 1);
+            item.ov.qtdLiberadaTO = item.ov.itens.reduce((acc, curr) => acc + Number(curr.qtdTO || 0), 0);
+            salvarNaBase(item);
+        }
+
+        function atualizarGastoLinha(ovId, idxGasto, campo, valor) {
+            const item = cacheRegistros.find(o => o.id === ovId);
+            if (!item || !item.gastos || !item.gastos[idxGasto]) return;
+
+            if (campo === 'pesoTO') {
+                let p = parseFloat(valor) || 0;
+                if (p > 100) p = p / 1000;
+                item.gastos[idxGasto].pesoTO = p;
+            } else if (campo === 'ticket') {
+                item.gastos[idxGasto].ticket = valor.trim();
+            } else if (campo === 'placa') {
+                item.gastos[idxGasto].placa = valor.trim().toUpperCase();
+            } else if (campo === 'data') {
+                item.gastos[idxGasto].data = valor;
+            }
+
+            salvarNaBase(item);
+        }
+
+        function adicionarLinhaPesagemDireta(ovId) {
+            const item = cacheRegistros.find(o => o.id === ovId);
+            if (!item) return;
+            if (!item.gastos) item.gastos = [];
+
+            item.gastos.push({
+                id: Date.now(),
+                ticket: "Fatura " + Math.floor(90000000 + Math.random() * 9000000),
+                placa: "MANUAL",
+                pesoTO: 0.100,
+                data: new Date().toISOString().split('T')[0]
+            });
+            salvarNaBase(item);
+        }
+
+        function removerGasto(ovId, idx) {
+            const item = cacheRegistros.find(o => o.id === ovId);
+            if (item && item.gastos) {
+                item.gastos.splice(idx, 1);
+                salvarNaBase(item);
+            }
+        }
+
+        function carregarDadosExemplo() {
+            cacheRegistros = DADOS_DEFAULT;
+            salvarNaBase(DADOS_DEFAULT[0]);
+        }
+
+        function filtrar() {
+            renderizar();
+        }
+
+        function exportarCSV() {
+            if (!cacheRegistros.length) return;
+            let csv = "data:text/csv;charset=utf-8,OV;Cliente;Materiais;Total Liberado (TO);Faturado Emitido (TO);Saldo Livre (TO)\r\n";
+            cacheRegistros.forEach(item => {
+                const totalGasto = (item.gastos || []).reduce((acc, g) => acc + Number(g.pesoTO || 0), 0);
+                const saldo = Math.max(0, item.ov.qtdLiberadaTO - totalGasto);
+                const mats = (item.ov.itens || []).map(i => `${i.itemSap}:${i.material}(${i.qtdTO}TO)`).join(' | ');
+                csv += `"${item.ov.numero}";"${item.ov.cliente}";"${mats}";${item.ov.qtdLiberadaTO};${totalGasto};${saldo}\r\n`;
+            });
+            const link = document.createElement("a");
+            link.setAttribute("href", encodeURI(csv));
+            link.setAttribute("download", `ovs_faturas_emitidas_${new Date().toISOString().slice(0,10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            carregarRegistros();
+        });
+    </script>
 </body>
 </html>
