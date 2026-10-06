@@ -132,7 +132,7 @@
                         <h1 class="text-lg font-extrabold tracking-wide">Painel de OVs por Empresa & Saldos</h1>
                         <span class="bg-blue-600 text-white font-black text-[10px] px-2.5 py-0.5 rounded shadow-sm">GERDAU AZUL</span>
                     </div>
-                    <p class="text-xs text-teal-100/90 mt-1">Validação automática de OV e edição completa de itens com o lápis ✏️</p>
+                    <p class="text-xs text-teal-100/90 mt-1">Validação automática de OV e gravação sincronizada em Nuvem</p>
                 </div>
 
                 <div class="flex flex-wrap gap-2 text-right">
@@ -217,7 +217,7 @@
 
     </div>
 
-    <!-- MODAL 1: LEITOR SUPERIOR (ITENS DA OV / VA03 COM LÁPIS DE EDIÇÃO E VALIDAÇÃO) -->
+    <!-- MODAL 1: LEITOR SUPERIOR (ITENS DA OV / VA03) -->
     <div id="modalLeitorOV" class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-3xl w-full p-6 shadow-2xl border border-slate-100 space-y-4 max-h-[92vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -225,7 +225,7 @@
                     <span class="text-2xl">📋</span>
                     <div>
                         <h3 class="font-bold text-slate-900 text-sm">Leitor de Linhas da OV (Tela VA03)</h3>
-                        <p class="text-[11px] text-slate-500">Valida o número da OV e permite editar o nome completo dos materiais com o lápis ✏️</p>
+                        <p class="text-[11px] text-slate-500">Valida o número da OV e edita as descrições dos materiais</p>
                     </div>
                 </div>
                 <button type="button" onclick="fecharModalLeitorOV()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
@@ -233,12 +233,11 @@
 
             <input type="hidden" id="leitorOVTargetId">
 
-            <!-- Alerta de Validação da OV -->
             <div id="alertaComparacaoOV" class="hidden p-3 rounded-xl text-xs font-bold transition flex items-center gap-2"></div>
 
             <div class="border-2 border-dashed border-teal-300 bg-teal-50/50 p-4 rounded-2xl text-center space-y-2">
                 <input type="file" id="inputFileLeitorOV" accept="image/*" class="w-full text-slate-600 text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-teal-700 file:text-white hover:file:bg-teal-800 cursor-pointer">
-                <p class="text-[11px] text-slate-500">Pressione <b>Ctrl + V</b> com esta janela aberta para colar o print do ecrã da VA03.</p>
+                <p class="text-[11px] text-slate-500">Pressione <b>Ctrl + V</b> com esta janela aberta para colar o print da VA03.</p>
             </div>
 
             <div id="progressoLeitorOV" class="hidden space-y-1.5 bg-slate-50 p-3 rounded-2xl border border-slate-200 text-xs">
@@ -253,7 +252,7 @@
 
             <div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 space-y-3 text-xs">
                 <div class="flex items-center justify-between">
-                    <span class="font-bold text-slate-700 uppercase tracking-wider block">Linhas Reconhecidas (Clique no ✏️ para editar qualquer campo):</span>
+                    <span class="font-bold text-slate-700 uppercase tracking-wider block">Linhas Reconhecidas:</span>
                     <button type="button" onclick="adicionarLinhaManualNoLeitor()" class="text-[11px] font-bold text-teal-700 hover:underline">+ Adicionar Item Manual</button>
                 </div>
                 <div id="detalhesLeitorOV" class="text-[11px] text-slate-700 bg-white p-2.5 rounded-xl border border-slate-200 max-h-60 overflow-y-auto space-y-2">
@@ -273,7 +272,7 @@
         </div>
     </div>
 
-    <!-- MODAL 2: LEITOR INFERIOR (NOTAS FISCAIS / FLUXO / ROMANEIOS COM EDIÇÃO) -->
+    <!-- MODAL 2: LEITOR INFERIOR (NOTAS FISCAIS / FLUXO / ROMANEIOS) -->
     <div id="modalLeitorNotas" class="fixed inset-0 bg-slate-950/75 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
         <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl border border-slate-100 space-y-4 max-h-[92vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -281,7 +280,7 @@
                     <span class="text-2xl">⚖️</span>
                     <div>
                         <h3 class="font-bold text-slate-900 text-sm">Leitor de Notas Fiscais e Saídas (Fluxo SAP)</h3>
-                        <p class="text-[11px] text-slate-500">Lê o print do fluxo de documentos / faturas e permite editar as saídas com o lápis ✏️</p>
+                        <p class="text-[11px] text-slate-500">Lê o print do fluxo de documentos / faturas e gera os romaneios de saída</p>
                     </div>
                 </div>
                 <button type="button" onclick="fecharModalLeitorNotas()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
@@ -329,6 +328,7 @@
     <!-- SCRIPT DE PROCESSAMENTO -->
     <script>
         const SUPABASE_URL = "https://gloxtswcksbczinpwtzu.supabase.co";
+        // Chave anônima pública de acesso à API
         const SUPABASE_ANON_KEY = "sb_publishable_0kEiqthWKZZwjM120wQIYw_Hba7qeLc";
         
         let supabaseClient = null;
@@ -340,7 +340,7 @@
             console.error("Falha ao inicializar o Supabase SDK:", e);
         }
 
-        const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v17_edicao_lapis";
+        const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v18_diagnostico";
         let cacheRegistros = [];
         let linhasTempLeitorOV = [];
         let notasTempLeitorNotas = [];
@@ -490,7 +490,13 @@
                 try {
                     atualizarIndicadorStatus('gravando', 'Sincronizando...');
                     const { data, error } = await supabaseClient.from('modulo11_ovs').select('*').order('created_at', { ascending: false });
-                    if (!error && data && data.length > 0) {
+                    
+                    if (error) {
+                        console.error("Erro ao ler Supabase:", error);
+                        throw error;
+                    }
+
+                    if (data && data.length > 0) {
                         cacheRegistros = data.map(d => {
                             const itens = Array.isArray(d.itens) && d.itens.length > 0 ? d.itens : [
                                 { itemSap: "40", material: d.material || "SUCATA DE FIO-CABO DE ALUMÍNIO E...", qtdTO: 0.300 },
@@ -542,33 +548,38 @@
             if (supabaseClient) {
                 try {
                     const payloads = cacheRegistros.map(item => ({
-                        id: String(item.id),
-                        ov: String(item.ov.numero),
+                        id: String(item.id).trim(),
+                        ov: String(item.ov.numero).trim(),
                         status: item.status || "ATIVO",
-                        cliente: item.ov.cliente,
+                        cliente: String(item.ov.cliente || ''),
                         material: (item.ov.itens || []).map(i => i.material).join(' / '),
-                        itens: item.ov.itens || [],
-                        pedido_drs: item.ov.pedidoDRS,
+                        itens: JSON.parse(JSON.stringify(item.ov.itens || [])),
+                        pedido_drs: String(item.ov.pedidoDRS || ''),
                         qtd_liberada_to: Number(item.ov.qtdLiberadaTO || 0),
                         qtd_liberada_kg: Number(item.ov.qtdLiberadaTO || 0) * 1000,
                         valor_brl: Number(item.ov.valorBRL || 0),
                         preco_unitario_to: Number(item.ov.precoUnitarioPorTO || 14575.50),
-                        contrato_numero: item.contrato.numero,
+                        contrato_numero: String(item.contrato.numero || ''),
                         contrato_total_to: Number(item.contrato.qtdTotalTO || 0),
-                        gastos: item.gastos
+                        gastos: JSON.parse(JSON.stringify(item.gastos || []))
                     }));
 
                     const { error } = await supabaseClient.from('modulo11_ovs').upsert(payloads, { onConflict: 'id' });
-                    if (error) throw error;
+                    
+                    if (error) {
+                        console.error("Erro Supabase:", error);
+                        throw new Error(`${error.message} (Código: ${error.code || 'RLS/Tabela'})`);
+                    }
                     
                     atualizarIndicadorStatus('online', 'Salvo com Sucesso!');
-                    alert("✓ Todas as OVs foram salvas com sucesso no Supabase!");
+                    alert("✓ Gravado no Supabase com sucesso!");
                 } catch (err) {
-                    alert("Erro ao gravar no Supabase: " + (err.message || err));
-                    atualizarIndicadorStatus('offline', 'Erro na Gravação');
+                    console.error("Erro detalhado ao gravar no Supabase:", err);
+                    alert("⚠️ O Supabase recusou a gravação:\n" + err.message + "\n\nSe o erro citar 'row-level security' ou 'permission denied', execute o comando SQL de liberação fornecido.");
+                    atualizarIndicadorStatus('offline', 'Falha na Gravação');
                 }
             } else {
-                alert("Dados salvos no armazenamento local!");
+                alert("Supabase SDK não está ativo. Dados salvos apenas no armazenamento local.");
             }
 
             btn.disabled = false;
@@ -596,24 +607,28 @@
                 try {
                     atualizarIndicadorStatus('gravando', 'Gravando...');
                     const payload = {
-                        id: String(novoItem.id),
-                        ov: String(novoItem.ov.numero),
+                        id: String(novoItem.id).trim(),
+                        ov: String(novoItem.ov.numero).trim(),
                         status: novoItem.status || "ATIVO",
-                        cliente: novoItem.ov.cliente,
+                        cliente: String(novoItem.ov.cliente || ''),
                         material: (novoItem.ov.itens || []).map(i => i.material).join(' / '),
-                        itens: novoItem.ov.itens || [],
-                        pedido_drs: novoItem.ov.pedidoDRS,
+                        itens: JSON.parse(JSON.stringify(novoItem.ov.itens || [])),
+                        pedido_drs: String(novoItem.ov.pedidoDRS || ''),
                         qtd_liberada_to: Number(novoItem.ov.qtdLiberadaTO || 0),
                         qtd_liberada_kg: Number(novoItem.ov.qtdLiberadaTO || 0) * 1000,
                         valor_brl: Number(novoItem.ov.valorBRL || 0),
                         preco_unitario_to: Number(novoItem.ov.precoUnitarioPorTO || 14575.50),
-                        contrato_numero: novoItem.contrato.numero,
+                        contrato_numero: String(novoItem.contrato.numero || ''),
                         contrato_total_to: Number(novoItem.contrato.qtdTotalTO || 0),
-                        gastos: novoItem.gastos
+                        gastos: JSON.parse(JSON.stringify(novoItem.gastos || []))
                     };
-                    await supabaseClient.from('modulo11_ovs').upsert(payload, { onConflict: 'id' });
+                    
+                    const { error } = await supabaseClient.from('modulo11_ovs').upsert(payload, { onConflict: 'id' });
+                    if (error) throw error;
+                    
                     atualizarIndicadorStatus('online', 'Nuvem Conectada');
                 } catch (err) {
+                    console.error("Falha ao salvar individualmente no Supabase:", err);
                     atualizarIndicadorStatus('offline', 'Pendente');
                 }
             }
@@ -956,7 +971,7 @@
         }
 
         // ==========================================
-        // LEITOR 1: VA03 (LÁPIS DE EDIÇÃO E RECONHECIMENTO)
+        // LEITOR 1: VA03 COM LÁPIS E OCR
         // ==========================================
         function abrirModalLeitorOV(ovId) {
             document.getElementById('leitorOVTargetId').value = ovId;
@@ -1029,7 +1044,6 @@
                     return;
                 }
 
-                // Renderiza as linhas identificadas com o lápis de edição
                 renderizarLinhasDoLeitorOV();
 
             } catch (err) {
@@ -1040,7 +1054,6 @@
             }
         }
 
-        // Renderiza a lista de itens com botão de lápis (✏️) para edição inline
         function renderizarLinhasDoLeitorOV() {
             const container = document.getElementById('detalhesLeitorOV');
             if (!linhasTempLeitorOV || linhasTempLeitorOV.length === 0) {
@@ -1052,7 +1065,6 @@
 
             container.innerHTML = linhasTempLeitorOV.map((l, idx) => {
                 if (l.emEdicao) {
-                    // MODO EDIÇÃO ATIVADO PELO LÁPIS
                     return `
                         <div class="bg-amber-50/70 p-2.5 rounded-xl border border-amber-300 space-y-2">
                             <div class="flex items-center justify-between">
@@ -1079,7 +1091,6 @@
                     `;
                 }
 
-                // MODO EXIBIÇÃO COM BOTÃO DE LÁPIS
                 return `
                     <div class="flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-200/80 hover:bg-teal-50/40 transition">
                         <div class="flex items-center gap-2 flex-1 pr-2">
@@ -1194,7 +1205,6 @@
                 if (!confirma) return;
             }
 
-            // Normaliza as linhas removendo flags de edição
             item.ov.itens = linhasTempLeitorOV.map(l => ({
                 itemSap: l.itemSap,
                 material: l.material,
@@ -1213,7 +1223,7 @@
         }
 
         // ==========================================
-        // LEITOR 2: FLUXO DE NOTAS / FATURAMENTO COM EDIÇÃO
+        // LEITOR 2: FLUXO DE NOTAS / FATURAMENTO
         // ==========================================
         function abrirModalLeitorNotas(ovId) {
             document.getElementById('leitorNotasTargetId').value = ovId;
@@ -1482,7 +1492,6 @@
             document.body.removeChild(link);
         }
 
-        // Listener de Colagem (Ctrl+V) direto nos modais
         window.addEventListener('paste', e => {
             const clipboardItems = e.clipboardData.items;
             for (let i = 0; i < clipboardItems.length; i++) {
