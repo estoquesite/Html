@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Módulo 7 - Compras Cartão Corporativo | Portal Vale v1.1</title>
+<title>Módulo 7 - Compras Cartão Corporativo | Portal Vale v1.2</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>tailwind.config = { darkMode: 'class' }</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -23,7 +23,8 @@
 </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen p-4 sm:p-6 transition-colors">
-<div id="toast" role="status" aria-live="polite" class="fixed bottom-6 right-6 z-[60] text-xs font-bold px-4 py-2.5 rounded-lg shadow-xl bg-slate-900 text-white opacity-0 pointer-events-none transition-opacity"></div>
+<div id="toast" role="status" aria-live="polite" class="fixed bottom-6 right-6 z-[70] text-xs font-bold px-4 py-2.5 rounded-lg shadow-xl bg-slate-900 text-white opacity-0 pointer-events-none transition-opacity max-w-sm"></div>
+<datalist id="dlSol"></datalist>
 
 <div class="max-w-7xl mx-auto space-y-5">
   <header class="card flex flex-wrap justify-between items-center gap-3">
@@ -33,6 +34,7 @@
     </div>
     <div class="flex flex-wrap items-center gap-2">
       <a href="index.html" class="btn bg-slate-100 dark:bg-slate-700">⬅ Menu</a>
+      <button id="bGer" class="btn bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950 dark:text-amber-300 dark:border-amber-800">👥 Solicitantes</button>
       <label class="btn bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950 dark:text-blue-300 dark:border-blue-800">📁 Carregar arquivo<input type="file" id="fArquivo" accept=".json,.csv" class="hidden"></label>
       <button id="bCSV" class="btn bg-emerald-600 text-white">📥 Baixar CSV</button>
       <button id="bDup" class="btn bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950 dark:text-rose-300 dark:border-rose-800">⚡ Limpar duplicadas</button>
@@ -60,7 +62,7 @@
     <div id="aba-manual" class="p-5 space-y-3">
       <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div><label class="lbl">Data da compra</label><input type="date" id="mData" class="inp"></div>
-        <div><label class="lbl text-rose-600">Solicitante (*)</label><input id="mSol" data-sol class="inp up falta" placeholder="Quem pediu?"></div>
+        <div><label class="lbl text-rose-600">Solicitante (*)</label><input id="mSol" data-sol list="dlSol" autocomplete="off" class="inp up falta" placeholder="Quem pediu?"></div>
         <div><label class="lbl">Local / fornecedor</label><input id="mLocal" class="inp up" placeholder="Ex: Mercado Livre"></div>
       </div>
       <div id="mRows" class="space-y-2"></div>
@@ -72,7 +74,7 @@
     <div id="aba-nota" class="p-5 space-y-3 hidden">
       <div class="grid grid-cols-1 sm:grid-cols-4 gap-3">
         <div><label class="lbl">Data</label><input type="date" id="nData" class="inp"></div>
-        <div><label class="lbl text-rose-600">Solicitante (*)</label><input id="nSol" data-sol class="inp up falta"></div>
+        <div><label class="lbl text-rose-600">Solicitante (*)</label><input id="nSol" data-sol list="dlSol" autocomplete="off" class="inp up falta"></div>
         <div><label class="lbl">Fornecedor</label><input id="nLocal" class="inp up"></div>
         <div><label class="lbl">Projeto</label><input id="nProj" class="inp up"></div>
       </div>
@@ -86,7 +88,7 @@
     </div>
 
     <div id="aba-link" class="p-5 space-y-3 hidden">
-      <label class="lbl">Um link ou mensagem por linha (Mercado Livre, Amazon, Teams, WhatsApp...)</label>
+      <label class="lbl">Um link ou mensagem por linha (Mercado Livre, Amazon, Teams, WhatsApp...). Dica: escreva "solicitante: Nome" na linha para já preencher quem pediu.</label>
       <textarea id="lTexto" rows="4" class="inp" placeholder="https://produto.mercadolivre.com.br/..."></textarea>
       <div class="flex justify-between gap-2">
         <button id="bColar" class="btn bg-slate-100 dark:bg-slate-700">📋 Colar da área de transferência</button>
@@ -105,11 +107,27 @@
   </section>
 
   <!-- FILTROS -->
-  <div class="card !p-3 grid grid-cols-1 sm:grid-cols-4 gap-2">
-    <input id="fBusca" class="inp up" placeholder="🔍 Produto, local ou pessoa">
+  <div class="card !p-3 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+    <input id="fBusca" class="inp up col-span-2 sm:col-span-1" placeholder="🔍 Produto, local ou pessoa">
     <input id="fValor" type="number" step="0.01" class="inp" placeholder="💲 Valor exato (R$)">
     <select id="fSol" class="inp"><option value="">Todos os solicitantes</option></select>
-    <select id="fEntrega" class="inp"><option value="">Todas as entregas</option><option value="p">Pendentes</option><option value="e">Entregues</option></select>
+    <select id="fEntrega" class="inp">
+      <option value="">Todas as entregas</option><option value="p">Pendentes</option><option value="a">⏰ Atrasadas (+10 dias)</option><option value="e">Entregues</option>
+    </select>
+    <select id="fMes" class="inp"><option value="">Todos os meses</option></select>
+    <select id="fOrdem" class="inp">
+      <option value="pend">Pendentes primeiro</option><option value="dt_d">Data (mais recente)</option><option value="dt_a">Data (mais antiga)</option>
+      <option value="val_d">Maior valor</option><option value="sol">Solicitante A–Z</option>
+    </select>
+  </div>
+
+  <!-- AÇÕES EM LOTE -->
+  <div id="barra" class="card !p-3 flex flex-wrap items-center gap-2 !border-indigo-400 hidden">
+    <span id="nSel" class="text-xs font-black text-indigo-700 dark:text-indigo-300 mr-2"></span>
+    <button id="bEntSel" class="btn bg-emerald-600 text-white">📦 Marcar entregues</button>
+    <button id="bSolSel" class="btn bg-amber-500 text-white">👤 Trocar solicitante</button>
+    <button id="bDelSel" class="btn bg-rose-600 text-white">🗑 Excluir selecionados</button>
+    <button id="bLimpaSel" class="btn bg-slate-100 dark:bg-slate-700">Limpar seleção</button>
   </div>
 
   <!-- TABELA -->
@@ -121,76 +139,126 @@
     <div class="overflow-x-auto">
       <table class="w-full text-left text-xs">
         <thead><tr class="border-b border-slate-100 dark:border-slate-700 text-slate-400 font-bold uppercase text-[10px]">
+          <th class="p-2"><input type="checkbox" id="chkAll" aria-label="Selecionar todos"></th>
           <th class="p-2">Data</th><th class="p-2">Solicitante</th><th class="p-2">Produto</th><th class="p-2">Local</th><th class="p-2">Projeto</th>
           <th class="p-2 text-center">Qtd</th><th class="p-2 text-right">Unit.</th><th class="p-2 text-right">Total</th><th class="p-2 text-center">Entrega</th><th class="p-2 text-center">Link</th><th class="p-2 text-center">Ações</th>
         </tr></thead>
         <tbody id="tbody" class="divide-y divide-slate-100 dark:divide-slate-700/60 uppercase"></tbody>
       </table>
     </div>
+    <div id="maisBox" class="text-center hidden"><button id="bMais" class="btn bg-slate-100 dark:bg-slate-700">⬇ Mostrar mais</button></div>
   </section>
 </div>
 
 <!-- MODAL EDIÇÃO -->
 <div id="modal" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 hidden">
-  <div class="card w-full max-w-xl space-y-3 max-h-[92vh] overflow-y-auto">
-    <div class="flex justify-between"><h3 class="text-sm font-black uppercase text-indigo-600">✏️ Editar registro</h3><button id="eFechar" class="font-black" aria-label="Fechar">✕</button></div>
-    <input type="hidden" id="eId"><input type="hidden" id="eSub">
-    <div data-row class="grid grid-cols-2 gap-3">
-      <div id="eWData"><label class="lbl">Data</label><input type="date" id="eData" class="inp"></div>
-      <div><label class="lbl">Solicitante</label><input id="eSol" class="inp up"></div>
-      <div class="col-span-2"><label class="lbl">Produto</label><input id="eProd" class="inp up"></div>
-      <div class="col-span-2 e-main"><label class="lbl">Local</label><input id="eLocal" class="inp up"></div>
-      <div class="col-span-2 e-main"><label class="lbl">Projeto</label><input id="eProj" class="inp up"></div>
-      <div><label class="lbl">Qtd</label><input type="number" min="1" id="eQtd" data-f="qtd" class="inp"></div>
-      <div><label class="lbl">Total (R$)</label><input type="number" step="0.01" id="eTotal" data-f="total" class="inp"></div>
-      <div class="col-span-2"><label class="lbl">Unitário (R$)</label><input type="number" step="0.01" id="eUnit" data-f="unit" class="inp"></div>
-      <div class="col-span-2 e-main flex items-center gap-3">
-        <label class="flex items-center gap-2 text-xs font-bold"><input type="checkbox" id="eEnt"> Entregue</label>
-        <input type="date" id="eEntData" class="inp !w-auto">
-      </div>
-      <div class="col-span-2 e-main"><label class="lbl">Link</label><input id="eLink" class="inp" placeholder="https://..."></div>
+  <div class="card w-full max-w-3xl space-y-3 max-h-[92vh] overflow-y-auto">
+    <div class="flex justify-between"><h3 class="text-sm font-black uppercase text-indigo-600">✏️ Editar compra</h3><button id="eFechar" class="font-black" aria-label="Fechar">✕</button></div>
+    <input type="hidden" id="eId">
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      <div><label class="lbl">Data</label><input type="date" id="eData" class="inp"></div>
+      <div><label class="lbl text-rose-600">Solicitante (*)</label><input id="eSol" data-sol list="dlSol" autocomplete="off" class="inp up"></div>
+      <div><label class="lbl">Local / fornecedor</label><input id="eLocal" class="inp up"></div>
+      <div><label class="lbl">Projeto</label><input id="eProj" class="inp up"></div>
     </div>
-    <div class="flex justify-end gap-2"><button id="eCancel" class="btn bg-slate-100 dark:bg-slate-700">Cancelar</button><button id="eSalvar" class="btn bg-indigo-600 text-white">💾 Salvar alterações</button></div>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 items-end">
+      <div class="flex items-center gap-2">
+        <label class="flex items-center gap-2 text-xs font-bold whitespace-nowrap"><input type="checkbox" id="eEnt"> Entregue</label>
+        <input type="date" id="eEntData" class="inp">
+      </div>
+      <div class="sm:col-span-2"><label class="lbl">Link</label><input id="eLink" class="inp" placeholder="https://..."></div>
+    </div>
+    <div>
+      <span class="lbl">Itens da compra (adicione, edite ou remova)</span>
+      <div id="eRows" class="space-y-2"></div>
+    </div>
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <button id="eAddRow" class="btn bg-indigo-100 text-indigo-800 dark:bg-indigo-950 dark:text-indigo-300 !text-[11px]">➕ Adicionar item</button>
+      <span class="text-xs font-black text-emerald-600">Total da compra: <span id="eTot">R$ 0,00</span></span>
+    </div>
+    <div class="flex flex-wrap justify-between gap-2">
+      <button id="eExcluir" class="btn bg-rose-50 text-rose-700 border border-rose-200 dark:bg-rose-950 dark:text-rose-300 dark:border-rose-800">🗑 Excluir compra</button>
+      <div class="flex gap-2"><button id="eCancel" class="btn bg-slate-100 dark:bg-slate-700">Cancelar</button><button id="eSalvar" class="btn bg-indigo-600 text-white">💾 Salvar alterações</button></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SOLICITANTES -->
+<div id="mGer" class="fixed inset-0 bg-slate-900/60 z-50 flex items-center justify-center p-4 hidden">
+  <div class="card w-full max-w-2xl space-y-3 max-h-[92vh] overflow-y-auto">
+    <div class="flex justify-between items-center"><h3 class="text-sm font-black uppercase text-amber-600">👥 Gerenciar solicitantes</h3><button id="gFechar" class="font-black" aria-label="Fechar">✕</button></div>
+    <p class="text-[11px] text-slate-500">Renomeie para corrigir a grafia. Se digitar o nome de outro solicitante, os dois são mesclados. A mudança vale para todo o histórico.</p>
+    <button id="gPadr" class="btn bg-amber-100 text-amber-900 dark:bg-amber-950 dark:text-amber-300">✨ Padronizar variações (acentos e espaços)</button>
+    <div id="gLista" class="space-y-2"></div>
   </div>
 </div>
 
 <script>
 const SB_URL = "https://gloxtswcksbczinpwtzu.supabase.co";
 const SB_KEY = "sb_publishable_0kEiqthWKZZwjM120wQIYw_Hba7qeLc";
-const T = 'compras_corporativas', LS = 'compras_corporativas_base';
-let compras = [], pend = [], sb = null, exp = {};
+const T = 'compras_corporativas', LS = 'compras_corporativas_base', LSD = 'compras_corporativas_fila_exclusao';
+let compras = [], pend = [], sb = null, exp = {}, limite = 100;
+const sel = new Set();
 
 /* ---------- utilitários ---------- */
 const $ = id => document.getElementById(id);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const iso = d => { d = new Date(d); d.setMinutes(d.getMinutes() - d.getTimezoneOffset()); return d.toISOString().slice(0, 10); };
 const hoje = () => iso(new Date());
-const maisDias = (s, n) => { const d = new Date(s + 'T00:00:00'); d.setDate(d.getDate() + n); return iso(d); };
+const maisDias = (s, n) => { const d = new Date((s || hoje()) + 'T00:00:00'); d.setDate(d.getDate() + n); return iso(d); };
 const fd = s => { const p = (s || '').split('-'); return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : (s || ''); };
 const brl = n => 'R$ ' + Number(n || 0).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
 const pbr = s => parseFloat(String(s).replace(/\./g, '').replace(',', '.')) || 0;
 const up = v => String(v || '').trim().toUpperCase();
+const limpa = v => up(v).replace(/\s+/g, ' ');
+const norm = v => limpa(v).normalize('NFD').replace(/[\u0300-\u036f]/g, '');
 const isLocal = id => Number(id) > 1e12;
 const novoId = () => Date.now() + Math.floor(Math.random() * 1000);
 const urlOk = u => /^https?:\/\//i.test(u || '');
-const chaveDup = i => [up(i.solicitante), up(i.produto), Number(i.total || 0).toFixed(2), Number(i.qtd || 1)].join('_');
+const chaveDup = i => [norm(i.solicitante), norm(i.produto), Number(i.total || 0).toFixed(2), Number(i.qtd || 1)].join('_');
+const atrasada = i => !i.entregue && i.data && maisDias(i.data, 10) < hoje();
 
 function toast(m, erro) {
   const t = $('toast'); t.textContent = m;
-  t.className = t.className.replace(/bg-\S+/, erro ? 'bg-rose-700' : 'bg-slate-900') + ' opacity-100';
-  clearTimeout(t._h); t._h = setTimeout(() => t.classList.replace('opacity-100', 'opacity-0'), 3500);
+  t.classList.toggle('bg-rose-700', !!erro); t.classList.toggle('bg-slate-900', !erro);
+  t.classList.remove('opacity-0'); t.classList.add('opacity-100');
+  clearTimeout(t._h); t._h = setTimeout(() => { t.classList.remove('opacity-100'); t.classList.add('opacity-0'); }, 4000);
 }
 function status(ok) {
   $('badgeNuvem').textContent = ok ? '● Nuvem conectada' : '⚠️ Offline: dados locais';
   $('badgeNuvem').className = 'font-bold ml-1 ' + (ok ? 'text-emerald-600' : 'text-amber-600');
 }
-const salvarLocal = () => localStorage.setItem(LS, JSON.stringify(compras));
+const salvarLocal = () => { try { localStorage.setItem(LS, JSON.stringify(compras)); } catch (e) { console.warn(e); } };
+
+/* ---------- Solicitantes: nome padronizado ---------- */
+function mapaNomes() {                       // chave sem acento -> grafia mais usada
+  const cnt = {};
+  compras.forEach(c => { const n = limpa(c.solicitante); if (!n) return; const k = norm(n); (cnt[k] ??= {})[n] = (cnt[k][n] || 0) + 1; });
+  const m = {};
+  for (const k in cnt) m[k] = Object.entries(cnt[k]).sort((a, b) => b[1] - a[1])[0][0];
+  return m;
+}
+const canon = v => { const n = limpa(v); return n ? (mapaNomes()[norm(n)] || n) : ''; };
+
+function agrupar() {
+  const mapa = mapaNomes(), g = {};
+  compras.forEach(i => {
+    const k = norm(i.solicitante);
+    const x = (g[k] ??= { k, nome: k ? mapa[k] : 'SEM SOLICITANTE', n: 0, p: 0, v: 0, qtd: 0, vars: new Set() });
+    x.n++; x.v += Number(i.total || 0); x.qtd += Number(i.qtd || 1); if (!i.entregue) x.p++;
+    if (i.solicitante) x.vars.add(String(i.solicitante));
+  });
+  return Object.values(g).sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+}
 
 /* ---------- Supabase ---------- */
 const payload = i => ({ data: i.data, solicitante: i.solicitante, produto: i.produto, local: i.local || '', projeto: i.projeto || '',
   qtd: i.qtd, unit: i.unit, total: i.total, link: i.link || '', entregue: !!i.entregue, data_entrega: i.data_entrega || '', sub_itens: i.sub_itens || [] });
 
-async function persistir(item) {
+const fila = () => { try { return JSON.parse(localStorage.getItem(LSD)) || []; } catch { return []; } };
+const salvarFila = a => { try { localStorage.setItem(LSD, JSON.stringify([...new Set(a)])); } catch {} };
+
+async function persistir(item, quieto) {
   salvarLocal();
   if (!sb) return false;
   try {
@@ -199,33 +267,63 @@ async function persistir(item) {
       if (error) throw error;
       item.id = data[0].id;                       // adota o ID real da nuvem
     } else {
-      const { error } = await sb.from(T).update(payload(item)).eq('id', item.id);
+      const { data, error } = await sb.from(T).update(payload(item)).eq('id', item.id).select('id');
       if (error) throw error;
+      if (!data || !data.length) throw new Error('a nuvem não aceitou a alteração (registro removido ou sem permissão de edição)');
     }
-    salvarLocal(); status(true); render(); return true;
+    salvarLocal(); status(true); if (!quieto) render(); return true;
   } catch (e) {
     console.warn(e); status(false);
-    toast('Salvo só neste aparelho. Use "Salvar tudo" para reenviar.', true); return false;
+    if (!quieto) toast('Salvo só neste aparelho: ' + (e.message || 'falha na nuvem') + '.', true);
+    return false;
   }
+}
+
+async function flushFila() {                      // exclusões que ainda não chegaram na nuvem
+  const f = fila(); if (!f.length) return true; if (!sb) return false;
+  try {
+    const { error } = await sb.from(T).delete().in('id', f);
+    if (error) throw error;
+    const { data, error: e2 } = await sb.from(T).select('id').in('id', f);   // confirma que sumiram de fato
+    if (e2) throw e2;
+    salvarFila((data || []).map(r => r.id));
+    if (data && data.length) { toast('A nuvem recusou a exclusão (verifique as permissões/RLS da tabela).', true); return false; }
+    return true;
+  } catch (e) { console.warn(e); status(false); return false; }
+}
+async function removerNuvem(ids) {
+  const reais = ids.filter(id => !isLocal(id));
+  if (!reais.length) return true;
+  salvarFila([...fila(), ...reais]);
+  return flushFila();
 }
 
 async function carregar(silencioso) {
   if (!sb) return;
   try {
+    await flushFila();
     const { data, error } = await sb.from(T).select('*').order('id', { ascending: false });
     if (error) throw error;
-    compras = [...compras.filter(c => isLocal(c.id)), ...data];   // preserva o que ainda não subiu
+    const f = new Set(fila().map(String));
+    compras = [...compras.filter(c => isLocal(c.id)), ...data.filter(d => !f.has(String(d.id)))];   // preserva o que ainda não subiu
     salvarLocal(); status(true); render();
     if (!silencioso) toast('✅ Sincronizado com a nuvem!');
   } catch (e) { console.warn(e); status(false); if (!silencioso) toast('Sem conexão com a nuvem.', true); }
 }
 
+async function enviarLote(lista) {
+  let ok = true;
+  for (const c of lista) if (!(await persistir(c, true))) ok = false;
+  render(); return ok;
+}
 async function salvarTudo() {
   if (!sb) return toast('Nuvem indisponível.', true);
   const pendentes = compras.filter(c => isLocal(c.id));
   let ok = 0;
-  for (const c of pendentes) if (await persistir(c)) ok++;
-  toast(pendentes.length ? `💾 ${ok}/${pendentes.length} registro(s) enviados.` : '✅ Tudo já está na nuvem.');
+  for (const c of pendentes) if (await persistir(c, true)) ok++;
+  const filaOk = await flushFila();
+  render();
+  toast(pendentes.length || fila().length ? `💾 ${ok}/${pendentes.length} registro(s) enviados.${filaOk ? '' : ' Há exclusões pendentes.'}` : '✅ Tudo já está na nuvem.', !filaOk);
 }
 
 /* ---------- Linhas de item (manual, pendentes, edição) ---------- */
@@ -239,6 +337,11 @@ const rowHTML = (v = {}, remover = false) => `
     ${remover ? '<button data-rm class="col-span-2 sm:col-span-12 text-[10px] text-rose-600 font-bold text-right">✕ Remover item</button>' : ''}
   </div>`;
 
+function somaEdit() {
+  const t = [...$('eRows').querySelectorAll('[data-f=total]')].reduce((a, i) => a + (parseFloat(i.value) || 0), 0);
+  $('eTot').textContent = brl(t);
+}
+
 // Cálculo automático total <-> unitário em qualquer linha [data-row]
 document.addEventListener('input', e => {
   const f = e.target.dataset.f;
@@ -249,6 +352,11 @@ document.addEventListener('input', e => {
   const s = (k, v) => r.querySelector(`[data-f=${k}]`).value = v > 0 ? v.toFixed(2) : '';
   const q = g('qtd') || 1;
   f === 'unit' ? s('total', q * g('unit')) : s('unit', g('total') / q);
+  if (e.target.closest('#eRows')) somaEdit();
+});
+// Ao sair do campo solicitante, encaixa na grafia já existente (evita JOAO / João / João )
+document.addEventListener('change', e => {
+  if (e.target.hasAttribute('data-sol')) { e.target.value = canon(e.target.value); e.target.classList.toggle('falta', !e.target.value.trim()); }
 });
 
 function lerLinhas(cont) {
@@ -257,7 +365,8 @@ function lerLinhas(cont) {
     const g = k => r.querySelector(`[data-f=${k}]`).value;
     const qtd = parseFloat(g('qtd')) || 1;
     let total = parseFloat(g('total')) || 0, unit = parseFloat(g('unit')) || 0;
-    if (!total) total = qtd * unit; if (!unit) unit = total / qtd;
+    if (!total) total = qtd * unit;
+    if (!unit) unit = total / qtd;
     const produto = up(g('prod'));
     if (!produto || total <= 0) { toast('Informe produto e valor em todos os itens.', true); return null; }
     itens.push({ produto, projeto: up(g('proj')), qtd, unit, total });
@@ -285,7 +394,7 @@ function resetManual() {
   $('mLocal').value = ''; $('mEntregue').checked = false;
 }
 async function lancarManual() {
-  const sol = up($('mSol').value);
+  const sol = canon($('mSol').value);
   if (!sol) { $('mSol').focus(); return toast('Preencha o solicitante.', true); }
   const subs = lerLinhas($('mRows')); if (!subs) return;
   const data = $('mData').value || hoje();
@@ -316,7 +425,7 @@ function interpretarNota(texto) {
   return subs;
 }
 async function lancarNota() {
-  const sol = up($('nSol').value);
+  const sol = canon($('nSol').value);
   if (!sol) { $('nSol').focus(); return toast('Preencha o solicitante.', true); }
   const subs = interpretarNota($('nTexto').value);
   if (!subs.length) return toast('Não foi possível identificar itens e valores.', true);
@@ -338,9 +447,12 @@ function reconhecer() {
   if (!linhas.length) return toast('Cole ao menos um link ou mensagem.', true);
   linhas.reverse().forEach(l => {
     const u = (l.match(/https?:\/\/\S+/i) || [''])[0];
-    const sol = (l.match(/(?:solicitante|quem pediu|pediu|de|por)[:\s-]+([A-Za-zÀ-ÿ ]{2,25})/i) || [])[1];
-    pend.unshift({ tid: novoId() + Math.random(), data: hoje(), solicitante: up(sol), local: u ? lojaPorLink(u) : 'MERCADO LIVRE',
-      produto: nomePorLink(u) || up(l.replace(/https?:\/\/\S+/gi, '')) || 'PRODUTO', link: u, qtd: 1 });
+    const semUrl = l.replace(/https?:\/\/\S+/gi, ' ');
+    // só reconhece o solicitante quando há um marcador claro (evita pegar "de ouvido" em "fone de ouvido")
+    const sol = (semUrl.match(/\b(?:solicitante|solicitado por|pedido por|pedido de|quem pediu)\s*[:\-]?\s*([A-Za-zÀ-ÿ]+(?: [A-Za-zÀ-ÿ]+){0,2})/i) || [])[1];
+    const produtoTxt = up(semUrl.replace(/\b(?:solicitante|solicitado por|pedido por|pedido de|quem pediu)\s*[:\-]?\s*[A-Za-zÀ-ÿ]+(?: [A-Za-zÀ-ÿ]+){0,2}/i, ''));
+    pend.unshift({ tid: novoId() + Math.random(), data: hoje(), solicitante: sol ? canon(sol) : '', local: u ? lojaPorLink(u) : 'MERCADO LIVRE',
+      produto: nomePorLink(u) || produtoTxt || 'PRODUTO', link: u, qtd: 1 });
   });
   $('lTexto').value = ''; renderPend(); toast(`⚡ ${linhas.length} item(ns) reconhecido(s). Confira e confirme.`);
 }
@@ -351,7 +463,7 @@ function renderPend() {
     <div class="card !border-purple-400 !border-2 space-y-2" data-tid="${p.tid}">
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
         <div><label class="lbl">Data</label><input type="date" data-h="data" class="inp" value="${esc(p.data)}"></div>
-        <div><label class="lbl text-rose-600">Solicitante (*)</label><input data-h="sol" data-sol class="inp up ${p.solicitante ? '' : 'falta'}" value="${esc(p.solicitante)}"></div>
+        <div><label class="lbl text-rose-600">Solicitante (*)</label><input data-h="sol" data-sol list="dlSol" autocomplete="off" class="inp up ${p.solicitante ? '' : 'falta'}" value="${esc(p.solicitante)}"></div>
         <div><label class="lbl">Local</label><input data-h="local" class="inp up" value="${esc(p.local)}"></div>
         <div class="flex items-end gap-2"><button data-ok class="btn bg-emerald-600 text-white flex-1">✅ OK</button><button data-del class="btn bg-slate-100 dark:bg-slate-700">✕</button></div>
       </div>
@@ -361,7 +473,7 @@ function renderPend() {
 }
 async function confirmarPend(card) {
   const h = k => card.querySelector(`[data-h=${k}]`).value;
-  const sol = up(h('sol'));
+  const sol = canon(h('sol'));
   if (!sol) { card.querySelector('[data-h=sol]').focus(); toast('Preencha o solicitante.', true); return false; }
   const subs = lerLinhas(card); if (!subs) return false;
   const c = montarCompra({ data: h('data') || hoje(), solicitante: sol, local: up(h('local')), link: h('link') }, subs);
@@ -370,58 +482,84 @@ async function confirmarPend(card) {
   await persistir(c); return true;
 }
 
-/* ---------- Edição ---------- */
-function abrirEdicao(id, sub) {
+/* ---------- Edição completa (cabeçalho + itens) ---------- */
+function abrirEdicao(id) {
   const it = compras.find(c => String(c.id) === String(id)); if (!it) return;
-  const alvo = sub !== '' ? it.sub_itens[sub] : it;
-  $('eId').value = id; $('eSub').value = sub;
-  document.querySelectorAll('.e-main, #eWData').forEach(e => e.style.display = sub !== '' ? 'none' : '');
-  $('eData').value = it.data || ''; $('eSol').value = it.solicitante || ''; $('eProd').value = alvo.produto || '';
-  $('eLocal').value = it.local || ''; $('eProj').value = it.projeto || '';
-  $('eQtd').value = alvo.qtd || 1; $('eTotal').value = Number(alvo.total || 0).toFixed(2); $('eUnit').value = Number(alvo.unit || 0).toFixed(2);
+  $('eId').value = it.id;
+  $('eData').value = it.data || ''; $('eSol').value = it.solicitante || ''; $('eLocal').value = it.local || ''; $('eProj').value = it.projeto || '';
   $('eEnt').checked = !!it.entregue; $('eEntData').value = it.data_entrega || ''; $('eLink').value = it.link || '';
-  $('modal').classList.remove('hidden');
+  $('eSol').classList.remove('falta');
+  const subs = (it.sub_itens || []).length ? it.sub_itens : [{ produto: it.produto, projeto: it.projeto, qtd: it.qtd, unit: it.unit, total: it.total }];
+  $('eRows').innerHTML = subs.map(s => rowHTML({ ...s, total: Number(s.total || 0).toFixed(2), unit: Number(s.unit || 0).toFixed(2) }, true)).join('');
+  somaEdit(); $('modal').classList.remove('hidden');
 }
 async function salvarEdicao() {
-  const it = compras.find(c => String(c.id) === $('eId').value), sub = $('eSub').value;
-  const sol = up($('eSol').value); if (!it || !sol) return toast('Informe o solicitante.', true);
-  const campos = { produto: up($('eProd').value), qtd: parseFloat($('eQtd').value) || 1, unit: parseFloat($('eUnit').value) || 0, total: parseFloat($('eTotal').value) || 0 };
-  it.solicitante = sol;
-  if (sub !== '') {
-    Object.assign(it.sub_itens[sub], campos);
-    it.total = it.sub_itens.reduce((a, s) => a + Number(s.total || 0), 0);
-    it.qtd = it.sub_itens.reduce((a, s) => a + Number(s.qtd || 1), 0);
-    it.unit = it.qtd ? it.total / it.qtd : 0;
-  } else {
-    Object.assign(it, campos, { data: $('eData').value, local: up($('eLocal').value), projeto: up($('eProj').value), link: $('eLink').value.trim(),
-      entregue: $('eEnt').checked, data_entrega: $('eEnt').checked ? ($('eEntData').value || maisDias(it.data, 10)) : '' });
-  }
+  const it = compras.find(c => String(c.id) === $('eId').value); if (!it) return;
+  const sol = canon($('eSol').value);
+  if (!sol) { $('eSol').focus(); return toast('Informe o solicitante.', true); }
+  const subs = lerLinhas($('eRows')); if (!subs) return;
+  if (!subs.length) return toast('A compra precisa ter ao menos um item (ou use Excluir compra).', true);
+  const ent = $('eEnt').checked, data = $('eData').value || it.data || hoje();
+  const novo = montarCompra({ data, solicitante: sol, local: up($('eLocal').value) || 'NÃO INFORMADO', link: $('eLink').value.trim(),
+    entregue: ent, data_entrega: ent ? ($('eEntData').value || maisDias(data, 10)) : '' }, subs);
+  const projH = up($('eProj').value);
+  novo.projeto = projH !== (it.projeto || '') ? projH : (novo.projeto || it.projeto || '');   // respeita edição manual do projeto
+  Object.assign(it, novo, { id: it.id });
   $('modal').classList.add('hidden'); render(); await persistir(it);
+  toast('✅ Compra atualizada.');
+}
+
+/* ---------- Exclusão (individual e em lote) ---------- */
+async function excluir(ids) {
+  const alvo = compras.filter(c => ids.includes(String(c.id)));
+  if (!alvo.length) return;
+  const msg = alvo.length === 1 ? `Apagar "${alvo[0].produto}" de ${alvo[0].solicitante}?` : `Apagar ${alvo.length} compra(s) selecionada(s)? Esta ação não pode ser desfeita.`;
+  if (!confirm(msg)) return;
+  const set = new Set(alvo);
+  compras = compras.filter(c => !set.has(c)); alvo.forEach(a => sel.delete(String(a.id)));
+  salvarLocal(); render();
+  const ok = await removerNuvem(alvo.map(a => a.id));
+  toast(ok ? `🗑 ${alvo.length} item(ns) apagado(s).` : 'Apagado aqui; a nuvem ainda não confirmou (será reenviado ao sincronizar).', !ok);
 }
 
 /* ---------- Render ---------- */
 function filtrar() {
-  const q = up($('fBusca').value), v = parseFloat($('fValor').value), s = $('fSol').value, e = $('fEntrega').value;
-  return compras.filter(i =>
-    (!s || up(i.solicitante) === s) &&
-    (!e || (e === 'e') === !!i.entregue) &&
-    (!q || [i.produto, i.local, i.solicitante].some(x => up(x).includes(q)) || (i.sub_itens || []).some(x => up(x.produto).includes(q))) &&
-    (!(v > 0) || [i.total, i.unit, ...(i.sub_itens || []).map(x => x.total)].some(x => Number(x) === v))
-  ).sort((a, b) => (!!a.entregue === !!b.entregue) ? new Date(b.data) - new Date(a.data) : a.entregue ? 1 : -1);
+  const q = norm($('fBusca').value), v = parseFloat($('fValor').value), s = norm($('fSol').value),
+        e = $('fEntrega').value, m = $('fMes').value, o = $('fOrdem').value;
+  const lista = compras.filter(i => {
+    if (s && norm(i.solicitante) !== s) return false;
+    if (e === 'p' && i.entregue) return false;
+    if (e === 'e' && !i.entregue) return false;
+    if (e === 'a' && !atrasada(i)) return false;
+    if (m && (i.data || '').slice(0, 7) !== m) return false;
+    if (q && ![i.produto, i.local, i.solicitante, i.projeto].some(x => norm(x).includes(q)) && !(i.sub_itens || []).some(x => norm(x.produto).includes(q))) return false;
+    if (v > 0 && ![i.total, i.unit, ...(i.sub_itens || []).flatMap(x => [x.total, x.unit])].some(x => Math.abs(Number(x) - v) < 0.005)) return false;
+    return true;
+  });
+  const dt = (a, b) => String(b.data || '').localeCompare(String(a.data || ''));
+  const ord = {
+    pend: (a, b) => (!!a.entregue - !!b.entregue) || dt(a, b), dt_d: dt, dt_a: (a, b) => -dt(a, b),
+    val_d: (a, b) => Number(b.total || 0) - Number(a.total || 0),
+    sol: (a, b) => norm(a.solicitante).localeCompare(norm(b.solicitante)) || dt(a, b)
+  };
+  return lista.sort(ord[o] || ord.pend);
 }
 
 function render() {
-  const lista = filtrar(), cont = {}, dups = {};
+  const lista = filtrar(), vis = lista.slice(0, limite), dups = {};
   compras.forEach(i => dups[chaveDup(i)] = (dups[chaveDup(i)] || 0) + 1);
+  const ids = new Set(compras.map(c => String(c.id))); [...sel].forEach(id => { if (!ids.has(id)) sel.delete(id); });
 
-  $('tbody').innerHTML = lista.length ? lista.map(i => {
-    const subs = i.sub_itens || [], aberto = !!exp[i.id], dup = dups[chaveDup(i)] > 1;
-    cont[i.solicitante] = (cont[i.solicitante] || 0) + 1;
-    let h = `<tr class="${i.entregue ? 'opacity-60' : ''}" data-id="${esc(i.id)}">
+  $('tbody').innerHTML = vis.length ? vis.map(i => {
+    const subs = i.sub_itens || [], aberto = !!exp[i.id], dup = dups[chaveDup(i)] > 1, atr = atrasada(i);
+    let h = `<tr class="${i.entregue ? 'opacity-60' : ''} ${sel.has(String(i.id)) ? 'bg-indigo-50 dark:bg-indigo-950/40' : ''}" data-id="${esc(i.id)}">
+      <td class="p-2"><input type="checkbox" data-a="sel" ${sel.has(String(i.id)) ? 'checked' : ''} aria-label="Selecionar"></td>
       <td class="p-2 whitespace-nowrap">${fd(i.data)}</td>
       <td class="p-2 font-bold whitespace-nowrap">${esc(i.solicitante)}</td>
       <td class="p-2 max-w-xs"><div class="flex items-center gap-2">${subs.length ? `<button data-a="exp" class="bg-indigo-100 dark:bg-indigo-900 px-1.5 rounded text-[10px] font-black">${aberto ? '➖' : '➕'}</button>` : ''}
-        <span class="truncate ${i.entregue ? 'line-through' : ''}">${esc(i.produto)}</span>${dup ? '<span class="text-[9px] font-black bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded">⚠ POSSÍVEL DUPLICADA</span>' : ''}</div></td>
+        <span class="truncate ${i.entregue ? 'line-through' : ''}">${esc(i.produto)}</span>
+        ${dup ? '<span class="text-[9px] font-black bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded whitespace-nowrap">⚠ POSSÍVEL DUPLICADA</span>' : ''}
+        ${atr ? '<span class="text-[9px] font-black bg-rose-100 text-rose-800 px-1.5 py-0.5 rounded whitespace-nowrap">⏰ ATRASADA</span>' : ''}</div></td>
       <td class="p-2 text-indigo-700 dark:text-indigo-300 whitespace-nowrap">${esc(i.local || '-')}</td>
       <td class="p-2 whitespace-nowrap">${esc(i.projeto || '-')}</td>
       <td class="p-2 text-center font-bold">${esc(i.qtd)}</td>
@@ -430,28 +568,76 @@ function render() {
       <td class="p-2 text-center"><label class="flex items-center gap-1 justify-center"><input type="checkbox" data-a="ent" ${i.entregue ? 'checked' : ''}><span class="text-[10px] font-bold">Entregue</span></label>
         <input type="date" data-a="entdata" value="${esc(i.data_entrega || '')}" class="text-[10px] p-1 border rounded dark:bg-slate-900 ${i.entregue ? '' : 'hidden'}"></td>
       <td class="p-2 text-center">${urlOk(i.link) ? `<a href="${esc(i.link)}" target="_blank" rel="noopener noreferrer" class="text-blue-600 font-bold normal-case">Link ↗</a>` : '-'}</td>
-      <td class="p-2 text-center whitespace-nowrap"><button data-a="edit" title="Editar" class="p-1">✏️</button><button data-a="del" title="Excluir" class="p-1 text-rose-500 font-bold">✕</button></td></tr>`;
+      <td class="p-2 text-center whitespace-nowrap">
+        <button data-a="edit" title="Editar" aria-label="Editar" class="p-1.5">✏️</button>
+        <button data-a="dup" title="Duplicar compra" aria-label="Duplicar" class="p-1.5">📋</button>
+        <button data-a="del" title="Excluir" aria-label="Excluir" class="p-1.5 text-rose-500">🗑</button></td></tr>`;
     if (subs.length && aberto) h += subs.map((s, n) => `<tr class="bg-indigo-50/50 dark:bg-slate-900/40 text-[11px]" data-id="${esc(i.id)}">
-      <td class="p-2 text-right text-slate-400">↳</td><td colspan="2" class="p-2 pl-6 font-semibold">📌 ${n + 1}. ${esc(s.produto)}</td><td colspan="2"></td>
+      <td></td><td class="p-2 text-right text-slate-400">↳</td><td colspan="2" class="p-2 pl-6 font-semibold">📌 ${n + 1}. ${esc(s.produto)}</td><td colspan="2" class="p-2">${esc(s.projeto || '')}</td>
       <td class="p-2 text-center font-bold">${esc(s.qtd)} un</td><td class="p-2 text-right">${brl(s.unit)}</td><td class="p-2 text-right font-bold text-emerald-600">${brl(s.total)}</td>
-      <td colspan="2" class="text-center"><button data-a="edit" data-sub="${n}" class="text-indigo-600 font-bold text-[10px]">✏️ Editar item</button></td><td></td></tr>`).join('');
+      <td colspan="3" class="text-center"><button data-a="edit" class="text-indigo-600 font-bold text-[10px]">✏️ Editar compra</button></td></tr>`).join('');
     return h;
-  }).join('') : '<tr><td colspan="11" class="text-center py-6 text-slate-400 italic normal-case">Nenhuma compra encontrada. Use as abas acima para lançar a primeira.</td></tr>';
+  }).join('') : '<tr><td colspan="12" class="text-center py-6 text-slate-400 italic normal-case">Nenhuma compra encontrada. Use as abas acima para lançar a primeira ou ajuste os filtros.</td></tr>';
+
+  $('maisBox').classList.toggle('hidden', lista.length <= limite);
+  $('bMais').textContent = `⬇ Mostrar mais (${Math.min(100, lista.length - limite)} de ${lista.length - limite} restantes)`;
+  $('chkAll').checked = vis.length > 0 && vis.every(i => sel.has(String(i.id)));
+  $('barra').classList.toggle('hidden', !sel.size);
+  $('nSel').textContent = `${sel.size} selecionado(s)`;
 
   $('cItens').textContent = lista.length;
-  $('contador').textContent = `${lista.length} DE ${compras.length} REGISTROS`;
+  $('contador').textContent = `${vis.length} DE ${lista.length} FILTRADOS · ${compras.length} NO TOTAL`;
   $('cTotal').textContent = brl(lista.reduce((a, i) => a + Number(i.total || 0), 0));
+  const mapa = mapaNomes(), cont = {};
+  lista.forEach(i => { const k = norm(i.solicitante); if (k) cont[k] = (cont[k] || 0) + 1; });
   const top = Object.entries(cont).sort((a, b) => b[1] - a[1])[0];
-  $('cTop').textContent = top ? `${top[0]} (${top[1]})` : '—';
+  $('cTop').textContent = top ? `${mapa[top[0]]} (${top[1]})` : '—';
 
-  const pessoas = {};
-  compras.forEach(i => { const n = up(i.solicitante) || 'OUTROS'; (pessoas[n] ??= { q: 0, v: 0 }); pessoas[n].q += Number(i.qtd || 1); pessoas[n].v += Number(i.total || 0); });
-  const nomes = Object.keys(pessoas).sort(), sel = $('fSol'), atual = sel.value;
-  sel.innerHTML = '<option value="">Todos os solicitantes</option>' + nomes.map(n => `<option>${esc(n)}</option>`).join('');
-  sel.value = nomes.includes(atual) ? atual : '';
-  $('cardsPessoas').innerHTML = nomes.map(n => `<button data-p="${esc(n)}" class="card !p-2.5 text-left hover:border-indigo-400 ${sel.value === n ? '!border-indigo-500' : ''}">
-    <span class="text-[10px] font-black uppercase block truncate">👤 ${esc(n)}</span>
-    <span class="flex justify-between text-[11px] font-black mt-1"><span class="text-indigo-600">${pessoas[n].q} un</span><span class="text-emerald-600">${brl(pessoas[n].v)}</span></span></button>`).join('');
+  // solicitantes: cartões, filtro e sugestões
+  const gr = agrupar(), nomes = gr.filter(g => g.k).map(g => g.nome), selSol = $('fSol'), atual = norm(selSol.value);
+  selSol.innerHTML = '<option value="">Todos os solicitantes</option>' + nomes.map(n => `<option>${esc(n)}</option>`).join('');
+  selSol.value = nomes.find(n => norm(n) === atual) || '';
+  $('dlSol').innerHTML = nomes.map(n => `<option value="${esc(n)}">`).join('');
+  $('cardsPessoas').innerHTML = gr.map(g => `<button data-p="${esc(g.nome)}" class="card !p-2.5 text-left hover:border-indigo-400 ${g.k && norm(selSol.value) === g.k ? '!border-indigo-500 !border-2' : ''}">
+    <span class="text-[10px] font-black uppercase block truncate">👤 ${esc(g.nome)}</span>
+    <span class="text-[10px] text-slate-500 block">${g.n} compra(s)${g.p ? ` · <b class="text-amber-600">${g.p} pend.</b>` : ''}</span>
+    <span class="flex justify-between text-[11px] font-black mt-1"><span class="text-indigo-600">${g.qtd} un</span><span class="text-emerald-600">${brl(g.v)}</span></span></button>`).join('');
+
+  // meses disponíveis
+  const meses = [...new Set(compras.map(c => (c.data || '').slice(0, 7)).filter(Boolean))].sort().reverse(), mAtual = $('fMes').value;
+  $('fMes').innerHTML = '<option value="">Todos os meses</option>' + meses.map(m => `<option value="${m}">${m.slice(5)}/${m.slice(0, 4)}</option>`).join('');
+  $('fMes').value = meses.includes(mAtual) ? mAtual : '';
+}
+
+/* ---------- Gerenciar solicitantes ---------- */
+function renderGer() {
+  $('gLista').innerHTML = agrupar().filter(g => g.k).map(g => {
+    const vars = [...g.vars].filter(v => v !== g.nome);
+    return `<div data-g class="flex flex-wrap items-center gap-2 p-2 rounded-xl border border-slate-200 dark:border-slate-700" data-k="${esc(g.k)}">
+      <div class="flex-1 min-w-[150px]"><div class="text-xs font-black uppercase">${esc(g.nome)}</div>
+        <div class="text-[10px] text-slate-500">${g.n} compra(s) · ${brl(g.v)}</div>
+        ${vars.length ? `<div class="text-[10px] text-amber-600 font-bold">variações: ${vars.map(esc).join(', ')}</div>` : ''}</div>
+      <input class="inp up !w-44" value="${esc(g.nome)}" list="dlSol" autocomplete="off" aria-label="Novo nome">
+      <button data-ren class="btn bg-indigo-600 text-white">Aplicar</button></div>`;
+  }).join('') || '<p class="text-xs text-slate-400 italic">Nenhum solicitante cadastrado ainda.</p>';
+}
+async function renomear(chave, para) {
+  const novo = limpa(para); if (!novo) return toast('Informe o novo nome.', true);
+  const alvo = compras.filter(c => norm(c.solicitante) === chave && c.solicitante !== novo);
+  if (!alvo.length) return toast('Nada a alterar.');
+  if (!confirm(`Alterar ${alvo.length} compra(s) para "${novo}"?`)) return;
+  alvo.forEach(c => c.solicitante = novo);
+  salvarLocal(); render(); renderGer();
+  const ok = await enviarLote(alvo);
+  toast(ok ? `✅ ${alvo.length} compra(s) atualizadas.` : 'Atualizado aqui; use "Salvar tudo" para reenviar à nuvem.', !ok);
+}
+async function padronizar() {
+  const mapa = mapaNomes(), alvo = compras.filter(c => c.solicitante && c.solicitante !== mapa[norm(c.solicitante)]);
+  if (!alvo.length) return toast('Nenhuma variação encontrada.');
+  alvo.forEach(c => c.solicitante = mapa[norm(c.solicitante)]);
+  salvarLocal(); render(); renderGer();
+  const ok = await enviarLote(alvo);
+  toast(ok ? `✨ ${alvo.length} compra(s) padronizadas.` : 'Padronizado aqui; use "Salvar tudo" para reenviar.', !ok);
 }
 
 /* ---------- Arquivos ---------- */
@@ -494,7 +680,7 @@ function importar(input) {
         });
       }
       if (!novos.length) throw new Error('Nenhum registro válido encontrado.');
-      novos = novos.map(i => ({ ...i, id: novoId() + Math.random() }));
+      novos = novos.map(i => ({ ...i, id: novoId() + Math.random(), solicitante: canon(i.solicitante) }));
       if (!confirm(`Adicionar ${novos.length} registro(s) ao histórico? Depois clique em "Salvar tudo" para enviar à nuvem.`)) return;
       compras = [...novos, ...compras]; salvarLocal(); render(); toast(`✅ ${novos.length} registro(s) importados.`);
     } catch (err) { toast('Erro ao ler o arquivo: ' + err.message, true); }
@@ -504,14 +690,17 @@ function importar(input) {
 }
 
 async function limparDuplicadas() {
+  // entre iguais, mantém a que já foi entregue / tem link; apaga as demais
+  const ord = [...compras].sort((a, b) => (!!b.entregue - !!a.entregue) || (urlOk(b.link) - urlOk(a.link)));
   const vistos = new Set(), remover = [];
-  compras.forEach(i => { const k = chaveDup(i); vistos.has(k) ? remover.push(i) : vistos.add(k); });
+  ord.forEach(i => { const k = chaveDup(i); vistos.has(k) ? remover.push(i) : vistos.add(k); });
   if (!remover.length) return toast('Nenhuma duplicidade encontrada.');
-  if (!confirm(`Remover ${remover.length} registro(s) duplicado(s)? Itens do mesmo solicitante, produto, valor e quantidade serão considerados iguais.`)) return;
-  const ids = new Set(remover.map(i => i.id));
-  compras = compras.filter(i => !ids.has(i.id)); salvarLocal(); render();
-  if (sb) for (const i of remover) if (!isLocal(i.id)) await sb.from(T).delete().eq('id', i.id);
-  toast(`⚡ ${remover.length} duplicada(s) removida(s).`);
+  if (!confirm(`Remover ${remover.length} registro(s) duplicado(s)? Itens do mesmo solicitante, produto, valor e quantidade são considerados iguais; fica a cópia já entregue/com link. Se você realmente comprou o mesmo item duas vezes, cancele e exclua manualmente.`)) return;
+  const set = new Set(remover);
+  compras = compras.filter(i => !set.has(i)); remover.forEach(r => sel.delete(String(r.id)));
+  salvarLocal(); render();
+  const ok = await removerNuvem(remover.map(i => i.id));
+  toast(ok ? `⚡ ${remover.length} duplicada(s) removida(s).` : 'Removidas aqui; a nuvem ainda não confirmou.', !ok);
 }
 
 /* ---------- Eventos ---------- */
@@ -523,6 +712,7 @@ function tema(escuro) {
   document.documentElement.classList.toggle('dark', escuro); $('bTema').textContent = escuro ? '☀️' : '🌙';
   try { localStorage.setItem('tema_portal', escuro ? 'dark' : 'light'); } catch {}
 }
+const refiltrar = () => { limite = 100; render(); };
 
 window.addEventListener('DOMContentLoaded', () => {
   let escuro = false;
@@ -537,15 +727,19 @@ window.addEventListener('DOMContentLoaded', () => {
   $('abas').onclick = e => { const b = e.target.closest('[data-tab]'); if (b) aba(b.dataset.tab); };
   $('bAddRow').onclick = () => { $('mRows').insertAdjacentHTML('beforeend', rowHTML({}, true)); $('mRows').lastElementChild.querySelector('[data-f=prod]').focus(); };
   $('mRows').onclick = e => { if (e.target.matches('[data-rm]')) e.target.closest('[data-row]').remove(); };
-  $('mEntregue').onchange = null;
   $('bManual').onclick = lancarManual; $('bNota').onclick = lancarNota; $('bLink').onclick = reconhecer;
   $('bColar').onclick = async () => { try { $('lTexto').value = (await navigator.clipboard.readText()).trim(); reconhecer(); } catch { toast('Não foi possível acessar a área de transferência.', true); } };
   $('fNota').onchange = e => { const f = e.target.files[0]; if (!f) return; const r = new FileReader(); r.onload = () => { $('nTexto').value = r.result; toast('Texto carregado. Confira e processe.'); }; r.readAsText(f, 'UTF-8'); e.target.value = ''; };
   $('fArquivo').onchange = e => importar(e.target);
   $('bCSV').onclick = exportarCSV; $('bDup').onclick = limparDuplicadas;
   $('bSync').onclick = () => carregar(false); $('bSalvar').onclick = salvarTudo;
-  ['fBusca', 'fValor'].forEach(i => $(i).oninput = render); ['fSol', 'fEntrega'].forEach(i => $(i).onchange = render);
-  $('cardsPessoas').onclick = e => { const b = e.target.closest('[data-p]'); if (b) { $('fSol').value = $('fSol').value === b.dataset.p ? '' : b.dataset.p; render(); } };
+  ['fBusca', 'fValor'].forEach(i => $(i).oninput = refiltrar);
+  ['fSol', 'fEntrega', 'fMes', 'fOrdem'].forEach(i => $(i).onchange = refiltrar);
+  $('bMais').onclick = () => { limite += 100; render(); };
+  $('cardsPessoas').onclick = e => {
+    const b = e.target.closest('[data-p]'); if (!b) return;
+    const s = $('fSol'); s.value = norm(s.value) === norm(b.dataset.p) ? '' : (b.dataset.p === 'SEM SOLICITANTE' ? '' : b.dataset.p); refiltrar();
+  };
 
   $('listaPend').onclick = e => {
     const card = e.target.closest('[data-tid]'); if (!card) return;
@@ -554,27 +748,69 @@ window.addEventListener('DOMContentLoaded', () => {
   };
   $('bTodos').onclick = async () => { for (const c of [...$('listaPend').querySelectorAll('[data-tid]')]) if (!await confirmarPend(c)) break; };
 
+  // tabela: expandir / editar / duplicar / excluir
   $('tbody').onclick = async e => {
     const b = e.target.closest('[data-a]'); if (!b) return;
     const id = b.closest('tr').dataset.id, a = b.dataset.a;
     if (a === 'exp') { exp[id] = !exp[id]; render(); }
-    if (a === 'edit') abrirEdicao(id, b.dataset.sub ?? '');
-    if (a === 'del') {
-      const it = compras.find(c => String(c.id) === id);
-      if (!it || !confirm(`Apagar "${it.produto}" de ${it.solicitante}?`)) return;
-      compras = compras.filter(c => c !== it); salvarLocal(); render(); toast('Item apagado.');
-      if (sb && !isLocal(it.id)) try { await sb.from(T).delete().eq('id', it.id); } catch { toast('Apagado só localmente.', true); }
+    if (a === 'edit') abrirEdicao(id);
+    if (a === 'del') excluir([id]);
+    if (a === 'dup') {
+      const it = compras.find(c => String(c.id) === id); if (!it) return;
+      const c = JSON.parse(JSON.stringify(it)); c.id = novoId(); c.data = hoje(); c.entregue = false; c.data_entrega = '';
+      compras.unshift(c); salvarLocal(); render(); persistir(c, true);
+      toast('📋 Cópia criada. Ajuste e salve.'); abrirEdicao(c.id);
     }
   };
   $('tbody').onchange = async e => {
-    const a = e.target.dataset.a; if (a !== 'ent' && a !== 'entdata') return;
-    const it = compras.find(c => String(c.id) === e.target.closest('tr').dataset.id); if (!it) return;
+    const a = e.target.dataset.a; if (!['ent', 'entdata', 'sel'].includes(a)) return;
+    const id = e.target.closest('tr').dataset.id;
+    if (a === 'sel') { e.target.checked ? sel.add(id) : sel.delete(id); return render(); }
+    const it = compras.find(c => String(c.id) === id); if (!it) return;
     if (a === 'ent') { it.entregue = e.target.checked; it.data_entrega = it.entregue ? (it.data_entrega || maisDias(it.data, 10)) : ''; }
     else it.data_entrega = e.target.value;
     render(); await persistir(it);
   };
-  $('eFechar').onclick = $('eCancel').onclick = () => $('modal').classList.add('hidden');
+  $('chkAll').onchange = e => { filtrar().slice(0, limite).forEach(i => e.target.checked ? sel.add(String(i.id)) : sel.delete(String(i.id))); render(); };
+
+  // ações em lote
+  $('bLimpaSel').onclick = () => { sel.clear(); render(); };
+  $('bDelSel').onclick = () => excluir([...sel]);
+  $('bEntSel').onclick = async () => {
+    const alvo = compras.filter(c => sel.has(String(c.id)) && !c.entregue); if (!alvo.length) return toast('Todos já estão entregues.');
+    alvo.forEach(c => { c.entregue = true; c.data_entrega = c.data_entrega || maisDias(c.data, 10); });
+    sel.clear(); salvarLocal(); render();
+    const ok = await enviarLote(alvo); toast(ok ? `📦 ${alvo.length} marcada(s) como entregue.` : 'Marcado aqui; use "Salvar tudo" para reenviar.', !ok);
+  };
+  $('bSolSel').onclick = async () => {
+    const r = prompt(`Novo solicitante para as ${sel.size} compra(s) selecionada(s):`); if (r === null) return;
+    const nome = canon(r); if (!nome) return toast('Informe um nome.', true);
+    const alvo = compras.filter(c => sel.has(String(c.id)));
+    alvo.forEach(c => c.solicitante = nome); sel.clear(); salvarLocal(); render();
+    const ok = await enviarLote(alvo); toast(ok ? `👤 ${alvo.length} compra(s) atribuídas a ${nome}.` : 'Alterado aqui; use "Salvar tudo" para reenviar.', !ok);
+  };
+
+  // modal de edição
+  const fechar = () => $('modal').classList.add('hidden');
+  $('eFechar').onclick = $('eCancel').onclick = fechar;
+  $('modal').onclick = e => { if (e.target === $('modal')) fechar(); };
   $('eSalvar').onclick = salvarEdicao;
+  $('eAddRow').onclick = () => { $('eRows').insertAdjacentHTML('beforeend', rowHTML({}, true)); $('eRows').lastElementChild.querySelector('[data-f=prod]').focus(); };
+  $('eRows').onclick = e => {
+    if (!e.target.matches('[data-rm]')) return;
+    if ($('eRows').querySelectorAll('[data-row]').length < 2) return toast('A compra precisa de ao menos um item. Para apagar tudo, use "Excluir compra".', true);
+    e.target.closest('[data-row]').remove(); somaEdit();
+  };
+  $('eExcluir').onclick = async () => { const id = $('eId').value; fechar(); await excluir([id]); };
+
+  // modal de solicitantes
+  const fecharG = () => $('mGer').classList.add('hidden');
+  $('bGer').onclick = () => { renderGer(); $('mGer').classList.remove('hidden'); };
+  $('gFechar').onclick = fecharG;
+  $('mGer').onclick = e => { if (e.target === $('mGer')) fecharG(); };
+  $('gPadr').onclick = padronizar;
+  $('gLista').onclick = e => { if (!e.target.matches('[data-ren]')) return; const row = e.target.closest('[data-g]'); renomear(row.dataset.k, row.querySelector('input').value); };
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { fechar(); fecharG(); } });
 
   try { sb = window.supabase.createClient(SB_URL, SB_KEY); carregar(true); } catch { console.warn('Modo local'); }
 });
