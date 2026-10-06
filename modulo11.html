@@ -80,13 +80,13 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1e293
     <input type="hidden" id="mAlvo">
     <div class="border-2 border-dashed border-teal-300 bg-teal-50/50 p-4 rounded-2xl text-center space-y-2">
       <input type="file" id="mArq" accept="image/*" onchange="if(this.files[0])ocr(this.files[0]);this.value=''" class="w-full text-xs file:mr-3 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:font-bold file:bg-teal-700 file:text-white cursor-pointer">
-      <p class="text-[11px] text-slate-500">Escolha o print ou capture com <b>Win+Shift+S</b> e pressione <b>Ctrl+V</b> nesta tela.</p>
+      <p class="text-[11px] text-slate-500">Escolha o ficheiro de imagem ou faça captura com <b>Win+Shift+S</b> e utilize <b>Ctrl+V</b> nesta janela.</p>
     </div>
     <div id="mProg" class="hidden bg-slate-50 p-3 rounded-2xl border text-xs space-y-1.5">
-      <div class="flex justify-between font-bold"><span id="mProgTxt">Lendo...</span><span id="mProgPct" class="text-teal-700">0%</span></div>
+      <div class="flex justify-between font-bold"><span id="mProgTxt">A ler...</span><span id="mProgPct" class="text-teal-700">0%</span></div>
       <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden"><div id="mBarra" class="bg-[#007e7a] h-full transition-all" style="width:0%"></div></div>
     </div>
-    <div id="mRes" class="bg-slate-50 p-4 rounded-2xl border text-xs space-y-2 text-slate-700">Aguardando print...</div>
+    <div id="mRes" class="bg-slate-50 p-4 rounded-2xl border text-xs space-y-2 text-slate-700">A aguardar imagem...</div>
     <div class="flex justify-end gap-2 pt-3 border-t">
       <button onclick="fecharModal()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Cancelar</button>
       <button id="mAplicar" onclick="aplicar()" class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white">Aplicar</button>
@@ -107,11 +107,11 @@ const esc=s=>String(s==null?'':s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 const num=v=>Number(v)||0;
 const TO=(v,c=2)=>num(v).toLocaleString('pt-BR',{minimumFractionDigits:c,maximumFractionDigits:c})+' TO';
 const BRL=v=>num(v).toLocaleString('pt-BR',{style:'currency',currency:'BRL'});
-const sid=s=>String(s).replace(/[^\w-]/g,'');
+const sid=s=>String(s||'').replace(/[^\w-]/g,'');
 const hoje=()=>new Date().toISOString().slice(0,10);
 const sz=s=>String(s==null?'':s).replace(/^0+/,'');
 const norm=n=>{n=(n||'').trim();return /gerdau/i.test(n)?'GERDAU AÇOS LONGOS S.A.':(n||'OUTROS CLIENTES')};
-const aviso=m=>{const t=$('toast');t.textContent=m;t.style.opacity=1;clearTimeout(tt);tt=setTimeout(()=>t.style.opacity=0,3800)};
+const aviso=m=>{const t=$('toast');if(!t)return;t.textContent=m;t.style.opacity=1;clearTimeout(tt);tt=setTimeout(()=>t.style.opacity=0,3800)};
 const loc=()=>{try{localStorage.setItem(KEY,JSON.stringify(dados))}catch(e){}};
 const BR=s=>{s=String(s==null?'':s).trim();if(s.indexOf(',')>=0)s=s.replace(/\./g,'').replace(',','.');return parseFloat(s)||0};
 const qTO=(n,u)=>{if(/KG/i.test(u))return(parseFloat(String(n).replace(/\./g,'').replace(',','.'))||0)/1000;return BR(n)};
@@ -121,92 +121,144 @@ const T=[
  {h:'bg-purple-700',l:'bg-purple-50/50',b:'border-purple-400',t:'text-purple-900',d:'bg-purple-800',o:'border-purple-300'},
  {h:'bg-emerald-700',l:'bg-emerald-50/50',b:'border-emerald-400',t:'text-emerald-900',d:'bg-emerald-800',o:'border-emerald-300'},
  {h:'bg-amber-600',l:'bg-amber-50/50',b:'border-amber-400',t:'text-amber-900',d:'bg-amber-700',o:'border-amber-300'}];
-const temas=emps=>{let k=0;const m={};emps.forEach(e=>m[e]=/gerdau/i.test(e)?T[0]:T[1+(k++)%3]);return m};
+const temas=emps=>{let k=0;const m={};(emps||[]).forEach(e=>m[e]=/gerdau/i.test(e)?T[0]:T[1+(k++)%3]);return m};
 const ST={online:['bg-emerald-50 text-emerald-700 border-emerald-200','bg-emerald-500 animate-pulse'],gravando:['bg-amber-50 text-amber-700 border-amber-200','bg-amber-500 animate-ping'],offline:['bg-slate-100 text-slate-600 border-slate-200','bg-slate-400']};
-function status(s,txt){$('badgeConexao').className='text-[11px] font-bold px-2.5 py-1.5 rounded-xl border flex items-center gap-1.5 '+ST[s][0];$('pontoConexao').className='w-2 h-2 rounded-full '+ST[s][1];$('textoConexao').textContent=txt}
+function status(s,txt){
+  const b=$('badgeConexao'),p=$('pontoConexao'),t=$('textoConexao');
+  if(!b||!p||!t)return;
+  b.className='text-[11px] font-bold px-2.5 py-1.5 rounded-xl border flex items-center gap-1.5 '+ST[s][0];
+  p.className='w-2 h-2 rounded-full '+ST[s][1];
+  t.textContent=txt;
+}
 
 const DEFAULT=()=>({id:'115939257',status:'ATIVO',contrato:{numero:'0000071823',item:'30',qtdTotalTO:2635,valorTotalBRL:3320100},
  ov:{numero:'115939257',cliente:'AUCOBRE GESTÃO DE RESIDUOS LTDA.',pedidoDRS:'DSR 018-2025',
- itens:[{itemSap:'40',material:'SUCATA DE FIO-CABO DE ALUMÍNIO E...',qtdTO:.3},{itemSap:'60',material:'SUCATA DE FIO-CABO DE COBRE ENCA...',qtdTO:.3}],
- qtdLiberadaTO:.6,valorBRL:8745.3,precoUnitarioPorTO:PRECO},gastos:[]});
+ itens:[{itemSap:'40',material:'SUCATA DE FIO-CABO DE ALUMÍNIO',qtdTO:0.3},{itemSap:'60',material:'SUCATA DE FIO-CABO DE COBRE',qtdTO:0.3}],
+ qtdLiberadaTO:0.6,valorBRL:8745.3,precoUnitarioPorTO:PRECO},gastos:[]});
 
-function calc(i){const canc=i.status==='CANCELADO',lib=num(i.ov.qtdLiberadaTO),gasto=(i.gastos||[]).reduce((s,g)=>s+num(g.pesoTO),0),
+function calc(i){
+ if(!i||!i.ov)return{canc:false,lib:0,gasto:0,unit:PRECO,vg:0,saldo:0,vs:0};
+ const canc=i.status==='CANCELADO',lib=num(i.ov.qtdLiberadaTO),gasto=(i.gastos||[]).reduce((s,g)=>s+num(g.pesoTO),0),
  unit=num(i.ov.precoUnitarioPorTO)||(lib>0?num(i.ov.valorBRL)/lib:PRECO),vg=gasto*unit;
  return{canc,lib,gasto,unit,vg,saldo:canc?0:Math.max(0,lib-gasto),vs:canc?0:Math.max(0,num(i.ov.valorBRL)-vg)}}
 
 function totais(list){const t={n:0,lib:0,libV:0,gas:0,gasV:0,sal:0,salV:0};
- list.forEach(i=>{const c=calc(i);if(c.canc)return;t.n++;t.lib+=c.lib;t.libV+=num(i.ov.valorBRL);t.gas+=c.gasto;t.gasV+=c.vg;t.sal+=c.saldo;t.salV+=c.vs});return t}
+ (list||[]).forEach(i=>{const c=calc(i);if(c.canc)return;t.n++;t.lib+=c.lib;t.libV+=num(i.ov?i.ov.valorBRL:0);t.gas+=c.gasto;t.gasV+=c.vg;t.sal+=c.saldo;t.salV+=c.vs});return t}
 const pct=t=>t.lib>0?Math.round(t.sal/t.lib*100):0;
 
 /* ---------- Supabase / armazenamento ---------- */
-const payload=i=>({id:String(i.id),ov:String(i.ov.numero),status:i.status||'ATIVO',cliente:i.ov.cliente,material:(i.ov.itens||[]).map(x=>x.material).join(' / '),itens:i.ov.itens||[],pedido_drs:i.ov.pedidoDRS,qtd_liberada_to:num(i.ov.qtdLiberadaTO),qtd_liberada_kg:num(i.ov.qtdLiberadaTO)*1000,valor_brl:num(i.ov.valorBRL),preco_unitario_to:num(i.ov.precoUnitarioPorTO)||PRECO,contrato_numero:i.contrato.numero,contrato_total_to:num(i.contrato.qtdTotalTO),gastos:i.gastos||[]});
+const payload=i=>({id:String(i.id),ov:String(i.ov.numero),status:i.status||'ATIVO',cliente:i.ov.cliente,material:(i.ov.itens||[]).map(x=>x.material).join(' / '),itens:i.ov.itens||[],pedido_drs:i.ov.pedidoDRS,qtd_liberada_to:num(i.ov.qtdLiberadaTO),qtd_liberada_kg:num(i.ov.qtdLiberadaTO)*1000,valor_brl:num(i.ov.valorBRL),preco_unitario_to:num(i.ov.precoUnitarioPorTO)||PRECO,contrato_numero:i.contrato?i.contrato.numero:'',contrato_total_to:num(i.contrato?i.contrato.qtdTotalTO:0),gastos:i.gastos||[]});
 const fromRow=d=>{const it=Array.isArray(d.itens)?d.itens:[],soma=it.reduce((s,x)=>s+num(x.qtdTO),0),q=soma||num(d.qtd_liberada_to),v=num(d.valor_brl);
  return{id:String(d.id),status:d.status||'ATIVO',contrato:{numero:d.contrato_numero||'0000071823',item:'30',qtdTotalTO:num(d.contrato_total_to)||2635,valorTotalBRL:num(d.contrato_total_brl)},
  ov:{numero:String(d.ov),cliente:d.cliente||'',pedidoDRS:d.pedido_drs||'',itens:it,qtdLiberadaTO:q,valorBRL:v,precoUnitarioPorTO:num(d.preco_unitario_to)||(q>0&&v>0?v/q:PRECO)},gastos:Array.isArray(d.gastos)?d.gastos:[]}};
 
 async function carregar(){
- if(sb){try{status('gravando','Sincronizando...');
+ if(sb){try{status('gravando','A sincronizar...');
   const{data,error}=await sb.from(TABELA).select('*').order('created_at',{ascending:false});
   if(!error&&data&&data.length){dados=data.map(fromRow);loc();render();status('online','Nuvem Conectada');return true}
  }catch(e){console.warn(e)}}
- let raw=null;try{raw=JSON.parse(localStorage.getItem(KEY))}catch(e){}
- dados=Array.isArray(raw)?raw:[DEFAULT()];render();status('offline','Salvo localmente');return false}
+ try{
+   const raw=JSON.parse(localStorage.getItem(KEY));
+   if(Array.isArray(raw)&&raw.length>0&&raw[0].ov){dados=raw}else{dados=[DEFAULT()]}
+ }catch(e){dados=[DEFAULT()]}
+ render();status('offline','Salvo localmente');return false}
 
 async function salvarTudo(){
  const b=$('btnSalvar');b.disabled=true;loc();
- if(!sb){aviso('Salvo no armazenamento local.');b.disabled=false;return}
- status('gravando','Gravando...');
- try{const{error}=await sb.from(TABELA).upsert(dados.map(payload),{onConflict:'id'});if(error)throw error;status('online','Salvo com sucesso');aviso('✓ Todas as OVs foram salvas na nuvem.')}
+ if(!sb){aviso('Guardado no armazenamento local.');b.disabled=false;return}
+ status('gravando','A gravar...');
+ try{const{error}=await sb.from(TABELA).upsert(dados.map(payload),{onConflict:'id'});if(error)throw error;status('online','Guardado com sucesso');aviso('✓ Todas as OVs foram guardadas na nuvem.')}
  catch(e){status('offline','Erro na gravação');aviso('Erro ao gravar: '+(e.message||e))}
  b.disabled=false}
 
 async function sincronizar(){
- const i=$('iconeSync');i.classList.add('animate-spin');
- const ok=await carregar();i.classList.remove('animate-spin');
- aviso(ok?'Sincronizado com a nuvem.':'Nuvem indisponível: mostrando dados locais.')}
+ const i=$('iconeSync');if(i)i.classList.add('animate-spin');
+ const ok=await carregar();if(i)i.classList.remove('animate-spin');
+ aviso(ok?'Sincronizado com a nuvem.':'Nuvem indisponível: a apresentar dados locais.')}
 
 function persistir(i){
  if(!dados.some(x=>x.id===i.id))dados.unshift(i);
  loc();render();
  clearTimeout(pend.get(i.id));
  pend.set(i.id,setTimeout(async()=>{if(!sb)return;
-  try{status('gravando','Gravando...');const{error}=await sb.from(TABELA).upsert(payload(i),{onConflict:'id'});if(error)throw error;status('online','Nuvem Conectada')}
+  try{status('gravando','A gravar...');const{error}=await sb.from(TABELA).upsert(payload(i),{onConflict:'id'});if(error)throw error;status('online','Nuvem Conectada')}
   catch(e){status('offline','Pendente de envio')}},600))}
 
-/* ---------- renderização ---------- */
+/* ---------- renderização defensiva ---------- */
 const mini=(rot,cls,t)=>`<div class="${cls} border rounded-xl p-2.5"><span class="block text-[10px] font-bold uppercase opacity-70">${rot}</span><div class="text-sm font-black">${TO(t[0],2)}</div><div class="text-[11px] font-bold opacity-80">${BRL(t[1])}</div></div>`;
 
 function render(){
- const q=($('filtroTexto').value||'').toLowerCase().trim();
- const emps=[...new Set(dados.map(i=>norm(i.ov.cliente)))],tm=temas(emps);
- const sel=$('filtroEmpresa'),atual=sel.value;
- sel.innerHTML='<option value="TODAS">Todas as Empresas</option>'+emps.map(e=>`<option value="${esc(e)}">${esc(e)}</option>`).join('');
- sel.value=emps.includes(atual)?atual:'TODAS';
- const fe=sel.value;
+ try {
+   const q=($('filtroTexto')?$('filtroTexto').value||'':'').toLowerCase().trim();
+   const emps=[...new Set(dados.map(i=>norm(i.ov?i.ov.cliente:'')))].filter(Boolean);
+   const tm=temas(emps);
+   const sel=$('filtroEmpresa');
+   if(sel){
+     const atual=sel.value;
+     sel.innerHTML='<option value="TODAS">Todas as Empresas</option>'+emps.map(e=>`<option value="${esc(e)}">${esc(e)}</option>`).join('');
+     sel.value=emps.includes(atual)?atual:'TODAS';
+   }
+   const fe=sel?sel.value:'TODAS';
 
- const escopo=fe==='TODAS'?dados:dados.filter(i=>norm(i.ov.cliente)===fe),G=totais(escopo);
- $('tTitulo').textContent=fe==='TODAS'?'📊 Total Geral Consolidado (todas as empresas)':'📊 Total Geral — '+fe;
- $('tLib').textContent=TO(G.lib);$('tLibV').textContent=BRL(G.libV);$('tGas').textContent=TO(G.gas);$('tGasV').textContent=BRL(G.gasV);$('tSal').textContent=TO(G.sal);$('tSalV').textContent=BRL(G.salV)+' livre';$('tPct').textContent=pct(G)+'% livre';
- $('hCount').textContent=G.n+' OV(s)';$('hSal').textContent=TO(G.sal);$('hSalV').textContent=BRL(G.salV);$('hEsc').textContent=fe==='TODAS'?'Saldo Livre Geral':'Saldo Livre • '+fe.split(' ')[0];
+   const escopo=fe==='TODAS'?dados:dados.filter(i=>norm(i.ov?i.ov.cliente:'')===fe);
+   const G=totais(escopo);
+   
+   if($('tTitulo'))$('tTitulo').textContent=fe==='TODAS'?'📊 Total Geral Consolidado (todas as empresas)':'📊 Total Geral — '+fe;
+   if($('tLib'))$('tLib').textContent=TO(G.lib);
+   if($('tLibV'))$('tLibV').textContent=BRL(G.libV);
+   if($('tGas'))$('tGas').textContent=TO(G.gas);
+   if($('tGasV'))$('tGasV').textContent=BRL(G.gasV);
+   if($('tSal'))$('tSal').textContent=TO(G.sal);
+   if($('tSalV'))$('tSalV').textContent=BRL(G.salV)+' livre';
+   if($('tPct'))$('tPct').textContent=pct(G)+'% livre';
+   if($('hCount'))$('hCount').textContent=G.n+' OV(s)';
+   if($('hSal'))$('hSal').textContent=TO(G.sal);
+   if($('hSalV'))$('hSalV').textContent=BRL(G.salV);
+   if($('hEsc'))$('hEsc').textContent=fe==='TODAS'?'Saldo Livre Geral':'Saldo Livre • '+fe.split(' ')[0];
 
- $('cardsEmp').innerHTML=emps.map(e=>{const t=tm[e],p=totais(dados.filter(i=>norm(i.ov.cliente)===e)),total=dados.filter(i=>norm(i.ov.cliente)===e).length;
-  return`<div data-emp="${esc(e)}" onclick="filtrarEmpresa(this.dataset.emp)" class="cursor-pointer border-2 ${t.b} ${t.l} rounded-2xl p-3.5 shadow-sm hover:-translate-y-1 transition ${fe===e?'ring-2 ring-teal-500':''}">
-  <div class="flex justify-between mb-2"><span class="${t.d} text-white text-[10px] font-black px-2.5 py-0.5 rounded-md">EMPRESA</span><span class="text-[11px] font-bold text-slate-500">${p.n} OV(s) ativa(s)${total>p.n?' • '+(total-p.n)+' cancelada(s)':''}</span></div>
-  <div class="font-black text-sm ${t.t} truncate" title="${esc(e)}">${esc(e)}</div>
-  <div class="mt-2 pt-2 border-t grid grid-cols-3 gap-1.5">${mini('Total OVs','bg-white',[p.lib,p.libV])}${mini('Faturado','bg-rose-50 text-rose-700',[p.gas,p.gasV])}${mini('Saldo livre','bg-emerald-50 text-emerald-800',[p.sal,p.salV])}</div></div>`}).join('');
+   if($('cardsEmp')) {$('cardsEmp').innerHTML=emps.map(e=>{
+       const t=tm[e]||T[0],p=totais(dados.filter(i=>norm(i.ov?i.ov.cliente:'')===e)),total=dados.filter(i=>norm(i.ov?i.ov.cliente:'')===e).length;
+       return`<div data-emp="${esc(e)}" onclick="filtrarEmpresa(this.dataset.emp)" class="cursor-pointer border-2 ${t.b} ${t.l} rounded-2xl p-3.5 shadow-sm hover:-translate-y-1 transition ${fe===e?'ring-2 ring-teal-500':''}">
+       <div class="flex justify-between mb-2"><span class="${t.d} text-white text-[10px] font-black px-2.5 py-0.5 rounded-md">EMPRESA</span><span class="text-[11px] font-bold text-slate-500">${p.n} OV(s) ativa(s)${total>p.n?' • '+(total-p.n)+' cancelada(s)':''}</span></div>
+       <div class="font-black text-sm ${t.t} truncate" title="${esc(e)}">${esc(e)}</div>
+       <div class="mt-2 pt-2 border-t grid grid-cols-3 gap-1.5">${mini('Total OVs','bg-white',[p.lib,p.libV])}${mini('Faturado','bg-rose-50 text-rose-700',[p.gas,p.gasV])}${mini('Saldo livre','bg-emerald-50 text-emerald-800',[p.sal,p.salV])}</div></div>`}).join('');
+   }
 
- const lista=dados.filter(i=>(fe==='TODAS'||norm(i.ov.cliente)===fe)&&(!q||[i.ov.numero,i.contrato.numero,i.ov.cliente,i.ov.pedidoDRS,...(i.ov.itens||[]).map(x=>x.material)].join(' ').toLowerCase().includes(q)));
- if(!lista.length){$('containerOVs').innerHTML='<div class="bg-white p-12 text-center rounded-2xl border font-bold text-slate-700">Nenhum registro encontrado</div>';return}
- const grupos={};lista.forEach(i=>(grupos[norm(i.ov.cliente)]=grupos[norm(i.ov.cliente)]||[]).push(i));
- $('containerOVs').innerHTML=Object.keys(grupos).map(e=>{const t=tm[e],all=dados.filter(i=>norm(i.ov.cliente)===e),p=totais(all);
-  const ct={};all.forEach(i=>{if(i.status==='CANCELADO')return;const k=i.contrato.numero;ct[k]=ct[k]||{tot:num(i.contrato.qtdTotalTO),lib:0};ct[k].lib+=num(i.ov.qtdLiberadaTO)});
-  const ctx=Object.keys(ct).map(k=>`<span class="bg-white/15 px-2 py-0.5 rounded-lg">Contrato ${esc(k)}: ${TO(ct[k].tot,0)} • em OVs ${TO(ct[k].lib)} • sem OV ${TO(Math.max(0,ct[k].tot-ct[k].lib))}</span>`).join(' ');
-  return`<div class="rounded-3xl border-2 ${t.b} ${t.l} space-y-4 p-5"><div class="${t.h} text-white p-4 rounded-2xl space-y-3">
-   <div class="flex justify-between items-center"><h3 class="text-base font-black">${esc(e)}</h3><span class="text-xs bg-white/20 px-3 py-1 rounded-xl font-bold">${grupos[e].length} OV(s)</span></div>
-   <div class="text-[11px] font-bold uppercase opacity-80">Total desta empresa (todas as OVs)</div>
-   <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-slate-800">${mini('Total das OVs','bg-white',[p.lib,p.libV])}${mini('Já faturado','bg-rose-50 text-rose-700',[p.gas,p.gasV])}${mini('Saldo livre ('+pct(p)+'%)','bg-emerald-50 text-emerald-800',[p.sal,p.salV])}</div>
-   <div class="text-[10px] font-semibold flex flex-wrap gap-1.5">${ctx}</div></div>
-   <div class="space-y-4">${grupos[e].map(i=>cardOV(i,t)).join('')}</div></div>`}).join('')}
+   const lista=dados.filter(i=>{
+     if(!i||!i.ov)return false;
+     const matchEmp=(fe==='TODAS'||norm(i.ov.cliente)===fe);
+     const matchTxt=(!q||[i.ov.numero,i.contrato?i.contrato.numero:'',i.ov.cliente,i.ov.pedidoDRS,...(i.ov.itens||[]).map(x=>x.material)].join(' ').toLowerCase().includes(q));
+     return matchEmp&&matchTxt;
+   });
+
+   if(!lista.length){
+     if($('containerOVs'))$('containerOVs').innerHTML='<div class="bg-white p-12 text-center rounded-2xl border font-bold text-slate-700">Nenhum registo encontrado</div>';
+     return;
+   }
+
+   const grupos={};
+   lista.forEach(i=>{
+     const cName=norm(i.ov.cliente);
+     grupos[cName]=grupos[cName]||[];
+     grupos[cName].push(i);
+   });
+
+   if($('containerOVs')) {$('containerOVs').innerHTML=Object.keys(grupos).map(e=>{
+      const t=tm[e]||T[0],all=dados.filter(i=>norm(i.ov?i.ov.cliente:'')===e),p=totais(all);
+      const ct={};
+      all.forEach(i=>{if(i.status==='CANCELADO'||!i.contrato)return;const k=i.contrato.numero||'S/N';ct[k]=ct[k]||{tot:num(i.contrato.qtdTotalTO),lib:0};ct[k].lib+=num(i.ov.qtdLiberadaTO)});
+      const ctx=Object.keys(ct).map(k=>`<span class="bg-white/15 px-2 py-0.5 rounded-lg">Contrato ${esc(k)}: ${TO(ct[k].tot,0)} • em OVs ${TO(ct[k].lib)} • sem OV ${TO(Math.max(0,ct[k].tot-ct[k].lib))}</span>`).join(' ');
+      return`<div class="rounded-3xl border-2 ${t.b} ${t.l} space-y-4 p-5"><div class="${t.h} text-white p-4 rounded-2xl space-y-3">
+       <div class="flex justify-between items-center"><h3 class="text-base font-black">${esc(e)}</h3><span class="text-xs bg-white/20 px-3 py-1 rounded-xl font-bold">${grupos[e].length} OV(s)</span></div>
+       <div class="text-[11px] font-bold uppercase opacity-80">Total desta empresa (todas as OVs)</div>
+       <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 text-slate-800">${mini('Total das OVs','bg-white',[p.lib,p.libV])}${mini('Já faturado','bg-rose-50 text-rose-700',[p.gas,p.gasV])}${mini('Saldo livre ('+pct(p)+'%)','bg-emerald-50 text-emerald-800',[p.sal,p.salV])}</div>
+       <div class="text-[10px] font-semibold flex flex-wrap gap-1.5">${ctx}</div></div>
+       <div class="space-y-4">${grupos[e].map(i=>cardOV(i,t)).join('')}</div></div>`}).join('');
+   }
+ } catch(err) {
+   console.error("Erro no render:", err);
+ }
+}
 
 function cardOV(i,t){
  const id=sid(i.id),c=calc(i);
@@ -223,10 +275,10 @@ function cardOV(i,t){
   <td class="px-3 text-right"><span class="text-rose-500 font-bold">-</span><input type="number" step="0.001" class="in w-24 text-right font-black text-rose-600" value="${num(g.pesoTO).toFixed(3)}" onchange="editGasto('${id}',${k},'pesoTO',this.value)"></td>
   <td class="px-3 text-right font-bold text-rose-600">${BRL(num(g.pesoTO)*c.unit)}</td>
   <td class="px-3 np"><button class="text-rose-500" onclick="delGasto('${id}',${k})">✕</button></td></tr>`).join('')+`</tbody></table></div>`
-  :'<p class="text-[11px] text-slate-400 italic">Nenhuma fatura emitida ainda: o saldo está integral. Leia o print do fluxo de documentos ou lance manualmente.</p>';
+  :'<p class="text-[11px] text-slate-400 italic">Nenhuma fatura emitida ainda: o saldo está integral. Leia a captura do fluxo de documentos ou registe manualmente.</p>';
  return`<div class="bg-white rounded-2xl border-2 ${t.o} shadow-sm overflow-hidden ${c.canc?'opacity-60':''}">
  <div class="bg-slate-100 border-b px-5 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
-  <div class="flex flex-wrap items-center gap-2"><span class="${t.d} text-white font-mono font-bold text-[10px] px-2 py-0.5 rounded">OV ${esc(i.ov.numero)}</span>${c.canc?'<span class="bg-rose-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">CANCELADA</span>':''}<span class="font-bold">${esc(i.ov.cliente)}</span><span class="text-slate-600">DRS: <b>${esc(i.ov.pedidoDRS)}</b></span><span class="text-slate-500">Contrato: <b>${esc(i.contrato.numero)}</b></span></div>
+  <div class="flex flex-wrap items-center gap-2"><span class="${t.d} text-white font-mono font-bold text-[10px] px-2 py-0.5 rounded">OV ${esc(i.ov.numero)}</span>${c.canc?'<span class="bg-rose-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">CANCELADA</span>':''}<span class="font-bold">${esc(i.ov.cliente)}</span><span class="text-slate-600">DRS: <b>${esc(i.ov.pedidoDRS)}</b></span><span class="text-slate-500">Contrato: <b>${esc(i.contrato?i.contrato.numero:'')}</b></span></div>
   <div class="np flex gap-2"><button onclick="abrir('ov','${id}')" class="font-bold px-3 py-1 rounded-xl bg-teal-700 hover:bg-teal-800 text-white">📷 1. Ler OV (VA03)</button><button onclick="toggleCancel('${id}')" class="font-bold px-3 py-1 rounded-xl bg-white border text-slate-600 hover:bg-slate-50">${c.canc?'Reativar':'Cancelar'}</button></div></div>
  <div class="p-5 space-y-4">
   <div class="bg-slate-50/60 p-3 rounded-2xl border space-y-2"><div class="flex justify-between items-center text-xs"><b class="text-slate-700">📋 Materiais da OV (soma = ${TO(i.ov.qtdLiberadaTO,3)})</b><button onclick="addMat('${id}')" class="np text-[11px] font-bold text-teal-700 hover:underline">+ Adicionar linha</button></div><div class="space-y-1.5">${mats}</div></div>
@@ -235,10 +287,10 @@ function cardOV(i,t){
    <div class="bg-rose-50 border border-rose-200 p-3 rounded-xl"><span class="block text-[10px] font-bold text-rose-600 uppercase mb-1">2. Já faturado (${(i.gastos||[]).length} fatura(s))</span><div class="text-base font-black text-rose-700">${TO(c.gasto,3)}</div><div class="text-xs font-bold text-rose-600">${BRL(c.vg)}</div></div>
    <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl"><span class="block text-[10px] font-bold text-emerald-700 uppercase mb-1">3. Saldo livre</span><div class="text-base font-black text-emerald-800">${TO(c.saldo,3)}</div><div class="text-xs font-bold text-emerald-700">${BRL(c.vs)}</div></div></div>
   <div class="border-t pt-3"><div class="flex flex-wrap justify-between items-center gap-2 mb-2"><b class="text-xs text-slate-700">⚖️ Faturas emitidas</b>
-   <div class="np flex gap-2"><button onclick="abrir('notas','${id}')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100">📷 2. Ler Faturas (Fluxo SAP)</button><button onclick="addGasto('${id}')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-50 border hover:bg-slate-100">+ Lançar manual</button></div></div>${fat}</div>
+   <div class="np flex gap-2"><button onclick="abrir('notas','${id}')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100">📷 2. Ler Faturas (Fluxo SAP)</button><button onclick="addGasto('${id}')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-50 border hover:bg-slate-100">+ Registar manual</button></div></div>${fat}</div>
  </div></div>`}
 
-function filtrarEmpresa(e){$('filtroEmpresa').value=e;render()}
+function filtrarEmpresa(e){if($('filtroEmpresa'))$('filtroEmpresa').value=e;render()}
 
 /* ---------- edições ---------- */
 const achar=id=>dados.find(o=>sid(o.id)===id);
@@ -246,28 +298,26 @@ const somar=i=>{i.ov.qtdLiberadaTO=(i.ov.itens||[]).reduce((s,x)=>s+num(x.qtdTO)
 const kgParaTO=v=>{v=num(v);return v>100?v/1000:v};
 function editMat(id,k,campo,v){const i=achar(id);if(!i||!i.ov.itens[k])return;
  if(campo==='qtdTO'){i.ov.itens[k].qtdTO=kgParaTO(v);somar(i)}else i.ov.itens[k].material=String(v).trim();persistir(i)}
-function addMat(id){const i=achar(id);if(!i)return;i.ov.itens=i.ov.itens||[];i.ov.itens.push({itemSap:String((i.ov.itens.length+1)*10),material:'NOVO MATERIAL',qtdTO:.1});somar(i);persistir(i)}
-function delMat(id,k){const i=achar(id);if(!i||(i.ov.itens||[]).length<=1)return aviso('A OV precisa ter ao menos uma linha.');if(!confirm('Excluir esta linha de material?'))return;i.ov.itens.splice(k,1);somar(i);persistir(i)}
+function addMat(id){const i=achar(id);if(!i)return;i.ov.itens=i.ov.itens||[];i.ov.itens.push({itemSap:String((i.ov.itens.length+1)*10),material:'NOVO MATERIAL',qtdTO:0.1});somar(i);persistir(i)}
+function delMat(id,k){const i=achar(id);if(!i||(i.ov.itens||[]).length<=1)return aviso('A OV precisa ter pelo menos uma linha.');if(!confirm('Eliminar esta linha de material?'))return;i.ov.itens.splice(k,1);somar(i);persistir(i)}
 function editGasto(id,k,campo,v){const i=achar(id);if(!i||!i.gastos[k])return;
  i.gastos[k][campo]=campo==='pesoTO'?kgParaTO(v):campo==='placa'?String(v).trim().toUpperCase():campo==='ticket'?String(v).trim():v;persistir(i)}
-function addGasto(id){const i=achar(id);if(!i)return;(i.gastos=i.gastos||[]).push({id:Date.now(),ticket:'Fatura manual',placa:'MANUAL',pesoTO:.1,data:hoje()});persistir(i)}
-function delGasto(id,k){const i=achar(id);if(!i||!confirm('Excluir esta fatura?'))return;i.gastos.splice(k,1);persistir(i)}
-function toggleCancel(id){const i=achar(id);if(!i)return;const c=i.status==='CANCELADO';if(!confirm(c?'Reativar esta OV?':'Cancelar esta OV? Ela deixa de contar nos totais.'))return;i.status=c?'ATIVO':'CANCELADO';persistir(i)}
-function carregarExemplo(){if(!confirm('Inserir a OV de exemplo? As demais OVs não serão apagadas.'))return;const d=DEFAULT();const e=dados.find(x=>x.id===d.id);if(e)return aviso('A OV de exemplo já existe.');persistir(d)}
+function addGasto(id){const i=achar(id);if(!i)return;(i.gastos=i.gastos||[]).push({id:Date.now(),ticket:'Fatura manual',placa:'MANUAL',pesoTO:0.1,data:hoje()});persistir(i)}
+function delGasto(id,k){const i=achar(id);if(!i||!confirm('Eliminar esta fatura?'))return;i.gastos.splice(k,1);persistir(i)}
+function toggleCancel(id){const i=achar(id);if(!i)return;const c=i.status==='CANCELADO';if(!confirm(c?'Reativar esta OV?':'Cancelar esta OV? Deixará de contar nos totais.'))return;i.status=c?'ATIVO':'CANCELADO';persistir(i)}
+function carregarExemplo(){if(!confirm('Inserir a OV de exemplo? As restantes OVs não serão apagadas.'))return;const d=DEFAULT();const e=dados.find(x=>x.id===d.id);if(e)return aviso('A OV de exemplo já existe.');persistir(d)}
 
 /* ---------- leitores (OCR) ---------- */
 function abrir(m,id){
  modo=m;tmp=null;$('mAlvo').value=id\vert{}\vert{}'';$('mProg').classList.add('hidden');
  const ov=m==='ov';
  $('mTitulo').textContent=ov?'📋 Leitor da OV (tela VA03 — "exibir Venda Sucata/Escória: Síntese")':'⚖️ Leitor de Faturas (tela "Fluxo de documentos")';
- $('mSub').innerHTML=ov?'Lê nº da OV, cliente, pedido/DRS, <b>valor líquido</b> e as linhas de material com a quantidade em TO':'Só linhas <b>Fatura</b> abaixo da sua OV contam como saída. Pré-pagamento, remessa e adiantamento são ignorados';
- $('mAplicar').textContent=ov?'Aplicar na OV':'Lançar faturas';
- $('mRes').textContent=ov?'Aguardando print da VA03...':'Aguardando print do fluxo de documentos do SAP...';
+ $('mSub').innerHTML=ov?'Lê nº da OV, cliente, pedido/DRS, <b>valor líquido</b> e as linhas de material com a quantidade em TO':'Apenas linhas <b>Fatura</b> abaixo da sua OV contam como saída. Pré-pagamento, remessa e adiantamento são ignorados';
+ $('mAplicar').textContent=ov?'Aplicar na OV':'Registar faturas';$('mRes').textContent=ov?'A aguardar imagem da VA03...':'A aguardar imagem do fluxo de documentos do SAP...';
  $('modal').classList.remove('hidden');$('modal').classList.add('flex')}
 function fecharModal(){$('modal').classList.add('hidden');$('modal').classList.remove('flex')}
 const prog=(p,t)=>{$('mBarra').style.width=p+'%';$('mProgPct').textContent=p+'\%';$('mProgTxt').textContent=t};
 
-/* Prepara a imagem: escala e binariza preto/branco para contraste das fontes finas do SAP */
 async function preparar(blob){
  try{
   const b=await createImageBitmap(blob);
@@ -291,13 +341,13 @@ async function preparar(blob){
  }catch(e){return blob}}
 
 async function ocr(blob){
- if(busy)return aviso('Aguarde: leitura em andamento...');
+ if(busy)return aviso('Aguarde: leitura em curso...');
  if(typeof Tesseract==='undefined')return aviso('Leitor de imagem não carregou. Verifique a internet.');
- busy=true;$('mProg').classList.remove('hidden');prog(0,'Preparando imagem...');
+ busy=true;$('mProg').classList.remove('hidden');prog(0,'A preparar imagem...');
  const parser=modo==='ov'?parseOV:parseFluxo;
  try{
   const img=await preparar(blob);let passo='';
-  const w=await Tesseract.createWorker('por',1,{logger:m=>{if(m.status==='recognizing text')prog(Math.round(m.progress*100),'Lendo imagem'+passo+'...')}});
+  const w=await Tesseract.createWorker('por',1,{logger:m=>{if(m.status==='recognizing text')prog(Math.round(m.progress*100),'A ler imagem'+passo+'...')}});
   let res=null;
   for(const psm of['6','4','3']){
    passo=psm==='6'?'':' (tentativa '+(psm==='4'?2:3)+')';
@@ -306,7 +356,7 @@ async function ocr(blob){
    const r=parser(text);if(!res)res=r;if(r.ok){res=r;break}}
   await w.terminate();
   modo==='ov'?mostrarOV(res):mostrarNotas(res);
- }catch(e){console.error(e);aviso('Falha ao ler a imagem. Tente outro print.')}
+ }catch(e){console.error(e);aviso('Falha ao ler a imagem. Tente outra captura.')}
  finally{busy=false;$('mProg').classList.add('hidden')}}
 
 function limpaMat(s){
@@ -316,7 +366,6 @@ function limpaMat(s){
   .replace(/[^A-Za-zÀ-ú0-9\/\.\-\(\) ]+$/g,'')
   .trim()||'MATERIAL'}
 
-/* Parser específico para tela VA03 (Exibir Venda Sucata/Escória) */
 function parseOV(text){
  const flat=text.replace(/\r/g,' ').replace(/\s+/g,' ');
  const mo=flat.match(/(?:Venda\s+Sucata\/?Esc[oó]ria|Venda\s+Sucata)\s*(\d{8,10})/i)||
@@ -357,31 +406,30 @@ function mostrarOV(r){
  const cmp='w-full border rounded-lg px-2 py-1 text-xs font-bold text-slate-800 bg-white';
  const valor=r.valor>0?r.valor.toLocaleString('pt-BR',{minimumFractionDigits:2}):'';
  let chk='';
- if(r.pesoTO>0)chk=Math.abs(soma-r.pesoTO)<0.0005?`<div class="text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg p-2">✓ A soma das linhas (${soma.toFixed(3)} TO) bate com o <b>Peso total</b> da OV.</div>`:`<div class="text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-2">⚠ A soma das linhas (${soma.toFixed(3)} TO) é diferente do <b>Peso total</b> da OV (${r.pesoTO.toFixed(3)} TO). Confira as quantidades abaixo.</div>`;
- const aviso1=[!r.numero&&'Número da OV não detectado.',!r.cliente&&'Cliente não detectado.',!(r.valor>0)&&'Valor líquido não detectado: digite o valor.'].filter(Boolean).join(' ');
+ if(r.pesoTO>0)chk=Math.abs(soma-r.pesoTO)<0.0005?`<div class="text-emerald-800 bg-emerald-50 border border-emerald-200 rounded-lg p-2">✓ A soma das linhas (${soma.toFixed(3)} TO) confere com o <b>Peso total</b> da OV.</div>`:`<div class="text-amber-800 bg-amber-50 border border-amber-200 rounded-lg p-2">⚠ A soma das linhas (${soma.toFixed(3)} TO) diverge do <b>Peso total</b> da OV (${r.pesoTO.toFixed(3)} TO). Verifique os valores abaixo.</div>`;
+ const aviso1=[!r.numero&&'Número da OV não detetado.',!r.cliente&&'Cliente não detetado.',!(r.valor>0)&&'Valor líquido não detetado: introduza o valor manualmente.'].filter(Boolean).join(' ');
  $('mRes').innerHTML=`<div class="grid grid-cols-3 gap-2">
   <label class="text-[10px] font-bold text-slate-500 uppercase">OV<input id="mNum" class="${cmp}" value="${esc(r.numero||(alvo?alvo.ov.numero:''))}"></label>
   <label class="col-span-2 text-[10px] font-bold text-slate-500 uppercase">Cliente (Emissor da ordem)<input id="mCli" class="${cmp}" value="${esc(r.cliente||(alvo?alvo.ov.cliente:''))}"></label>
   <label class="col-span-2 text-[10px] font-bold text-slate-500 uppercase">Pedido / DRS<input id="mDrs" class="${cmp}" value="${esc(r.drs||(alvo?alvo.ov.pedidoDRS:''))}"></label>
   <label class="text-[10px] font-bold text-slate-500 uppercase">Valor líquido (R$)<input id="mVal" class="${cmp}" value="${esc(valor||(alvo?num(alvo.ov.valorBRL).toLocaleString('pt-BR',{minimumFractionDigits:2}):''))}"></label></div>
   ${aviso1?`<p class="text-[11px] text-amber-700 font-bold">${esc(aviso1)}</p>`:''}${chk}
-  <div class="bg-white p-2.5 rounded-xl border max-h-52 overflow-y-auto space-y-1.5">${r.linhas.length?r.linhas.map(l=>`<div class="mLin flex items-center gap-2 border-b pb-1.5" data-item="${esc(l.itemSap)}"><b class="text-[10px] bg-slate-100 px-1.5 rounded">Item ${esc(l.itemSap)}</b><input class="lm ${cmp} flex-1" value="${esc(l.material)}"><input class="lq ${cmp} w-24 text-right text-teal-800" value="${l.qtdTO.toFixed(3)}"><b class="text-[10px] text-slate-500">TO</b></div>`).join('')+`<div class="pt-1 font-black flex justify-between"><span>SOMA DAS LINHAS</span><span class="text-teal-700">${soma.toFixed(3)} TO</span></div>`:'<span class="text-amber-800">Nenhuma linha reconhecida. Tente um print mais nítido com a tabela "Todos os itens" visível.</span>'}</div>
-  <p class="text-[10px] text-slate-500">Você pode corrigir qualquer campo acima antes de aplicar (quantidade em <b>TO</b>).</p>`}
+  <div class="bg-white p-2.5 rounded-xl border max-h-52 overflow-y-auto space-y-1.5">${r.linhas.length?r.linhas.map(l=>`<div class="mLin flex items-center gap-2 border-b pb-1.5" data-item="${esc(l.itemSap)}"><b class="text-[10px] bg-slate-100 px-1.5 rounded">Item ${esc(l.itemSap)}</b><input class="lm ${cmp} flex-1" value="${esc(l.material)}"><input class="lq ${cmp} w-24 text-right text-teal-800" value="${l.qtdTO.toFixed(3)}"><b class="text-[10px] text-slate-500">TO</b></div>`).join('')+`<div class="pt-1 font-black flex justify-between"><span>SOMA DAS LINHAS</span><span class="text-teal-700">${soma.toFixed(3)} TO</span></div>`:'<span class="text-amber-800">Nenhuma linha reconhecida. Experimente uma captura mais nítida com a tabela "Todos os itens" visível.</span>'}</div>
+  <p class="text-[10px] text-slate-500">Pode corrigir qualquer campo acima antes de aplicar (quantidade em <b>TO</b>).</p>`}
 
 function aplicarOV(){
  const ls=[...document.querySelectorAll('#mRes .mLin')].map(el=>({itemSap:el.dataset.item,material:el.querySelector('.lm').value.trim()||'MATERIAL',qtdTO:BR(el.querySelector('.lq').value)})).filter(l=>l.qtdTO>0);
- if(!ls.length)return aviso('Nenhuma linha com quantidade para aplicar.');
+ if(!ls.length)return aviso('Nenhuma linha com quantidade válida para aplicar.');
  const numOV=sid($('mNum').value.trim());if(!numOV)return aviso('Informe o número da OV.');
  const cli=$('mCli').value.trim()||'OUTROS CLIENTES',drs=$('mDrs').value.trim(),valor=BR($('mVal').value);
  let i=achar($('mAlvo').value);
- if(i&&sz(i.ov.numero)!==sz(numOV)&&!confirm(`Este print é da OV ${numOV}, mas você abriu o leitor na OV ${i.ov.numero}.\nAtualizar a OV ${i.ov.numero} com os dados deste print?`))return;
+ if(i&&sz(i.ov.numero)!==sz(numOV)&&!confirm(`Esta captura pertence à OV ${numOV}, mas abriu o leitor na OV ${i.ov.numero}.\nPretende atualizar a OV ${i.ov.numero} com estes dados?`))return;
  if(!i)i=dados.find(o=>sz(o.ov.numero)===sz(numOV));
  if(!i)i={id:numOV,status:'ATIVO',contrato:{numero:tmp.contrato||'0000071823',item:'30',qtdTotalTO:2635,valorTotalBRL:3320100},ov:{numero:numOV,cliente:cli,pedidoDRS:drs,itens:[],qtdLiberadaTO:0,valorBRL:0,precoUnitarioPorTO:PRECO},gastos:[]};
  const soma=ls.reduce((s,l)=>s+l.qtdTO,0),preco=valor>0&&soma>0?valor/soma:(num(i.ov.precoUnitarioPorTO)||PRECO);
  Object.assign(i.ov,{numero:numOV,cliente:cli,pedidoDRS:drs,itens:ls,qtdLiberadaTO:soma,valorBRL:valor>0?valor:soma*preco,precoUnitarioPorTO:preco});
  persistir(i);fecharModal();aviso(`✓ OV ${numOV} atualizada\nSolicitado: ${soma.toFixed(3)} TO • ${BRL(i.ov.valorBRL)}`)}
 
-/* ----- Fluxo de documentos: contrato > venda (OV) > fatura ----- */
 function parseFluxo(text){
  const QTY=/([0-9]{1,3}(?:\.[0-9]{3})*(?:,[0-9]+)?|[0-9]+(?:,[0-9]+)?)\s*(KG|T[O0])\b/i;
  let cur=null,contrato=null;const vendas=[],faturas=[];
@@ -403,17 +451,17 @@ function mostrarNotas(r){
  r.minhas=erradoOV?[]:r.faturas.filter(f=>f.ov===meu||(f.ov==null&&r.vendas.length===0));
  const outras=r.faturas.length-r.minhas.length;
  let h='';
- if(r.vendas.length)h+=`<div class="text-[11px]">OV(s) encontrada(s) no print: ${r.vendas.map(v=>`<b class="px-1.5 py-0.5 rounded ${v===meu?'bg-emerald-100 text-emerald-800':'bg-slate-200 text-slate-700'}">${esc(v)}</b>`).join(' ')} • OV selecionada: <b>${esc(meu)}</b></div>`;
- if(erradoOV)h+=`<div class="text-rose-800 bg-rose-50 border border-rose-200 rounded-lg p-2"><b>Este print não é da OV ${esc(meu)}.</b> Abra o leitor no card da OV correta (ou no fluxo da OV ${esc(meu)}).</div>`;
+ if(r.vendas.length)h+=`<div class="text-[11px]">OV(s) detetada(s) no ecrã: ${r.vendas.map(v=>`<b class="px-1.5 py-0.5 rounded ${v===meu?'bg-emerald-100 text-emerald-800':'bg-slate-200 text-slate-700'}">${esc(v)}</b>`).join(' ')} • OV selecionada: <b>${esc(meu)}</b></div>`;
+ if(erradoOV)h+=`<div class="text-rose-800 bg-rose-50 border border-rose-200 rounded-lg p-2"><b>Esta captura não pertence à OV ${esc(meu)}.</b> Abra o leitor no cartão correspondente.</div>`;
  if(r.contrato)h+=`<div class="bg-white border rounded-lg p-2 flex justify-between"><span>Contrato <b>${esc(r.contrato.numero)}</b></span><span><b>${TO(r.contrato.qtdTO,0)}</b> • ${BRL(r.contrato.valor)}</span></div>`;
  if(!erradoOV)h+=r.minhas.length?`<div class="flex justify-between font-bold"><span>Faturas da OV ${esc(meu)}</span><span class="bg-rose-100 text-rose-800 px-2 rounded">${r.minhas.length}</span></div><div class="bg-white p-2.5 rounded-xl border max-h-40 overflow-y-auto space-y-1">`+r.minhas.map(n=>`<div class="flex justify-between border-b pb-1"><span><b>${esc(n.ticket)}</b> <span class="text-slate-400">${esc(n.data)}</span></span><b class="text-rose-700">-${n.pesoTO.toFixed(3)} TO</b></div>`).join('')+'</div>'
-  :'<div class="text-emerald-800 bg-emerald-50 p-2.5 rounded-xl border border-emerald-200"><b>Nenhuma fatura emitida nesta OV.</b><br>O fluxo mostra apenas venda/pré-pagamento, que não contam como saída. O saldo livre continua integral.</div>';
+  :'<div class="text-emerald-800 bg-emerald-50 p-2.5 rounded-xl border border-emerald-200"><b>Nenhuma fatura emitida nesta OV.</b><br>O fluxo apresenta apenas venda/pré-pagamento. O saldo livre permanece integral.</div>';
  if(outras>0&&!erradoOV)h+=`<p class="text-[11px] text-slate-500">${outras} fatura(s) de outras OVs foram ignoradas.</p>`;
  $('mRes').innerHTML=h}
 
 function aplicarNotas(){
  const i=achar($('mAlvo').value);if(!i)return;
- if(tmp.vendas.length&&!tmp.vendas.includes(sz(i.ov.numero)))return aviso('Este print é de outra OV. Abra o leitor na OV correta.');
+ if(tmp.vendas.length&&!tmp.vendas.includes(sz(i.ov.numero)))return aviso('Esta captura pertence a outra OV.');
  let msg='';
  if(tmp.contrato&&tmp.contrato.qtdTO>0){const k=sz(tmp.contrato.numero);
   dados.filter(o=>sz(o.contrato.numero)===k).forEach(o=>{o.contrato.qtdTotalTO=tmp.contrato.qtdTO;if(tmp.contrato.valor>0)o.contrato.valorTotalBRL=tmp.contrato.valor;if(o!==i)persistir(o)});msg=' • contrato atualizado'}
@@ -422,23 +470,21 @@ function aplicarNotas(){
  novas.forEach(n=>{const{ov,...g}=n;i.gastos.push({id:Date.now()+Math.random(),...g})});
  persistir(i);fecharModal();
  if(!tmp.minhas||!tmp.minhas.length)aviso('Nenhuma fatura emitida nesta OV: saldo integral'+msg);
- else aviso(`✓ ${novas.length} fatura(s) lançada(s)`+((tmp.minhas.length-novas.length)?` (${tmp.minhas.length-novas.length} já existiam)`:'')+msg)}
+ else aviso(`✓ ${novas.length} fatura(s) registada(s)`+((tmp.minhas.length-novas.length)?` (${tmp.minhas.length-novas.length} já existiam)`:'')+msg)}
 
-function aplicar(){if(!tmp)return aviso('Leia um print primeiro.');modo==='ov'?aplicarOV():aplicarNotas()}
+function aplicar(){if(!tmp)return aviso('Carregue uma imagem primeiro.');modo==='ov'?aplicarOV():aplicarNotas()}
 
-/* ---------- CSV ---------- */
 function exportarCSV(){
  if(!dados.length)return aviso('Nada para exportar.');
  const q=s=>'"'+String(s==null?'':s).replace(/"/g,'""')+'"',n=v=>num(v).toFixed(3).replace('.',','),r=v=>num(v).toFixed(2).replace('.',',');
  const L=['Empresa;OV;Contrato;DRS;Materiais;Total da OV (TO);Valor da OV (R$);Faturado (TO);Faturado (R$);Saldo Livre (TO);Saldo Livre (R$);Status'];
  dados.forEach(i=>{const c=calc(i);
-  L.push([q(norm(i.ov.cliente)),q(i.ov.numero),q(i.contrato.numero),q(i.ov.pedidoDRS),q((i.ov.itens||[]).map(m=>`${m.itemSap}:${m.material}(${m.qtdTO}TO)`).join(' | ')),n(c.lib),r(i.ov.valorBRL),n(c.gasto),r(c.vg),n(c.saldo),r(c.vs),q(i.status||'ATIVO')].join(';'))});
+  L.push([q(norm(i.ov.cliente)),q(i.ov.numero),q(i.contrato?i.contrato.numero:''),q(i.ov.pedidoDRS),q((i.ov.itens||[]).map(m=>`${m.itemSap}:${m.material}(${m.qtdTO}TO)`).join(' | ')),n(c.lib),r(i.ov.valorBRL),n(c.gasto),r(c.vg),n(c.saldo),r(c.vs),q(i.status||'ATIVO')].join(';'))});
  const a=document.createElement('a');
  a.href=URL.createObjectURL(new Blob(['\ufeff'+L.join('\r\n')],{type:'text/csv;charset=utf-8'}));
  a.download=`ovs_faturas_emitidas_${hoje()}.csv`;document.body.appendChild(a);a.click();a.remove();
  setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
 
-/* ---------- eventos globais ---------- */
 window.addEventListener('paste',e=>{
  if($('modal').classList.contains('hidden'))return;
  for(const it of(e.clipboardData||{}).items||[])if(it.kind==='file'&&it.type.startsWith('image/')){ocr(it.getAsFile());break}});
