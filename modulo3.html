@@ -516,4 +516,177 @@ window.onload = function () {
 };
 </script>
 </body>
+  <style>
+:root{--primary:#db2777;--primary-dark:#be185d;--primary-light:#fce7f3;--primary-border:#f472b6;--primary-bg:#fff1f2;--accent:#f59e0b;--danger:#ef4444;--success:#10b981;--s900:#0f172a;--s700:#334155;--s600:#475569;--s300:#cbd5e1;--s200:#e2e8f0;--s100:#f1f5f9;--s50:#f8fafc}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#fff5f7;color:var(--s900);min-height:100vh;padding:16px}
+#toastNotificacao{position:fixed;bottom:24px;right:24px;background:var(--s900);color:#fff;padding:10px 18px;border-radius:6px;font-size:12px;font-weight:600;box-shadow:0 10px 25px -5px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:.25s;transform:translateY(12px);z-index:9999}
+#toastNotificacao.ativo{opacity:1;transform:none}
+.painel-controle{background:#fff;padding:18px 22px;margin:0 auto 16px;border-radius:12px;box-shadow:0 10px 25px -5px rgba(219,39,119,.08);border:1px solid #fbcfe8;max-width:1200px}
+.topo-modulo-info{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;border-bottom:2px solid var(--primary);padding-bottom:8px;gap:8px;flex-wrap:wrap}
+.badge-modulo{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;font-size:11.5px;font-weight:800;padding:5px 12px;border-radius:6px;text-transform:uppercase;letter-spacing:.8px}
+.tag-v06{background:var(--accent);color:#fff;font-weight:800;font-size:10px;padding:2px 7px;border-radius:4px;margin-left:6px}
+.campos-painel{display:grid;gap:12px;margin-bottom:12px;grid-template-columns:140px 1.5fr 1.5fr}
+.campo-grupo label{display:flex;justify-content:space-between;font-weight:700;margin-bottom:4px;font-size:10.5px;color:#9d174d;text-transform:uppercase}
+.painel-controle input[type=text],.painel-controle textarea{width:100%;font-family:inherit;font-size:12px;padding:8px 10px;border:1px solid var(--primary-border);border-radius:6px;background:var(--primary-bg);outline:none;transition:.2s}
+.painel-controle textarea{height:90px;resize:vertical;text-transform:uppercase}
+.painel-controle input:focus,.painel-controle textarea:focus{border-color:var(--primary);background:#fff;box-shadow:0 0 0 3px rgba(219,39,119,.12)}
+.contador-colaboradores{font-size:10px;font-weight:700;color:var(--primary);text-transform:none}
+.contador-colaboradores.aviso{color:var(--danger)}
+.acoes-textarea{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.botoes-painel{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.btn{cursor:pointer;padding:7px 14px;font-size:11px;font-weight:700;border:none;border-radius:6px;color:#fff;display:inline-flex;align-items:center;gap:5px;transition:filter .15s,transform .05s;text-decoration:none}
+.btn:hover{filter:brightness(1.08)}.btn:active{transform:translateY(1px)}
+.btn-sm{padding:4px 9px;font-size:10px;border-radius:4px}
+.btn-pink{background:var(--primary)}.btn-add-folha{background:#7c3aed}.btn-renumerar{background:#ea580c}.btn-salvar{background:#2563eb}.btn-carregar{background:#0891b2}.btn-exportar{background:#4f46e5}
+.btn-copia-cola{background:#db2777}
+.btn-subir{background:#059669}
+.btn-baixar{background:#0d9488}
+.btn-limpar{background:var(--s100);color:var(--s600);border:1px solid var(--s300)}
+.btn-voltar{background:var(--s600)}.btn-imprimir{background:var(--s900);margin-left:auto}
+.dica{font-size:10px;color:var(--s600);margin-top:8px}
+.barra-zoom{background:var(--primary-light);padding:6px 14px;max-width:1200px;margin:0 auto 10px;border-radius:6px;display:flex;align-items:center;justify-content:flex-end;gap:8px;font-size:11px;font-weight:700;color:#9d174d;border:1px solid #fbcfe8}
+.btn-zoom{background:#fff;border:1px solid var(--primary-border);padding:3px 10px;border-radius:4px;cursor:pointer;font-weight:800;color:var(--primary)}
+.btn-zoom:hover{background:#fdf2f8}
+.folha-a4{width:100%;max-width:1200px;background:#fff;padding:14px 16px;margin:0 auto 20px;box-shadow:0 10px 30px rgba(219,39,119,.08);border-radius:10px;border:1px solid var(--primary-border)}
+.rolagem{overflow-x:auto}
+.rolagem>table{min-width:1000px}
+.barra-controle-folha{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;background:var(--primary-bg);padding:5px 10px;border:1px solid #fbcfe8;border-radius:6px}
+.btn-linha-topo,.btn-remover-folha{border-radius:4px;font-size:10px;font-weight:700;padding:3px 8px;cursor:pointer;background:#fff}
+.btn-linha-topo{border:1px solid var(--primary);color:var(--primary)}
+.btn-remover-folha{color:var(--danger);border:1px solid #fca5a5}
+.cabecalho-container,.info-ferias-bar,table.tabela-ferias{width:100%;border-collapse:collapse;border:1.2px solid var(--s900);margin-bottom:4px;table-layout:fixed}
+.cabecalho-container td,.info-ferias-bar td{border:1px solid var(--s700);padding:3px 8px;vertical-align:middle;text-align:center}
+.logo-box{width:90px;font-weight:900;font-size:16px;color:#007e7a;letter-spacing:1.5px;background:var(--s50)}
+.titulo-box{font-size:11px;font-weight:800;text-transform:uppercase;padding:0 10px}
+.meta-box{width:130px;font-size:8.5px;text-align:left!important;padding-left:8px!important;background:var(--s50);line-height:1.35}
+.info-ferias-bar{font-size:8.5px;font-weight:700;background:var(--s50)}
+.info-ferias-bar td{text-align:left;padding:2px 8px}
+.campo-editavel{outline:none;display:inline-block;min-width:25px;font-weight:600}
+table.tabela-ferias{border:1.5px solid var(--primary)}
+table.tabela-ferias th,table.tabela-ferias td{border:1px solid var(--primary-border);text-align:center;vertical-align:middle;font-size:8.5px;height:24px;padding:1px}
+table.tabela-ferias th{background:var(--primary);color:#fff;font-weight:800;text-transform:uppercase}
+table.tabela-ferias tbody tr:hover{background:#fff7fa}
+.col-id{width:38px;background:var(--primary-bg);font-weight:800;color:#831843}
+.col-id-texto{outline:none;font-size:9px;font-weight:800;color:#831843;display:inline-block;width:100%;text-align:center}
+.col-nome{background:var(--primary-light)!important;width:220px}
+.col-nome-container{display:flex;align-items:center;justify-content:space-between;padding:0 6px;width:100%;gap:4px}
+.col-nome-texto{flex-grow:1;text-align:left;outline:none;white-space:nowrap;overflow:hidden;font-size:9px;font-weight:700;color:#831843;text-transform:uppercase;min-height:11px}
+.celula-ferias{outline:none;font-size:8px;font-weight:700;background:#fff}
+.celula-ferias:focus{background:#fdf2f8;box-shadow:inset 0 0 0 1.5px var(--primary)}
+.celula-ferias.invalida{background:#fee2e2;color:var(--danger)}
+.col-saldo{width:45px;font-weight:800;background:var(--primary-bg);outline:none;color:#831843;font-size:9px}
+.col-saldo:focus{background:#fff;box-shadow:inset 0 0 0 1.5px var(--primary)}
+.botoes-acoes{display:flex;gap:2px;opacity:.3;transition:opacity .2s}
+tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
+.btn-acao{background:rgba(219,39,119,.1);border:1px solid rgba(219,39,119,.3);border-radius:3px;cursor:pointer;padding:1px 3px;font-size:8px;color:#831843}
+.btn-mais-linha{color:var(--success);font-weight:900}.btn-menos-linha{color:var(--accent);font-weight:900}.btn-lixeira{color:var(--danger)}
+@media(max-width:800px){.campos-painel{grid-template-columns:1fr}.btn-imprimir{margin-left:0}}
+
+/* CSS de Impressão Rígido para Folha Única */
+@media print{
+  @page {
+    size: A4 landscape;
+    margin: 3mm 4mm 2mm 4mm;
+  }
+  html, body {
+    background: #fff !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    height: auto !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+  .painel-controle, .barra-zoom, .botoes-acoes, .barra-controle-folha, #toastNotificacao, input[type=file] {
+    display: none !important;
+  }
+  .rolagem {
+    overflow: visible !important;
+    display: block !important;
+    width: 100% !important;
+  }
+  .rolagem > table {
+    min-width: 0 !important;
+    width: 100% !important;
+  }
+  .folha-a4 {
+    box-shadow: none !important;
+    border: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    zoom: 0.94 !important; /* Encolhe levemente para caber o bloco todo em 1 página */
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+    page-break-after: always;
+    break-after: page;
+  }
+  .folha-a4:last-child {
+    page-break-after: auto !important;
+    break-after: auto !important;
+  }
+  .cabecalho-container, .info-ferias-bar {
+    margin-bottom: 2px !important;
+  }
+  .cabecalho-container td, .info-ferias-bar td {
+    padding: 1px 4px !important;
+    line-height: 1.1 !important;
+  }
+  .logo-box {
+    font-size: 11px !important;
+    width: 65px !important;
+  }
+  .titulo-box {
+    font-size: 8.5px !important;
+    padding: 1px 3px !important;
+  }
+  .meta-box {
+    font-size: 6.5px !important;
+    width: 95px !important;
+    line-height: 1.1 !important;
+  }
+  .info-ferias-bar td {
+    font-size: 6.5px !important;
+    padding: 1px 3px !important;
+  }
+  table.tabela-ferias {
+    border-collapse: collapse !important;
+    margin-bottom: 0 !important;
+    width: 100% !important;
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  table.tabela-ferias th {
+    font-size: 6.5px !important;
+    padding: 0.5px !important;
+    height: 12px !important;
+    line-height: 1 !important;
+  }
+  table.tabela-ferias thead tr:nth-child(2) th {
+    font-size: 5.5px !important;
+    height: 10px !important;
+  }
+  table.tabela-ferias tbody tr {
+    page-break-inside: avoid !important;
+    break-inside: avoid !important;
+  }
+  table.tabela-ferias td {
+    font-size: 6.5px !important;
+    height: 16px !important;
+    padding: 0 0.5px !important;
+    line-height: 1 !important;
+  }
+  .col-id { width: 20px !important; }
+  .col-id-texto { font-size: 6.5px !important; }
+  .col-nome { width: 140px !important; }
+  .col-nome-container { padding: 0 2px !important; }
+  .col-nome-texto { font-size: 6.5px !important; letter-spacing: -0.2px; }
+  .celula-ferias { font-size: 6px !important; }
+  .col-saldo { width: 24px !important; font-size: 6.5px !important; }
+  table.tabela-ferias tbody tr:hover { background: inherit !important; }
+  .celula-ferias.invalida { background: #fff !important; color: inherit !important; }
+}
+</style>
 </html>
+
