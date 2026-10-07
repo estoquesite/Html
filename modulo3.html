@@ -72,20 +72,16 @@ tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
 @media(max-width:800px){.campos-painel{grid-template-columns:1fr}.btn-imprimir{margin-left:0}}
 
 /* ========================================================
-   IMPRESSÃO: TRAVADO RIGOROSO PARA 1 FOLHA A4 PAISAGEM
+   IMPRESSÃO MULTI-FOLHAS: CADA FOLHA EM 1 PÁGINA A4 RIGOROSA
    ======================================================== */
 @media print {
   @page {
-    size: 297mm 210mm;
+    size: A4 landscape;
     margin: 0 !important;
   }
   html, body {
     margin: 0 !important;
     padding: 0 !important;
-    width: 297mm !important;
-    height: 210mm !important;
-    max-height: 210mm !important;
-    overflow: hidden !important;
     background: #fff !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
@@ -96,23 +92,23 @@ tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
   #contentorFolhasFerias {
     margin: 0 !important;
     padding: 0 !important;
-    width: 297mm !important;
-    height: 210mm !important;
-    overflow: hidden !important;
+    width: 100% !important;
   }
   .folha-a4 {
     box-shadow: none !important;
     border: none !important;
     margin: 0 !important;
     padding: 4mm 5mm 0 5mm !important;
-    width: 338mm !important; /* compensação da escala 0.88 (297 / 0.88) */
-    transform: scale(0.88) !important;
+    width: 338mm !important;
+    height: 238mm !important;
+    transform: scale(0.875) !important;
     transform-origin: top left !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
-    page-break-after: always;
-    break-after: page;
+    page-break-after: always !important;
+    break-after: page !important;
     overflow: hidden !important;
+    display: block !important;
   }
   .folha-a4:last-child {
     page-break-after: auto !important;
@@ -226,7 +222,7 @@ tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
     <button type="button" class="btn btn-limpar" onclick="limparTudoFerias()">Limpar</button>
     <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
   </div>
-  <p class="dica">💡 Impressão calibrada para 1 página por folha. Ao imprimir, selecione Margens: Nenhuma.</p>
+  <p class="dica">💡 Numeração sequencial contínua entre as folhas. Na impressão (Ctrl+P), configure Margens: Nenhuma.</p>
 </div>
 
 <div class="barra-zoom">
@@ -372,19 +368,24 @@ function removerLinhaFerias(b) { const tr = b.closest('tr'); if (tr.parentNode.q
 function removerFolhaFerias(b) {
   if (document.querySelectorAll('#contentorFolhasFerias .folha-a4').length <= 1) { mostrarToast('Mantenha ao menos uma folha na tela.'); return; }
   if (!confirm('Remover esta folha e todos os dados dela?')) return;
-  b.closest('.folha-a4').remove(); atualizarPaginacaoFerias(); agendarAutoSave();
+  b.closest('.folha-a4').remove(); atualizarPaginacaoFerias(); reordenarNumFerias();
 }
+
+/* Reordenação contínua entre todas as folhas */
 function reordenarNumFerias(notificar = false) {
+  let contadorGeral = 1;
   document.querySelectorAll('#contentorFolhasFerias .folha-a4').forEach(folha => {
-    folha.querySelectorAll('.corpo-tabela-ferias tr .col-id-texto').forEach((s, i) => { s.innerText = pad(i + 1); });
+    folha.querySelectorAll('.corpo-tabela-ferias tr .col-id-texto').forEach(s => {
+      s.innerText = pad(contadorGeral++);
+    });
   });
-  if (notificar) mostrarToast('Numeração reorganizada sequencialmente');
+  if (notificar) mostrarToast('Numeração contínua atualizada entre todas as folhas!');
   agendarAutoSave();
 }
 
-function criarTabelaFeriasHTML(nomes) {
+function criarTabelaFeriasHTML(nomes, offset = 0) {
   const lista = nomes.length ? nomes : Array(TOTAL_LINHAS_FERIAS).fill('');
-  const linhas = lista.map((n, i) => `<tr>${criarLinhaFerias(pad(i + 1), n)}</tr>`).join('');
+  const linhas = lista.map((n, i) => `<tr>${criarLinhaFerias(pad(offset + i + 1), n)}</tr>`).join('');
   const f = document.createElement('div'); f.className = 'folha-a4'; f.style.zoom = nivelZoom;
   f.innerHTML = `
   <div class="barra-controle-folha">
@@ -414,20 +415,29 @@ function temDadosPreenchidos() {
 }
 function montarFolhas(nomes) {
   const box = $('contentorFolhasFerias'); box.innerHTML = '';
-  if (!nomes.length) box.appendChild(criarTabelaFeriasHTML([]));
-  for (let i = 0; i < nomes.length; i += TOTAL_LINHAS_FERIAS) box.appendChild(criarTabelaFeriasHTML(nomes.slice(i, i + TOTAL_LINHAS_FERIAS)));
+  if (!nomes.length) {
+    box.appendChild(criarTabelaFeriasHTML([], 0));
+  } else {
+    for (let i = 0; i < nomes.length; i += TOTAL_LINHAS_FERIAS) {
+      box.appendChild(criarTabelaFeriasHTML(nomes.slice(i, i + TOTAL_LINHAS_FERIAS), i));
+    }
+  }
   atualizarPaginacaoFerias();
+  reordenarNumFerias();
 }
 function gerarTabelaPorNomes() {
   if (temDadosPreenchidos() && !confirm('Gerar novas folhas vai substituir o que já está preenchido (nomes, datas e saldos). Continuar?')) return;
   const nomes = lerNomes().sort((a, b) => a.localeCompare(b, 'pt-BR'));
   $('nomesInputFerias').value = nomes.join('\n'); atualizarContadorNomes();
   montarFolhas(nomes); agendarAutoSave();
-  mostrarToast(nomes.length ? 'Tabela de férias gerada em ordem A-Z' : 'Folha em branco gerada');
+  mostrarToast(nomes.length ? 'Tabela gerada com numeração contínua em A-Z' : 'Folha em branco gerada');
 }
 function adicionarFolhaFerias() {
-  $('contentorFolhasFerias').appendChild(criarTabelaFeriasHTML([]));
-  atualizarPaginacaoFerias(); agendarAutoSave(); mostrarToast('Folha extra adicionada');
+  const totalLinhasAtuais = document.querySelectorAll('#contentorFolhasFerias .corpo-tabela-ferias tr').length;
+  $('contentorFolhasFerias').appendChild(criarTabelaFeriasHTML([], totalLinhasAtuais));
+  atualizarPaginacaoFerias();
+  reordenarNumFerias();
+  mostrarToast('Folha extra adicionada com numeração contínua');
 }
 
 function obterEstadoCompleto() {
@@ -451,7 +461,7 @@ function restaurarEstado(d) {
   if (d.html !== undefined) $('contentorFolhasFerias').innerHTML = d.html;
   if (!document.querySelector('#contentorFolhasFerias .folha-a4')) montarFolhas([]);
   document.querySelectorAll('.folha-a4').forEach(f => { f.style.transform = ''; });
-  aplicarZoom(); atualizarPaginacaoFerias(); atualizarContadorNomes();
+  aplicarZoom(); atualizarPaginacaoFerias(); atualizarContadorNomes(); reordenarNumFerias();
 }
 function exportarBackupJSON() {
   const blob = new Blob([JSON.stringify(obterEstadoCompleto(), null, 2)], { type: 'application/json' });
