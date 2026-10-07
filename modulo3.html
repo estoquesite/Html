@@ -21,10 +21,15 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#fff5f7;color:var(--
 .painel-controle input:focus,.painel-controle textarea:focus{border-color:var(--primary);background:#fff;box-shadow:0 0 0 3px rgba(219,39,119,.12)}
 .contador-colaboradores{font-size:10px;font-weight:700;color:var(--primary);text-transform:none}
 .contador-colaboradores.aviso{color:var(--danger)}
-.botoes-painel{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.acoes-textarea{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.botoes-painel{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
 .btn{cursor:pointer;padding:7px 14px;font-size:11px;font-weight:700;border:none;border-radius:6px;color:#fff;display:inline-flex;align-items:center;gap:5px;transition:filter .15s,transform .05s;text-decoration:none}
 .btn:hover{filter:brightness(1.08)}.btn:active{transform:translateY(1px)}
+.btn-sm{padding:4px 9px;font-size:10px;border-radius:4px}
 .btn-pink{background:var(--primary)}.btn-add-folha{background:#7c3aed}.btn-renumerar{background:#ea580c}.btn-salvar{background:#2563eb}.btn-carregar{background:#0891b2}.btn-exportar{background:#4f46e5}
+.btn-copia-cola{background:#db2777}
+.btn-subir{background:#059669}
+.btn-baixar{background:#0d9488}
 .btn-limpar{background:var(--s100);color:var(--s600);border:1px solid var(--s300)}
 .btn-voltar{background:var(--s600)}.btn-imprimir{background:var(--s900);margin-left:auto}
 .dica{font-size:10px;color:var(--s600);margin-top:8px}
@@ -66,22 +71,33 @@ tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
 .btn-mais-linha{color:var(--success);font-weight:900}.btn-menos-linha{color:var(--accent);font-weight:900}.btn-lixeira{color:var(--danger)}
 @media(max-width:800px){.campos-painel{grid-template-columns:1fr}.btn-imprimir{margin-left:0}}
 
-/* Otimização exata para caber em 1 folha A4 Paisagem */
+/* Regras de impressão para 1 folha exata A4 Paisagem */
 @media print{
   @page{
     size: A4 landscape;
-    margin: 4mm 4mm 3mm 4mm;
+    margin: 3mm 4mm 2mm 4mm;
+  }
+  *, *::before, *::after{
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
   }
   html, body{
     background:#fff!important;
     margin:0!important;
     padding:0!important;
-    height:100%!important;
-    -webkit-print-color-adjust:exact;
-    print-color-adjust:exact;
+    width:100%!important;
+    height:auto!important;
   }
-  .painel-controle,.barra-zoom,.botoes-acoes,.barra-controle-folha,#toastNotificacao{display:none!important}
-  .rolagem{overflow:visible!important}.rolagem>table{min-width:100%!important}
+  .painel-controle, .barra-zoom, .botoes-acoes, .barra-controle-folha, #toastNotificacao, input[type=file]{
+    display:none!important;
+  }
+  .rolagem{
+    overflow:visible!important;
+  }
+  .rolagem>table{
+    min-width:100%!important;
+    width:100%!important;
+  }
   .folha-a4{
     box-shadow:none!important;
     border:none!important;
@@ -91,64 +107,68 @@ tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
     transform:none!important;
     margin:0!important;
     padding:0!important;
-    page-break-inside:avoid!important;
     break-inside:avoid!important;
-    page-break-after:always;
+    page-break-inside:avoid!important;
     break-after:page;
+    page-break-after:always;
   }
   .folha-a4:last-child{
-    page-break-after:auto!important;
     break-after:auto!important;
+    page-break-after:auto!important;
   }
   .cabecalho-container, .info-ferias-bar{
     margin-bottom:2px!important;
+    border:1px solid #000!important;
   }
-  .cabecalho-container td{
-    padding:2px 5px!important;
+  .cabecalho-container td, .info-ferias-bar td{
+    padding:1.5px 4px!important;
+    line-height:1.1!important;
   }
   .logo-box{
-    font-size:13px!important;
-    width:75px!important;
+    font-size:12px!important;
+    width:70px!important;
   }
   .titulo-box{
-    font-size:9.5px!important;
-    padding:1px 5px!important;
+    font-size:9px!important;
+    padding:1px 4px!important;
   }
   .meta-box{
-    font-size:7.5px!important;
-    width:115px!important;
-    line-height:1.2!important;
+    font-size:7px!important;
+    width:105px!important;
+    line-height:1.15!important;
   }
   .info-ferias-bar td{
-    font-size:7.5px!important;
-    padding:1.5px 6px!important;
+    font-size:7px!important;
+    padding:1px 4px!important;
   }
   table.tabela-ferias{
     border-collapse:collapse!important;
     margin-bottom:0!important;
+    border:1.2px solid var(--primary)!important;
   }
   table.tabela-ferias th{
-    font-size:7.5px!important;
+    font-size:7px!important;
     padding:1px!important;
-    height:14px!important;
-  }
-  table.tabela-ferias thead tr:nth-child(2) th{
-    font-size:6.5px!important;
-    height:12px!important;
-  }
-  table.tabela-ferias td{
-    font-size:7.5px!important;
-    height:20px!important; /* 21 linhas x 20px = 420px, cabe perfeitamente nos ~740px úteis da A4 paisagem */
-    padding:0 1px!important;
+    height:13px!important;
     line-height:1!important;
   }
-  .col-id{width:26px!important}
-  .col-id-texto{font-size:7.5px!important}
-  .col-nome{width:180px!important}
-  .col-nome-container{padding:0 3px!important}
-  .col-nome-texto{font-size:7.5px!important;letter-spacing:-0.2px}
-  .celula-ferias{font-size:7px!important}
-  .col-saldo{width:35px!important;font-size:7.5px!important}
+  table.tabela-ferias thead tr:nth-child(2) th{
+    font-size:6px!important;
+    height:11px!important;
+  }
+  table.tabela-ferias td{
+    font-size:7px!important;
+    height:18px!important;
+    padding:0 0.5px!important;
+    line-height:1!important;
+  }
+  .col-id{width:22px!important}
+  .col-id-texto{font-size:7px!important}
+  .col-nome{width:165px!important}
+  .col-nome-container{padding:0 2px!important}
+  .col-nome-texto{font-size:7px!important;letter-spacing:-0.2px}
+  .celula-ferias{font-size:6.5px!important}
+  .col-saldo{width:28px!important;font-size:7px!important}
   table.tabela-ferias tbody tr:hover{background:inherit}
   .celula-ferias.invalida{background:#fff!important;color:inherit!important}
 }
@@ -157,6 +177,7 @@ tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
 <body>
 <div id="toastNotificacao" role="status" aria-live="polite">Mensagem</div>
 <input type="file" id="arquivoBackupFerias" style="display:none" accept=".json" onchange="processarArquivoBackup(this)">
+<input type="file" id="arquivoListaTxtFerias" style="display:none" accept=".txt,.csv" onchange="processarArquivoListaTxt(this)">
 
 <div class="painel-controle">
   <div class="topo-modulo-info">
@@ -171,6 +192,14 @@ tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
   <div class="campo-grupo">
     <label for="nomesInputFerias"><span>Lista de Colaboradores (A-Z automático):</span><span id="contadorColaboradores" class="contador-colaboradores">0 colaborador(es) | 1 folha(s)</span></label>
     <textarea id="nomesInputFerias" oninput="atualizarContadorNomes()" placeholder="COLE OS NOMES AQUI (UM POR LINHA)..."></textarea>
+    
+    <div class="acoes-textarea">
+      <button type="button" class="btn btn-copia-cola btn-sm" onclick="colarDaAreaDeTransferencia()">📋 Colar</button>
+      <button type="button" class="btn btn-limpar btn-sm" onclick="copiarListaNomes()">📄 Copiar</button>
+      <button type="button" class="btn btn-baixar btn-sm" onclick="baixarListaNomesTxt()">📥 Baixar Nomes (.txt)</button>
+      <button type="button" class="btn btn-subir btn-sm" onclick="document.getElementById('arquivoListaTxtFerias').click()">📂 Carregar (.txt)</button>
+      <button type="button" class="btn btn-limpar btn-sm" onclick="limparApenasListaNomes()">✕ Limpar Campo</button>
+    </div>
   </div>
   <div class="botoes-painel">
     <button type="button" class="btn btn-pink" onclick="gerarTabelaPorNomes()">Gerar com Nomes (A-Z)</button>
@@ -183,7 +212,7 @@ tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
     <button type="button" class="btn btn-limpar" onclick="limparTudoFerias()">Limpar</button>
     <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
   </div>
-  <p class="dica">💾 Salvamento automático neste navegador. Nas datas, digite 4 números (ex.: 1507) e ela vira 15/07. Duplo clique numa data vazia preenche com hoje. Enter desce para a linha de baixo.</p>
+  <p class="dica">💡 Digite 4 números numa data (ex.: 1507) e vira 15/07. Duplo clique insere a data de hoje. Imprime em folha única.</p>
 </div>
 
 <div class="barra-zoom">
@@ -225,13 +254,94 @@ function sincronizarCabecalhosFerias() {
   agendarAutoSave();
 }
 
-function lerNomes() { return $('nomesInputFerias').value.toUpperCase().split('\n').map(l => l.trim()).filter(Boolean); }
+function normalizarLinhasTexto(txt) {
+  return txt
+    .split(/\r?\n/)
+    .map(l => l.replace(/[\t;]/g, ' ').trim().replace(/\s+/g, ' '))
+    .filter(Boolean);
+}
+
+function lerNomes() {
+  return normalizarLinhasTexto($('nomesInputFerias').value.toUpperCase());
+}
+
 function atualizarContadorNomes() {
-  const ta = $('nomesInputFerias'), pos = ta.selectionStart;
-  ta.value = ta.value.toUpperCase(); ta.setSelectionRange(pos, pos);
+  const ta = $('nomesInputFerias');
   const nomes = lerNomes(), total = nomes.length, dup = total - new Set(nomes).size, c = $('contadorColaboradores');
   c.innerText = `${total} colaborador(es) | ${Math.max(1, Math.ceil(total / TOTAL_LINHAS_FERIAS))} folha(s)` + (dup ? ` | ⚠ ${dup} repetido(s)` : '');
   c.classList.toggle('aviso', dup > 0);
+}
+
+async function colarDaAreaDeTransferencia() {
+  try {
+    const texto = await navigator.clipboard.readText();
+    if (!texto.trim()) {
+      mostrarToast('Área de transferência vazia.');
+      return;
+    }
+    const linhas = normalizarLinhasTexto(texto.toUpperCase());
+    $('nomesInputFerias').value = linhas.join('\n');
+    atualizarContadorNomes();
+    mostrarToast(`${linhas.length} nome(s) colado(s)!`);
+    agendarAutoSave();
+  } catch (err) {
+    mostrarToast('Clique na caixa e use Ctrl+V.');
+  }
+}
+
+async function copiarListaNomes() {
+  const nomes = lerNomes();
+  if (!nomes.length) {
+    mostrarToast('Nenhum nome para copiar.');
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(nomes.join('\n'));
+    mostrarToast(`${nomes.length} nome(s) copiado(s)!`);
+  } catch (e) {
+    mostrarToast('Falha ao copiar.');
+  }
+}
+
+function baixarListaNomesTxt() {
+  const nomes = lerNomes();
+  if (!nomes.length) {
+    mostrarToast('Nenhum nome para baixar.');
+    return;
+  }
+  const blob = new Blob([nomes.join('\r\n')], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = url;
+  a.download = `colaboradores_ferias_${$('anoInputFerias').value.trim() || '2026'}.txt`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  mostrarToast('Arquivo .txt baixado!');
+}
+
+function processarArquivoListaTxt(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = e => {
+    const linhas = normalizarLinhasTexto(e.target.result.toUpperCase());
+    if (!linhas.length) {
+      mostrarToast('Arquivo vazio ou sem nomes válidos.');
+      return;
+    }
+    $('nomesInputFerias').value = linhas.join('\n');
+    atualizarContadorNomes();
+    mostrarToast(`${linhas.length} nome(s) carregado(s) do arquivo!`);
+    agendarAutoSave();
+  };
+  r.readAsText(file);
+  input.value = '';
+}
+
+function limparApenasListaNomes() {
+  $('nomesInputFerias').value = '';
+  atualizarContadorNomes();
+  agendarAutoSave();
+  mostrarToast('Lista de nomes limpa.');
 }
 
 function criarLinhaFerias(numStr, nome = '') {
@@ -397,7 +507,12 @@ window.addEventListener('beforeunload', () => gravar(true));
 window.onload = function () {
   const d = lerSalvo();
   if (d && d.html) { restaurarEstado(d); mostrarToast('Último trabalho recuperado.'); }
-  else { $('nomesInputFerias').value = DADOS_F_INICIAIS.join('\n'); atualizarContadorNomes(); montarFolhas([...DADOS_F_INICIAIS].sort((a, b) => a.localeCompare(b, 'pt-BR')));$('nomesInputFerias').value = [...DADOS_F_INICIAIS].sort((a, b) => a.localeCompare(b, 'pt-BR')).join('\n'); }
+  else {
+    const ordenados = [...DADOS_F_INICIAIS].sort((a, b) => a.localeCompare(b, 'pt-BR'));
+    $('nomesInputFerias').value = ordenados.join('\n');
+    atualizarContadorNomes();
+    montarFolhas(ordenados);
+  }
 };
 </script>
 </body>
