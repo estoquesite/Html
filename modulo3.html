@@ -72,17 +72,19 @@ tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
 @media(max-width:800px){.campos-painel{grid-template-columns:1fr}.btn-imprimir{margin-left:0}}
 
 /* ========================================================
-   IMPRESSÃO MULTI-FOLHAS: CADA FOLHA EM 1 PÁGINA A4 RIGOROSA
+   IMPRESSÃO: 1 FOLHA CHEIA POR PÁGINA A4 PAISAGEM
    ======================================================== */
 @media print {
   @page {
     size: A4 landscape;
-    margin: 0 !important;
+    margin: 6mm 8mm 6mm 8mm;
   }
   html, body {
     margin: 0 !important;
     padding: 0 !important;
     background: #fff !important;
+    width: 100% !important;
+    height: auto !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
   }
@@ -98,17 +100,16 @@ tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
     box-shadow: none !important;
     border: none !important;
     margin: 0 !important;
-    padding: 4mm 5mm 0 5mm !important;
-    width: 338mm !important;
-    height: 238mm !important;
-    transform: scale(0.875) !important;
-    transform-origin: top left !important;
+    padding: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    transform: none !important;
+    zoom: 1 !important;
+    display: block !important;
     page-break-inside: avoid !important;
     break-inside: avoid !important;
     page-break-after: always !important;
     break-after: page !important;
-    overflow: hidden !important;
-    display: block !important;
   }
   .folha-a4:last-child {
     page-break-after: auto !important;
@@ -123,28 +124,29 @@ tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
     width: 100% !important;
   }
   .cabecalho-container, .info-ferias-bar {
-    margin-bottom: 2px !important;
+    margin-bottom: 3px !important;
+    width: 100% !important;
   }
   .cabecalho-container td, .info-ferias-bar td {
-    padding: 2px 4px !important;
-    line-height: 1.1 !important;
+    padding: 3px 6px !important;
+    line-height: 1.15 !important;
   }
   .logo-box {
-    font-size: 13px !important;
-    width: 75px !important;
+    font-size: 14px !important;
+    width: 85px !important;
   }
   .titulo-box {
-    font-size: 10px !important;
-    padding: 1px 4px !important;
+    font-size: 11px !important;
+    padding: 2px 6px !important;
   }
   .meta-box {
-    font-size: 7.5px !important;
-    width: 110px !important;
-    line-height: 1.2 !important;
+    font-size: 8px !important;
+    width: 120px !important;
+    line-height: 1.25 !important;
   }
   .info-ferias-bar td {
-    font-size: 8px !important;
-    padding: 1.5px 5px !important;
+    font-size: 8.5px !important;
+    padding: 2px 8px !important;
   }
   table.tabela-ferias {
     width: 100% !important;
@@ -155,31 +157,31 @@ tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
     break-inside: avoid !important;
   }
   table.tabela-ferias th {
-    font-size: 7.5px !important;
-    height: 14px !important;
+    font-size: 8px !important;
+    height: 16px !important;
     padding: 1px !important;
   }
   table.tabela-ferias thead tr:nth-child(2) th {
-    font-size: 6.5px !important;
-    height: 12px !important;
+    font-size: 7px !important;
+    height: 14px !important;
   }
   table.tabela-ferias tbody tr {
     page-break-inside: avoid !important;
     break-inside: avoid !important;
   }
   table.tabela-ferias td {
-    font-size: 7.5px !important;
-    height: 18.5px !important;
-    padding: 0 !important;
-    line-height: 1 !important;
+    font-size: 8px !important;
+    height: 23px !important;
+    padding: 0 1px !important;
+    line-height: 1.1 !important;
   }
-  .col-id { width: 24px !important; }
-  .col-id-texto { font-size: 7.5px !important; }
-  .col-nome { width: 175px !important; }
-  .col-nome-container { padding: 0 3px !important; }
-  .col-nome-texto { font-size: 7.5px !important; }
-  .celula-ferias { font-size: 7px !important; }
-  .col-saldo { width: 32px !important; font-size: 7.5px !important; }
+  .col-id { width: 30px !important; }
+  .col-id-texto { font-size: 8px !important; }
+  .col-nome { width: 210px !important; }
+  .col-nome-container { padding: 0 4px !important; }
+  .col-nome-texto { font-size: 8px !important; }
+  .celula-ferias { font-size: 7.5px !important; }
+  .col-saldo { width: 40px !important; font-size: 8px !important; }
   table.tabela-ferias tbody tr:hover { background: inherit !important; }
 }
 </style>
@@ -222,7 +224,7 @@ tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
     <button type="button" class="btn btn-limpar" onclick="limparTudoFerias()">Limpar</button>
     <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
   </div>
-  <p class="dica">💡 Numeração sequencial contínua entre as folhas. Na impressão (Ctrl+P), configure Margens: Nenhuma.</p>
+  <p class="dica">💡 Numeração sequencial contínua entre as folhas. Na impressão (Ctrl+P), configure Margens: Padrão.</p>
 </div>
 
 <div class="barra-zoom">
