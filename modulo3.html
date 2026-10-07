@@ -4,8 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Módulo 3 - Cronograma de Férias | Portal Vale v07</title>
-<!-- Biblioteca para gerar PDF em 1 página ajustada 100% -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<!-- Bibliotecas para renderizar e forçar 1 folha única em PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <style>
 :root{--primary:#db2777;--primary-dark:#be185d;--primary-light:#fce7f3;--primary-border:#f472b6;--primary-bg:#fff1f2;--accent:#f59e0b;--danger:#ef4444;--success:#10b981;--s900:#0f172a;--s700:#334155;--s600:#475569;--s300:#cbd5e1;--s200:#e2e8f0;--s100:#f1f5f9;--s50:#f8fafc}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -32,7 +33,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#fff5f7;color:var(--
 .btn-copia-cola{background:#db2777}
 .btn-subir{background:#059669}
 .btn-baixar{background:#0d9488}
-.btn-pdf{background:#10b981;font-size:12px;padding:7px 16px}
+.btn-pdf{background:#10b981;font-size:12px;padding:8px 18px;box-shadow:0 2px 8px rgba(16,185,129,.3)}
 .btn-limpar{background:var(--s100);color:var(--s600);border:1px solid var(--s300)}
 .btn-voltar{background:var(--s600)}.btn-imprimir{background:var(--s900);margin-left:auto}
 .dica{font-size:10px;color:var(--s600);margin-top:8px}
@@ -71,25 +72,6 @@ tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
 .btn-acao{background:rgba(219,39,119,.1);border:1px solid rgba(219,39,119,.3);border-radius:3px;cursor:pointer;padding:1px 3px;font-size:8px;color:#831843}
 .btn-mais-linha{color:var(--success);font-weight:900}.btn-menos-linha{color:var(--accent);font-weight:900}.btn-lixeira{color:var(--danger)}
 @media(max-width:800px){.campos-painel{grid-template-columns:1fr}.btn-imprimir{margin-left:0}}
-
-/* Estilo aplicado no momento de gerar o PDF para esticar 100% da folha */
-.modo-pdf-export {
-  width: 1100px !important;
-  max-width: 1100px !important;
-  padding: 8px 12px !important;
-  margin: 0 !important;
-  box-shadow: none !important;
-  border: none !important;
-}
-.modo-pdf-export .barra-controle-folha, .modo-pdf-export .botoes-acoes {
-  display: none !important;
-}
-.modo-pdf-export table.tabela-ferias tbody tr {
-  height: var(--altura-linha-pdf, 22px) !important;
-}
-.modo-pdf-export table.tabela-ferias td {
-  font-size: var(--fonte-pdf, 8px) !important;
-}
 </style>
 </head>
 <body>
@@ -120,16 +102,16 @@ tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
     </div>
   </div>
   <div class="botoes-painel">
-    <button type="button" class="btn btn-pink" onclick="gerarTabelaPorNomes()">Atualizar Tabela Única (A-Z)</button>
+    <button type="button" class="btn btn-pink" onclick="gerarTabelaPorNomes()">Atualizar Tabela (A-Z)</button>
     <button type="button" class="btn btn-renumerar" onclick="reordenarNumFerias(true)">🔢 Renumerar</button>
-    <button type="button" class="btn btn-pdf" onclick="descarregarPDFCompleto()">📄 Gerar PDF Direto (100% da Folha)</button>
+    <button type="button" class="btn btn-pdf" onclick="descarregarPDFCompleto()">📄 Baixar PDF (1 Folha Exata)</button>
     <button type="button" class="btn btn-salvar" onclick="salvarTudoFerias()">💾 Salvar</button>
     <button type="button" class="btn btn-carregar" onclick="carregarTudoFerias()">📂 Carregar</button>
     <button type="button" class="btn btn-exportar" onclick="exportarBackupJSON()">⬇️ Backup</button>
     <button type="button" class="btn btn-exportar" onclick="document.getElementById('arquivoBackupFerias').click()">⬆️ Restaurar</button>
     <button type="button" class="btn btn-limpar" onclick="limparTudoFerias()">Limpar</button>
   </div>
-  <p class="dica">💡 Clique em <b>"Gerar PDF Direto"</b>: o PDF é calculado e gerado em formato horizontal exato, preenchendo toda a folha.</p>
+  <p class="dica">💡 O botão verde <b>"Baixar PDF (1 Folha Exata)"</b> comprime e encaixa todos os colaboradores na página sem dividir em folha 2[span_1](start_span)[span_1](end_span).</p>
 </div>
 
 <div class="barra-zoom">
@@ -187,38 +169,60 @@ function atualizarContadorNomes() {
   c.classList.toggle('aviso', dup > 0);
 }
 
-/* Geração de PDF direto sem distorções de margens do navegador */
-function descarregarPDFCompleto() {
+/* GERAÇÃO DE PDF 100% GARANTIDO EM UMA ÚNICA PÁGINA */
+async function descarregarPDFCompleto() {
   const elemento = document.querySelector('#contentorFolhasFerias .folha-a4');
   if (!elemento) return;
   
-  mostrarToast('A gerar o PDF ajustado...');
+  mostrarToast('Gerando PDF em 1 folha única...');
   
-  const totalLinhas = elemento.querySelectorAll('.corpo-tabela-ferias tr').length;
-  // Calcula dinamicamente a altura e a fonte para preencher 100% da página A4 horizontal
-  const alturaLinha = Math.max(16, Math.min(32, Math.floor(540 / totalLinhas)));
-  const tamanhoFonte = totalLinhas > 30 ? '7px' : (totalLinhas > 25 ? '7.8px' : '8.5px');
+  // Oculta botões que não devem sair no PDF
+  const botoesOcultar = elemento.querySelectorAll('.barra-controle-folha, .botoes-acoes');
+  botoesOcultar.forEach(b => b.style.display = 'none');
   
-  document.documentElement.style.setProperty('--altura-linha-pdf', `${alturaLinha}px`);
-  document.documentElement.style.setProperty('--fonte-pdf', tamanhoFonte);
-  
-  elemento.classList.add('modo-pdf-export');
-  
-  const opcoes = {
-    margin: [4, 4, 4, 4],
-    filename: `cronograma_ferias_${$('anoInputFerias').value.trim() || '2026'}.pdf`,
-    image: { type: 'jpeg', quality: 0.98 },
-    html2canvas: { scale: 2, useCORS: true, logging: false },
-    jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
-  };
-  
-  html2pdf().set(opcoes).from(elemento).save().then(() => {
-    elemento.classList.remove('modo-pdf-export');
-    mostrarToast('PDF transferido com sucesso!');
-  }).catch(() => {
-    elemento.classList.remove('modo-pdf-export');
+  try {
+    const canvas = await html2canvas(elemento, {
+      scale: 2,
+      useCORS: true,
+      backgroundColor: '#ffffff'
+    });
+    
+    const { jsPDF } = window.jspdf;
+    // Cria o PDF no formato exato A4 Paisagem (297 x 210 mm)
+    const pdf = new jsPDF('landscape', 'mm', 'a4');
+    
+    const larguraPagina = 297;
+    const alturaPagina = 210;
+    const margem = 4;
+    
+    const larguraDisponivel = larguraPagina - (margem * 2);
+    const alturaDisponivel = alturaPagina - (margem * 2);
+    
+    // Converte e ajusta o canvas para preencher a folha respeitando a proporção
+    const imgData = canvas.toDataURL('image/jpeg', 0.98);
+    const proporcao = canvas.width / canvas.height;
+    
+    let larguraFinal = larguraDisponivel;
+    let alturaFinal = larguraFinal / proporcao;
+    
+    if (alturaFinal > alturaDisponivel) {
+      alturaFinal = alturaDisponivel;
+      larguraFinal = alturaFinal * proporcao;
+    }
+    
+    const posX = margem + (larguraDisponivel - larguraFinal) / 2;
+    const posY = margem + (alturaDisponivel - alturaFinal) / 2;
+    
+    // Adiciona exatamente em 1 página
+    pdf.addImage(imgData, 'JPEG', posX, posY, larguraFinal, alturaFinal);
+    pdf.save(`cronograma_ferias_${$('anoInputFerias').value.trim() || '2026'}.pdf`);
+    
+    mostrarToast('PDF baixado em 1 folha só com sucesso!');
+  } catch (err) {
     mostrarToast('Erro ao gerar PDF.');
-  });
+  } finally {
+    botoesOcultar.forEach(b => b.style.display = '');
+  }
 }
 
 async function colarDaAreaDeTransferencia() {
