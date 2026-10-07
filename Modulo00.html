@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Módulo 00 - Central de Funcionários | Portal Vale</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<style>
+:root{--primary:#007e7a;--primary-dark:#005a57;--primary-light:#e6f4f4;--accent:#f59e0b;--danger:#ef4444;--success:#10b981;--s900:#0f172a;--s700:#334155;--s600:#475569;--s300:#cbd5e1;--s200:#e2e8f0;--s100:#f1f5f9;--s50:#f8fafc}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#edf2f7;color:var(--s900);min-height:100vh;padding:16px}
+#toastNotificacao{position:fixed;bottom:24px;right:24px;background:var(--s900);color:#fff;padding:10px 18px;border-radius:6px;font-size:12px;font-weight:600;box-shadow:0 10px 25px -5px rgba(0,0,0,.25);opacity:0;pointer-events:none;transition:.25s;transform:translateY(12px);z-index:9999}
+#toastNotificacao.ativo{opacity:1;transform:none}
+.painel-controle{background:#fff;padding:18px 22px;margin:0 auto 16px;border-radius:12px;box-shadow:0 10px 25px -5px rgba(0,0,0,.05);border:1px solid var(--s200);max-width:1120px}
+.topo-modulo-info{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;border-bottom:2px solid var(--primary);padding-bottom:8px;gap:8px;flex-wrap:wrap}
+.badge-modulo{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;font-size:11.5px;font-weight:800;padding:5px 12px;border-radius:6px;text-transform:uppercase;letter-spacing:.8px}
+.tag-v00{background:var(--accent);color:#fff;font-weight:800;font-size:10px;padding:2px 7px;border-radius:4px;margin-left:6px}
+.campos-painel{display:grid;gap:12px;margin-bottom:12px;grid-template-columns:1.5fr 1fr 1fr}
+.campo-grupo label{display:flex;justify-content:space-between;font-weight:700;margin-bottom:4px;font-size:10.5px;color:var(--s600);text-transform:uppercase}
+.painel-controle input[type=text],.painel-controle textarea{width:100%;font-family:inherit;font-size:12px;padding:8px 10px;border:1px solid var(--s300);border-radius:6px;background:var(--s50);outline:none;transition:.2s}
+.painel-controle textarea{height:110px;resize:vertical;text-transform:uppercase}
+.painel-controle input:focus,.painel-controle textarea:focus{border-color:var(--primary);background:#fff;box-shadow:0 0 0 3px rgba(0,126,122,.12)}
+.contador-colaboradores{font-size:10.5px;font-weight:700;color:var(--primary);text-transform:none}
+.contador-colaboradores.aviso{color:var(--danger)}
+.acoes-textarea{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}
+.botoes-painel{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.btn{cursor:pointer;padding:7px 14px;font-size:11px;font-weight:700;border:none;border-radius:6px;color:#fff;display:inline-flex;align-items:center;gap:5px;transition:filter .15s,transform .05s;text-decoration:none}
+.btn:hover{filter:brightness(1.08)}.btn:active{transform:translateY(1px)}
+.btn-sm{padding:4px 9px;font-size:10px;border-radius:4px}
+.btn-verde{background:var(--success)}
+.btn-azul{background:var(--primary)}
+.btn-copiar-destaque{background:#4f46e5;font-weight:800}
+.btn-pdf{background:#059669;font-size:11.5px;padding:7px 16px}
+.btn-salvar{background:#2563eb}.btn-carregar{background:#0891b2}.btn-exportar{background:#6366f1}
+.btn-limpar{background:var(--s100);color:var(--s600);border:1px solid var(--s300)}
+.btn-voltar{background:var(--s600)}.btn-imprimir{background:var(--s900);margin-left:auto}
+.dica{font-size:10px;color:var(--s600);margin-top:8px}
+
+.folha-a4{width:100%;max-width:1120px;background:#fff;padding:16px 20px;margin:0 auto 20px;box-shadow:0 10px 30px rgba(0,0,0,.06);border-radius:10px;border:1px solid var(--s200)}
+.barra-controle-folha{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;background:var(--s50);padding:6px 12px;border:1px solid var(--s200);border-radius:6px}
+.btn-linha-topo{border-radius:4px;font-size:10px;font-weight:700;padding:4px 10px;cursor:pointer;background:#fff;border:1px solid var(--primary);color:var(--primary)}
+.cabecalho-container,table.tabela-central{width:100%;border-collapse:collapse;border:1.2px solid var(--s900);margin-bottom:6px;table-layout:fixed}
+.cabecalho-container td{border:1px solid var(--s700);padding:4px 8px;vertical-align:middle;text-align:center}
+.logo-box{width:90px;font-weight:900;font-size:16px;color:var(--primary);letter-spacing:1.5px;background:var(--s50)}
+.titulo-box{font-size:12px;font-weight:800;text-transform:uppercase;padding:0 10px}
+.meta-box{width:140px;font-size:8.5px;text-align:left!important;padding-left:8px!important;background:var(--s50);line-height:1.35}
+
+table.tabela-central th,table.tabela-central td{border:1px solid var(--s700);text-align:center;vertical-align:middle;font-size:9px;padding:3px 4px}
+table.tabela-central th{background:var(--primary);color:#fff;font-weight:800;text-transform:uppercase}
+table.tabela-central tbody tr:nth-child(even){background:#fafbfc}
+table.tabela-central tbody tr:hover{background:#f0fafa}
+.col-id{width:40px;background:var(--s100);font-weight:800}
+.col-nome-container{display:flex;align-items:center;justify-content:space-between;padding:0 6px;gap:6px;width:100%}
+.col-nome-texto{flex-grow:1;text-align:left;outline:none;white-space:nowrap;overflow:hidden;font-size:9.5px;font-weight:700;text-transform:uppercase;min-height:12px}
+.campo-coluna{outline:none;font-size:9px;font-weight:600;background:transparent;text-align:center}
+.botoes-acoes{display:flex;gap:2px;opacity:.25;transition:opacity .2s}
+tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
+.btn-acao{background:var(--s100);border:1px solid var(--s300);border-radius:3px;cursor:pointer;padding:1px 4px;font-size:8.5px}
+.btn-mais-linha{color:var(--success);font-weight:900}.btn-menos-linha{color:var(--accent);font-weight:900}.btn-lixeira{color:var(--danger)}
+
+/* Impressão direta pelo navegador sem cortes */
+@media print{
+  @page{size:A4 portrait;margin:6mm 8mm}
+  html,body{background:#fff!important;padding:0!important;margin:0!important;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .painel-controle,.barra-controle-folha,.botoes-acoes,#toastNotificacao,input[type=file]{display:none!important}
+  .folha-a4{box-shadow:none!important;border:none!important;padding:0!important;margin:0!important;width:100%!important;max-width:100%!important}
+}
+</style>
+</head>
+<body>
+<div id="toastNotificacao" role="status" aria-live="polite">Mensagem</div>
+<input type="file" id="arquivoBackupCentral" style="display:none" accept=".json" onchange="processarArquivoBackup(this)">
+<input type="file" id="arquivoListaTxtCentral" style="display:none" accept=".txt,.csv" onchange="processarArquivoListaTxt(this)">
+
+<div class="painel-controle">
+  <div class="topo-modulo-info">
+    <span class="badge-modulo">Módulo 00: Central & Cadastro de Funcionários <span class="tag-v00">Autónomo</span></span>
+    <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
+  </div>
+  
+  <div class="campos-painel">
+    <div class="campo-grupo"><label for="gerenciaInput">Gerência / Setor:</label><input type="text" id="gerenciaInput" placeholder="Operação / Gestão de Ativos" oninput="sincronizarMeta()"></div>
+    <div class="campo-grupo"><label for="supervisorInput">Gestor / Supervisor:</label><input type="text" id="supervisorInput" placeholder="Nome do Responsável" oninput="sincronizarMeta()"></div>
+    <div class="campo-grupo"><label for="anoInput">Ano de Referência:</label><input type="text" id="anoInput" value="2026" inputmode="numeric" oninput="sincronizarMeta()"></div>
+  </div>
+
+  <div class="campo-grupo">
+    <label for="nomesInputCentral">
+      <span>Área de Trabalho de Nomes (Digitar, Colar ou Ordenar):</span>
+      <span id="contadorColaboradores" class="contador-colaboradores">0 colaborador(es)</span>
+    </label>
+    <textarea id="nomesInputCentral" oninput="atualizarContadorNomes()" placeholder="COLE OU DIGITE OS NOMES AQUI (UM POR LINHA)..."></textarea>
+    
+    <div class="acoes-textarea">
+      <button type="button" class="btn btn-azul btn-sm" onclick="colarDaAreaDeTransferencia()">📋 Colar Aqui</button>
+      <button type="button" class="btn btn-copiar-destaque btn-sm" onclick="copiarListaParaTransferencia()">🚀 Copiar Lista Limpa (p/ colar noutros módulos)</button>
+      <button type="button" class="btn btn-limpar btn-sm" onclick="descarregarListaNomesTxt()">📥 Descarregar (.txt)</button>
+      <button type="button" class="btn btn-limpar btn-sm" onclick="document.getElementById('arquivoListaTxtCentral').click()">📂 Subir Ficheiro (.txt)</button>
+      <button type="button" class="btn btn-limpar btn-sm" onclick="limparApenasListaNomes()">✕ Limpar Caixa</button>
+    </div>
+  </div>
+
+  <div class="botoes-painel">
+    <button type="button" class="btn btn-verde" onclick="gerarTabelaCentral(true)">Atualizar Tabela em A-Z</button>
+    <button type="button" class="btn btn-azul" onclick="gerarTabelaCentral(false)">Atualizar Tabela (Ordem Atual)</button>
+    <button type="button" class="btn btn-pdf" onclick="gerarPDFCentral()">📄 Baixar PDF (1 Página Exata)</button>
+    <button type="button" class="btn btn-salvar" onclick="salvarTudoCentral()">💾 Guardar Dados</button>
+    <button type="button" class="btn btn-carregar" onclick="carregarTudoCentral()">📂 Carregar</button>
+    <button type="button" class="btn btn-exportar" onclick="exportarBackupJSON()">⬇️ Fazer Backup</button>
+    <button type="button" class="btn btn-exportar" onclick="document.getElementById('arquivoBackupCentral').click()">⬆️ Restaurar Backup</button>
+    <button type="button" class="btn btn-limpar" onclick="limparTudoCentral()">Limpar Tudo</button>
+    <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
+  </div>
+  <p class="dica">💡 <b>Como usar:</b> Faça a gestão da lista oficial aqui. Quando precisar de preencher o DDS ou Férias, clique em <b>"Copiar Lista Limpa"</b> e cole diretamente lá.</p>
+</div>
+
+<div id="contentorFolhaCentral">
+  <div class="folha-a4" id="blocoImpressao">
+    <div class="barra-controle-folha">
+      <button type="button" class="btn-linha-topo" onclick="adicionarLinhaFim()">➕ Adicionar Funcionário no Fim</button>
+      <span style="font-size:10px;font-weight:700;color:var(--s600)">Tabela Principal de Registo</span>
+    </div>
+
+    <table class="cabecalho-container">
+      <tr>
+        <td class="logo-box">VALE</td>
+        <td class="titulo-box">CENTRAL DE CONTROLO E CADASTRO DE FUNCIONÁRIOS</td>
+        <td class="meta-box">
+          <strong>Ano:</strong> <span id="metaAno">2026</span><br>
+          <strong>Setor:</strong> <span id="metaSetor">Geral</span>
+        </td>
+      </tr>
+    </table>
+
+    <table class="tabela-central">
+      <thead>
+        <tr>
+          <th style="width:36px">Nº</th>
+          <th style="width:260px;text-align:left;padding-left:10px">Nome Completo do Funcionário</th>
+          <th style="width:85px">Matrícula</th>
+          <th style="width:130px">Função / Cargo</th>
+          <th style="width:75px">Turno</th>
+          <th style="width:75px">Estado</th>
+        </tr>
+      </thead>
+      <tbody id="corpoTabelaCentral"></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+const CHAVE = 'valecentral_v00';
+const DADOS_INICIAIS = [
+  "MARIANA PEREIRA CRUZ","RICARDO GONCALVES DE MELLO LEITE","JOAO SILVA RAMOS","ALFREDO AUGUSTO RAMOS NETO",
+  "MARCOS AURELIO CATALLARES MATTOS","VANDERSON TEIXEIRA","BRUNO RICARDO","GABRIEL CARNEIRO",
+  "GLEIVSTON SILVA MENDES","ROBSON DE SOUZA MENDONCA","PAULO HENRIQUE","BRUNO GOMES FIDELIS",
+  "ATMISTO SILVA","CAIO HENRIQUE","PABLO MESQUITA","DAVID MARCELO DELGADO DOS SANTOS",
+  "DOMINIQUE SILVA","RICHARD SILVA","EMERSON RIBEIRO DOS SANTOS","ALLAN SOUZA DE CARVALHO","TITO DACAL"
+];
+const $ = id => document.getElementById(id);
+const pad = n => n < 10 ? '0' + n : '' + n;
+const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let _toast, _auto;
+
+function mostrarToast(msg) {
+  const t = $('toastNotificacao'); t.innerText = msg; t.classList.add('ativo');
+  clearTimeout(_toast); _toast = setTimeout(() => t.classList.remove('ativo'), 2600);
+}
+
+function sincronizarMeta() {
+  $('metaAno').innerText =$('anoInput').value.trim() || '2026';
+  $('metaSetor').innerText =$('gerenciaInput').value.trim() || 'Geral';
+  agendarAutoSave();
+}
+
+function normalizarLinhasTexto(txt) {
+  return txt.split(/\r?\n/).map(l => l.replace(/[\t;]/g, ' ').trim().replace(/\s+/g, ' ')).filter(Boolean);
+}
+
+function lerNomes() {
+  return normalizarLinhasTexto($('nomesInputCentral').value.toUpperCase());
+}
+
+function atualizarContadorNomes() {
+  const nomes = lerNomes(), total = nomes.length, dup = total - new Set(nomes).size;
+  const c = $('contadorColaboradores');
+  c.innerText = `${total} colaborador(es)` + (dup ? ` | ⚠ ${dup} repetido(s)` : '');
+  c.classList.toggle('aviso', dup > 0);
+}
+
+async function colarDaAreaDeTransferencia() {
+  try {
+    const texto = await navigator.clipboard.readText();
+    if (!texto.trim()) { mostrarToast('A área de transferência está vazia.'); return; }
+    const linhas = normalizarLinhasTexto(texto.toUpperCase());
+    $('nomesInputCentral').value = linhas.join('\n');
+    atualizarContadorNomes();
+    mostrarToast(`${linhas.length} nome(s) colado(s) com sucesso!`);
+    agendarAutoSave();
+  } catch (err) { mostrarToast('Clique na caixa e use Ctrl+V.'); }
+}
+
+async function copiarListaParaTransferencia() {
+  const nomes = lerNomes();
+  if (!nomes.length) { mostrarToast('Não existem nomes para copiar.'); return; }
+  try {
+    await navigator.clipboard.writeText(nomes.join('\n'));
+    mostrarToast(`${nomes.length} nome(s) copiado(s)! Pronto a colar noutro módulo.`);
+  } catch (e) { mostrarToast('Erro ao copiar.'); }
+}
+
+function descarregarListaNomesTxt() {
+  const nomes = lerNomes();
+  if (!nomes.length) { mostrarToast('Nenhum nome para descarregar.'); return; }
+  const blob = new Blob([nomes.join('\r\n')], { type: 'text/plain;charset=utf-8' });
+  const url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = url;
+  a.download = `lista_funcionarios_${$('anoInput').value.trim() || 'central'}.txt`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  mostrarToast('Ficheiro .txt descarregado!');
+}
+
+function processarArquivoListaTxt(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = e => {
+    const linhas = normalizarLinhasTexto(e.target.result.toUpperCase());
+    $('nomesInputCentral').value = linhas.join('\n');
+    atualizarContadorNomes();
+    mostrarToast(`${linhas.length} nome(s) carregado(s)!`);
+    agendarAutoSave();
+  };
+  r.readAsText(file);
+  input.value = '';
+}
+
+function limparApenasListaNomes() {
+  $('nomesInputCentral').value = '';
+  atualizarContadorNomes();
+  agendarAutoSave();
+  mostrarToast('Caixa de texto limpa.');
+}
+
+function criarLinhaTabela(numStr, nome = '', mat = '', cargo = '', turno = 'ADM', status = 'ATIVO') {
+  return `<tr>
+    <td class="col-id">${numStr}</td>
+    <td>
+      <div class="col-nome-container">
+        <span class="col-nome-texto" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()">${esc(nome)}</span>
+        <div class="botoes-acoes">
+          <button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixo(this)" title="Adicionar abaixo">➕</button>
+          <button type="button" class="btn-acao btn-menos-linha" onclick="removerLinha(this)" title="Remover linha">➖</button>
+          <button type="button" class="btn-acao btn-lixeira" onclick="apagarNome(this)" title="Limpar nome">🗑️</button>
+        </div>
+      </div>
+    </td>
+    <td class="campo-coluna" contenteditable="true">${esc(mat)}</td>
+    <td class="campo-coluna" contenteditable="true">${esc(cargo)}</td>
+    <td class="campo-coluna" contenteditable="true">${esc(turno)}</td>
+    <td class="campo-coluna" contenteditable="true">${esc(status)}</td>
+  </tr>`;
+}
+
+function apagarNome(b) { b.closest('tr').querySelector('.col-nome-texto').innerText = ''; agendarAutoSave(); }
+function adicionarLinhaAbaixo(b) { const tr = document.createElement('tr'); tr.innerHTML = criarLinhaTabela('00'); b.closest('tr').after(tr); renumerarTabela(); }
+function adicionarLinhaFim() { const tr = document.createElement('tr'); tr.innerHTML = criarLinhaTabela('00'); $('corpoTabelaCentral').appendChild(tr); renumerarTabela(); }
+function removerLinha(b) { const tr = b.closest('tr'); if (tr.parentNode.querySelectorAll('tr').length > 1) { tr.remove(); renumerarTabela(); } }
+
+function renumerarTabela(notificar = false) {
+  $('corpoTabelaCentral').querySelectorAll('tr .col-id').forEach((td, i) => { td.innerText = pad(i + 1); });
+  if (notificar) mostrarToast('Numeração sequencial atualizada!');
+  agendarAutoSave();
+}
+
+function gerarTabelaCentral(ordenarAZ = true) {
+  let nomes = lerNomes();
+  if (ordenarAZ) {
+    nomes = nomes.sort((a, b) => a.localeCompare(b, 'pt-BR'));
+    $('nomesInputCentral').value = nomes.join('\n');
+  }
+  const corpo = $('corpoTabelaCentral');
+  corpo.innerHTML = '';
+  const lista = nomes.length ? nomes : [''];
+  lista.forEach((nome, i) => {
+    corpo.innerHTML += criarLinhaTabela(pad(i + 1), nome);
+  });
+  atualizarContadorNomes();
+  agendarAutoSave();
+  mostrarToast(`Tabela sincronizada com ${lista.length} colaborador(es)!`);
+}
+
+/* Geração de PDF em 1 página vertical exata */
+async function gerarPDFCentral() {
+  const elemento = $('blocoImpressao');
+  if (!elemento) return;
+  mostrarToast('A gerar o PDF da Central...');
+  const botoes = elemento.querySelectorAll('.barra-controle-folha, .botoes-acoes');
+  botoes.forEach(b => b.style.display = 'none');
+  try {
+    const canvas = await html2canvas(elemento, { scale: 2, backgroundColor: '#ffffff' });
+    const { jsPDF } = window.jspdf;
+    const pdf = new jsPDF('portrait', 'mm', 'a4');
+    const imgData = canvas.toDataURL('image/jpeg', 0.98);
+    const prop = canvas.width / canvas.height;
+    const largDisponivel = 200, altDisponivel = 285;
+    let largFinal = largDisponivel, altFinal = largFinal / prop;
+    if (altFinal > altDisponivel) { altFinal = altDisponivel; largFinal = altFinal * prop; }
+    pdf.addImage(imgData, 'JPEG', (210 - largFinal) / 2, 6, largFinal, altFinal);
+    pdf.save(`central_funcionarios_${$('anoInput').value.trim() || '2026'}.pdf`);
+    mostrarToast('PDF descarregado com sucesso!');
+  } catch (e) {
+    mostrarToast('Erro ao gerar o PDF.');
+  } finally {
+    botoes.forEach(b => b.style.display = '');
+  }
+}
+
+function obterEstadoCompleto() {
+  return {
+    gerencia: $('gerenciaInput').value, supervisor:$('supervisorInput').value,
+    ano: $('anoInput').value, nomes:$('nomesInputCentral').value,
+    html: $('corpoTabelaCentral').innerHTML
+  };
+}
+function salvarTudoCentral() {
+  try { localStorage.setItem(CHAVE, JSON.stringify(obterEstadoCompleto())); mostrarToast('Dados da Central guardados com sucesso!'); }
+  catch(e) { mostrarToast('Erro ao guardar.'); }
+}
+function agendarAutoSave() { clearTimeout(_auto); _auto = setTimeout(() => {
+  try { localStorage.setItem(CHAVE, JSON.stringify(obterEstadoCompleto())); } catch(e){}
+}, 1200); }
+
+function carregarTudoCentral() {
+  try {
+    const s = localStorage.getItem(CHAVE);
+    if (!s) { mostrarToast('Nenhum dado guardado encontrado.'); return; }
+    const d = JSON.parse(s);
+    if (d.gerencia !== undefined) $('gerenciaInput').value = d.gerencia;
+    if (d.supervisor !== undefined) $('supervisorInput').value = d.supervisor;
+    if (d.ano !== undefined) $('anoInput').value = d.ano;
+    if (d.nomes !== undefined) $('nomesInputCentral').value = d.nomes;
+    if (d.html !== undefined) $('corpoTabelaCentral').innerHTML = d.html;
+    sincronizarMeta(); atualizarContadorNomes(); renumerarTabela();
+    mostrarToast('Dados carregados com sucesso!');
+  } catch(e) { mostrarToast('Erro ao carregar dados.'); }
+}
+
+function exportarBackupJSON() {
+  const blob = new Blob([JSON.stringify(obterEstadoCompleto(), null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob), a = document.createElement('a');
+  a.href = url;
+  a.download = `backup_central_funcionarios_${$('anoInput').value.trim() || '2026'}.json`;
+  document.body.appendChild(a); a.click(); a.remove();
+  URL.revokeObjectURL(url);
+  mostrarToast('Backup guardado em ficheiro!');
+}
+
+function processarArquivoBackup(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const r = new FileReader();
+  r.onload = e => {
+    try {
+      const d = JSON.parse(e.target.result);
+      if (d.gerencia !== undefined) $('gerenciaInput').value = d.gerencia;
+      if (d.supervisor !== undefined) $('supervisorInput').value = d.supervisor;
+      if (d.ano !== undefined) $('anoInput').value = d.ano;
+      if (d.nomes !== undefined) $('nomesInputCentral').value = d.nomes;
+      if (d.html !== undefined) $('corpoTabelaCentral').innerHTML = d.html;
+      sincronizarMeta(); atualizarContadorNomes(); renumerarTabela();
+      mostrarToast('Backup restaurado!');
+    } catch(err) { mostrarToast('Ficheiro de backup inválido.'); }
+  };
+  r.readAsText(file); input.value = '';
+}
+
+function limparTudoCentral() {
+  if (!confirm('Deseja limpar todos os dados da Central?')) return;
+  $('nomesInputCentral').value = '';$('corpoTabelaCentral').innerHTML = criarLinhaTabela('01', '');
+  atualizarContadorNomes();
+  agendarAutoSave();
+  mostrarToast('Área limpa.');
+}
+
+window.onload = function() {
+  const s = localStorage.getItem(CHAVE);
+  if (s) { carregarTudoCentral(); }
+  else {
+    const lista = [...DADOS_INICIAIS].sort((a,b) => a.localeCompare(b, 'pt-BR'));
+    $('nomesInputCentral').value = lista.join('\n');
+    atualizarContadorNomes();
+    gerarTabelaCentral(false);
+  }
+  sincronizarMeta();
+};
+</script>
+</body>
+</html>
