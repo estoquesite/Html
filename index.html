@@ -32,7 +32,7 @@
           <span class="text-2xl font-black tracking-widest text-teal-100">VALE</span>
           <div class="h-5 w-px bg-teal-300/40"></div>
           <h1 class="text-lg font-extrabold tracking-wide">Portal Operacional</h1>
-          <span class="bg-amber-500 text-white font-black text-[10px] px-2 py-0.5 rounded">v06</span>
+          <span class="bg-amber-500 text-white font-black text-[10px] px-2 py-0.5 rounded">v07</span>
         </div>
         <p class="text-xs text-teal-100/90 mt-1 font-medium">Gestão diária, segurança, equipamentos, equipas, FMDS e ordens de venda</p>
       </div>
@@ -45,7 +45,7 @@
     </div>
   </header>
 
-  <input id="busca" type="search" placeholder="🔍 Procurar módulo (ex: férias, notebook, FDS)" aria-label="Procurar módulo"
+  <input id="busca" type="search" placeholder="🔍 Procurar módulo (ex: funcionários, férias, notebook, FDS)" aria-label="Procurar módulo"
     class="w-full mb-4 text-sm p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm">
 
   <nav id="grade" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" aria-label="Módulos"></nav>
@@ -53,12 +53,13 @@
 
   <footer class="mt-8 text-center text-xs text-slate-400 font-medium space-y-1">
     <p>Sistema Operacional Integrado • Portal Vale Corporativo</p>
-    <p class="text-[10px]">Atalhos: teclas 1 a 9 abrem os módulos 1 a 9, 0 abre o 10 e – (hífen) abre o 11. Fora de campos de texto.</p>
+    <p class="text-[10px]">Atalhos: tecla ` abre o Módulo 00; teclas 1 a 9 abrem os módulos 1 a 9; 0 abre o 10; – (hífen) abre o 11.</p>
   </footer>
 </div>
 
 <script>
 const MODULOS = [
+  ['00', '🏢', 'Central de Funcionários', 'Base mestre de colaboradores para digitação, ordenação A-Z, cópia rápida para outros módulos e cadastro.', '#0f766e', '#ccfbf1', '`'],
   [1, '📋', 'DDS & Emociograma', 'Controle semanal com carinhas de emociograma, registro de rubricas e impressão A4 paisagem.', '#007e7a', '#e6f4f4', '1'],
   [2, '📅', 'Matriz Anual de DDS', 'Grelha anual completa (12 meses) com visibilidade por semestre/trimestre e autoajuste.', '#007e7a', '#e6f4f4', '2'],
   [3, '🏖️', 'Cronograma de Férias', 'Planejamento anual de início e término das férias da equipe com controle de saldo de dias.', '#db2777', '#fce7f3', '3'],
@@ -71,8 +72,16 @@ const MODULOS = [
   [10, '👥', 'Troca dos Participantes FMDS', 'Matriz de rotação de participantes (SSMA, Pessoas, Produtividade, Qualidade) com folhas de 24 linhas e salvamento automático.', '#475569', '#f1f5f9', '0'],
   [11, '📑', 'Controle de OV (Ordens de Venda)', 'Rastreio de Ordens de Venda (ZVSU / sucatas e resíduos), saldos, emissor, pesagens e remessas.', '#0284c7', '#e0f2fe', '-']
 ];
+
 const ROTAS = Object.fromEntries(MODULOS.map(m => [m[6], `modulo${m[0]}.html`]));
-const nomeTecla = t => t === '-' ? 'Tecla –' : `Tecla ${t}`;
+// Permite abrir o Módulo 00 tanto com crase (`) quanto apóstrofo (')
+ROTAS["'"] = "modulo00.html";
+
+const nomeTecla = t => {
+  if (t === '-') return 'Tecla –';
+  if (t === '`') return 'Tecla `';
+  return `Tecla ${t}`;
+};
 const $ = id => document.getElementById(id);
 
 function desenhar(filtro = '') {
@@ -81,11 +90,17 @@ function desenhar(filtro = '') {
   $('grade').innerHTML = lista.map(([n, ico, tit, desc, cor, bg, tecla]) => `
     <a href="modulo${n}.html" class="card-modulo" style="--c:${cor};--bg:${bg}" title="Atalho: ${nomeTecla(tecla)}">
       <div>
-        <div class="flex justify-between items-center mb-3"><div class="card-icone" aria-hidden="true">${ico}</div><span class="tecla">${nomeTecla(tecla)}</span></div>
+        <div class="flex justify-between items-center mb-3">
+          <div class="card-icone" aria-hidden="true">${ico}</div>
+          <span class="tecla">${nomeTecla(tecla)}</span>
+        </div>
         <div class="tit text-sm font-bold text-slate-800 mb-1">${tit}</div>
         <div class="desc text-xs text-slate-500 leading-relaxed mb-3">${desc}</div>
       </div>
-      <div class="rod border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold" style="color:${cor}"><span>Abrir Módulo ${n}</span><span aria-hidden="true">➔</span></div>
+      <div class="rod border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold" style="color:${cor}">
+        <span>Abrir Módulo ${n}</span>
+        <span aria-hidden="true">➔</span>
+      </div>
     </a>`).join('');
   $('vazio').classList.toggle('hidden', lista.length > 0);
 }
@@ -94,6 +109,7 @@ function relogio() {
   const d = new Date();
   $('relogio').textContent = d.toLocaleTimeString('pt-BR');$('data').textContent = d.toLocaleDateString('pt-BR');
 }
+
 function tema(escuro) {
   document.documentElement.classList.toggle('dark', escuro);
   $('bTema').textContent = escuro ? '☀️' : '🌙';
@@ -110,9 +126,17 @@ document.addEventListener('keydown', e => {
 window.addEventListener('DOMContentLoaded', () => {
   let escuro = false;
   try { const s = localStorage.getItem('tema_portal'); escuro = s ? s === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; } catch {}
-  tema(escuro); relogio(); setInterval(relogio, 1000); desenhar();
+  tema(escuro);
+  relogio();
+  setInterval(relogio, 1000);
+  desenhar();
   $('bTema').onclick = () => tema(!document.documentElement.classList.contains('dark'));
-  $('busca').oninput = e => desenhar(e.target.value);$('busca').onkeydown = e => { if (e.key === 'Enter') { const a = document.querySelector('#grade a'); if (a) location.href = a.href; } };
+  $('busca').oninput = e => desenhar(e.target.value);$('busca').onkeydown = e => {
+    if (e.key === 'Enter') {
+      const a = document.querySelector('#grade a');
+      if (a) location.href = a.href;
+    }
+  };
 });
 </script>
 </body>
