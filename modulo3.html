@@ -70,19 +70,19 @@ tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
 @media(max-width:800px){.campos-painel{grid-template-columns:1fr}.btn-imprimir{margin-left:0}}
 
 /* ========================================================
-   IMPRESSÃO: OCUPAR A PÁGINA A4 HORIZONTAL INTEIRA
+   IMPRESSÃO: OCUPAR A FOLHA INTEIRA (100% PAISAGEM)
    ======================================================== */
 @media print {
   @page {
     size: A4 landscape;
-    margin: 4mm 6mm;
+    margin: 5mm;
   }
   html, body {
     margin: 0 !important;
     padding: 0 !important;
     background: #fff !important;
-    width: 100% !important;
-    height: 100% !important;
+    width: 100vw !important;
+    height: 100vh !important;
     overflow: hidden !important;
     -webkit-print-color-adjust: exact !important;
     print-color-adjust: exact !important;
@@ -103,19 +103,15 @@ tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
     padding: 0 !important;
     width: 100% !important;
     max-width: 100% !important;
-    height: 100% !important;
+    height: calc(100vh - 10mm) !important;
     display: flex !important;
     flex-direction: column !important;
-    justify-content: flex-start !important;
-    page-break-inside: avoid !important;
-    break-inside: avoid !important;
-    page-break-after: avoid !important;
-    break-after: avoid !important;
+    justify-content: space-between !important;
   }
   .rolagem {
     overflow: visible !important;
     width: 100% !important;
-    flex-grow: 1 !important;
+    height: 100% !important;
     display: flex !important;
     flex-direction: column !important;
   }
@@ -123,59 +119,69 @@ tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
     min-width: 100% !important;
     width: 100% !important;
   }
-  .cabecalho-container, .info-ferias-bar {
+  .cabecalho-container {
+    height: 38px !important;
     margin-bottom: 2px !important;
-    width: 100% !important;
   }
-  .cabecalho-container td, .info-ferias-bar td {
+  .cabecalho-container td {
     padding: 2px 6px !important;
-    line-height: 1.15 !important;
+    line-height: 1.1 !important;
   }
-  .logo-box {
-    font-size: 13px !important;
-    width: 75px !important;
-  }
-  .titulo-box {
-    font-size: 10px !important;
-    padding: 2px 6px !important;
-  }
-  .meta-box {
-    font-size: 8px !important;
-    width: 110px !important;
+  .info-ferias-bar {
+    height: 24px !important;
+    margin-bottom: 3px !important;
   }
   .info-ferias-bar td {
-    font-size: 8px !important;
     padding: 2px 6px !important;
+    font-size: 8.5px !important;
+  }
+  .logo-box {
+    font-size: 15px !important;
+    width: 85px !important;
+  }
+  .titulo-box {
+    font-size: 11px !important;
+  }
+  .meta-box {
+    font-size: 8.5px !important;
+    width: 120px !important;
   }
   table.tabela-ferias {
     width: 100% !important;
+    flex-grow: 1 !important;
     border-collapse: collapse !important;
     table-layout: fixed !important;
     margin-bottom: 0 !important;
-    flex-grow: 1 !important;
+  }
+  table.tabela-ferias thead {
+    height: 32px !important;
   }
   table.tabela-ferias th {
     font-size: 8px !important;
-    height: 16px !important;
     padding: 1px !important;
+    line-height: 1.1 !important;
   }
   table.tabela-ferias thead tr:nth-child(2) th {
     font-size: 7px !important;
-    height: 13px !important;
+  }
+  table.tabela-ferias tbody {
+    height: 100% !important;
+  }
+  table.tabela-ferias tbody tr {
+    height: calc((100vh - 110mm) / 21) !important;
   }
   table.tabela-ferias td {
-    font-size: 8px !important;
-    height: 27px !important;
+    font-size: 8.5px !important;
     padding: 0 1px !important;
     line-height: 1.1 !important;
   }
-  .col-id { width: 28px !important; }
-  .col-id-texto { font-size: 8px !important; }
-  .col-nome { width: 190px !important; }
-  .col-nome-container { padding: 0 3px !important; }
-  .col-nome-texto { font-size: 8px !important; }
-  .celula-ferias { font-size: 7.5px !important; }
-  .col-saldo { width: 35px !important; font-size: 8px !important; }
+  .col-id { width: 32px !important; }
+  .col-id-texto { font-size: 8.5px !important; }
+  .col-nome { width: 220px !important; }
+  .col-nome-container { padding: 0 4px !important; }
+  .col-nome-texto { font-size: 8.5px !important; font-weight: 800 !important; }
+  .celula-ferias { font-size: 8px !important; }
+  .col-saldo { width: 42px !important; font-size: 8.5px !important; }
   table.tabela-ferias tbody tr:hover { background: inherit !important; }
 }
 </style>
@@ -217,7 +223,7 @@ tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
     <button type="button" class="btn btn-limpar" onclick="limparTudoFerias()">Limpar</button>
     <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
   </div>
-  <p class="dica">💡 Para imprimir corretamente, certifique-se de definir a orientação como Paisagem (Horizontal) na janela de impressão[span_1](start_span)[span_1](end_span).</p>
+  <p class="dica">💡 Ao imprimir, mude a Orientação para Paisagem e ative "Gráficos de segundo plano".</p>
 </div>
 
 <div class="barra-zoom">
