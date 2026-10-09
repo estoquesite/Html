@@ -112,6 +112,10 @@
                     <span>💾</span> Salvar na Nuvem
                 </button>
 
+                <button type="button" onclick="salvarArquivoLocal()" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-slate-700 hover:bg-slate-800 text-white transition flex items-center gap-1.5 shadow-sm active:scale-95" title="Baixar JSON de backup no computador">
+                    <span>💾</span> Salvar JSON
+                </button>
+
                 <button type="button" onclick="sincronizarComSupabase()" id="btnSincronizarGeral" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white transition flex items-center gap-1.5 shadow-sm active:scale-95">
                     <span id="iconeSync">🔄</span> Sincronizar
                 </button>
@@ -500,7 +504,7 @@
                         cacheRegistros = data.map(d => {
                             const itens = Array.isArray(d.itens) && d.itens.length > 0 ? d.itens : [
                                 { itemSap: "40", material: d.material || "SUCATA DE FIO-CABO DE ALUMÍNIO E...", qtdTO: 0.300 },
-                                { itemSap: "60", material: "SUCATA DE FIO-CABO DE COBRE ENCA...", qtdTO: 0.300 }
+                                { itemSap: "60", material: d.material || "SUCATA DE FIO-CABO DE COBRE ENCA...", qtdTO: 0.300 }
                             ];
                             const somaItens = itens.reduce((s, it) => s + Number(it.qtdTO || 0), 0);
                             return {
@@ -584,6 +588,22 @@
 
             btn.disabled = false;
             btn.innerHTML = `<span>💾</span> Salvar na Nuvem`;
+        }
+
+        function salvarArquivoLocal() {
+            try {
+                const dadosStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(cacheRegistros, null, 2));
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.setAttribute("href", dadosStr);
+                downloadAnchor.setAttribute("download", `backup_ovs_vale_${new Date().toISOString().slice(0,10)}.json`);
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                downloadAnchor.remove();
+                alert("✓ Arquivo JSON salvo com sucesso no seu computador!");
+            } catch (err) {
+                console.error("Erro ao salvar arquivo local:", err);
+                alert("Erro ao gerar o arquivo JSON.");
+            }
         }
 
         async function sincronizarComSupabase() {
