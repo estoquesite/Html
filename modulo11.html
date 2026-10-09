@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Módulo 11 - Controle de OVs por Empresa</title>
+    <title>Módulo 11 - Controle de OVs por Empresa & Supabase</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Chart.js para os Gráficos de Utilização -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Supabase JS Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- Tesseract OCR Engine CDN -->
     <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
     <script>
@@ -98,12 +100,24 @@
             
             <div class="flex flex-wrap items-center gap-2">
                 <span id="badgeConexao" class="text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5">
-                    <span id="pontoConexao" class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                    <span id="textoConexao">Salvo Localmente</span>
+                    <span id="pontoConexao" class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                    <span id="textoConexao">Nuvem Conectada</span>
                 </span>
 
                 <button type="button" onclick="adicionarNovaOVManual()" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white transition flex items-center gap-1.5 shadow-sm active:scale-95">
                     <span>➕</span> Nova OV
+                </button>
+
+                <button type="button" onclick="salvarTudoNoSupabase()" id="btnSalvarGeral" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white transition flex items-center gap-1.5 shadow-sm active:scale-95">
+                    <span>💾</span> Salvar na Nuvem
+                </button>
+
+                <button type="button" onclick="salvarArquivoLocal()" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-slate-700 hover:bg-slate-800 text-white transition flex items-center gap-1.5 shadow-sm active:scale-95" title="Baixar JSON de backup no computador">
+                    <span>💾</span> Salvar JSON
+                </button>
+
+                <button type="button" onclick="sincronizarComSupabase()" id="btnSincronizarGeral" class="text-xs font-bold px-3.5 py-1.5 rounded-xl bg-teal-600 hover:bg-teal-700 text-white transition flex items-center gap-1.5 shadow-sm active:scale-95">
+                    <span id="iconeSync">🔄</span> Sincronizar
                 </button>
 
                 <button type="button" onclick="exportarCSV()" class="text-xs font-bold px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-900 text-white transition">
@@ -122,7 +136,7 @@
                         <h1 class="text-lg font-extrabold tracking-wide">Painel de OVs por Empresa & Saldos</h1>
                         <span class="bg-blue-600 text-white font-black text-[10px] px-2.5 py-0.5 rounded shadow-sm">GERDAU AZUL</span>
                     </div>
-                    <p class="text-xs text-teal-100/90 mt-1">Validação automática de OV e gravação automática local</p>
+                    <p class="text-xs text-teal-100/90 mt-1">Validação automática de OV e gravação sincronizada em Nuvem</p>
                 </div>
 
                 <div class="flex flex-wrap gap-2 text-right">
@@ -317,6 +331,19 @@
 
     <!-- SCRIPT DE PROCESSAMENTO -->
     <script>
+        const SUPABASE_URL = "https://gloxtswcksbczinpwtzu.supabase.co";
+        // Chave anônima pública de acesso à API
+        const SUPABASE_ANON_KEY = "sb_publishable_0kEiqthWKZZwjM120wQIYw_Hba7qeLc";
+        
+        let supabaseClient = null;
+        try {
+            if (window.supabase && typeof window.supabase.createClient === 'function') {
+                supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            }
+        } catch(e) {
+            console.error("Falha ao inicializar o Supabase SDK:", e);
+        }
+
         const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v18_diagnostico";
         let cacheRegistros = [];
         let linhasTempLeitorOV = [];
@@ -388,18 +415,21 @@
             return parseFloat(limpo) || 0;
         }
 
+        // Quantidade como o SAP escreve: "3.040 KG" = 3040 kg (ponto = milhar)
         function parseQtdSapParaTO(numStr, unidade) {
             let s = String(numStr).trim().replace(/\s+/g, '');
             const un = (unidade || 'KG').toUpperCase();
             let valor;
             if (un === 'KG') {
-                if (/^\d{1,3}[.,]\d{3}$/.test(s) \vert{}\vert{} /^\d{1,3}([.,]\d{3})+$/.test(s)) {
+                // em KG o SAP não usa decimais: qualquer . ou , seguido de 3 dígitos é milhar
+                if (/^\d{1,3}[.,]\d{3}$/.test(s) || /^\d{1,3}([.,]\d{3})+$/.test(s)) {
                     valor = parseFloat(s.replace(/[.,]/g, ''));
                 } else {
                     valor = parseFloat(s.replace(/\./g, '').replace(',', '.'));
                 }
                 return (valor || 0) / 1000;
             }
+            // TO / TON / T
             valor = parseFloat(s.replace(/\./g, '').replace(',', '.'));
             return valor || 0;
         }
@@ -422,6 +452,7 @@
                         const data = imgData.data;
                         for (let i = 0; i < data.length; i += 4) {
                             const cinza = 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
+                            // sem binarizar: só escala de cinza com leve contraste (preserva texto sobre o marca-texto amarelo)
                             const val = binarizar
                                 ? (cinza > 165 ? 255 : 0)
                                 : Math.max(0, Math.min(255, (cinza - 128) * 1.3 + 128));
@@ -457,14 +488,151 @@
             }
         ];
 
-        function carregarRegistros() {
+        function atualizarIndicadorStatus(status, texto) {
+            const ponto = document.getElementById('pontoConexao');
+            const txt = document.getElementById('textoConexao');
+            const badge = document.getElementById('badgeConexao');
+            if (!ponto || !txt) return;
+
+            txt.innerText = texto;
+            if (status === 'online') {
+                badge.className = "text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5";
+                ponto.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+            } else if (status === 'gravando') {
+                badge.className = "text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 flex items-center gap-1.5";
+                ponto.className = "w-2 h-2 rounded-full bg-amber-500 animate-ping";
+            } else {
+                badge.className = "text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-slate-100 text-slate-600 border border-slate-200 flex items-center gap-1.5";
+                ponto.className = "w-2 h-2 rounded-full bg-slate-400";
+            }
+        }
+
+        async function carregarRegistros() {
+            if (supabaseClient) {
+                try {
+                    atualizarIndicadorStatus('gravando', 'Sincronizando...');
+                    const { data, error } = await supabaseClient.from('modulo11_ovs').select('*').order('created_at', { ascending: false });
+                    
+                    if (error) {
+                        console.error("Erro ao ler Supabase:", error);
+                        throw error;
+                    }
+
+                    if (data && data.length > 0) {
+                        cacheRegistros = data.map(d => {
+                            const itens = Array.isArray(d.itens) && d.itens.length > 0 ? d.itens : [
+                                { itemSap: "40", material: d.material || "SUCATA DE FIO-CABO DE ALUMÍNIO E...", qtdTO: 0.300 },
+                                { itemSap: "60", material: d.material || "SUCATA DE FIO-CABO DE COBRE ENCA...", qtdTO: 0.300 }
+                            ];
+                            const somaItens = itens.reduce((s, it) => s + Number(it.qtdTO || 0), 0);
+                            return {
+                                id: String(d.id),
+                                status: d.status || "ATIVO",
+                                contrato: { numero: d.contrato_numero || "0000071823", item: "30", qtdTotalTO: Number(d.contrato_total_to || 2635), valorTotalBRL: Number(d.contrato_total_brl || 0) },
+                                ov: {
+                                    numero: String(d.ov),
+                                    cliente: d.cliente || "AUCOBRE GESTÃO DE RESIDUOS LTDA.",
+                                    pedidoDRS: d.pedido_drs || "DSR 018-2025",
+                                    itens: itens,
+                                    qtdLiberadaTO: somaItens > 0 ? somaItens : 0.600,
+                                    valorBRL: Number(d.valor_brl || 8746.32),
+                                    precoUnitarioPorTO: Number(d.preco_unitario_to || 14575.50)
+                                },
+                                gastos: Array.isArray(d.gastos) ? d.gastos : []
+                            };
+                        });
+                        localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheRegistros));
+                        atualizarOpcoesEmpresas(cacheRegistros);
+                        renderizar();
+                        atualizarIndicadorStatus('online', 'Nuvem Conectada');
+                        return;
+                    }
+                } catch (e) {
+                    console.warn("Falha no Supabase, usando local:", e);
+                }
+            }
+
             const raw = localStorage.getItem(STORAGE_KEY);
             cacheRegistros = raw ? JSON.parse(raw) : DADOS_DEFAULT;
             atualizarOpcoesEmpresas(cacheRegistros);
             renderizar();
+            atualizarIndicadorStatus('offline', 'Salvo Localmente');
         }
 
-        function salvarNaBase(novoItem) {
+        async function salvarTudoNoSupabase() {
+            const btn = document.getElementById('btnSalvarGeral');
+            btn.disabled = true;
+            btn.innerHTML = `<span>⏳</span> Salvando...`;
+            atualizarIndicadorStatus('gravando', 'Gravando Dados...');
+
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheRegistros));
+
+            if (supabaseClient) {
+                try {
+                    const payloads = cacheRegistros.map(item => ({
+                        id: String(item.id).trim(),
+                        ov: String(item.ov.numero).trim(),
+                        status: item.status || "ATIVO",
+                        cliente: String(item.ov.cliente || ''),
+                        material: (item.ov.itens || []).map(i => i.material).join(' / '),
+                        itens: JSON.parse(JSON.stringify(item.ov.itens || [])),
+                        pedido_drs: String(item.ov.pedidoDRS || ''),
+                        qtd_liberada_to: Number(item.ov.qtdLiberadaTO || 0),
+                        qtd_liberada_kg: Number(item.ov.qtdLiberadaTO || 0) * 1000,
+                        valor_brl: Number(item.ov.valorBRL || 0),
+                        preco_unitario_to: Number(item.ov.precoUnitarioPorTO || 14575.50),
+                        contrato_numero: String(item.contrato.numero || ''),
+                        contrato_total_to: Number(item.contrato.qtdTotalTO || 0),
+                        gastos: JSON.parse(JSON.stringify(item.gastos || []))
+                    }));
+
+                    const { error } = await supabaseClient.from('modulo11_ovs').upsert(payloads, { onConflict: 'id' });
+                    
+                    if (error) {
+                        console.error("Erro Supabase:", error);
+                        throw new Error(`${error.message} (Código: ${error.code || 'RLS/Tabela'})`);
+                    }
+                    
+                    atualizarIndicadorStatus('online', 'Salvo com Sucesso!');
+                    alert("✓ Gravado no Supabase com sucesso!");
+                } catch (err) {
+                    console.error("Erro detalhado ao gravar no Supabase:", err);
+                    alert("⚠️ O Supabase recusou a gravação:\n" + err.message + "\n\nSe o erro citar 'row-level security' ou 'permission denied', execute o comando SQL de liberação fornecido.");
+                    atualizarIndicadorStatus('offline', 'Falha na Gravação');
+                }
+            } else {
+                alert("Supabase SDK não está ativo. Dados salvos apenas no armazenamento local.");
+            }
+
+            btn.disabled = false;
+            btn.innerHTML = `<span>💾</span> Salvar na Nuvem`;
+        }
+
+        function salvarArquivoLocal() {
+            try {
+                const dadosStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(cacheRegistros, null, 2));
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.setAttribute("href", dadosStr);
+                downloadAnchor.setAttribute("download", `backup_ovs_vale_${new Date().toISOString().slice(0,10)}.json`);
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                downloadAnchor.remove();
+                alert("✓ Arquivo JSON salvo com sucesso no seu computador!");
+            } catch (err) {
+                console.error("Erro ao salvar arquivo local:", err);
+                alert("Erro ao gerar o arquivo JSON.");
+            }
+        }
+
+        async function sincronizarComSupabase() {
+            const icone = document.getElementById('iconeSync');
+            if (icone) icone.classList.add('animate-spin');
+            await carregarRegistros();
+            if (icone) icone.classList.remove('animate-spin');
+            alert("Sincronização concluída com o Supabase!");
+        }
+
+        async function salvarNaBase(novoItem) {
             const idx = cacheRegistros.findIndex(i => i.id === novoItem.id);
             if (idx !== -1) cacheRegistros[idx] = novoItem;
             else cacheRegistros.unshift(novoItem);
@@ -472,6 +640,36 @@
             localStorage.setItem(STORAGE_KEY, JSON.stringify(cacheRegistros));
             atualizarOpcoesEmpresas(cacheRegistros);
             renderizar();
+
+            if (supabaseClient) {
+                try {
+                    atualizarIndicadorStatus('gravando', 'Gravando...');
+                    const payload = {
+                        id: String(novoItem.id).trim(),
+                        ov: String(novoItem.ov.numero).trim(),
+                        status: novoItem.status || "ATIVO",
+                        cliente: String(novoItem.ov.cliente || ''),
+                        material: (novoItem.ov.itens || []).map(i => i.material).join(' / '),
+                        itens: JSON.parse(JSON.stringify(novoItem.ov.itens || [])),
+                        pedido_drs: String(novoItem.ov.pedidoDRS || ''),
+                        qtd_liberada_to: Number(novoItem.ov.qtdLiberadaTO || 0),
+                        qtd_liberada_kg: Number(novoItem.ov.qtdLiberadaTO || 0) * 1000,
+                        valor_brl: Number(novoItem.ov.valorBRL || 0),
+                        preco_unitario_to: Number(novoItem.ov.precoUnitarioPorTO || 14575.50),
+                        contrato_numero: String(novoItem.contrato.numero || ''),
+                        contrato_total_to: Number(novoItem.contrato.qtdTotalTO || 0),
+                        gastos: JSON.parse(JSON.stringify(novoItem.gastos || []))
+                    };
+                    
+                    const { error } = await supabaseClient.from('modulo11_ovs').upsert(payload, { onConflict: 'id' });
+                    if (error) throw error;
+                    
+                    atualizarIndicadorStatus('online', 'Nuvem Conectada');
+                } catch (err) {
+                    console.error("Falha ao salvar individualmente no Supabase:", err);
+                    atualizarIndicadorStatus('offline', 'Pendente');
+                }
+            }
         }
 
         function adicionarNovaOVManual() {
@@ -671,7 +869,7 @@
                                 <span class="text-[10px] text-slate-400 font-bold">Qtd:</span>
                                 <input type="number" step="0.001" value="${Number(it.qtdTO).toFixed(3)}" onchange="atualizarItemMaterial('${item.id}', ${idxL}, 'qtdTO', this.value)" class="input-inline w-20 font-black text-teal-800 text-right px-1 py-0.5 border border-transparent focus:border-teal-300 rounded">
                                 <span class="text-[10px] font-bold text-slate-500">TO</span>
-                                <span class="text-[10px] font-slate-400">(${Math.round(Number(it.qtdTO)*1000)} KG)</span>
+                                <span class="text-[10px] text-slate-400">(${Math.round(Number(it.qtdTO)*1000)} KG)</span>
                             </div>
                             <button type="button" onclick="removerLinhaMaterialOV('${item.id}', ${idxL})" class="text-rose-400 hover:text-rose-600 px-1 font-bold no-print" title="Remover item">✕</button>
                         </div>
@@ -1045,7 +1243,7 @@
             if (!item || linhasTempLeitorOV.length === 0) return;
 
             if (ovLidaDoPrint && ovLidaDoPrint !== item.ov.numero) {
-                const confirma = confirm(`Atenção: A tela lida indicou a OV ${ovLidaDoPrint}, mais você está a atualizar a OV ${item.ov.numero}. Deseja prosseguir mesmo assim?`);
+                const confirma = confirm(`Atenção: A tela lida indicou a OV ${ovLidaDoPrint}, mas você está a atualizar a OV ${item.ov.numero}. Deseja prosseguir mesmo assim?`);
                 if (!confirma) return;
             }
 
@@ -1104,6 +1302,7 @@
                 });
                 const { data: { text } } = await worker.recognize(imagemOtimizada);
                 await worker.terminate();
+                console.log("OCR NOTAS (texto bruto):\n", text);
 
                 notasTempLeitorNotas = extrairNotasFluxoSAP(text);
                 document.getElementById('badgeNotasDetectadas').innerText = `${notasTempLeitorNotas.length} nota(s) encontrada(s)`;
@@ -1198,20 +1397,24 @@
             ovLidaDasNotas = null;
 
             linhas.forEach(linha => {
+                // OV (Venda Sucata/Escória 0115283416 / 30)
                 const mVenda = linha.match(/Venda[^\d]{0,30}(\d{8,10})/i);
                 if (mVenda) ovLidaDasNotas = String(parseInt(mVenda[1], 10));
 
+                // Delivery que antecede a fatura
                 const mDel = linha.match(/Delivery[^\d]{0,30}(\d{8,10})/i);
                 if (mDel) { deliveryAtual = mDel[1]; return; }
 
+                // Só linhas de FATURA
                 if (!/Fatur/i.test(linha)) return;
 
                 const mDoc = linha.match(/(\d{8,10})/);
                 if (!mDoc) return;
                 const numeroFatura = mDoc[1];
 
+                // remove "907777615 / 30 / 30" para não confundir com a quantidade
                 const resto = linha.slice(linha.indexOf(mDoc[1]) + mDoc[1].length)
-                                 .replace(/^(\s*[\/|\\]\s*\d+)+/, '');
+                                   .replace(/^(\s*[\/|\\]\s*\d+)+/, '');
 
                 const mQtd = resto.match(/(\d{1,3}(?:[.,]\d{3})*(?:,\d+)?|\d+)\s*(KG|TON|TO|T)\b/i);
                 const mData = linha.match(/(\d{2})\.(\d{2})\.(\d{4})/);
@@ -1220,15 +1423,15 @@
                 let pesoTO = 0;
                 if (mQtd) pesoTO = parseQtdSapParaTO(mQtd[1], mQtd[2]);
 
-                if (notas.some(n => n.ticket === numeroFatura)) return;
+                if (notas.some(n => n.ticket === numeroFatura)) return; // evita duplicada
 
                 notas.push({
-                    ticket: numeroFatura,
-                    placa: deliveryAtual,
+                    ticket: numeroFatura,                 // exatamente o número do SAP
+                    placa: deliveryAtual,                 // remessa (Delivery) da fatura
                     pesoTO: pesoTO,
                     valorBRL: mValor ? parseNumeroSap(mValor[1]) : 0,
                     data: mData ? `${mData[3]}-${mData[2]}-${mData[1]}` : new Date().toISOString().split('T')[0],
-                    emEdicao: pesoTO === 0
+                    emEdicao: pesoTO === 0                // se não leu o peso, já abre para corrigir
                 });
             });
 
