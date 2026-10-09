@@ -284,7 +284,7 @@
                     <span class="text-2xl">⚖️</span>
                     <div>
                         <h3 class="font-bold text-slate-900 text-sm">Leitor de Notas Fiscais e Saídas (Fluxo SAP)</h3>
-                        <p class="text-[11px] text-slate-500">Lê o print do fluxo de documentos / faturas e gera os romaneios de saída</p>
+                        <p class="text-[11px] text-slate-500">Lê as linhas de Fatura do fluxo de documentos exatamente como estão no SAP</p>
                     </div>
                 </div>
                 <button type="button" onclick="fecharModalLeitorNotas()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
@@ -349,6 +349,7 @@
         let linhasTempLeitorOV = [];
         let notasTempLeitorNotas = [];
         let ovLidaDoPrint = null;
+        let ovLidaDasNotas = null;
 
         const TEMA_GERDAU_AZUL = {
             nomeTema: "Gerdau Azul Corporativo",
@@ -414,7 +415,28 @@
             return parseFloat(limpo) || 0;
         }
 
-        function preProcessarImagemParaOCR(arquivoImagem) {
+        // Quantidade como o SAP escreve: "3.040 KG" = 3040 kg (ponto = milhar)
+        function parseQtdSapParaTO(numStr, unidade) {
+            let s = String(numStr).trim().replace(/\s+/g, '');
+            const un = (unidade || 'KG').toUpperCase();
+            let valor;
+            if (un === 'KG') {
+                // em KG o SAP não usa decimais: qualquer . ou , seguido de 3 dígitos é milhar
+                if (/^\d{1,3}[.,]\d{3}$/.test(s) || /^\d{1,3}([.,]\d{3})+$/.test(s)) {
+                    valor = parseFloat(s.replace(/[.,]/g, ''));
+                } else {
+                    valor = parseFloat(s.replace(/\./g, '').replace(',', '.'));
+                }
+                return (valor || 0) / 1000;
+            }
+            // TO / TON / T
+            valor = parseFloat(s.replace(/\./g, '').replace(',', '.'));
+            return valor || 0;
+        }
+
+        function preProcessarImagemParaOCR(arquivoImagem, opcoes = {}) {
+            const fator = opcoes.fator || 1.5;
+            const binarizar = opcoes.binarizar !== false;
             return new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.onload = (e) => {
@@ -422,24 +444,20 @@
                     img.onload = () => {
                         const canvas = document.createElement('canvas');
                         const ctx = canvas.getContext('2d');
-                        
-                        const fator = 1.5;
                         canvas.width = img.width * fator;
                         canvas.height = img.height * fator;
                         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
 
                         const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
                         const data = imgData.data;
-
                         for (let i = 0; i < data.length; i += 4) {
-                            const r = data[i], g = data[i+1], b = data[i+2];
-                            const cinza = 0.299 * r + 0.587 * g + 0.114 * b;
-                            const val = cinza > 165 ? 255 : 0;
-                            data[i] = val;
-                            data[i+1] = val;
-                            data[i+2] = val;
+                            const cinza = 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
+                            // sem binarizar: só escala de cinza com leve contraste (preserva texto sobre o marca-texto amarelo)
+                            const val = binarizar
+                                ? (cinza > 165 ? 255 : 0)
+                                : Math.max(0, Math.min(255, (cinza - 128) * 1.3 + 128));
+                            data[i] = data[i+1] = data[i+2] = val;
                         }
-
                         ctx.putImageData(imgData, 0, 0);
                         resolve(canvas.toDataURL('image/png'));
                     };
@@ -1252,6 +1270,7 @@
         function abrirModalLeitorNotas(ovId) {
             document.getElementById('leitorNotasTargetId').value = ovId;
             notasTempLeitorNotas = [];
+            ovLidaDasNotas = null;
             document.getElementById('detalhesLeitorNotas').innerHTML = 'Aguardando print do fluxo de notas...';
             document.getElementById('badgeNotasDetectadas').innerText = '0 nota(s)';
             document.getElementById('progressoLeitorNotas').classList.add('hidden');
@@ -1274,18 +1293,23 @@
             document.getElementById('progressoLeitorNotas').classList.remove('hidden');
 
             try {
-                const imagemOtimizada = await preProcessarImagemParaOCR(input.files[0]);
+                const imagemOtimizada = await preProcessarImagemParaOCR(input.files[0], { fator: 2, binarizar: false });
 
                 const worker = await Tesseract.createWorker('por');
+                await worker.setParameters({
+                    tessedit_pageseg_mode: '6',
+                    preserve_interword_spaces: '1'
+                });
                 const { data: { text } } = await worker.recognize(imagemOtimizada);
                 await worker.terminate();
+                console.log("OCR NOTAS (texto bruto):\n", text);
 
                 notasTempLeitorNotas = extrairNotasFluxoSAP(text);
                 document.getElementById('badgeNotasDetectadas').innerText = `${notasTempLeitorNotas.length} nota(s) encontrada(s)`;
 
                 if (notasTempLeitorNotas.length === 0) {
                     document.getElementById('detalhesLeitorNotas').innerHTML = `
-                        <div class="text-rose-600 font-semibold p-2">Nenhuma nota ou quantidade identificada no print.</div>
+                        <div class="text-rose-600 font-semibold p-2">Nenhuma linha de Fatura identificada no print.</div>
                     `;
                     btn.disabled = false;
                     return;
@@ -1317,7 +1341,7 @@
                             </div>
                             <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
                                 <div class="sm:col-span-5">
-                                    <label class="text-[10px] text-slate-500 font-bold block">Nº Documento / NF</label>
+                                    <label class="text-[10px] text-slate-500 font-bold block">Nº Fatura / NF</label>
                                     <input type="text" value="${n.ticket}" oninput="alterarNotaTemp(${idx}, 'ticket', this.value)" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs font-bold text-slate-800">
                                 </div>
                                 <div class="sm:col-span-4">
@@ -1336,12 +1360,10 @@
                 return `
                     <div class="flex justify-between items-center border-b border-slate-100 py-1">
                         <div class="flex items-center gap-2">
-                            <button type="button" onclick="alternarEdicaoNotaLeitor(${idx})" title="Editar esta nota" class="bg-white hover:bg-slate-200 text-slate-700 border border-slate-300 p-1 rounded-lg text-xs shadow-xs">
-                                ✏️
-                            </button>
-                            <span><b>${n.ticket}</b> (Placa: ${n.placa})</span>
+                            <button type="button" onclick="alternarEdicaoNotaLeitor(${idx})" title="Editar esta nota" class="bg-white hover:bg-slate-200 text-slate-700 border border-slate-300 p-1 rounded-lg text-xs shadow-xs">✏️</button>
+                            <span>Fatura <b>${n.ticket}</b> · Remessa: ${n.placa || '-'} · ${n.data.split('-').reverse().join('/')}</span>
                         </div>
-                        <span class="font-bold text-rose-700">-${Number(n.pesoTO).toFixed(3)} TO</span>
+                        <span class="font-bold text-rose-700">-${Number(n.pesoTO).toFixed(3)} TO <span class="text-[10px] text-slate-400">(${Math.round(Number(n.pesoTO)*1000)} KG)</span></span>
                     </div>
                 `;
             }).join('') + `
@@ -1371,32 +1393,46 @@
         function extrairNotasFluxoSAP(txt) {
             const notas = [];
             const linhas = txt.split(/\r?\n/);
-            let index = 1;
+            let deliveryAtual = '';
+            ovLidaDasNotas = null;
 
             linhas.forEach(linha => {
-                if (/Fatura/i.test(linha)) {
-                    const matchDoc = linha.match(/([0-9]{8,10})/);
-                    const matchPeso = linha.match(/([0-9]+(?:[.,][0-9]{1,3})?)\s*(TO|KG|TON|T)\b/i);
+                // OV (Venda Sucata/Escória 0115283416 / 30)
+                const mVenda = linha.match(/Venda[^\d]{0,30}(\d{8,10})/i);
+                if (mVenda) ovLidaDasNotas = String(parseInt(mVenda[1], 10));
 
-                    if (matchDoc && matchPeso) {
-                        let peso = parseNumeroSap(matchPeso[1]);
-                        const unidade = (matchPeso[2] || 'TO').toUpperCase();
-                        
-                        if (unidade === 'KG') {
-                            peso = peso / 1000;
-                        }
+                // Delivery que antecede a fatura
+                const mDel = linha.match(/Delivery[^\d]{0,30}(\d{8,10})/i);
+                if (mDel) { deliveryAtual = mDel[1]; return; }
 
-                        if (peso > 0) {
-                            notas.push({
-                                ticket: `NF-${matchDoc[1]}`,
-                                placa: `VEIC-${index++}`,
-                                pesoTO: peso,
-                                data: new Date().toISOString().split('T')[0],
-                                emEdicao: false
-                            });
-                        }
-                    }
-                }
+                // Só linhas de FATURA
+                if (!/Fatur/i.test(linha)) return;
+
+                const mDoc = linha.match(/(\d{8,10})/);
+                if (!mDoc) return;
+                const numeroFatura = mDoc[1];
+
+                // remove "907777615 / 30 / 30" para não confundir com a quantidade
+                const resto = linha.slice(linha.indexOf(mDoc[1]) + mDoc[1].length)
+                                   .replace(/^(\s*[\/|\\]\s*\d+)+/, '');
+
+                const mQtd = resto.match(/(\d{1,3}(?:[.,]\d{3})*(?:,\d+)?|\d+)\s*(KG|TON|TO|T)\b/i);
+                const mData = linha.match(/(\d{2})\.(\d{2})\.(\d{4})/);
+                const mValor = resto.match(/(\d{1,3}(?:\.\d{3})*,\d{2})\s*BRL/i);
+
+                let pesoTO = 0;
+                if (mQtd) pesoTO = parseQtdSapParaTO(mQtd[1], mQtd[2]);
+
+                if (notas.some(n => n.ticket === numeroFatura)) return; // evita duplicada
+
+                notas.push({
+                    ticket: numeroFatura,                 // exatamente o número do SAP
+                    placa: deliveryAtual,                 // remessa (Delivery) da fatura
+                    pesoTO: pesoTO,
+                    valorBRL: mValor ? parseNumeroSap(mValor[1]) : 0,
+                    data: mData ? `${mData[3]}-${mData[2]}-${mData[1]}` : new Date().toISOString().split('T')[0],
+                    emEdicao: pesoTO === 0                // se não leu o peso, já abre para corrigir
+                });
             });
 
             return notas;
@@ -1407,20 +1443,28 @@
             const item = cacheRegistros.find(o => o.id === ovId);
             if (!item || notasTempLeitorNotas.length === 0) return;
 
+            if (ovLidaDasNotas && ovLidaDasNotas !== item.ov.numero) {
+                if (!confirm(`A tela lida é da OV ${ovLidaDasNotas}, mas você está na OV ${item.ov.numero}. Deseja lançar mesmo assim?`)) return;
+            }
+
             if (!item.gastos) item.gastos = [];
+            let lancadas = 0, repetidas = 0;
+
             notasTempLeitorNotas.forEach(n => {
+                if (item.gastos.some(g => String(g.ticket).trim() === String(n.ticket).trim())) { repetidas++; return; }
                 item.gastos.push({
                     id: Date.now() + Math.random(),
                     ticket: n.ticket,
                     placa: n.placa,
                     pesoTO: Number(n.pesoTO),
-                    data: n.data || new Date().toISOString().split('T')[0]
+                    data: n.data
                 });
+                lancadas++;
             });
 
             salvarNaBase(item);
             fecharModalLeitorNotas();
-            alert(`✓ ${notasTempLeitorNotas.length} nota(s) lançada(s) com sucesso na OV!`);
+            alert(`✓ ${lancadas} nota(s) lançada(s)${repetidas ? ` (${repetidas} já existiam e foram ignoradas)` : ''}.`);
         }
 
         // ==========================================
