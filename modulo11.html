@@ -1223,7 +1223,7 @@
         }
 
         // ==========================================
-        // LEITOR 2: FLUXO DE NOTAS / FATURAMENTO
+        // LEITOR 2: FLUXO DE NOTAS / FATURAMENTO (CORRIGIDO)
         // ==========================================
         function abrirModalLeitorNotas(ovId) {
             document.getElementById('leitorNotasTargetId').value = ovId;
@@ -1346,26 +1346,36 @@
 
         function extrairNotasFluxoSAP(txt) {
             const notas = [];
-            const regexNota = /(?:NF|Nota|Fatura|Doc|Remessa|[0-9]{9,10})[^\d]*([0-9]{4,10})[^\n\r]*?([0-9]+(?:[.,][0-9]{1,3})?)\s*(TO|KG|TON|T)/gi;
-            
-            let match;
+            const linhas = txt.split(/\r?\n/);
             let index = 1;
-            while ((match = regexNota.exec(txt)) !== null) {
-                const numDoc = match[1];
-                let peso = parseNumeroSap(match[2]);
-                const unidade = (match[3] || 'TO').toUpperCase();
-                if (unidade === 'KG') peso = peso / 1000;
 
-                if (peso > 0) {
-                    notas.push({
-                        ticket: `NF-${numDoc}`,
-                        placa: `VEIC-${index++}`,
-                        pesoTO: peso,
-                        data: new Date().toISOString().split('T')[0],
-                        emEdicao: false
-                    });
+            linhas.forEach(linha => {
+                // Filtra estritamente apenas as linhas de Fatura do SAP
+                if (/Fatura/i.test(linha)) {
+                    const matchDoc = linha.match(/([0-9]{8,10})/);
+                    const matchPeso = linha.match(/([0-9]+(?:[.,][0-9]{1,3})?)\s*(TO|KG|TON|T)\b/i);
+
+                    if (matchDoc && matchPeso) {
+                        let peso = parseNumeroSap(matchPeso[1]);
+                        const unidade = (matchPeso[2] || 'TO').toUpperCase();
+                        
+                        if (unidade === 'KG') {
+                            peso = peso / 1000;
+                        }
+
+                        if (peso > 0) {
+                            notas.push({
+                                ticket: `NF-${matchDoc[1]}`,
+                                placa: `VEIC-${index++}`,
+                                pesoTO: peso,
+                                data: new Date().toISOString().split('T')[0],
+                                emEdicao: false
+                            });
+                        }
+                    }
                 }
-            }
+            });
+
             return notas;
         }
 
