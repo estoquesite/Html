@@ -319,7 +319,6 @@
 
     <!-- SCRIPT DE PROCESSAMENTO -->
     <script>
-        // Mesma chave de antes: os dados já salvos neste navegador continuam aparecendo
         const STORAGE_KEY = "vale_modulo11_sap_ovs_reconhecimento_v18_diagnostico";
         let cacheRegistros = [];
         let linhasTempLeitorOV = [];
@@ -391,21 +390,18 @@
             return parseFloat(limpo) || 0;
         }
 
-        // Quantidade como o SAP escreve: "3.040 KG" = 3040 kg (ponto = milhar)
         function parseQtdSapParaTO(numStr, unidade) {
             let s = String(numStr).trim().replace(/\s+/g, '');
             const un = (unidade || 'KG').toUpperCase();
             let valor;
             if (un === 'KG') {
-                // em KG o SAP não usa decimais: qualquer . ou , seguido de 3 dígitos é milhar
-                if (/^\d{1,3}[.,]\d{3}$/.test(s) || /^\d{1,3}([.,]\d{3})+$/.test(s)) {
+                if (/^\d{1,3}[.,]\d{3}$/.test(s) \vert{}\vert{} /^\d{1,3}([.,]\d{3})+$/.test(s)) {
                     valor = parseFloat(s.replace(/[.,]/g, ''));
                 } else {
                     valor = parseFloat(s.replace(/\./g, '').replace(',', '.'));
                 }
                 return (valor || 0) / 1000;
             }
-            // TO / TON / T
             valor = parseFloat(s.replace(/\./g, '').replace(',', '.'));
             return valor || 0;
         }
@@ -428,7 +424,6 @@
                         const data = imgData.data;
                         for (let i = 0; i < data.length; i += 4) {
                             const cinza = 0.299 * data[i] + 0.587 * data[i+1] + 0.114 * data[i+2];
-                            // sem binarizar: só escala de cinza com leve contraste (preserva texto sobre o marca-texto amarelo)
                             const val = binarizar
                                 ? (cinza > 165 ? 255 : 0)
                                 : Math.max(0, Math.min(255, (cinza - 128) * 1.3 + 128));
@@ -464,9 +459,6 @@
             }
         ];
 
-        // ==========================================
-        // SALVAMENTO LOCAL (no navegador, sem baixar arquivo)
-        // ==========================================
         function atualizarIndicadorStatus(status, texto) {
             const ponto = document.getElementById('pontoConexao');
             const txt = document.getElementById('textoConexao');
@@ -516,7 +508,6 @@
             renderizar();
             atualizarIndicadorStatus('online', salvo ? 'Dados carregados deste aparelho' : 'Ainda não salvo');
 
-            // pede ao navegador para não apagar os dados sozinho
             try { if (navigator.storage && navigator.storage.persist) navigator.storage.persist(); } catch (e) {}
         }
 
@@ -526,7 +517,7 @@
             const original = `<span>💾</span> Salvar`;
             btn.innerHTML = ok ? `<span>✓</span> Salvo!` : `<span>⚠️</span> Erro`;
             setTimeout(() => { btn.innerHTML = original; }, 1500);
-            if (!ok) alert("Não foi possível salvar neste navegador. Verifique se ele não está em modo anônimo ou com o armazenamento cheio.");
+            if (!ok) alert("Não foi possível salvar neste navegador.");
         }
 
         function salvarNaBase(novoItem) {
@@ -632,9 +623,6 @@
             }
         }
 
-        // ==========================================
-        // RENDERIZAÇÃO DOS CARDS
-        // ==========================================
         function renderizar() {
             const lista = cacheRegistros;
             const termo = (document.getElementById('filtroTexto')?.value || '').toLowerCase().trim();
@@ -728,17 +716,22 @@
 
                     const itensMateriais = item.ov.itens || [];
 
+                    // Renderização de cada linha de material totalmente editável (Item SAP, Material e Quantidade)
                     const linhasMateriaisHtml = itensMateriais.map((it, idxL) => `
-                        <div class="flex items-center gap-2 bg-slate-50/80 p-2 rounded-xl border border-slate-200/60 text-xs">
-                            <span class="text-[10px] font-bold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">Item ${it.itemSap}</span>
-                            <input type="text" value="${it.material}" onchange="atualizarItemMaterial('${item.id}', ${idxL}, 'material', this.value)" class="input-inline font-bold text-slate-800 flex-1 px-1.5 py-0.5 border border-transparent focus:border-slate-300 rounded" title="Clique para editar a descrição do material">
+                        <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 bg-slate-50/90 p-2.5 rounded-xl border border-slate-200 text-xs">
                             <div class="flex items-center gap-1">
-                                <span class="text-[10px] text-slate-400 font-bold">Qtd:</span>
-                                <input type="number" step="0.001" value="${Number(it.qtdTO).toFixed(3)}" onchange="atualizarItemMaterial('${item.id}', ${idxL}, 'qtdTO', this.value)" class="input-inline w-20 font-black text-teal-800 text-right px-1 py-0.5 border border-transparent focus:border-teal-300 rounded">
-                                <span class="text-[10px] font-bold text-slate-500">TO</span>
-                                <span class="text-[10px] text-slate-400">(${Math.round(Number(it.qtdTO)*1000)} KG)</span>
+                                <span class="text-[10px] font-bold text-slate-400">Item</span>
+                                <input type="text" value="${it.itemSap}" onchange="atualizarItemMaterialCampos('${item.id}', ${idxL}, 'itemSap', this.value)" class="input-inline w-12 font-bold text-slate-700 bg-white px-1 py-0.5 border border-slate-200 rounded text-center" title="Editar Item SAP">
                             </div>
-                            <button type="button" onclick="removerLinhaMaterialOV('${item.id}', ${idxL})" class="text-rose-400 hover:text-rose-600 px-1 font-bold no-print" title="Remover item">✕</button>
+
+                            <input type="text" value="${it.material}" onchange="atualizarItemMaterialCampos('${item.id}', ${idxL}, 'material', this.value)" class="input-inline font-bold text-slate-800 flex-1 px-2 py-1 bg-white border border-slate-200 rounded" title="Clique para editar a descrição do material">
+
+                            <div class="flex items-center gap-1.5">
+                                <input type="number" step="0.001" value="${Number(it.qtdTO).toFixed(3)}" onchange="atualizarItemMaterialCampos('${item.id}', ${idxL}, 'qtdTO', this.value)" class="input-inline w-24 font-black text-teal-800 text-right px-2 py-1 bg-white border border-teal-300 rounded" title="Editar Quantidade em TO">
+                                <span class="text-[10px] font-bold text-slate-500">TO</span>
+                            </div>
+
+                            <button type="button" onclick="removerLinhaMaterialOV('${item.id}', ${idxL})" class="text-rose-500 hover:text-rose-700 px-1.5 font-bold text-sm no-print" title="Remover item">✕</button>
                         </div>
                     `).join('');
 
@@ -768,7 +761,7 @@
                                 <div class="bg-slate-50/50 p-3 rounded-2xl border border-slate-100 space-y-2">
                                     <div class="flex justify-between items-center text-xs">
                                         <span class="font-bold text-slate-700 flex items-center gap-1.5">
-                                            <span>📋</span> Materiais da OV (Soma = ${formatarTO(item.ov.qtdLiberadaTO, 3)}):
+                                            <span>📋</span> Materiais da OV (Total Atual = ${formatarTO(item.ov.qtdLiberadaTO, 3)}):
                                         </span>
                                         <button type="button" onclick="adicionarLinhaMaterialOV('${item.id}')" class="text-[11px] font-bold text-teal-700 hover:underline no-print">
                                             + Adicionar Outra Linha de Material
@@ -879,9 +872,6 @@
             }).join('');
         }
 
-        // ==========================================
-        // LEITOR 1: VA03 COM LÁPIS E OCR
-        // ==========================================
         function abrirModalLeitorOV(ovId) {
             document.getElementById('leitorOVTargetId').value = ovId;
             linhasTempLeitorOV = [];
@@ -935,7 +925,7 @@
                         alertaBox.innerHTML = `<span>✓</span> Tela confirmada: OV ${ovLidaDoPrint} coincide com a OV selecionada.`;
                     } else {
                         alertaBox.className = 'p-3 rounded-xl text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300 flex items-center gap-2';
-                        alertaBox.innerHTML = `<span>⚠️</span> ATENÇÃO: A tela lida indica a <b>OV ${ovLidaDoPrint}</b>, mas você abriu a <b>OV ${itemEsperado.ov.numero}</b>. Verifique o print.`;
+                        alertaBox.innerHTML = `<span>⚠️</span> ATENÇÃO: A tela lida indica a <b>OV ${ovLidaDoPrint}</b>, mas você abriu a <b>OV ${itemEsperado.ov.numero}</b>.`;
                     }
                 } else {
                     alertaBox.classList.add('hidden');
@@ -946,7 +936,7 @@
                 if (linhasTempLeitorOV.length === 0) {
                     document.getElementById('detalhesLeitorOV').innerHTML = `
                         <div class="text-rose-600 font-semibold p-2">
-                            Não foi possível extrair as linhas automaticamente. Você pode clicar em <b>+ Adicionar Item Manual</b> ou colar uma captura com a tabela visível.
+                            Não foi possível extrair as linhas automaticamente. Você pode clicar em <b>+ Adicionar Item Manual</b>.
                         </div>
                     `;
                     btn.disabled = false;
@@ -973,51 +963,18 @@
             const soma = linhasTempLeitorOV.reduce((acc, l) => acc + Number(l.qtdTO || 0), 0);
 
             container.innerHTML = linhasTempLeitorOV.map((l, idx) => {
-                if (l.emEdicao) {
-                    return `
-                        <div class="bg-amber-50/70 p-2.5 rounded-xl border border-amber-300 space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="font-bold text-amber-800 text-[11px]">Editando Item #${idx + 1}</span>
-                                <button type="button" onclick="alternarEdicaoLinhaLeitor(${idx})" class="text-xs bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-2 py-0.5 rounded shadow-xs">
-                                    Concluir
-                                </button>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2 items-center">
-                                <div class="sm:col-span-2">
-                                    <label class="text-[10px] text-slate-500 font-bold block">Item SAP</label>
-                                    <input type="text" value="${l.itemSap}" oninput="alterarLinhaTemp(${idx}, 'itemSap', this.value)" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs font-bold text-slate-800">
-                                </div>
-                                <div class="sm:col-span-7">
-                                    <label class="text-[10px] text-slate-500 font-bold block">Descrição do Material Completa</label>
-                                    <input type="text" value="${l.material}" oninput="alterarLinhaTemp(${idx}, 'material', this.value)" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs font-bold text-slate-800" placeholder="Nome inteiro do material...">
-                                </div>
-                                <div class="sm:col-span-3">
-                                    <label class="text-[10px] text-slate-500 font-bold block">Qtd (TO)</label>
-                                    <input type="number" step="0.001" value="${Number(l.qtdTO).toFixed(3)}" oninput="alterarLinhaTemp(${idx}, 'qtdTO', this.value)" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs font-black text-teal-800 text-right">
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-
                 return `
-                    <div class="flex justify-between items-center bg-slate-50 p-2 rounded-xl border border-slate-200/80 hover:bg-teal-50/40 transition">
-                        <div class="flex items-center gap-2 flex-1 pr-2">
-                            <button type="button" onclick="alternarEdicaoLinhaLeitor(${idx})" title="Editar o nome ou dados deste item" class="bg-white hover:bg-slate-200 text-slate-700 border border-slate-300 p-1 rounded-lg text-xs transition shadow-xs flex items-center justify-center">
-                                ✏️
-                            </button>
-                            <div>
-                                <span class="font-bold text-slate-800">Item ${l.itemSap}:</span>
-                                <span class="text-slate-700 ml-1 font-semibold">${l.material}</span>
-                            </div>
+                    <div class="flex flex-wrap sm:flex-nowrap items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200">
+                        <div class="flex items-center gap-1">
+                            <span class="text-[10px] text-slate-400 font-bold">Item</span>
+                            <input type="text" value="${l.itemSap}" oninput="alterarLinhaTemp(${idx}, 'itemSap', this.value)" class="w-12 bg-white border border-slate-300 rounded px-1 py-0.5 text-xs font-bold text-slate-800 text-center">
                         </div>
-                        <div class="flex items-center gap-3 text-right">
-                            <div>
-                                <span class="font-black text-teal-800 text-xs">${Number(l.qtdTO).toFixed(3)} TO</span>
-                                <span class="text-[10px] text-slate-400 block">(${Math.round(Number(l.qtdTO) * 1000)} KG)</span>
-                            </div>
-                            <button type="button" onclick="removerLinhaDoLeitor(${idx})" class="text-rose-400 hover:text-rose-600 font-bold text-xs" title="Remover item">✕</button>
+                        <input type="text" value="${l.material}" oninput="alterarLinhaTemp(${idx}, 'material', this.value)" class="flex-1 bg-white border border-slate-300 rounded px-1.5 py-0.5 text-xs font-semibold text-slate-800" placeholder="Descrição do material...">
+                        <div class="flex items-center gap-1">
+                            <input type="number" step="0.001" value="${Number(l.qtdTO).toFixed(3)}" oninput="alterarLinhaTemp(${idx}, 'qtdTO', this.value)" class="w-20 bg-white border border-slate-300 rounded px-1 py-0.5 text-xs font-black text-teal-800 text-right">
+                            <span class="text-[10px] font-bold text-slate-500">TO</span>
                         </div>
+                        <button type="button" onclick="removerLinhaDoLeitor(${idx})" class="text-rose-400 hover:text-rose-600 font-bold text-xs px-1" title="Remover item">✕</button>
                     </div>
                 `;
             }).join('') + `
@@ -1026,13 +983,6 @@
                     <span class="text-teal-700 text-sm font-black">${soma.toFixed(3)} TO (${Math.round(soma * 1000)} KG)</span>
                 </div>
             `;
-        }
-
-        function alternarEdicaoLinhaLeitor(idx) {
-            if (linhasTempLeitorOV[idx]) {
-                linhasTempLeitorOV[idx].emEdicao = !linhasTempLeitorOV[idx].emEdicao;
-                renderizarLinhasDoLeitorOV();
-            }
         }
 
         function alterarLinhaTemp(idx, campo, valor) {
@@ -1053,9 +1003,8 @@
             const prox = (linhasTempLeitorOV.length + 1) * 10;
             linhasTempLeitorOV.push({
                 itemSap: String(prox),
-                material: "DIGITE O NOME COMPLETO DO MATERIAL",
-                qtdTO: 0.300,
-                emEdicao: true
+                material: "NOVO MATERIAL",
+                qtdTO: 0.300
             });
             renderizarLinhasDoLeitorOV();
         }
@@ -1085,7 +1034,7 @@
                     if (unidade === 'KG') qtd = qtd / 1000;
 
                     let mat = (match[5] || '').trim().replace(/\s{2,}/g, ' ');
-                    linhas.push({ itemSap: item, material: mat || `ITEM ${item}`, qtdTO: qtd, emEdicao: false });
+                    linhas.push({ itemSap: item, material: mat || `ITEM ${item}`, qtdTO: qtd });
                     return;
                 }
 
@@ -1097,7 +1046,7 @@
                     if (unidade === 'KG') qtd = qtd / 1000;
 
                     let mat = (match[4] || '').trim().replace(/\s{2,}/g, ' ');
-                    linhas.push({ itemSap: item, material: mat || `ITEM ${item}`, qtdTO: qtd, emEdicao: false });
+                    linhas.push({ itemSap: item, material: mat || `ITEM ${item}`, qtdTO: qtd });
                 }
             });
 
@@ -1110,7 +1059,7 @@
             if (!item || linhasTempLeitorOV.length === 0) return;
 
             if (ovLidaDoPrint && ovLidaDoPrint !== item.ov.numero) {
-                const confirma = confirm(`Atenção: A tela lida indicou a OV ${ovLidaDoPrint}, mas você está a atualizar a OV ${item.ov.numero}. Deseja prosseguir mesmo assim?`);
+                const confirma = confirm(`Atenção: A tela lida indicou a OV ${ovLidaDoPrint}, mas você está atualizando a OV ${item.ov.numero}. Deseja prosseguir?`);
                 if (!confirma) return;
             }
 
@@ -1132,7 +1081,7 @@
         }
 
         // ==========================================
-        // LEITOR 2: FLUXO DE NOTAS / FATURAMENTO
+        // LEITOR 2: NOTAS FISCAIS
         // ==========================================
         function abrirModalLeitorNotas(ovId) {
             document.getElementById('leitorNotasTargetId').value = ovId;
@@ -1169,21 +1118,17 @@
                 });
                 const { data: { text } } = await worker.recognize(imagemOtimizada);
                 await worker.terminate();
-                console.log("OCR NOTAS (texto bruto):\n", text);
 
                 notasTempLeitorNotas = extrairNotasFluxoSAP(text);
                 document.getElementById('badgeNotasDetectadas').innerText = `${notasTempLeitorNotas.length} nota(s) encontrada(s)`;
 
                 if (notasTempLeitorNotas.length === 0) {
-                    document.getElementById('detalhesLeitorNotas').innerHTML = `
-                        <div class="text-rose-600 font-semibold p-2">Nenhuma linha de Fatura identificada no print.</div>
-                    `;
+                    document.getElementById('detalhesLeitorNotas').innerHTML = `<div class="text-rose-600 font-semibold p-2">Nenhuma linha de Fatura identificada no print.</div>`;
                     btn.disabled = false;
                     return;
                 }
 
                 renderizarNotasDoLeitor();
-
             } catch (err) {
                 console.error(err);
                 alert("Falha no OCR de Notas: " + err.message);
@@ -1197,40 +1142,10 @@
             const totalNotasTO = notasTempLeitorNotas.reduce((acc, n) => acc + n.pesoTO, 0);
 
             container.innerHTML = notasTempLeitorNotas.map((n, idx) => {
-                if (n.emEdicao) {
-                    return `
-                        <div class="bg-rose-50/70 p-2.5 rounded-xl border border-rose-300 space-y-2">
-                            <div class="flex items-center justify-between">
-                                <span class="font-bold text-rose-800 text-[11px]">Editando Nota #${idx + 1}</span>
-                                <button type="button" onclick="alternarEdicaoNotaLeitor(${idx})" class="text-xs bg-rose-700 hover:bg-rose-800 text-white font-bold px-2 py-0.5 rounded shadow-xs">
-                                    Concluir
-                                </button>
-                            </div>
-                            <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
-                                <div class="sm:col-span-5">
-                                    <label class="text-[10px] text-slate-500 font-bold block">Nº Fatura / NF</label>
-                                    <input type="text" value="${n.ticket}" oninput="alterarNotaTemp(${idx}, 'ticket', this.value)" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs font-bold text-slate-800">
-                                </div>
-                                <div class="sm:col-span-4">
-                                    <label class="text-[10px] text-slate-500 font-bold block">Placa / Remessa</label>
-                                    <input type="text" value="${n.placa}" oninput="alterarNotaTemp(${idx}, 'placa', this.value)" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs font-mono uppercase text-slate-800">
-                                </div>
-                                <div class="sm:col-span-3">
-                                    <label class="text-[10px] text-slate-500 font-bold block">Peso (TO)</label>
-                                    <input type="number" step="0.001" value="${Number(n.pesoTO).toFixed(3)}" oninput="alterarNotaTemp(${idx}, 'pesoTO', this.value)" class="w-full bg-white border border-slate-300 rounded px-1.5 py-1 text-xs font-black text-rose-700 text-right">
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                }
-
                 return `
-                    <div class="flex justify-between items-center border-b border-slate-100 py-1">
-                        <div class="flex items-center gap-2">
-                            <button type="button" onclick="alternarEdicaoNotaLeitor(${idx})" title="Editar esta nota" class="bg-white hover:bg-slate-200 text-slate-700 border border-slate-300 p-1 rounded-lg text-xs shadow-xs">✏️</button>
-                            <span>Fatura <b>${n.ticket}</b> · Remessa: ${n.placa || '-'} · ${n.data.split('-').reverse().join('/')}</span>
-                        </div>
-                        <span class="font-bold text-rose-700">-${Number(n.pesoTO).toFixed(3)} TO <span class="text-[10px] text-slate-400">(${Math.round(Number(n.pesoTO)*1000)} KG)</span></span>
+                    <div class="flex justify-between items-center border-b border-slate-100 py-1 text-xs">
+                        <span>Fatura <b>${n.ticket}</b> · Remessa: ${n.placa || '-'}</span>
+                        <span class="font-bold text-rose-700">-${Number(n.pesoTO).toFixed(3)} TO</span>
                     </div>
                 `;
             }).join('') + `
@@ -1241,48 +1156,25 @@
             `;
         }
 
-        function alternarEdicaoNotaLeitor(idx) {
-            if (notasTempLeitorNotas[idx]) {
-                notasTempLeitorNotas[idx].emEdicao = !notasTempLeitorNotas[idx].emEdicao;
-                renderizarNotasDoLeitor();
-            }
-        }
-
-        function alterarNotaTemp(idx, campo, valor) {
-            if (!notasTempLeitorNotas[idx]) return;
-            if (campo === 'pesoTO') {
-                notasTempLeitorNotas[idx].pesoTO = parseNumeroSap(valor);
-            } else {
-                notasTempLeitorNotas[idx][campo] = valor;
-            }
-        }
-
         function extrairNotasFluxoSAP(txt) {
             const notas = [];
             const linhas = txt.split(/\r?\n/);
             let deliveryAtual = '';
-            ovLidaDasNotas = null;
 
             linhas.forEach(linha => {
-                // OV (Venda Sucata/Escória 0115283416 / 30)
                 const mVenda = linha.match(/Venda[^\d]{0,30}(\d{8,10})/i);
                 if (mVenda) ovLidaDasNotas = String(parseInt(mVenda[1], 10));
 
-                // Delivery que antecede a fatura
                 const mDel = linha.match(/Delivery[^\d]{0,30}(\d{8,10})/i);
                 if (mDel) { deliveryAtual = mDel[1]; return; }
 
-                // Só linhas de FATURA
                 if (!/Fatur/i.test(linha)) return;
 
                 const mDoc = linha.match(/(\d{8,10})/);
                 if (!mDoc) return;
                 const numeroFatura = mDoc[1];
 
-                // remove "907777615 / 30 / 30" para não confundir com a quantidade
-                const resto = linha.slice(linha.indexOf(mDoc[1]) + mDoc[1].length)
-                                   .replace(/^(\s*[\/|\\]\s*\d+)+/, '');
-
+                const resto = linha.slice(linha.indexOf(mDoc[1]) + mDoc[1].length).replace(/^(\s*[\/|\\]\s*\d+)+/, '');
                 const mQtd = resto.match(/(\d{1,3}(?:[.,]\d{3})*(?:,\d+)?|\d+)\s*(KG|TON|TO|T)\b/i);
                 const mData = linha.match(/(\d{2})\.(\d{2})\.(\d{4})/);
                 const mValor = resto.match(/(\d{1,3}(?:\.\d{3})*,\d{2})\s*BRL/i);
@@ -1290,15 +1182,14 @@
                 let pesoTO = 0;
                 if (mQtd) pesoTO = parseQtdSapParaTO(mQtd[1], mQtd[2]);
 
-                if (notas.some(n => n.ticket === numeroFatura)) return; // evita duplicada
+                if (notas.some(n => n.ticket === numeroFatura)) return;
 
                 notas.push({
-                    ticket: numeroFatura,                 // exatamente o número do SAP
-                    placa: deliveryAtual,                 // remessa (Delivery) da fatura
+                    ticket: numeroFatura,
+                    placa: deliveryAtual,
                     pesoTO: pesoTO,
                     valorBRL: mValor ? parseNumeroSap(mValor[1]) : 0,
-                    data: mData ? `${mData[3]}-${mData[2]}-${mData[1]}` : new Date().toISOString().split('T')[0],
-                    emEdicao: pesoTO === 0                // se não leu o peso, já abre para corrigir
+                    data: mData ? `${mData[3]}-${mData[2]}-${mData[1]}` : new Date().toISOString().split('T')[0]
                 });
             });
 
@@ -1309,10 +1200,6 @@
             const ovId = document.getElementById('leitorNotasTargetId').value;
             const item = cacheRegistros.find(o => o.id === ovId);
             if (!item || notasTempLeitorNotas.length === 0) return;
-
-            if (ovLidaDasNotas && ovLidaDasNotas !== item.ov.numero) {
-                if (!confirm(`A tela lida é da OV ${ovLidaDasNotas}, mas você está na OV ${item.ov.numero}. Deseja lançar mesmo assim?`)) return;
-            }
 
             if (!item.gastos) item.gastos = [];
             let lancadas = 0, repetidas = 0;
@@ -1331,13 +1218,13 @@
 
             salvarNaBase(item);
             fecharModalLeitorNotas();
-            alert(`✓ ${lancadas} nota(s) lançada(s)${repetidas ? ` (${repetidas} já existiam e foram ignoradas)` : ''}.`);
+            alert(`✓ ${lancadas} nota(s) lançada(s).`);
         }
 
         // ==========================================
         // ATUALIZAÇÕES MANUAIS INLINE NA TABELA PRINCIPAL
         // ==========================================
-        function atualizarItemMaterial(ovId, idxLinha, campo, valor) {
+        function atualizarItemMaterialCampos(ovId, idxLinha, campo, valor) {
             const item = cacheRegistros.find(o => o.id === ovId);
             if (!item || !item.ov.itens || !item.ov.itens[idxLinha]) return;
 
@@ -1346,6 +1233,8 @@
                 item.ov.qtdLiberadaTO = item.ov.itens.reduce((acc, curr) => acc + Number(curr.qtdTO || 0), 0);
             } else if (campo === 'material') {
                 item.ov.itens[idxLinha].material = valor.trim();
+            } else if (campo === 'itemSap') {
+                item.ov.itens[idxLinha].itemSap = valor.trim();
             }
 
             salvarNaBase(item);
