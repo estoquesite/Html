@@ -10,6 +10,7 @@ body{margin:0;background:#8a8f94;font-family:Arial,Helvetica,sans-serif;color:#2
 button{font-family:inherit}
 .bar{position:sticky;top:0;z-index:9;background:#222;color:#fff;padding:8px 12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:13px}
 .bar button,.tb button,.tools button{padding:5px 10px;border:0;border-radius:4px;background:#e8e8e8;cursor:pointer;font-weight:bold;font-size:12px}
+.bar button.ok{background:#2e9e4f;color:#fff}
 .bar label{display:flex;align-items:center;gap:4px}
 .bar input[type=color]{width:32px;height:26px;padding:0;border:1px solid #888;background:none;cursor:pointer}
 .bar .sep{width:1px;height:22px;background:#666}
@@ -18,29 +19,29 @@ button{font-family:inherit}
 .tb{background:#222;color:#fff;padding:6px 10px;border-radius:6px 6px 0 0;display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12px}
 .tb .gap{flex:1}
 .sheet{width:297mm;height:210mm;background:#fff;padding:12mm 14mm;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 2px 10px #0006}
-.sheet h1{margin:0 0 6mm;font-size:28px;padding:4px 8px}
 table{width:100%;border-collapse:separate;border-spacing:0;flex:1;table-layout:fixed}
-th{font-size:14px;padding:6px;border:2px solid #333}
-td{padding:4px 8px;font-size:15px;vertical-align:middle;border:2px solid #333}
-[contenteditable]{outline:none;min-height:1.2em;word-break:break-word}
+th{font-size:14px;padding:6px;border:2px solid #333;background:#eceeee;text-align:center}
+td{padding:4px 8px;font-size:15px;vertical-align:middle;text-align:center;border:2px solid #333}
+[contenteditable]{outline:none;min-height:1.2em;word-break:break-word;text-align:center}
 [contenteditable]:focus{outline:1px dashed #888}
 .sel{outline:3px solid #1e88e5!important;outline-offset:-3px}
 .st{width:44px;height:44px;border-radius:50%;border:2px solid #333;background:#fff;cursor:pointer;display:block;margin:auto;padding:0}
 .st.r{background:#e0393e}.st.y{background:#f4c20d}.st.g{background:#2e9e4f}.st.b{background:#2f6fd0}.st.p{background:#f7c6cc}
-.title{font-size:20px;font-weight:bold;padding:8px 14px;text-align:center;border:2px solid #333;border-bottom:0}
-.meta{display:flex;justify-content:flex-end;gap:30px;font-size:12px;padding:4px 14px;border:2px solid #333;border-bottom:0}
+.sheet.c .st{width:28px;height:28px}.sheet.c td{padding:2px 8px}
+.title{font-size:22px;font-weight:bold;padding:10px 14px;text-align:center;border:2px solid #333;border-bottom:0;background:#2b6b5a;color:#fff}
+.meta{display:flex;justify-content:center;gap:30px;font-size:12px;padding:4px 14px;border:2px solid #333;border-bottom:0;text-align:center}
 .meta span{min-width:70px;display:inline-block;border-bottom:1px solid #666}
-.sep-rows table{border-spacing:0 7px}
-.bands{flex:1;display:flex;flex-direction:column;gap:4px}
-.band{flex:1;display:flex;gap:8px;padding:6px 8px;border:2px solid #333;align-items:stretch;min-height:0}
-.boxes{display:flex;gap:6px;flex:0 1 auto;min-width:0}
-.box{border:1px solid #333;border-radius:16px;padding:5px 10px;width:36mm;min-width:20mm;flex:0 1 36mm;display:flex;flex-direction:column;overflow:hidden}
+.bands{flex:1;display:flex;flex-direction:column;gap:0}
+.band{flex:1;display:flex;gap:8px;padding:6px 8px;border:2px solid #333;border-top-width:0;align-items:center;min-height:0}
+.boxes{display:flex;gap:6px;flex:0 1 auto;min-width:0;align-self:stretch}
+.box{border:1px solid #333;border-radius:16px;padding:5px 10px;width:36mm;min-width:20mm;flex:0 1 36mm;display:flex;flex-direction:column;overflow:hidden;text-align:center}
 .bl{font-size:12px;font-weight:bold}
 .bv{flex:1;font-size:15px;color:#1a2a8a}
-.free{flex:1;font-size:13px;padding:4px 6px;overflow:hidden;font-family:"Comic Sans MS","Segoe Print",cursive}
-.side{width:36mm;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;text-align:right}
+.free{flex:1;align-self:stretch;font-size:13px;padding:4px 6px;overflow:hidden;font-family:"Comic Sans MS","Segoe Print",cursive}
+.side{width:36mm;align-self:stretch;display:flex;flex-direction:column;justify-content:space-between;align-items:center;text-align:center}
+.band .st{width:30px;height:30px;margin:0}
 .lbl{font-weight:bold;font-size:14px}
-.tools{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.tools{display:flex;gap:4px;flex-wrap:wrap;justify-content:center}
 @media print{
  @page{size:A4 landscape;margin:0}
  body{background:#fff}
@@ -61,20 +62,21 @@ td{padding:4px 8px;font-size:15px;vertical-align:middle;border:2px solid #333}
   <span class="sep"></span>
   <button id="bPrint">🖨 Imprimir tudo</button><button id="bSave">💾 Salvar tudo no computador</button><button id="bReset">Restaurar modelo</button>
   <span class="sep"></span>
-  <label>Fundo <input type="color" id="cFundo" value="#ffe08a"></label>
-  <label>Texto <input type="color" id="cTexto" value="#000000"></label>
+  <label>Fundo <input type="color" id="cFundo" value="#ffe08a"></label><button class="ok" id="okFundo">OK</button>
+  <label>Texto <input type="color" id="cTexto" value="#000000"></label><button class="ok" id="okTexto">OK</button>
   <button id="bLimpa">Sem cor</button>
   <button id="bLinha">Pintar linha toda</button>
   <button id="bColuna">Pintar coluna toda</button>
+  <button id="bTudo">Pintar quadro todo</button>
   <span id="info">Clique em qualquer quadrado para selecioná-lo e escolher as cores.</span>
 </div>
 <div id="app"></div>
 
 <script id="codigo">
 const EST=window.__ESTADO__||null;
-const KEY=EST?'quadros_'+EST.id:'quadros_gestao_visual_v3';
+const KEY=EST?'quadros_'+EST.id:'quadros_gestao_visual_v4';
 const ST=['','r','y','g','b','p'];
-const SEL='td,th,.box,.band,.free,.title,.meta,h1,.lbl';
+const SEL='td,th,.box,.band,.free,.title,.meta,.lbl';
 const app=document.getElementById('app'),info=document.getElementById('info');
 const $=id=>document.getElementById(id);
 let sel=null,ativo=null,timer=null;
@@ -95,19 +97,20 @@ function folha(cls,extra,html){
   w.innerHTML=`<div class="tb">${extra}<span class="gap"></span>${tbBase}</div><section class="sheet ${cls}">${html}</section>`;
   app.appendChild(w);
 }
+const T=t=>`<div class="title">${E(t)}</div>`;
 function montar(){
   app.innerHTML='';
-  folha('',rowBtns,`<div class="title">${E('Pendências de Atendimentos')}</div>`+tabela(C4('Ação','Responsável','Vencimento','Status'),7));
-  folha('sep-rows',rowBtns,`<h1>${E('AÇÕES PENDENTES')}</h1>`+tabela(C4('AÇÃO','RESPONSÁVEL','VENCIMENTO','STATUS'),8));
-  folha('sep-rows',rowBtns,`<h1>${E('PENDÊNCIAS DE ATENDIMENTOS')}</h1>`+tabela(C4('AÇÃO','RESPONSÁVEL','VENCIMENTO','STATUS'),8));
-  folha('',rowBtns,`<div class="title">${E('Ações Pendentes')}</div><div class="meta"><div>% Aderência Mês Anterior: <span contenteditable="true"></span></div><div>Data Atualiz.: <span contenteditable="true"></span></div></div>`+
-    tabela([['Treinamentos',38,0],['ID',18,0],['Data Limite',16,0],['Colaboradores',28,0]],14));
+  folha('',rowBtns,T('Pendências de Atendimentos')+tabela(C4('Ação','Responsável','Vencimento','Status'),7));
+  folha('',rowBtns,T('Ações Pendentes')+tabela(C4('Ação','Responsável','Vencimento','Status'),7));
+  folha('',rowBtns,T('Pendências de Atendimentos')+tabela(C4('Ação','Responsável','Vencimento','Status'),7));
+  folha('c',rowBtns,T('Ações Pendentes')+`<div class="meta"><div>% Aderência Mês Anterior: <span contenteditable="true"></span></div><div>Data Atualiz.: <span contenteditable="true"></span></div></div>`+
+    tabela([['Treinamentos',32,0],['ID',14,0],['Data Limite',16,0],['Colaboradores',24,0],['Status',14,1]],12));
   const box=t=>`<div class="box"><div class="bl" contenteditable="true">${t}</div><div class="bv" contenteditable="true"></div></div>`;
   const niv=['Risco Muito Alto','Risco Alto','Risco Médio','Risco Baixo','Risco Eliminado'];
-  folha('',' ',`<h1>${E('Matriz de Risco (ART - Análise de Risco de Tarefa)')}</h1><div class="bands">`+
+  folha('',' ',T('Matriz de Risco (ART - Análise de Risco de Tarefa)')+`<div class="bands">`+
     niv.map(n=>`<div class="band"><div class="boxes">${box('Condição Inicial')}${box('Condição Atual')}</div><div class="free" contenteditable="true"></div>
-    <div class="side"><div class="tools"><button data-a="selband">🎨 faixa</button><button data-a="addbox">+ caixa</button><button data-a="delbox">− caixa</button></div><div class="lbl" contenteditable="true">${n}</div></div></div>`).join('')+'</div>');
-  folha('sep-rows',rowBtns,`<h1>${E('PLANO AÇÃO')}</h1>`+tabela(C4('AÇÃO','RESPONSÁVEL','DATA','STATUS'),8));
+    <div class="side"><div class="tools"><button data-a="selband">🎨 faixa</button><button data-a="addbox">+ caixa</button><button data-a="delbox">− caixa</button></div>${stBtn}<div class="lbl" contenteditable="true">${n}</div></div></div>`).join('')+'</div>');
+  folha('',rowBtns,T('Plano de Ação')+tabela(C4('Ação','Responsável','Data','Status'),7));
 }
 
 /* ---------- persistência e histórico ---------- */
@@ -137,24 +140,32 @@ function mover(w,d){
 function selecionar(el){
   if(sel)sel.classList.remove('sel');
   sel=el;
-  if(el){el.classList.add('sel');info.textContent='Quadrado selecionado: escolha o fundo/texto acima.'}
+  if(el){el.classList.add('sel');info.textContent='Quadrado selecionado: escolha a cor e clique em OK.'}
   else info.textContent='Clique em qualquer quadrado para selecioná-lo e escolher as cores.';
 }
 function pinta(prop,v){
-  if(!sel)return;sel.style[prop]=v;mudou(sel.closest('.wrap'));
+  if(!sel){info.textContent='Primeiro clique em um quadrado.';return}
+  sel.style[prop]=v;mudou(sel.closest('.wrap'));
 }
-$('cFundo').addEventListener('input',e=>pinta('background',e.target.value));
-$('cTexto').addEventListener('input',e=>pinta('color',e.target.value));
+const fundo=()=>$('cFundo').value,texto=()=>$('cTexto').value;
+$('cFundo').addEventListener('input',()=>pinta('background',fundo()));
+$('cTexto').addEventListener('input',()=>pinta('color',texto()));
+$('okFundo').onclick=()=>pinta('background',fundo());
+$('okTexto').onclick=()=>pinta('color',texto());
 $('bLimpa').onclick=()=>{if(!sel)return;sel.style.background='';sel.style.color='';mudou(sel.closest('.wrap'))};
 $('bLinha').onclick=()=>{
   if(!sel)return;const tr=sel.closest('tr');if(!tr)return;
-  tr.querySelectorAll('td,th').forEach(c=>c.style.background=$('cFundo').value);mudou(sel.closest('.wrap'));
+  tr.querySelectorAll('td,th').forEach(c=>c.style.background=fundo());mudou(sel.closest('.wrap'));
 };
 $('bColuna').onclick=()=>{
   if(!sel)return;const cell=sel.closest('td,th'),tb=sel.closest('table');if(!cell||!tb)return;
   const i=[...cell.parentElement.children].indexOf(cell);
-  tb.querySelectorAll('tr').forEach(r=>{if(r.children[i])r.children[i].style.background=$('cFundo').value});
+  tb.querySelectorAll('tr').forEach(r=>{if(r.children[i])r.children[i].style.background=fundo()});
   mudou(sel.closest('.wrap'));
+};
+$('bTudo').onclick=()=>{
+  if(!sel)return;const w=sel.closest('.wrap');if(!w)return;
+  w.querySelectorAll('td,th,.band').forEach(c=>c.style.background=fundo());mudou(w);
 };
 $('bUndo').onclick=()=>mover(ativo,-1);
 $('bRedo').onclick=()=>mover(ativo,1);
