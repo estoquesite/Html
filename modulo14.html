@@ -14,6 +14,8 @@ button{font-family:inherit}
 .bar label{display:flex;align-items:center;gap:4px}
 .bar input[type=color]{width:32px;height:26px;padding:0;border:1px solid #888;background:none;cursor:pointer}
 .bar .sep{width:1px;height:22px;background:#666}
+#pn{display:none;flex-basis:100%;flex-wrap:wrap;gap:8px 16px;background:#3a3a3a;padding:8px 10px;border-radius:6px}
+#pn label{display:flex;gap:5px;align-items:center}
 #info{color:#9fd3ff}
 .wrap{width:297mm;margin:14px auto}
 .tb{background:#222;color:#fff;padding:6px 10px;border-radius:6px 6px 0 0;display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12px}
@@ -41,11 +43,15 @@ td{padding:4px 8px;font-size:15px;vertical-align:middle;text-align:center;border
 .side{width:36mm;align-self:stretch;display:flex;flex-direction:column;justify-content:space-between;align-items:center;text-align:center}
 .band .st{width:30px;height:30px;margin:0}
 .lbl{font-weight:bold;font-size:14px}
+.nv{width:56px;height:36px;border-radius:8px;border:2px solid #333;background:#fff;cursor:pointer;display:block;margin:auto;padding:0;font-size:20px;font-weight:bold}
+.nv.n1{background:#e0393e;color:#fff}.nv.n2{background:#f29b3a}.nv.n3{background:#f7e94a}.nv.n4{background:#3c9d4e;color:#fff}
+.sheet.c .nv{height:28px;font-size:16px}
+.leg{font-size:11px;padding:4px 8px;text-align:center;border:2px solid #333;border-top:0}
 .tools{display:flex;gap:4px;flex-wrap:wrap;justify-content:center}
 @media print{
  @page{size:A4 landscape;margin:0}
  body{background:#fff}
- .bar,.tb,.tools{display:none!important}
+ .bar,.tb,.tools,#pn{display:none!important}
  .wrap{margin:0}
  .sheet{box-shadow:none;page-break-after:always}
  .sel{outline:none!important}
@@ -60,7 +66,7 @@ td{padding:4px 8px;font-size:15px;vertical-align:middle;text-align:center;border
   <span class="sep"></span>
   <button id="bUndo">↶ Desfazer</button><button id="bRedo">↷ Refazer</button>
   <span class="sep"></span>
-  <button id="bPrint">🖨 Imprimir tudo</button><button id="bSave">💾 Salvar tudo no computador</button><button id="bReset">Restaurar modelo</button>
+  <button id="bPrint">🖨 Impressão geral</button><button id="bSave">💾 Salvar tudo no computador</button><button id="bReset">Restaurar modelo</button>
   <span class="sep"></span>
   <label>Fundo <input type="color" id="cFundo" value="#ffe08a"></label><button class="ok" id="okFundo">OK</button>
   <label>Texto <input type="color" id="cTexto" value="#000000"></label><button class="ok" id="okTexto">OK</button>
@@ -70,23 +76,25 @@ td{padding:4px 8px;font-size:15px;vertical-align:middle;text-align:center;border
   <button id="bTudo">Pintar quadro todo</button>
   <span id="info">Clique em qualquer quadrado para selecioná-lo e escolher as cores.</span>
 </div>
+<div class="bar" id="pn" style="position:static"></div>
 <div id="app"></div>
 
 <script id="codigo">
 const EST=window.__ESTADO__||null;
 const KEY=EST?'quadros_'+EST.id:'quadros_gestao_visual_v4';
 const ST=['','r','y','g','b','p'];
-const SEL='td,th,.box,.band,.free,.title,.meta,.lbl';
+const SEL='td,th,.box,.band,.title,.meta';
 const app=document.getElementById('app'),info=document.getElementById('info');
 const $=id=>document.getElementById(id);
 let sel=null,ativo=null,timer=null;
 const H=new Map();
 
 const E=(t='')=>`<div contenteditable="true">${t}</div>`;
+const nvBtn=`<button class="nv" data-n="" title="Clique para mudar o nível (1 a 4)"></button>`;
 const stBtn=`<button class="st" data-s="" title="Clique para mudar o status"></button>`;
-function tabela(cols,rows){
+function tabela(cols,rows,pre){
   let h='<table><thead><tr>'+cols.map(c=>`<th style="width:${c[1]}%">${E(c[0])}</th>`).join('')+'</tr></thead><tbody>';
-  for(let i=0;i<rows;i++)h+='<tr>'+cols.map(c=>`<td>${c[2]?stBtn:E()}</td>`).join('')+'</tr>';
+  for(let i=0;i<rows;i++)h+='<tr>'+cols.map((c,j)=>`<td>${c[2]===2?nvBtn:c[2]?stBtn:E(j===0&&pre?pre[i]||'':'')}</td>`).join('')+'</tr>';
   return h+'</tbody></table>';
 }
 const C4=(a,b,c,d)=>[[a,46,0],[b,22,0],[c,17,0],[d,15,1]];
@@ -109,16 +117,47 @@ function montar(){
   const niv=['Risco Muito Alto','Risco Alto','Risco Médio','Risco Baixo','Risco Eliminado'];
   folha('',' ',T('Matriz de Risco (ART - Análise de Risco de Tarefa)')+`<div class="bands">`+
     niv.map(n=>`<div class="band"><div class="boxes">${box('Condição Inicial')}${box('Condição Atual')}</div><div class="free" contenteditable="true"></div>
-    <div class="side"><div class="tools"><button data-a="selband">🎨 faixa</button><button data-a="addbox">+ caixa</button><button data-a="delbox">− caixa</button></div>${stBtn}<div class="lbl" contenteditable="true">${n}</div></div></div>`).join('')+'</div>');
+    <div class="side"><div class="tools"><button data-a="selband">🎨 faixa</button><button data-a="addbox">+ caixa</button><button data-a="delbox">− caixa</button></div><div class="lbl" contenteditable="true">${n}</div></div></div>`).join('')+'</div>');
   folha('',rowBtns,T('Plano de Ação')+tabela(C4('Ação','Responsável','Data','Status'),7));
-  corFaixas();
+  novas();s5();atualiza();corFaixas();
 }
 
 const COR=['#e0393e','#f29b3a','#f7e94a','#3c9d4e','#2f6fd0'];
 function corFaixas(){
+  document.querySelectorAll('.band .st').forEach(x=>x.remove());
   document.querySelectorAll('.bands').forEach(b=>b.querySelectorAll('.band').forEach((f,i)=>{
     if(!f.style.background&&!f.style.backgroundColor)f.style.background=COR[i%5];
   }));
+}
+const LEG='<div class="leg" contenteditable="true">Legenda: 🔴 Atrasado &nbsp; 🟡 Em andamento &nbsp; 🟢 Concluído &nbsp; 🔵 Em análise &nbsp; 🌸 Cancelado</div>';
+const META='<div class="meta"><div>Responsável: <span contenteditable="true"></span></div><div>Data Atualiz.: <span contenteditable="true"></span></div></div>';
+function atualiza(){
+  app.querySelectorAll('.sheet').forEach(sh=>{
+    if(!sh.querySelector('table'))return;
+    if(!sh.querySelector('.meta')){const t=sh.querySelector('.title');if(t)t.insertAdjacentHTML('afterend',META)}
+    if(!sh.querySelector('.leg'))sh.insertAdjacentHTML('beforeend',LEG);
+  });
+}
+function s5(){
+  const n=app.children.length;
+  folha('',rowBtns,T('5S – Maturidade por Posto')+tabela([['Posto de Trabalho',28,0],['Responsável',20,0],['Maturidade (1 a 4)',14,2],['Ação para subir de nível',38,0]],10)+
+  '<div class="leg" contenteditable="true">Maturidade: 1 – Inicial &nbsp; 2 – Em desenvolvimento &nbsp; 3 – Estabelecido &nbsp; 4 – Sustentado &nbsp; (clique no quadrado para mudar o nível)</div>');
+  [...app.children].slice(n).forEach(w=>w.dataset.s5=1);
+}
+function ajusta5s(){
+  app.querySelectorAll('[data-s5] table').forEach(t=>{
+    const hr=t.querySelector('thead tr');
+    if(!hr||hr.children.length!==6)return;
+    t.querySelectorAll('tr').forEach(r=>{r.children[4].remove();r.children[3].remove()});
+    [...hr.children].forEach((th,i)=>th.style.width=[28,20,14,38][i]+'%');
+  });
+}
+function novas(){
+  const n=app.children.length;
+  folha('',rowBtns,T('Indicadores SQDCP')+tabela([['Indicador',24,0],['Meta',14,0],['Realizado',14,0],['Comentário / Desvio',36,0],['Status',12,1]],5,['S - Segurança','Q - Qualidade','D - Entrega','C - Custo','P - Pessoas']));
+  folha('',rowBtns,T('Análise de Desvios (PDCA / 5 Porquês)')+tabela([['Desvio / Problema',22,0],['Causa Raiz (5 Porquês)',26,0],['Contramedida',24,0],['Responsável',12,0],['Prazo',8,0],['Status',8,1]],7));
+  folha('',rowBtns,T('Rotina de Liderança (Gemba)')+tabela([['Área / Atividade',28,0],['Líder',18,0],['Data',12,0],['Constatação / Ação',28,0],['Status',14,1]],7));
+  [...app.children].slice(n).forEach(w=>w.dataset.fmds=1);
 }
 /* ---------- persistência e histórico ---------- */
 function limpo(el,outer){
@@ -176,7 +215,21 @@ $('bTudo').onclick=()=>{
 };
 $('bUndo').onclick=()=>mover(ativo,-1);
 $('bRedo').onclick=()=>mover(ativo,1);
-$('bPrint').onclick=()=>window.print();
+$('bPrint').onclick=()=>{
+  const pn=$('pn');
+  if(pn.style.display==='flex'){pn.style.display='none';return}
+  pn.innerHTML='<b>Escolha as folhas para imprimir:</b>'+[...app.children].map((w,i)=>{const t=w.querySelector('.title');
+    return `<label><input type="checkbox" value="${i}" checked> ${i+1}. ${(t?t.textContent:'Folha').trim().replace(/</g,'&lt;')}</label>`}).join('')+
+    '<button id="pAll">Marcar todas</button><button id="pNone">Limpar</button><button class="ok" id="pGo">🖨 Imprimir marcadas</button>';
+  pn.style.display='flex';
+  const cx=v=>pn.querySelectorAll('input').forEach(i=>i.checked=v);
+  $('pAll').onclick=()=>cx(true);$('pNone').onclick=()=>cx(false);
+  $('pGo').onclick=()=>{
+    const ws=[...pn.querySelectorAll('input:checked')].map(i=>app.children[+i.value]);
+    if(!ws.length){info.textContent='Marque ao menos uma folha.';return}
+    document.body.classList.add('um');ws.forEach(w=>w.classList.add('alvo'));window.print();
+  };
+};
 $('bSave').onclick=()=>baixar([...app.querySelectorAll('.wrap')],'quadros-gestao-visual');
 $('bReset').onclick=()=>{
   if(!confirm('Voltar ao modelo original? Todo o conteúdo e as cores serão apagados.'))return;
@@ -220,6 +273,10 @@ app.addEventListener('click',e=>{
   const b=e.target.closest('button');
   if(e.target.closest('.sheet')&&!(b&&b.dataset.a)){const el=e.target.closest(SEL);if(el)selecionar(el)}
   if(!b||!w)return;
+  if(b.classList.contains('nv')){
+    const L=['','1','2','3','4'],v=L[(L.indexOf(b.dataset.n)+1)%5];
+    b.dataset.n=v;b.textContent=v;b.className='nv n'+v;mudou(w);return;
+  }
   if(b.classList.contains('st')){
     b.dataset.s=ST[(ST.indexOf(b.dataset.s)+1)%ST.length];b.className='st '+b.dataset.s;mudou(w);return;
   }
@@ -239,6 +296,7 @@ app.addEventListener('click',e=>{
       c.querySelectorAll('.sel').forEach(x=>x.classList.remove('sel'));
       c.querySelectorAll('[contenteditable]').forEach(x=>x.innerHTML='');
       c.querySelectorAll('.st').forEach(x=>{x.dataset.s='';x.className='st'});
+      c.querySelectorAll('.nv').forEach(x=>{x.dataset.n='';x.textContent='';x.className='nv'});
       tb.appendChild(c);
     }else if(rs.length>1){if(sel&&rs[rs.length-1].contains(sel))selecionar(null);rs[rs.length-1].remove()}
   }
@@ -259,7 +317,9 @@ app.addEventListener('click',e=>{
   let s=null;try{s=localStorage.getItem(KEY)}catch(e){}
   if(!s&&EST)s=EST.html;
   if(s)app.innerHTML=s;else montar();
-  corFaixas();snapInit();
+  if(!app.querySelector('[data-fmds]'))novas();
+  if(!app.querySelector('[data-s5]'))s5();
+  ajusta5s();atualiza();corFaixas();snapInit();
 })();
 </script>
 </body>
