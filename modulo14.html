@@ -34,7 +34,7 @@ td{padding:4px 8px;font-size:15px;vertical-align:middle;text-align:center;border
 .bands{flex:1;display:flex;flex-direction:column;gap:0}
 .band{flex:1;display:flex;gap:8px;padding:6px 8px;border:2px solid #333;border-top-width:0;align-items:center;min-height:0}
 .boxes{display:flex;gap:6px;flex:0 1 auto;min-width:0;align-self:stretch}
-.box{border:1px solid #333;border-radius:16px;padding:5px 10px;width:36mm;min-width:20mm;flex:0 1 36mm;display:flex;flex-direction:column;overflow:hidden;text-align:center}
+.box{border:1px solid #333;border-radius:16px;padding:5px 10px;width:36mm;min-width:20mm;flex:0 1 36mm;display:flex;flex-direction:column;overflow:hidden;text-align:center;background:#dde6ee}
 .bl{font-size:12px;font-weight:bold}
 .bv{flex:1;font-size:15px;color:#1a2a8a}
 .free{flex:1;align-self:stretch;font-size:13px;padding:4px 6px;overflow:hidden;font-family:"Comic Sans MS","Segoe Print",cursive}
@@ -111,8 +111,15 @@ function montar(){
     niv.map(n=>`<div class="band"><div class="boxes">${box('Condição Inicial')}${box('Condição Atual')}</div><div class="free" contenteditable="true"></div>
     <div class="side"><div class="tools"><button data-a="selband">🎨 faixa</button><button data-a="addbox">+ caixa</button><button data-a="delbox">− caixa</button></div>${stBtn}<div class="lbl" contenteditable="true">${n}</div></div></div>`).join('')+'</div>');
   folha('',rowBtns,T('Plano de Ação')+tabela(C4('Ação','Responsável','Data','Status'),7));
+  corFaixas();
 }
 
+const COR=['#e0393e','#f29b3a','#f7e94a','#3c9d4e','#2f6fd0'];
+function corFaixas(){
+  document.querySelectorAll('.bands').forEach(b=>b.querySelectorAll('.band').forEach((f,i)=>{
+    if(!f.style.background&&!f.style.backgroundColor)f.style.background=COR[i%5];
+  }));
+}
 /* ---------- persistência e histórico ---------- */
 function limpo(el,outer){
   const c=el.cloneNode(true);
@@ -252,7 +259,7 @@ app.addEventListener('click',e=>{
   let s=null;try{s=localStorage.getItem(KEY)}catch(e){}
   if(!s&&EST)s=EST.html;
   if(s)app.innerHTML=s;else montar();
-  snapInit();
+  corFaixas();snapInit();
 })();
 </script>
 </body>
