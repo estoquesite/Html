@@ -3,111 +3,212 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Portal Operacional - Vale (Menu Mestre)</title>
+<title>Módulo 14 - Quadro FMDS | Portal Operacional</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>tailwind.config = { darkMode: 'class' }</script>
 <style>
   body { font-family:'Segoe UI', system-ui, sans-serif; background:#f0f4f8; color:#1e293b; min-height:100vh; padding:20px 16px; }
   .dark body { background:#0f172a; color:#e2e8f0; }
-  :focus-visible { outline:2px solid #007e7a; outline-offset:2px; }
-  .card-modulo { background:#fff; border-radius:12px; border:1px solid #e2e8f0; box-shadow:0 4px 6px -1px rgba(0,0,0,.03); padding:20px; display:flex; flex-direction:column;
-    justify-content:space-between; text-decoration:none; transition:transform .2s, box-shadow .2s; position:relative; overflow:hidden; min-height:180px; }
-  .card-modulo::before { content:''; position:absolute; inset:0 0 auto 0; height:4px; background:var(--c); }
-  .card-modulo:hover { transform:translateY(-4px); box-shadow:0 14px 25px -4px rgba(0,0,0,.1); border-color:#cbd5e1; }
-  .dark .card-modulo { background:#1e293b; border-color:#334155; }
-  .dark .card-modulo .tit { color:#f1f5f9; } .dark .card-modulo .desc { color:#94a3b8; } .dark .card-modulo .rod { border-color:#334155; }
-  .card-icone { width:42px; height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; background:var(--bg); }
-  .tecla { font-size:10px; font-weight:800; background:#f1f5f9; color:#64748b; padding:2px 6px; border-radius:4px; border:1px solid #cbd5e1; }
-  .dark .tecla { background:#0f172a; border-color:#475569; color:#94a3b8; }
-  @media (prefers-reduced-motion: reduce) { .card-modulo { transition:none; } .card-modulo:hover { transform:none; } }
+  :focus-visible { outline:2px solid #7c3aed; outline-offset:2px; }
+  .card-fmds { background:#fff; border-radius:12px; border:1px solid #e2e8f0; box-shadow:0 4px 6px -1px rgba(0,0,0,.03); padding:20px; transition:all .2s; }
+  .dark .card-fmds { background:#1e293b; border-color:#334155; }
+  .status-ok { background:#dcfce7; color:#166534; border:1px solid #bbf7d0; }
+  .status-atencao { background:#fef9c3; color:#854d0e; border:1px solid #fef08a; }
+  .status-critico { background:#fee2e2; color:#991b1b; border:1px solid #fecaca; }
+  .dark .status-ok { background:#064e3b; color:#a7f3d0; border-color:#065f46; }
+  .dark .status-atencao { background:#713f12; color:#fde047; border-color:#854d0e; }
+  .dark .status-critico { background:#7f1d1d; color:#fecaca; border-color:#991b1b; }
 </style>
 </head>
 <body>
 
-<div class="max-w-[1100px] w-full mx-auto">
-  <header class="bg-gradient-to-r from-[#007e7a] to-[#005a57] text-white p-6 sm:p-7 rounded-2xl shadow-lg mb-6">
+<div class="max-w-[1200px] w-full mx-auto">
+  <!-- Cabeçalho -->
+  <header class="bg-gradient-to-r from-violet-700 to-indigo-800 text-white p-6 sm:p-7 rounded-2xl shadow-lg mb-6">
     <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
       <div class="text-center sm:text-left">
         <div class="flex items-center justify-center sm:justify-start gap-3">
-          <span class="text-2xl font-black tracking-widest text-teal-100">VALE</span>
-          <div class="h-5 w-px bg-teal-300/40"></div>
-          <h1 class="text-lg font-extrabold tracking-wide">Portal Operacional</h1>
-          <span class="bg-amber-500 text-white font-black text-[10px] px-2 py-0.5 rounded">v07</span>
+          <span class="text-2xl font-black tracking-widest text-violet-200">VALE</span>
+          <div class="h-5 w-px bg-violet-300/40"></div>
+          <h1 class="text-lg font-extrabold tracking-wide">Módulo 14 — Quadro FMDS</h1>
+          <span class="bg-amber-500 text-white font-black text-[10px] px-2 py-0.5 rounded">Operacional</span>
         </div>
-        <p class="text-xs text-teal-100/90 mt-1 font-medium">Gestão diária, segurança, equipamentos, equipas, FMDS e ordens de venda</p>
+        <p class="text-xs text-violet-100/90 mt-1 font-medium">Safety (Segurança), Quality (Qualidade), Delivery (Entrega), Cost (Custos) e Morale (Moral)</p>
       </div>
       <div class="flex items-center gap-2">
         <div class="flex items-center gap-3 bg-white/10 px-3.5 py-1.5 rounded-xl text-xs font-semibold border border-white/10">
-          <span id="relogio">--:--:--</span><span class="text-teal-200">|</span><span id="data">--/--/----</span>
+          <span id="relogio">--:--:--</span><span class="text-violet-200">|</span><span id="data">--/--/----</span>
         </div>
+        <a href="index.html" class="bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl px-3 py-1.5 text-xs font-medium transition" title="Voltar ao Menu Mestre">🏠 Menu</a>
         <button id="bTema" class="bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl px-3 py-1.5 text-xs" aria-label="Alternar tema">🌙</button>
       </div>
     </div>
   </header>
 
-  <input id="busca" type="search" placeholder="🔍 Procurar módulo (ex: funcionários, férias, notebook, FDS)" aria-label="Procurar módulo"
-    class="w-full mb-4 text-sm p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm">
+  <!-- Filtro de Período e Ações -->
+  <div class="flex flex-col sm:flex-row justify-between items-center gap-3 mb-6 bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700 shadow-sm">
+    <div class="flex items-center gap-3 w-full sm:w-auto">
+      <label for="mesFiltro" class="text-xs font-bold text-slate-600 dark:text-slate-300">Período:</label>
+      <input type="month" id="mesFiltro" class="text-xs p-2 rounded-lg border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200">
+    </div>
+    <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
+      <button onclick="salvarQuadro()" class="bg-violet-600 hover:bg-violet-700 text-white text-xs font-bold px-4 py-2 rounded-lg shadow transition">💾 Salvar Alterações</button>
+      <button onclick="window.print()" class="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-slate-200 text-xs font-bold px-4 py-2 rounded-lg transition">🖨️ Imprimir / PDF</button>
+    </div>
+  </div>
 
-  <nav id="grade" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" aria-label="Módulos"></nav>
-  <p id="vazio" class="hidden text-center text-sm text-slate-400 italic py-8">Nenhum módulo encontrado para essa pesquisa.</p>
+  <!-- Grade dos Pilares FMDS -->
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 mb-6">
 
-  <footer class="mt-8 text-center text-xs text-slate-400 font-medium space-y-1">
-    <p>Sistema Operacional Integrado • Portal Vale Corporativo</p>
-    <p class="text-[10px]">Atalhos: tecla ` abre o Módulo 00; teclas 1 a 9 abrem os módulos 1 a 9; 0 abre o 10; – (hífen) abre o 11.</p>
+    <!-- S - Safety (Segurança) -->
+    <div class="card-fmds border-t-4 border-red-500">
+      <div class="flex justify-between items-center mb-3">
+        <h2 class="font-extrabold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-2">
+          <span class="text-lg">🛡️</span> 1. Safety (Segurança)
+        </h2>
+        <select id="statusS" class="text-xs font-bold px-2 py-1 rounded-md status-ok" onchange="atualizarStatus(this)">
+          <option value="ok">🟢 Meta Atingida</option>
+          <option value="atencao">🟡 Atenção</option>
+          <option value="critico">🔴 Não Conforme</option>
+        </select>
+      </div>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Acidentes registrados, desvios de segurança e DDS realizados no período.</p>
+      <div class="space-y-2">
+        <div>
+          <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-400">Acidentes com Afastamento:</label>
+          <input type="number" id="s_afastamento" value="0" class="w-full text-xs p-2 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+        </div>
+        <div>
+          <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-400">Quase Acidentes / Desvios:</label>
+          <input type="text" id="s_desvios" placeholder="Ex: 12 resolvidos, 2 pendentes" class="w-full text-xs p-2 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+        </div>
+      </div>
+    </div>
+
+    <!-- M - Quality (Qualidade) -->
+    <div class="card-fmds border-t-4 border-blue-500">
+      <div class="flex justify-between items-center mb-3">
+        <h2 class="font-extrabold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-2">
+          <span class="text-lg">🎯</span> 2. Quality (Qualidade)
+        </h2>
+        <select id="statusQ" class="text-xs font-bold px-2 py-1 rounded-md status-ok" onchange="atualizarStatus(this)">
+          <option value="ok">🟢 Meta Atingida</option>
+          <option value="atencao">🟡 Atenção</option>
+          <option value="critico">🔴 Não Conforme</option>
+        </select>
+      </div>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Índice de conformidade, retrabalhos e desvios de processo.</p>
+      <div class="space-y-2">
+        <div>
+          <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-400">Conformidade do Produto (%):</label>
+          <input type="text" id="q_conformidade" value="98.5%" class="w-full text-xs p-2 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+        </div>
+        <div>
+          <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-400">Não Conformidades (Rejeitos):</label>
+          <input type="text" id="q_rejeitos" placeholder="Ex: 2 lotes reavaliados" class="w-full text-xs p-2 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+        </div>
+      </div>
+    </div>
+
+    <!-- D - Delivery (Entrega) -->
+    <div class="card-fmds border-t-4 border-emerald-500">
+      <div class="flex justify-between items-center mb-3">
+        <h2 class="font-extrabold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-2">
+          <span class="text-lg">📦</span> 3. Delivery (Entrega)
+        </h2>
+        <select id="statusD" class="text-xs font-bold px-2 py-1 rounded-md status-ok" onchange="atualizarStatus(this)">
+          <option value="ok">🟢 Meta Atingida</option>
+          <option value="atencao">🟡 Atenção</option>
+          <option value="critico">🔴 Não Conforme</option>
+        </select>
+      </div>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Cumprimento de cronograma de expedição e atendimento a ordens.</p>
+      <div class="space-y-2">
+        <div>
+          <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-400">Atendimento ao Planejado (%):</label>
+          <input type="text" id="d_atendimento" value="100%" class="w-full text-xs p-2 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+        </div>
+        <div>
+          <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-400">Ordens de Venda / Remessas:</label>
+          <input type="text" id="d_ordens" placeholder="Ex: 45 faturadas no prazo" class="w-full text-xs p-2 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+        </div>
+      </div>
+    </div>
+
+    <!-- C - Cost (Custos) -->
+    <div class="card-fmds border-t-4 border-amber-500">
+      <div class="flex justify-between items-center mb-3">
+        <h2 class="font-extrabold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-2">
+          <span class="text-lg">💰</span> 4. Cost (Custos)
+        </h2>
+        <select id="statusC" class="text-xs font-bold px-2 py-1 rounded-md status-ok" onchange="atualizarStatus(this)">
+          <option value="ok">🟢 Meta Atingida</option>
+          <option value="atencao">🟡 Atenção</option>
+          <option value="critico">🔴 Não Conforme</option>
+        </select>
+      </div>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Controle orçamentário, eficiência operacional e consumo de insumos.</p>
+      <div class="space-y-2">
+        <div>
+          <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-400">Desempenho Orçamentário:</label>
+          <input type="text" id="c_orcamento" value="Dentro do budget" class="w-full text-xs p-2 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+        </div>
+        <div>
+          <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-400">Ações de Redução / Eficiência:</label>
+          <input type="text" id="c_acoes" placeholder="Ex: Otimização de insumos" class="w-full text-xs p-2 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+        </div>
+      </div>
+    </div>
+
+    <!-- M - Morale (Moral / Equipe) -->
+    <div class="card-fmds border-t-4 border-purple-500 md:col-span-2 lg:col-span-2">
+      <div class="flex justify-between items-center mb-3">
+        <h2 class="font-extrabold text-sm text-slate-800 dark:text-slate-100 flex items-center gap-2">
+          <span class="text-lg">👥</span> 5. Morale (Moral & Engajamento)
+        </h2>
+        <select id="statusM" class="text-xs font-bold px-2 py-1 rounded-md status-ok" onchange="atualizarStatus(this)">
+          <option value="ok">🟢 Meta Atingida</option>
+          <option value="atencao">🟡 Atenção</option>
+          <option value="critico">🔴 Não Conforme</option>
+        </select>
+      </div>
+      <p class="text-xs text-slate-500 dark:text-slate-400 mb-3">Clima organizacional, presença em DDS, treinamentos concluídos e sugestões da equipe.</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-400">Presença Média em DDS / Reuniões:</label>
+          <input type="text" id="m_presenca" value="95%" class="w-full text-xs p-2 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+        </div>
+        <div>
+          <label class="text-[11px] font-semibold text-slate-600 dark:text-slate-400">Sugestões / Kaizen implementados:</label>
+          <input type="text" id="m_kaizen" placeholder="Ex: 4 melhorias sugeridas" class="w-full text-xs p-2 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900">
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Planos de Ação / Ocorrências Relevantes -->
+  <section class="bg-white dark:bg-slate-800 p-5 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm mb-8">
+    <h3 class="text-sm font-bold text-slate-800 dark:text-slate-100 mb-2 flex items-center gap-2">
+      <span>📝</span> Planos de Ação & Ocorrências em Destaque
+    </h3>
+    <p class="text-xs text-slate-500 dark:text-slate-400 mb-4">Registe os desvios apontados nos pilares acima e os respectivos responsáveis e prazos de tratativa.</p>
+    <textarea id="planosAcao" rows="4" placeholder="Descreva aqui as ações corretivas, responsáveis e prazos..." class="w-full text-xs p-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 leading-relaxed"></textarea>
+  </section>
+
+  <!-- Rodapé -->
+  <footer class="text-center text-xs text-slate-400 font-medium space-y-1">
+    <p>Portal Operacional Vale • Quadro FMDS Integrado</p>
   </footer>
 </div>
 
 <script>
-const MODULOS = [
-  ['00', '🏢', 'Central de Funcionários', 'Base mestre de colaboradores para digitação, ordenação A-Z, cópia rápida para outros módulos e cadastro.', '#0f766e', '#ccfbf1', '`'],
-  [1, '📋', 'DDS & Emociograma', 'Controle semanal com carinhas de emociograma, registro de rubricas e impressão A4 paisagem.', '#007e7a', '#e6f4f4', '1'],
-  [2, '📅', 'Matriz Anual de DDS', 'Grelha anual completa (12 meses) com visibilidade por semestre/trimestre e autoajuste.', '#007e7a', '#e6f4f4', '2'],
-  [3, '🏖️', 'Cronograma de Férias', 'Planejamento anual de início e término das férias da equipe com controle de saldo de dias.', '#db2777', '#fce7f3', '3'],
-  [4, '🎂', 'Aniversariantes do Ano', 'Grade dos 12 meses preenchendo a folha A4, com ordenação cronológica por dia.', '#db2777', '#fce7f3', '4'],
-  [5, '📊', 'Absenteísmo & Justificativas', 'Registro padronizado de ocorrências (AT, FA, CO, FO) com resumo e lançamento rápido.', '#db2777', '#fce7f3', '5'],
-  [6, '🎓', 'Gestão de Treinamentos', 'Capacitações com cadastro de turma em lote, busca, indicadores por status, nuvem e exportação CSV.', '#059669', '#ecfdf5', '6'],
-  [7, '💳', 'Compras Cartão Corporativo', 'Compras no cartão com itens agrupados, leitura de nota fiscal e links, controle de entrega e CSV.', '#6366f1', '#eef2ff', '7'],
-  [8, '📄', 'Gestão de FDS / FISPQ', 'Fichas de segurança por produto e fornecedor, PDFs guardados no aparelho, junção em um só PDF e leitura por foto.', '#0891b2', '#ecfeff', '8'],
-  [9, '💻', 'Controle de Notebooks', 'Entrega e recebimento com leitor de código de barras, patrimônio, termos, status e alerta de duplicidade.', '#d97706', '#fef3c7', '9'],
-  [10, '👥', 'Troca dos Participantes FMDS', 'Matriz de rotação de participantes (SSMA, Pessoas, Produtividade, Qualidade) com folhas de 24 linhas e salvamento automático.', '#475569', '#f1f5f9', '0'],
-  [11, '📑', 'Controle de OV (Ordens de Venda)', 'Rastreio de Ordens de Venda (ZVSU / sucatas e resíduos), saldos, emissor, pesagens e remessas.', '#0284c7', '#e0f2fe', '-']
-];
-
-const ROTAS = Object.fromEntries(MODULOS.map(m => [m[6], `modulo${m[0]}.html`]));
-// Permite abrir o Módulo 00 tanto com crase (`) quanto apóstrofo (')
-ROTAS["'"] = "modulo00.html";
-
-const nomeTecla = t => {
-  if (t === '-') return 'Tecla –';
-  if (t === '`') return 'Tecla `';
-  return `Tecla ${t}`;
-};
 const $ = id => document.getElementById(id);
-
-function desenhar(filtro = '') {
-  const f = filtro.trim().toLowerCase();
-  const lista = MODULOS.filter(m => !f || (m[2] + ' ' + m[3]).toLowerCase().includes(f) || String(m[0]) === f);
-  $('grade').innerHTML = lista.map(([n, ico, tit, desc, cor, bg, tecla]) => `
-    <a href="modulo${n}.html" class="card-modulo" style="--c:${cor};--bg:${bg}" title="Atalho: ${nomeTecla(tecla)}">
-      <div>
-        <div class="flex justify-between items-center mb-3">
-          <div class="card-icone" aria-hidden="true">${ico}</div>
-          <span class="tecla">${nomeTecla(tecla)}</span>
-        </div>
-        <div class="tit text-sm font-bold text-slate-800 mb-1">${tit}</div>
-        <div class="desc text-xs text-slate-500 leading-relaxed mb-3">${desc}</div>
-      </div>
-      <div class="rod border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold" style="color:${cor}">
-        <span>Abrir Módulo ${n}</span>
-        <span aria-hidden="true">➔</span>
-      </div>
-    </a>`).join('');
-  $('vazio').classList.toggle('hidden', lista.length > 0);
-}
 
 function relogio() {
   const d = new Date();
-  $('relogio').textContent = d.toLocaleTimeString('pt-BR');$('data').textContent = d.toLocaleDateString('pt-BR');
+  $('relogio').textContent = d.toLocaleTimeString('pt-BR');
+  $('data').textContent = d.toLocaleDateString('pt-BR');
 }
 
 function tema(escuro) {
@@ -116,12 +217,72 @@ function tema(escuro) {
   try { localStorage.setItem('tema_portal', escuro ? 'dark' : 'light'); } catch {}
 }
 
-document.addEventListener('keydown', e => {
-  if (e.ctrlKey || e.metaKey || e.altKey) return;
-  const t = e.target;
-  if (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable) return;
-  if (ROTAS[e.key]) location.href = ROTAS[e.key];
-});
+function atualizarStatus(el) {
+  el.className = 'text-xs font-bold px-2 py-1 rounded-md ' + 
+    (el.value === 'ok' ? 'status-ok' : el.value === 'atencao' ? 'status-atencao' : 'status-critico');
+}
+
+function salvarQuadro() {
+  const mes = $('mesFiltro').value;
+  if (!mes) { alert('Por favor, selecione o período/mês.'); return; }
+  
+  const dados = {
+    status: {
+      S: $('statusS').value,
+      Q: $('statusQ').value,
+      D: $('statusD').value,
+      C: $('statusC').value,
+      M: $('statusM').value
+    },
+    campos: {
+      s_afastamento: $('s_afastamento').value,
+      s_desvios: $('s_desvios').value,
+      q_conformidade: $('q_conformidade').value,
+      q_rejeitos: $('q_rejeitos').value,
+      d_atendimento: $('d_atendimento').value,
+      d_ordens: $('d_ordens').value,
+      c_orcamento: $('c_orcamento').value,
+      c_acoes: $('c_acoes').value,
+      m_presenca: $('m_presenca').value,
+      m_kaizen: $('m_kaizen').value,
+      planosAcao: $('planosAcao').value
+    }
+  };
+
+  try {
+    localStorage.setItem('fmds_' + mes, JSON.stringify(dados));
+    alert('Quadro FMDS salvo com sucesso para o período ' + mes + '!');
+  } catch (e) {
+    alert('Erro ao salvar no armazenamento local.');
+  }
+}
+
+function carregarQuadro(mes) {
+  try {
+    const salvo = localStorage.getItem('fmds_' + mes);
+    if (salvo) {
+      const dados = JSON.parse(salvo);
+      if (dados.status) {
+        for (let k in dados.status) {
+          const el = $('status' + k);
+          if (el) {
+            el.value = dados.status[k];
+            atualizarStatus(el);
+          }
+        }
+      }
+      if (dados.campos) {
+        for (let k in dados.campos) {
+          const el = $(k);
+          if (el) el.value = dados.campos[k];
+        }
+      }
+    } else {
+      // Limpa ou define padrões se não houver registro
+      $('planosAcao').value = '';
+    }
+  } catch (e) {}
+}
 
 window.addEventListener('DOMContentLoaded', () => {
   let escuro = false;
@@ -129,14 +290,15 @@ window.addEventListener('DOMContentLoaded', () => {
   tema(escuro);
   relogio();
   setInterval(relogio, 1000);
-  desenhar();
+
+  // Define o mês atual por padrão no input month
+  const hoje = new Date();
+  const anoMes = hoje.toISOString().slice(0, 7);
+  $('mesFiltro').value = anoMes;
+  carregarQuadro(anoMes);
+
+  $('mesFiltro').onchange = e => carregarQuadro(e.target.value);
   $('bTema').onclick = () => tema(!document.documentElement.classList.contains('dark'));
-  $('busca').oninput = e => desenhar(e.target.value);$('busca').onkeydown = e => {
-    if (e.key === 'Enter') {
-      const a = document.querySelector('#grade a');
-      if (a) location.href = a.href;
-    }
-  };
 });
 </script>
 </body>
