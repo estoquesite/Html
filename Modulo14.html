@@ -2,247 +2,145 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Quadros de Gestão à Vista</title>
-<style id="estilo">
-*{box-sizing:border-box}
-body{margin:0;background:#8a8f94;font-family:Arial,Helvetica,sans-serif;color:#222}
-button{font-family:inherit}
-.bar{position:sticky;top:0;z-index:9;background:#222;color:#fff;padding:8px 12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center;font-size:13px}
-.bar button,.tb button,.tools button{padding:5px 10px;border:0;border-radius:4px;background:#e8e8e8;cursor:pointer;font-weight:bold;font-size:12px}
-.bar label{display:flex;align-items:center;gap:4px}
-.bar input[type=color]{width:32px;height:26px;padding:0;border:1px solid #888;background:none;cursor:pointer}
-.bar .sep{width:1px;height:22px;background:#666}
-#info{color:#9fd3ff}
-.wrap{width:297mm;margin:14px auto}
-.tb{background:#222;color:#fff;padding:6px 10px;border-radius:6px 6px 0 0;display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12px}
-.tb .gap{flex:1}
-.sheet{width:297mm;height:210mm;background:#fff;padding:12mm 14mm;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 2px 10px #0006}
-.sheet h1{margin:0 0 6mm;font-size:28px;padding:4px 8px}
-table{width:100%;border-collapse:separate;border-spacing:0;flex:1;table-layout:fixed}
-th{font-size:14px;padding:6px;border:2px solid #333}
-td{padding:4px 8px;font-size:15px;vertical-align:middle;border:2px solid #333}
-[contenteditable]{outline:none;min-height:1.2em;word-break:break-word}
-[contenteditable]:focus{outline:1px dashed #888}
-.sel{outline:3px solid #1e88e5!important;outline-offset:-3px}
-.st{width:44px;height:44px;border-radius:50%;border:2px solid #333;background:#fff;cursor:pointer;display:block;margin:auto;padding:0}
-.st.r{background:#e0393e}.st.y{background:#f4c20d}.st.g{background:#2e9e4f}.st.b{background:#2f6fd0}.st.p{background:#f7c6cc}
-.title{font-size:20px;font-weight:bold;padding:8px 14px;text-align:center;border:2px solid #333;border-bottom:0}
-.meta{display:flex;justify-content:flex-end;gap:30px;font-size:12px;padding:4px 14px;border:2px solid #333;border-bottom:0}
-.meta span{min-width:70px;display:inline-block;border-bottom:1px solid #666}
-.sep-rows table{border-spacing:0 7px}
-.bands{flex:1;display:flex;flex-direction:column;gap:4px}
-.band{flex:1;display:flex;gap:8px;padding:6px 8px;border:2px solid #333;align-items:stretch;min-height:0}
-.boxes{display:flex;gap:6px;flex:0 1 auto;min-width:0}
-.box{border:1px solid #333;border-radius:16px;padding:5px 10px;width:36mm;min-width:20mm;flex:0 1 36mm;display:flex;flex-direction:column;overflow:hidden}
-.bl{font-size:12px;font-weight:bold}
-.bv{flex:1;font-size:15px;color:#1a2a8a}
-.free{flex:1;font-size:13px;padding:4px 6px;overflow:hidden;font-family:"Comic Sans MS","Segoe Print",cursive}
-.side{width:36mm;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;text-align:right}
-.lbl{font-weight:bold;font-size:14px}
-.tools{display:flex;gap:4px;flex-wrap:wrap;justify-content:flex-end}
-@media print{
- @page{size:A4 landscape;margin:0}
- body{background:#fff}
- .bar,.tb,.tools{display:none!important}
- .wrap{margin:0}
- .sheet{box-shadow:none;page-break-after:always}
- .sel{outline:none!important}
- body.um .wrap:not(.alvo){display:none}
- *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
-}
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal Operacional - Vale (Menu Mestre)</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>tailwind.config = { darkMode: 'class' }</script>
+<style>
+  body { font-family:'Segoe UI', system-ui, sans-serif; background:#f0f4f8; color:#1e293b; min-height:100vh; padding:20px 16px; }
+  .dark body { background:#0f172a; color:#e2e8f0; }
+  :focus-visible { outline:2px solid #007e7a; outline-offset:2px; }
+  .card-modulo { background:#fff; border-radius:12px; border:1px solid #e2e8f0; box-shadow:0 4px 6px -1px rgba(0,0,0,.03); padding:20px; display:flex; flex-direction:column;
+    justify-content:space-between; text-decoration:none; transition:transform .2s, box-shadow .2s; position:relative; overflow:hidden; min-height:180px; }
+  .card-modulo::before { content:''; position:absolute; inset:0 0 auto 0; height:4px; background:var(--c); }
+  .card-modulo:hover { transform:translateY(-4px); box-shadow:0 14px 25px -4px rgba(0,0,0,.1); border-color:#cbd5e1; }
+  .dark .card-modulo { background:#1e293b; border-color:#334155; }
+  .dark .card-modulo .tit { color:#f1f5f9; } .dark .card-modulo .desc { color:#94a3b8; } .dark .card-modulo .rod { border-color:#334155; }
+  .card-icone { width:42px; height:42px; border-radius:10px; display:flex; align-items:center; justify-content:center; font-size:20px; background:var(--bg); }
+  .tecla { font-size:10px; font-weight:800; background:#f1f5f9; color:#64748b; padding:2px 6px; border-radius:4px; border:1px solid #cbd5e1; }
+  .dark .tecla { background:#0f172a; border-color:#475569; color:#94a3b8; }
+  @media (prefers-reduced-motion: reduce) { .card-modulo { transition:none; } .card-modulo:hover { transform:none; } }
 </style>
 </head>
 <body>
-<div class="bar">
-  <strong>Quadros de Gestão à Vista</strong>
-  <span class="sep"></span>
-  <button id="bUndo">↶ Desfazer</button><button id="bRedo">↷ Refazer</button>
-  <span class="sep"></span>
-  <button id="bPrint">🖨 Imprimir tudo</button><button id="bSave">💾 Salvar tudo no computador</button><button id="bReset">Restaurar modelo</button>
-  <span class="sep"></span>
-  <label>Fundo <input type="color" id="cFundo" value="#ffe08a"></label>
-  <label>Texto <input type="color" id="cTexto" value="#000000"></label>
-  <button id="bLimpa">Sem cor</button>
-  <button id="bLinha">Pintar linha toda</button>
-  <button id="bColuna">Pintar coluna toda</button>
-  <span id="info">Clique em qualquer quadrado para selecioná-lo e escolher as cores.</span>
+
+<div class="max-w-[1100px] w-full mx-auto">
+  <header class="bg-gradient-to-r from-[#007e7a] to-[#005a57] text-white p-6 sm:p-7 rounded-2xl shadow-lg mb-6">
+    <div class="flex flex-col sm:flex-row justify-between items-center gap-4">
+      <div class="text-center sm:text-left">
+        <div class="flex items-center justify-center sm:justify-start gap-3">
+          <span class="text-2xl font-black tracking-widest text-teal-100">VALE</span>
+          <div class="h-5 w-px bg-teal-300/40"></div>
+          <h1 class="text-lg font-extrabold tracking-wide">Portal Operacional</h1>
+          <span class="bg-amber-500 text-white font-black text-[10px] px-2 py-0.5 rounded">v08</span>
+        </div>
+        <p class="text-xs text-teal-100/90 mt-1 font-medium">Gestão diária, segurança, equipamentos, equipas, FMDS e ordens de venda</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="flex items-center gap-3 bg-white/10 px-3.5 py-1.5 rounded-xl text-xs font-semibold border border-white/10">
+          <span id="relogio">--:--:--</span><span class="text-teal-200">|</span><span id="data">--/--/----</span>
+        </div>
+        <button id="bTema" class="bg-white/10 hover:bg-white/20 border border-white/10 rounded-xl px-3 py-1.5 text-xs" aria-label="Alternar tema">🌙</button>
+      </div>
+    </div>
+  </header>
+
+  <input id="busca" type="search" placeholder="🔍 Procurar módulo (ex: funcionários, férias, notebook, FMDS)" aria-label="Procurar módulo"
+    class="w-full mb-4 text-sm p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 shadow-sm">
+
+  <nav id="grade" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4" aria-label="Módulos"></nav>
+  <p id="vazio" class="hidden text-center text-sm text-slate-400 italic py-8">Nenhum módulo encontrado para essa pesquisa.</p>
+
+  <footer class="mt-8 text-center text-xs text-slate-400 font-medium space-y-1">
+    <p>Sistema Operacional Integrado • Portal Vale Corporativo</p>
+    <p class="text-[10px]">Atalhos: tecla ` abre o Módulo 00; teclas 1 a 9 abrem os módulos 1 a 9; 0 abre o 10; – (hífen) abre o 11; F ou 4 abre o Quadro FMDS (Módulo 14).</p>
+  </footer>
 </div>
-<div id="app"></div>
 
-<script id="codigo">
-const EST=window.__ESTADO__||null;
-const KEY=EST?'quadros_'+EST.id:'quadros_gestao_visual_v3';
-const ST=['','r','y','g','b','p'];
-const SEL='td,th,.box,.band,.free,.title,.meta,h1,.lbl';
-const app=document.getElementById('app'),info=document.getElementById('info');
-const $=id=>document.getElementById(id);
-let sel=null,ativo=null,timer=null;
-const H=new Map();
+<script>
+const MODULOS = [
+  ['00', '🏢', 'Central de Funcionários', 'Base mestre de colaboradores para digitação, ordenação A-Z, cópia rápida para outros módulos e cadastro.', '#0f766e', '#ccfbf1', '`'],
+  [1, '📋', 'DDS & Emociograma', 'Controle semanal com carinhas de emociograma, registro de rubricas e impressão A4 paisagem.', '#007e7a', '#e6f4f4', '1'],
+  [2, '📅', 'Matriz Anual de DDS', 'Grelha anual completa (12 meses) com visibilidade por semestre/trimestre e autoajuste.', '#007e7a', '#e6f4f4', '2'],
+  [3, '🏖️', 'Cronograma de Férias', 'Planejamento anual de início e término das férias da equipe com controle de saldo de dias.', '#db2777', '#fce7f3', '3'],
+  [4, '🎂', 'Aniversariantes do Ano', 'Grade dos 12 meses preenchendo a folha A4, com ordenação cronológica por dia.', '#db2777', '#fce7f3', '4'],
+  [5, '📊', 'Absenteísmo & Justificativas', 'Registro padronizado de ocorrências (AT, FA, CO, FO) com resumo e lançamento rápido.', '#db2777', '#fce7f3', '5'],
+  [6, '🎓', 'Gestão de Treinamentos', 'Capacitações com cadastro de turma em lote, busca, indicadores por status, nuvem e exportação CSV.', '#059669', '#ecfdf5', '6'],
+  [7, '💳', 'Compras Cartão Corporativo', 'Compras no cartão com itens agrupados, leitura de nota fiscal e links, controle de entrega e CSV.', '#6366f1', '#eef2ff', '7'],
+  [8, '📄', 'Gestão de FDS / FISPQ', 'Fichas de segurança por produto e fornecedor, PDFs guardados no aparelho, junção em um só PDF e leitura por foto.', '#0891b2', '#ecfeff', '8'],
+  [9, '💻', 'Controle de Notebooks', 'Entrega e recebimento com leitor de código de barras, patrimônio, termos, status e alerta de duplicidade.', '#d97706', '#fef3c7', '9'],
+  [10, '👥', 'Troca dos Participantes FMDS', 'Matriz de rotação de participantes (SSMA, Pessoas, Produtividade, Qualidade) com folhas de 24 linhas e salvamento automático.', '#475569', '#f1f5f9', '0'],
+  [11, '📑', 'Controle de OV (Ordens de Venda)', 'Rastreio de Ordens de Venda (ZVSU / sucatas e resíduos), saldos, emissor, pesagens e remessas.', '#0284c7', '#e0f2fe', '-'],
+  [14, '📊', 'Quadro FMDS', 'Gestão visual integrada dos 5 pilares: Safety, Quality, Delivery, Cost e Morale com indicadores e planos de ação.', '#7c3aed', '#f3e8ff', 'f']
+];
 
-const E=(t='')=>`<div contenteditable="true">${t}</div>`;
-const stBtn=`<button class="st" data-s="" title="Clique para mudar o status"></button>`;
-function tabela(cols,rows){
-  let h='<table><thead><tr>'+cols.map(c=>`<th style="width:${c[1]}%">${E(c[0])}</th>`).join('')+'</tr></thead><tbody>';
-  for(let i=0;i<rows;i++)h+='<tr>'+cols.map(c=>`<td>${c[2]?stBtn:E()}</td>`).join('')+'</tr>';
-  return h+'</tbody></table>';
-}
-const C4=(a,b,c,d)=>[[a,46,0],[b,22,0],[c,17,0],[d,15,1]];
-const rowBtns='<button data-a="addrow">+ linha</button><button data-a="delrow">− linha</button>';
-const tbBase='<button data-a="undo">↶ Desfazer</button><button data-a="redo">↷ Refazer</button><button data-a="print">🖨 Imprimir</button><button data-a="save">💾 Salvar no computador</button>';
-function folha(cls,extra,html){
-  const w=document.createElement('div');w.className='wrap';
-  w.innerHTML=`<div class="tb">${extra}<span class="gap"></span>${tbBase}</div><section class="sheet ${cls}">${html}</section>`;
-  app.appendChild(w);
-}
-function montar(){
-  app.innerHTML='';
-  folha('',rowBtns,`<div class="title">${E('Pendências de Atendimentos')}</div>`+tabela(C4('Ação','Responsável','Vencimento','Status'),7));
-  folha('sep-rows',rowBtns,`<h1>${E('AÇÕES PENDENTES')}</h1>`+tabela(C4('AÇÃO','RESPONSÁVEL','VENCIMENTO','STATUS'),8));
-  folha('sep-rows',rowBtns,`<h1>${E('PENDÊNCIAS DE ATENDIMENTOS')}</h1>`+tabela(C4('AÇÃO','RESPONSÁVEL','VENCIMENTO','STATUS'),8));
-  folha('',rowBtns,`<div class="title">${E('Ações Pendentes')}</div><div class="meta"><div>% Aderência Mês Anterior: <span contenteditable="true"></span></div><div>Data Atualiz.: <span contenteditable="true"></span></div></div>`+
-    tabela([['Treinamentos',38,0],['ID',18,0],['Data Limite',16,0],['Colaboradores',28,0]],14));
-  const box=t=>`<div class="box"><div class="bl" contenteditable="true">${t}</div><div class="bv" contenteditable="true"></div></div>`;
-  const niv=['Risco Muito Alto','Risco Alto','Risco Médio','Risco Baixo','Risco Eliminado'];
-  folha('',' ',`<h1>${E('Matriz de Risco (ART - Análise de Risco de Tarefa)')}</h1><div class="bands">`+
-    niv.map(n=>`<div class="band"><div class="boxes">${box('Condição Inicial')}${box('Condição Atual')}</div><div class="free" contenteditable="true"></div>
-    <div class="side"><div class="tools"><button data-a="selband">🎨 faixa</button><button data-a="addbox">+ caixa</button><button data-a="delbox">− caixa</button></div><div class="lbl" contenteditable="true">${n}</div></div></div>`).join('')+'</div>');
-  folha('sep-rows',rowBtns,`<h1>${E('PLANO AÇÃO')}</h1>`+tabela(C4('AÇÃO','RESPONSÁVEL','DATA','STATUS'),8));
-}
+const ROTAS = Object.fromEntries(MODULOS.map(m => [String(m[6]).toLowerCase(), `modulo${m[0]}.html`]));
+// Permite abrir o Módulo 00 tanto com crase (`) quanto apóstrofo (')
+ROTAS["'"] = "modulo00.html";
 
-/* ---------- persistência e histórico ---------- */
-function limpo(el,outer){
-  const c=el.cloneNode(true);
-  c.querySelectorAll('.sel').forEach(x=>x.classList.remove('sel'));
-  return outer?c.outerHTML:c.innerHTML;
-}
-function salvar(){try{localStorage.setItem(KEY,limpo(app))}catch(e){}}
-function snapInit(){H.clear();app.querySelectorAll('.wrap').forEach(w=>H.set(w,{p:[limpo(w)],i:0}))}
-function snap(w){
-  const h=H.get(w);if(!h)return;
-  const s=limpo(w);if(s===h.p[h.i])return;
-  h.p=h.p.slice(0,h.i+1);h.p.push(s);
-  if(h.p.length>60)h.p.shift();
-  h.i=h.p.length-1;
-}
-function mudou(w){salvar();if(!w)return;clearTimeout(timer);timer=setTimeout(()=>snap(w),500)}
-function mover(w,d){
-  if(!w)return;snap(w);
-  const h=H.get(w);if(!h)return;
-  const n=h.i+d;if(n<0||n>=h.p.length)return;
-  h.i=n;w.innerHTML=h.p[n];selecionar(null);salvar();
-}
-
-/* ---------- seleção e cores ---------- */
-function selecionar(el){
-  if(sel)sel.classList.remove('sel');
-  sel=el;
-  if(el){el.classList.add('sel');info.textContent='Quadrado selecionado: escolha o fundo/texto acima.'}
-  else info.textContent='Clique em qualquer quadrado para selecioná-lo e escolher as cores.';
-}
-function pinta(prop,v){
-  if(!sel)return;sel.style[prop]=v;mudou(sel.closest('.wrap'));
-}
-$('cFundo').addEventListener('input',e=>pinta('background',e.target.value));
-$('cTexto').addEventListener('input',e=>pinta('color',e.target.value));
-$('bLimpa').onclick=()=>{if(!sel)return;sel.style.background='';sel.style.color='';mudou(sel.closest('.wrap'))};
-$('bLinha').onclick=()=>{
-  if(!sel)return;const tr=sel.closest('tr');if(!tr)return;
-  tr.querySelectorAll('td,th').forEach(c=>c.style.background=$('cFundo').value);mudou(sel.closest('.wrap'));
+const nomeTecla = t => {
+  if (t === '-') return 'Tecla –';
+  if (t === '`') return 'Tecla `';
+  if (t === 'f') return 'Tecla F';
+  return `Tecla ${t}`;
 };
-$('bColuna').onclick=()=>{
-  if(!sel)return;const cell=sel.closest('td,th'),tb=sel.closest('table');if(!cell||!tb)return;
-  const i=[...cell.parentElement.children].indexOf(cell);
-  tb.querySelectorAll('tr').forEach(r=>{if(r.children[i])r.children[i].style.background=$('cFundo').value});
-  mudou(sel.closest('.wrap'));
-};
-$('bUndo').onclick=()=>mover(ativo,-1);
-$('bRedo').onclick=()=>mover(ativo,1);
-$('bPrint').onclick=()=>window.print();
-$('bSave').onclick=()=>baixar([...app.querySelectorAll('.wrap')],'quadros-gestao-visual');
-$('bReset').onclick=()=>{
-  if(!confirm('Voltar ao modelo original? Todo o conteúdo e as cores serão apagados.'))return;
-  try{localStorage.removeItem(KEY)}catch(e){}
-  selecionar(null);montar();snapInit();
-};
+const $ = id => document.getElementById(id);
 
-/* ---------- imprimir / salvar ---------- */
-function imprimirUm(w){document.body.classList.add('um');w.classList.add('alvo');window.print()}
-window.addEventListener('afterprint',()=>{document.body.classList.remove('um');document.querySelectorAll('.alvo').forEach(x=>x.classList.remove('alvo'))});
-function baixar(lista,nome){
-  const clone=document.documentElement.cloneNode(true);
-  const a=clone.querySelector('#app');
-  const html=lista.map(w=>limpo(w,true)).join('');
-  a.innerHTML='';
-  const old=clone.querySelector('#estado');if(old)old.remove();
-  const s=document.createElement('script');s.id='estado';
-  s.textContent='window.__ESTADO__='+JSON.stringify({id:Date.now(),html:html}).replace(/</g,'\\u003c')+';';
-  clone.querySelector('head').prepend(s);
-  const blob=new Blob(['<!DOCTYPE html>\n'+clone.outerHTML],{type:'text/html'});
-  const l=document.createElement('a');
-  l.href=URL.createObjectURL(blob);l.download=nome+'.html';
-  document.body.appendChild(l);l.click();l.remove();
-  setTimeout(()=>URL.revokeObjectURL(l.href),2000);
+function desenhar(filtro = '') {
+  const f = filtro.trim().toLowerCase();
+  const lista = MODULOS.filter(m => !f || (m[2] + ' ' + m[3]).toLowerCase().includes(f) || String(m[0]) === f);
+  $('grade').innerHTML = lista.map(([n, ico, tit, desc, cor, bg, tecla]) => `
+    <a href="modulo${n}.html" class="card-modulo" style="--c:${cor};--bg:${bg}" title="Atalho: ${nomeTecla(tecla)}">
+      <div>
+        <div class="flex justify-between items-center mb-3">
+          <div class="card-icone" aria-hidden="true">${ico}</div>
+          <span class="tecla">${nomeTecla(tecla)}</span>
+        </div>
+        <div class="tit text-sm font-bold text-slate-800 mb-1">${tit}</div>
+        <div class="desc text-xs text-slate-500 leading-relaxed mb-3">${desc}</div>
+      </div>
+      <div class="rod border-t border-slate-100 pt-2.5 flex items-center justify-between text-xs font-bold" style="color:${cor}">
+        <span>Abrir Módulo ${n}</span>
+        <span aria-hidden="true">➔</span>
+      </div>
+    </a>`).join('');
+  $('vazio').classList.toggle('hidden', lista.length > 0);
 }
 
-/* ---------- eventos da área de folhas ---------- */
-app.addEventListener('input',e=>mudou(e.target.closest('.wrap')));
-app.addEventListener('paste',e=>{
-  if(e.target.closest('[contenteditable]')){
-    e.preventDefault();
-    document.execCommand('insertText',false,(e.clipboardData||window.clipboardData).getData('text/plain'));
-  }
-});
-app.addEventListener('focusin',e=>{
-  const w=e.target.closest('.wrap');if(w)ativo=w;
-  if(e.target.closest('.sheet')){const el=e.target.closest(SEL);if(el)selecionar(el)}
-});
-app.addEventListener('click',e=>{
-  const w=e.target.closest('.wrap');if(w)ativo=w;
-  const b=e.target.closest('button');
-  if(e.target.closest('.sheet')&&!(b&&b.dataset.a)){const el=e.target.closest(SEL);if(el)selecionar(el)}
-  if(!b||!w)return;
-  if(b.classList.contains('st')){
-    b.dataset.s=ST[(ST.indexOf(b.dataset.s)+1)%ST.length];b.className='st '+b.dataset.s;mudou(w);return;
-  }
-  const a=b.dataset.a;if(!a)return;
-  const sh=w.querySelector('.sheet');
-  if(a==='undo')return mover(w,-1);
-  if(a==='redo')return mover(w,1);
-  if(a==='print')return imprimirUm(w);
-  if(a==='save'){
-    const t=(sh.querySelector('[contenteditable]').textContent||'quadro').trim().replace(/[^\wÀ-ÿ -]/g,'').replace(/\s+/g,'-').toLowerCase();
-    return baixar([w],t||'quadro');
-  }
-  if(a==='addrow'||a==='delrow'){
-    const tb=sh.querySelector('tbody'),rs=tb.querySelectorAll('tr');
-    if(a==='addrow'){
-      const c=rs[rs.length-1].cloneNode(true);
-      c.querySelectorAll('.sel').forEach(x=>x.classList.remove('sel'));
-      c.querySelectorAll('[contenteditable]').forEach(x=>x.innerHTML='');
-      c.querySelectorAll('.st').forEach(x=>{x.dataset.s='';x.className='st'});
-      tb.appendChild(c);
-    }else if(rs.length>1){if(sel&&rs[rs.length-1].contains(sel))selecionar(null);rs[rs.length-1].remove()}
-  }
-  if(a==='addbox'||a==='delbox'){
-    const bx=b.closest('.band').querySelector('.boxes');
-    if(a==='addbox'){
-      const d=document.createElement('div');d.className='box';
-      d.innerHTML='<div class="bl" contenteditable="true">Nova condição</div><div class="bv" contenteditable="true"></div>';
-      bx.appendChild(d);
-    }else if(bx.children.length>1)bx.lastElementChild.remove();
-  }
-  if(a==='selband')selecionar(b.closest('.band'));
-  mudou(w);
+function relogio() {
+  const d = new Date();
+  $('relogio').textContent = d.toLocaleTimeString('pt-BR');$('data').textContent = d.toLocaleDateString('pt-BR');
+}
+
+function tema(escuro) {
+  document.documentElement.classList.toggle('dark', escuro);
+  $('bTema').textContent = escuro ? '☀️' : '🌙';
+  try { localStorage.setItem('tema_portal', escuro ? 'dark' : 'light'); } catch {}
+}
+
+document.addEventListener('keydown', e => {
+  if (e.ctrlKey || e.metaKey || e.altKey) return;
+  const t = e.target;
+  if (/^(INPUT|TEXTAREA|SELECT)$/.test(t.tagName) || t.isContentEditable) return;
+  const teclaLower = e.key.toLowerCase();
+  if (ROTAS[teclaLower]) location.href = ROTAS[teclaLower];
 });
 
-/* ---------- início ---------- */
-(function(){
-  let s=null;try{s=localStorage.getItem(KEY)}catch(e){}
-  if(!s&&EST)s=EST.html;
-  if(s)app.innerHTML=s;else montar();
-  snapInit();
-})();
+window.addEventListener('DOMContentLoaded', () => {
+  let escuro = false;
+  try { const s = localStorage.getItem('tema_portal'); escuro = s ? s === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; } catch {}
+  tema(escuro);
+  relogio();
+  setInterval(relogio, 1000);
+  desenhar();
+  $('bTema').onclick = () => tema(!document.documentElement.classList.contains('dark'));
+  $('busca').oninput = e => desenhar(e.target.value);$('busca').onkeydown = e => {
+    if (e.key === 'Enter') {
+      const a = document.querySelector('#grade a');
+      if (a) location.href = a.href;
+    }
+  };
+});
 </script>
 </body>
 </html>
