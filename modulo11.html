@@ -19,6 +19,11 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1e293
 .nm{background:rgba(255,255,255,.12);border:1px solid transparent;border-radius:.5rem;padding:2px 8px;color:#fff;font-weight:900;font-size:1rem;outline:none;min-width:0;width:100%}
 .nm:hover{border-color:rgba(255,255,255,.4)}
 .nm:focus{background:rgba(255,255,255,.25);border-color:#fff}
+/* destaque piscando das notas */
+@keyframes piscarDup{0%,100%{background-color:transparent}50%{background-color:#fcd34d}}
+@keyframes piscarNovo{0%,100%{background-color:transparent}50%{background-color:#6ee7b7}}
+tr.piscando td{animation:piscarDup .6s ease-in-out 6}
+tr.piscando-novo td{animation:piscarNovo .6s ease-in-out 4}
 @media print{.no-print{display:none!important}body{background:#fff}}
 </style>
 </head>
@@ -238,6 +243,36 @@ const DADOS_DEFAULT=[{id:"115939257",status:"ATIVO",obs:"",
   itens:[{itemSap:"40",material:"SUCATA DE FIO-CABO DE ALUMÍNIO E...",qtdTO:0.300},{itemSap:"60",material:"SUCATA DE FIO-CABO DE COBRE ENCA...",qtdTO:0.300}],
   qtdLiberadaTO:0.600,valorBRL:8746.32,precoUnitarioPorTO:14575.50},gastos:[]}];
 
+// ---------- NOTAS: ordem cronológica, comparação e destaque ----------
+// Chave de comparação da nota (ignora espaços e zeros à esquerda)
+function chaveNF(t){return String(t==null?'':t).trim().replace(/^0+/,'');}
+// Ordena as notas da OV da data mais antiga para a mais nova (desempate pelo nº da nota)
+function ordenarGastos(it){
+  if(!it||!Array.isArray(it.gastos))return;
+  it.gastos.sort((a,b)=>{
+    const da=a.data||'9999-99-99',db=b.data||'9999-99-99';
+    if(da!==db)return da<db?-1:1;
+    return String(a.ticket||'').localeCompare(String(b.ticket||''),'pt-BR',{numeric:true});
+  });
+}
+// Faz as linhas (notas) piscarem na tabela: amarelo = já existia, verde = nova
+function piscarNotas(ovId,jaExistiam,novas){
+  setTimeout(()=>{
+    const linhas=[...document.querySelectorAll('tr[data-ov]')].filter(r=>r.dataset.ov===String(ovId));
+    const kD=(jaExistiam||[]).map(chaveNF),kN=(novas||[]).map(chaveNF);
+    const rD=linhas.filter(r=>kD.includes(chaveNF(r.dataset.nf))),rN=linhas.filter(r=>kN.includes(chaveNF(r.dataset.nf)));
+    const reiniciar=(r,c)=>{r.classList.remove('piscando','piscando-novo');void r.offsetWidth;r.classList.add(c);};
+    rD.forEach(r=>reiniciar(r,'piscando'));rN.forEach(r=>reiniciar(r,'piscando-novo'));
+    const alvo=rD[0]||rN[0];if(alvo)alvo.scrollIntoView({behavior:'smooth',block:'center'});
+    setTimeout(()=>[...rD,...rN].forEach(r=>r.classList.remove('piscando','piscando-novo')),4500);
+  },200);
+}
+function avisar(msg,cor){
+  const d=document.createElement('div');
+  d.className='fixed bottom-5 left-1/2 -translate-x-1/2 z-[60] px-4 py-3 rounded-xl text-xs font-bold shadow-xl text-white max-w-[90vw] '+(cor||'bg-slate-800');
+  d.textContent=msg;document.body.appendChild(d);setTimeout(()=>d.remove(),5500);
+}
+
 // ---------- armazenamento ----------
 function atualizarIndicadorStatus(st,txt){
   $('textoConexao').innerText=txt;
@@ -257,6 +292,7 @@ function carregarRegistros(){
   try{const raw=localStorage.getItem(STORAGE_KEY);if(raw){const a=JSON.parse(raw);if(Array.isArray(a))salvo=a;}}catch(e){}
   try{const c=JSON.parse(localStorage.getItem(CLIENTES_KEY)||'[]');clientes=Array.isArray(c)?c:[];}catch(e){clientes=[];}
   cacheRegistros=salvo||JSON.parse(JSON.stringify(DADOS_DEFAULT));
+  cacheRegistros.forEach(ordenarGastos);
   atualizarOpcoesEmpresas();renderizar();
   atualizarIndicadorStatus('online',salvo?'Dados carregados deste aparelho':'Ainda não salvo');
   try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist();}catch(e){}
@@ -266,6 +302,7 @@ function salvarLocal(){
   if(!ok)alert("Não foi possível salvar neste navegador (modo anônimo ou armazenamento cheio?).");
 }
 function salvarNaBase(item){
+  ordenarGastos(item);
   const i=cacheRegistros.findIndex(x=>x.id===item.id);
   if(i!==-1)cacheRegistros[i]=item;else cacheRegistros.unshift(item);
   gravarLocal();atualizarOpcoesEmpresas();renderizar();
@@ -485,8 +522,8 @@ function renderizar(){
       const cf=(r,campo,v,tp)=>`<label class="bg-white border border-slate-200 rounded-xl px-2 py-1.5 block"><span class="block text-[9px] font-bold text-slate-400 uppercase">${r}</span>${I(id,campo,v,tp,'font-bold text-slate-700 text-xs w-full')}</label>`;
       const gastos=!(it.gastos||[]).length?'<p class="text-[11px] text-slate-400 italic">Nenhuma nota fiscal lançada. Use o leitor de notas ou lance manualmente.</p>':
        `<div class="overflow-x-auto"><table class="w-full text-left text-xs border border-slate-100"><thead><tr class="bg-slate-50 text-slate-500 text-[10px] uppercase font-bold border-b border-slate-100">
-        <th class="py-1.5 px-3">✏️</th><th class="py-1.5 px-3">Data</th><th class="py-1.5 px-3">Nº Nota Fiscal / Ticket</th><th class="py-1.5 px-3">Placa / Remessa</th><th class="py-1.5 px-3 text-right">Peso (TO)</th><th class="py-1.5 px-3 text-center no-print">Ação</th></tr></thead><tbody class="divide-y divide-slate-100">`+
-        it.gastos.map((g,i)=>`<tr><td class="py-1 px-3"><button type="button" onclick="focarLinha(this)" class="p-1 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded text-xs" title="Editar esta linha">✏️</button></td>
+        <th class="py-1.5 px-3">✏️</th><th class="py-1.5 px-3">Data ↑</th><th class="py-1.5 px-3">Nº Nota Fiscal / Ticket</th><th class="py-1.5 px-3">Placa / Remessa</th><th class="py-1.5 px-3 text-right">Peso (TO)</th><th class="py-1.5 px-3 text-center no-print">Ação</th></tr></thead><tbody class="divide-y divide-slate-100">`+
+        it.gastos.map((g,i)=>`<tr data-ov="${esc(id)}" data-nf="${esc(g.ticket)}"><td class="py-1 px-3"><button type="button" onclick="focarLinha(this)" class="p-1 bg-amber-50 hover:bg-amber-100 text-amber-700 border border-amber-200 rounded text-xs" title="Editar esta linha">✏️</button></td>
         <td class="py-1 px-3"><input type="date" value="${esc(g.data)}" onchange="atualizarGastoLinha('${id}',${i},'data',this.value)" class="ii text-slate-600 text-xs"></td>
         <td class="py-1 px-3"><input value="${esc(g.ticket)}" onchange="atualizarGastoLinha('${id}',${i},'ticket',this.value)" class="ii font-semibold text-slate-800 text-xs w-32"></td>
         <td class="py-1 px-3"><input value="${esc(g.placa)}" onchange="atualizarGastoLinha('${id}',${i},'placa',this.value)" class="ii text-slate-600 font-mono text-xs w-28 uppercase"></td>
@@ -526,7 +563,7 @@ function renderizar(){
           </div>
           <label class="block bg-white border border-slate-200 rounded-xl px-2 py-1.5"><span class="block text-[9px] font-bold text-slate-400 uppercase">Observações</span>${I(id,'obs',it.obs||'','text','text-xs w-full text-slate-700','Anotações desta OV...')}</label>
           <div class="border-t border-slate-100 pt-3">
-            <div class="flex flex-wrap justify-between items-center gap-2 mb-2"><span class="text-xs font-bold text-slate-700">⚖️ Romaneios / Notas Fiscais Emitidas</span>
+            <div class="flex flex-wrap justify-between items-center gap-2 mb-2"><span class="text-xs font-bold text-slate-700">⚖️ Romaneios / Notas Fiscais Emitidas <span class="text-[10px] font-semibold text-slate-400">(ordem cronológica)</span></span>
               <div class="flex gap-2 no-print"><button type="button" onclick="abrirModalLeitorNotas('${id}')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100">📷 2. Ler Tela de Notas (Fluxo SAP)</button>
               <button type="button" onclick="adicionarLinhaPesagemDireta('${id}')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100">+ Lançar Manual</button></div></div>
             ${gastos}</div></div></div>`;
@@ -549,10 +586,12 @@ function adicionarLinhaMaterialOV(id){const it=achar(id);if(!it)return;it.ov.ite
 function removerLinhaMaterialOV(id,i){const it=achar(id);if(!it||!it.ov.itens||it.ov.itens.length<=1)return;it.ov.itens.splice(i,1);somarItens(it);salvarNaBase(it);}
 function atualizarGastoLinha(id,i,campo,v){
   const it=achar(id);if(!it||!it.gastos||!it.gastos[i])return;
-  it.gastos[i][campo]=campo==='pesoTO'?parseNumeroSap(v):campo==='placa'?String(v).trim().toUpperCase():campo==='data'?v:String(v).trim();
-  salvarNaBase(it);
+  const g=it.gastos[i];
+  g[campo]=campo==='pesoTO'?parseNumeroSap(v):campo==='placa'?String(v).trim().toUpperCase():campo==='data'?v:String(v).trim();
+  salvarNaBase(it); // reordena por data
+  if(campo==='data'||campo==='ticket')piscarNotas(id,[],[g.ticket]); // mostra onde a nota foi parar
 }
-function adicionarLinhaPesagemDireta(id){const it=achar(id);if(!it)return;it.gastos=it.gastos||[];it.gastos.push({id:Date.now(),ticket:"NF-"+Math.floor(10000+Math.random()*90000),placa:"RIO-0A00",pesoTO:0.3,data:hoje()});salvarNaBase(it);}
+function adicionarLinhaPesagemDireta(id){const it=achar(id);if(!it)return;it.gastos=it.gastos||[];const t="NF-"+Math.floor(10000+Math.random()*90000);it.gastos.push({id:Date.now(),ticket:t,placa:"RIO-0A00",pesoTO:0.3,data:hoje()});salvarNaBase(it);piscarNotas(id,[],[t]);}
 function removerGasto(id,i){const it=achar(id);if(it&&it.gastos){it.gastos.splice(i,1);salvarNaBase(it);}}
 function carregarDadosExemplo(){if(!confirm("Isso volta para os dados de exemplo e substitui as OVs na tela (os clientes cadastrados são mantidos). Deseja continuar?"))return;cacheRegistros=JSON.parse(JSON.stringify(DADOS_DEFAULT));salvarNaBase(cacheRegistros[0]);}
 
@@ -652,21 +691,32 @@ async function processarLeitorNotas(){
   }catch(e){console.error(e);alert("Falha no OCR de Notas: "+e.message);}
   finally{btn.disabled=false;$('progressoLeitorNotas').classList.add('hidden');}
 }
+function notaJaLancada(n){
+  const alvo=achar($('leitorNotasTargetId').value);
+  return !!alvo&&(alvo.gastos||[]).some(g=>chaveNF(g.ticket)===chaveNF(n.ticket));
+}
 function renderizarNotasDoLeitor(){
   const c=$('detalhesLeitorNotas');
   if(!notasTempLeitorNotas.length){c.innerHTML='Nenhuma nota.';totalNotasLeitor();return;}
   const cl='bg-white border border-slate-300 rounded px-1.5 py-1 text-xs text-slate-800';
-  c.innerHTML=notasTempLeitorNotas.map((n,i)=>`<div class="flex flex-wrap items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200">
+  c.innerHTML=notasTempLeitorNotas.map((n,i)=>{
+    const ja=notaJaLancada(n);
+    return `<div class="flex flex-wrap items-center gap-2 p-2 rounded-xl border ${ja?'bg-amber-50 border-amber-300':'bg-slate-50 border-slate-200'}">
     <button type="button" onclick="this.parentNode.querySelector('input').focus()" class="bg-white hover:bg-slate-200 border border-slate-300 p-1 rounded-lg text-xs" title="Editar">✏️</button>
     <input value="${esc(n.ticket)}" oninput="alterarNotaTemp(${i},'ticket',this.value)" class="w-28 font-bold ${cl}" title="Nº Fatura / NF">
     <input value="${esc(n.placa)}" oninput="alterarNotaTemp(${i},'placa',this.value)" class="w-28 font-mono uppercase ${cl}" title="Placa / Remessa">
     <input type="date" value="${esc(n.data)}" oninput="alterarNotaTemp(${i},'data',this.value)" class="${cl}">
     <input type="number" step="0.001" value="${Number(n.pesoTO).toFixed(3)}" oninput="alterarNotaTemp(${i},'pesoTO',this.value);totalNotasLeitor()" class="w-24 text-right font-black text-rose-700 ${cl}"><span class="text-[10px] text-slate-500">TO</span>
-    <button type="button" onclick="removerNotaDoLeitor(${i})" class="text-rose-400 hover:text-rose-600 font-bold text-xs">✕</button></div>`).join('')+
+    ${ja?'<span class="text-[10px] font-black bg-amber-500 text-white px-2 py-0.5 rounded-md animate-pulse">JÁ LANÇADA</span>':'<span class="text-[10px] font-black bg-emerald-600 text-white px-2 py-0.5 rounded-md">NOVA</span>'}
+    <button type="button" onclick="removerNotaDoLeitor(${i})" class="text-rose-400 hover:text-rose-600 font-bold text-xs">✕</button></div>`;}).join('')+
     '<div class="pt-2 font-bold text-slate-800 flex justify-between border-t border-slate-300 mt-2"><span>TOTAL SAÍDAS:</span><span id="totalNotasLeitor" class="text-rose-700 text-sm font-black"></span></div>';
   totalNotasLeitor();
 }
-function totalNotasLeitor(){const s=notasTempLeitorNotas.reduce((a,n)=>a+Number(n.pesoTO||0),0),e=$('totalNotasLeitor');if(e)e.innerText='-'+s.toFixed(3)+' TO';$('badgeNotasDetectadas').innerText=notasTempLeitorNotas.length+' nota(s)';}
+function totalNotasLeitor(){
+  const s=notasTempLeitorNotas.reduce((a,n)=>a+Number(n.pesoTO||0),0),e=$('totalNotasLeitor');if(e)e.innerText='-'+s.toFixed(3)+' TO';
+  const dup=notasTempLeitorNotas.filter(notaJaLancada).length;
+  $('badgeNotasDetectadas').innerText=notasTempLeitorNotas.length+' nota(s)'+(dup?` • ${dup} já lançada(s)`:'');
+}
 function alterarNotaTemp(i,campo,v){if(!notasTempLeitorNotas[i])return;notasTempLeitorNotas[i][campo]=campo==='pesoTO'?parseNumeroSap(v):v;}
 function removerNotaDoLeitor(i){notasTempLeitorNotas.splice(i,1);renderizarNotasDoLeitor();}
 function extrairNotasFluxoSAP(txt){
@@ -679,21 +729,28 @@ function extrairNotasFluxoSAP(txt){
     const nf=mDoc[1],resto=l.slice(l.indexOf(nf)+nf.length).replace(/^(\s*[\/|\\]\s*\d+)+/,'');
     const mQ=resto.match(/(\d{1,3}(?:[.,]\d{3})*(?:,\d+)?|\d+)\s*(KG|TON|TO|T)\b/i),mDt=l.match(/(\d{2})\.(\d{2})\.(\d{4})/),mVal=resto.match(/(\d{1,3}(?:\.\d{3})*,\d{2})\s*BRL/i);
     const peso=mQ?parseQtdSapParaTO(mQ[1],mQ[2]):0;
-    if(notas.some(n=>n.ticket===nf))return;
+    if(notas.some(n=>chaveNF(n.ticket)===chaveNF(nf)))return;
     notas.push({ticket:nf,placa:del,pesoTO:peso,valorBRL:mVal?parseNumeroSap(mVal[1]):0,data:mDt?`${mDt[3]}-${mDt[2]}-${mDt[1]}`:hoje()});
   });
+  // lista do leitor já aparece em ordem cronológica
+  notas.sort((a,b)=>(a.data<b.data?-1:a.data>b.data?1:String(a.ticket).localeCompare(String(b.ticket),'pt-BR',{numeric:true})));
   return notas;
 }
 function aplicarNotasNaOV(){
   const it=achar($('leitorNotasTargetId').value);if(!it||!notasTempLeitorNotas.length)return;
   if(ovLidaDasNotas&&ovLidaDasNotas!==it.ov.numero&&!confirm(`A tela lida é da OV ${ovLidaDasNotas}, mas você está na OV ${it.ov.numero}. Deseja lançar mesmo assim?`))return;
-  it.gastos=it.gastos||[];let ok=0,rep=0;
+  it.gastos=it.gastos||[];
+  const novas=[],jaExistiam=[];
   notasTempLeitorNotas.forEach(n=>{
-    if(it.gastos.some(g=>String(g.ticket).trim()===String(n.ticket).trim())){rep++;return;}
-    it.gastos.push({id:Date.now()+Math.random(),ticket:n.ticket,placa:n.placa,pesoTO:Number(n.pesoTO),data:n.data});ok++;
+    if(it.gastos.some(g=>chaveNF(g.ticket)===chaveNF(n.ticket))){jaExistiam.push(n.ticket);return;}
+    it.gastos.push({id:Date.now()+Math.random(),ticket:n.ticket,placa:n.placa,pesoTO:Number(n.pesoTO),data:n.data});novas.push(n.ticket);
   });
-  salvarNaBase(it);fecharModalLeitorNotas();
-  alert(`✓ ${ok} nota(s) lançada(s)${rep?` (${rep} já existiam e foram ignoradas)`:''}.`);
+  salvarNaBase(it);   // salva e reordena por data
+  fecharModalLeitorNotas();
+  piscarNotas(it.id,jaExistiam,novas); // amarelo = já estava lançada | verde = nova
+  if(jaExistiam.length&&!novas.length)avisar(`⚠️ ${jaExistiam.length} nota(s) já estavam lançadas — nada foi duplicado (linhas piscando em amarelo).`,'bg-amber-600');
+  else if(jaExistiam.length)avisar(`✓ ${novas.length} nota(s) nova(s) lançada(s) (verde). ${jaExistiam.length} já existiam e piscam em amarelo.`,'bg-emerald-700');
+  else avisar(`✓ ${novas.length} nota(s) lançada(s) em ordem cronológica.`,'bg-emerald-700');
 }
 
 // ---------- CSV, backup e colar imagem ----------
@@ -723,6 +780,7 @@ function importarBackup(inp){
       if(!d||!Array.isArray(d.ovs))throw new Error("Arquivo inválido.");
       if(!confirm(`Restaurar backup com ${d.ovs.length} OV(s)? Isso substitui os dados atuais desta tela.`))return;
       cacheRegistros=d.ovs;clientes=Array.isArray(d.clientes)?d.clientes:[];
+      cacheRegistros.forEach(ordenarGastos);
       gravarLocal();atualizarOpcoesEmpresas();renderizar();alert("✓ Backup restaurado.");
     }catch(x){alert("Não foi possível ler o backup: "+x.message);}
     inp.value='';
