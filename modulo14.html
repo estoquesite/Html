@@ -20,10 +20,15 @@ button{font-family:inherit}
 .wrap{width:297mm;margin:14px auto}
 .tb{background:#222;color:#fff;padding:6px 10px;border-radius:6px 6px 0 0;display:flex;gap:6px;flex-wrap:wrap;align-items:center;font-size:12px}
 .tb .gap{flex:1}
+.tb button.novo{background:#9fd3ff}
+.tb button.perigo{background:#f3b0b0}
 .sheet{width:297mm;height:210mm;background:#fff;padding:12mm 14mm;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 2px 10px #0006}
 table{width:100%;border-collapse:separate;border-spacing:0;flex:1;table-layout:fixed}
 th{font-size:14px;padding:6px;border:2px solid #333;background:#eceeee;text-align:center}
 td{padding:4px 8px;font-size:15px;vertical-align:middle;text-align:center;border:2px solid #333}
+th.fill{background:#fff8d6;border:2px dashed #999;padding:3px;display:table-cell;white-space:nowrap}
+th.fill .fi{width:calc(100% - 26px);font-size:12px;padding:2px;border:1px solid #aaa;border-radius:3px;font-family:inherit}
+th.fill button{width:22px;height:22px;padding:0;border:0;border-radius:3px;background:#2e9e4f;color:#fff;cursor:pointer;font-weight:bold;vertical-align:middle}
 [contenteditable]{outline:none;min-height:1.2em;word-break:break-word;text-align:center}
 [contenteditable]:focus{outline:1px dashed #888}
 .sel{outline:3px solid #1e88e5!important;outline-offset:-3px}
@@ -51,7 +56,7 @@ td{padding:4px 8px;font-size:15px;vertical-align:middle;text-align:center;border
 @media print{
  @page{size:A4 landscape;margin:0}
  body{background:#fff}
- .bar,.tb,.tools,#pn{display:none!important}
+ .bar,.tb,.tools,#pn,.fill{display:none!important}
  .wrap{margin:0}
  .sheet{box-shadow:none;page-break-after:always}
  .sel{outline:none!important}
@@ -66,6 +71,7 @@ td{padding:4px 8px;font-size:15px;vertical-align:middle;text-align:center;border
   <span class="sep"></span>
   <button id="bUndo">↶ Desfazer</button><button id="bRedo">↷ Refazer</button>
   <span class="sep"></span>
+  <button id="bNova" class="ok">➕ Nova folha</button>
   <button id="bPrint">🖨 Impressão geral</button><button id="bSave">💾 Salvar tudo no computador</button><button id="bReset">Restaurar modelo</button>
   <span class="sep"></span>
   <label>Fundo <input type="color" id="cFundo" value="#ffe08a"></label><button class="ok" id="okFundo">OK</button>
@@ -98,7 +104,9 @@ function tabela(cols,rows,pre){
   return h+'</tbody></table>';
 }
 const C4=(a,b,c,d)=>[[a,46,0],[b,22,0],[c,17,0],[d,15,1]];
-const rowBtns='<button data-a="addrow">+ linha</button><button data-a="delrow">− linha</button>';
+const BTN_COL='<button data-a="addcol">+ coluna</button><button data-a="delcol">− coluna</button>';
+const BTN_DUP='<button data-a="dup" class="novo">⧉ Duplicar folha</button><button data-a="delsheet" class="perigo">🗑 Excluir folha</button>';
+const rowBtns='<button data-a="addrow">+ linha</button><button data-a="delrow">− linha</button>'+BTN_COL+BTN_DUP;
 const tbBase='<button data-a="undo">↶ Desfazer</button><button data-a="redo">↷ Refazer</button><button data-a="print">🖨 Imprimir</button><button data-a="save">💾 Salvar no computador</button>';
 function folha(cls,extra,html){
   const w=document.createElement('div');w.className='wrap';
@@ -115,11 +123,11 @@ function montar(){
     tabela([['Treinamentos',32,0],['ID',14,0],['Data Limite',16,0],['Colaboradores',24,0],['Status',14,1]],12));
   const box=t=>`<div class="box"><div class="bl" contenteditable="true">${t}</div><div class="bv" contenteditable="true"></div></div>`;
   const niv=['Risco Muito Alto','Risco Alto','Risco Médio','Risco Baixo','Risco Eliminado'];
-  folha('',' ',T('Matriz de Risco (ART - Análise de Risco de Tarefa)')+`<div class="bands">`+
+  folha('',BTN_DUP,T('Matriz de Risco (ART - Análise de Risco de Tarefa)')+`<div class="bands">`+
     niv.map(n=>`<div class="band"><div class="boxes">${box('Condição Inicial')}${box('Condição Atual')}</div><div class="free" contenteditable="true"></div>
     <div class="side"><div class="tools"><button data-a="selband">🎨 faixa</button><button data-a="addbox">+ caixa</button><button data-a="delbox">− caixa</button></div><div class="lbl" contenteditable="true">${n}</div></div></div>`).join('')+'</div>');
   folha('',rowBtns,T('Plano de Ação')+tabela(C4('Ação','Responsável','Data','Status'),7));
-  novas();s5();atualiza();corFaixas();
+  novas();s5();atualiza();corFaixas();preparaTudo();
 }
 
 const COR=['#e0393e','#f29b3a','#f7e94a','#3c9d4e','#2f6fd0'];
@@ -140,13 +148,13 @@ function atualiza(){
 }
 function s5(){
   const n=app.children.length;
-  folha('',rowBtns,T('5S – Maturidade por Posto')+tabela([['Posto de Trabalho',28,0],['Responsável',20,0],['Maturidade (1 a 4)',14,2],['Ação para subir de nível',38,0]],10)+
+  folha('',rowBtns,T('5S – Maturidade por Posto')+tabela([['Posto de Trabalho',24,0],['Responsável',17,0],['Maturidade (1 a 4)',13,2],['Data da próxima maturidade',16,0],['Ação para subir de nível',30,0]],10)+
   '<div class="leg" contenteditable="true">Maturidade: 1 – Inicial &nbsp; 2 – Em desenvolvimento &nbsp; 3 – Estabelecido &nbsp; 4 – Sustentado &nbsp; (clique no quadrado para mudar o nível)</div>');
   [...app.children].slice(n).forEach(w=>w.dataset.s5=1);
 }
 function ajusta5s(){
   app.querySelectorAll('[data-s5] table').forEach(t=>{
-    const hr=t.querySelector('thead tr');
+    const hr=t.querySelector('thead tr:not(.fill)');
     if(!hr||hr.children.length!==6)return;
     t.querySelectorAll('tr').forEach(r=>{r.children[4].remove();r.children[3].remove()});
     [...hr.children].forEach((th,i)=>th.style.width=[28,20,14,38][i]+'%');
@@ -159,6 +167,84 @@ function novas(){
   folha('',rowBtns,T('Rotina de Liderança (Gemba)')+tabela([['Área / Atividade',28,0],['Líder',18,0],['Data',12,0],['Constatação / Ação',28,0],['Status',14,1]],7));
   [...app.children].slice(n).forEach(w=>w.dataset.fmds=1);
 }
+
+/* ---------- colunas, folhas e preenchimento de coluna ---------- */
+const hdr=tb=>tb.querySelector('thead tr:not(.fill)');
+function normaliza(tb,novo){
+  const ths=[...hdr(tb).children];
+  const w=ths.map((t,i)=>i===novo?0:(parseFloat(t.style.width)||10));
+  const soma=w.reduce((a,b)=>a+b,0)||1,nw=novo>=0?14:0;
+  ths.forEach((t,i)=>t.style.width=(i===novo?nw:w[i]*(100-nw)/soma).toFixed(2)+'%');
+}
+function addCol(tb,idx,titulo){
+  let novo=-1;
+  tb.querySelectorAll('tr').forEach(r=>{
+    if(r.classList.contains('fill'))return;
+    const cab=r.parentElement.tagName==='THEAD';
+    const c=document.createElement(cab?'th':'td');
+    c.innerHTML=E(cab?titulo:'');
+    const ref=idx>=0?r.children[idx]||null:null;
+    r.insertBefore(c,ref);
+    if(cab)novo=[...r.children].indexOf(c);
+  });
+  normaliza(tb,novo);refazFill(tb);
+}
+function colSel(tb){
+  if(!sel)return -1;const c=sel.closest('td,th');
+  return c&&tb.contains(c)?[...c.parentElement.children].indexOf(c):-1;
+}
+function refazFill(tb){
+  const th=tb.querySelector('thead');if(!th)return;
+  const old=th.querySelector('.fill');if(old)old.remove();
+  const hr=th.querySelector('tr'),b=tb.querySelector('tbody tr');if(!hr)return;
+  const tr=document.createElement('tr');tr.className='fill';
+  const op=a=>a.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('');
+  [...hr.children].forEach((h,i)=>{
+    const c=b&&b.children[i];let ctl;
+    if(c&&c.querySelector('.st'))ctl='<select class="fi">'+op([['','(limpar)'],['r','🔴 Atrasado'],['y','🟡 Andamento'],['g','🟢 Concluído'],['b','🔵 Análise'],['p','🌸 Cancelado']])+'</select>';
+    else if(c&&c.querySelector('.nv'))ctl='<select class="fi">'+op([['','(limpar)'],['1','1'],['2','2'],['3','3'],['4','4']])+'</select>';
+    else ctl='<input class="fi" placeholder="preencher coluna">';
+    tr.insertAdjacentHTML('beforeend',`<th class="fill" style="width:${h.style.width}">${ctl}<button data-a="fillcol" title="Aplicar em toda a coluna">↓</button></th>`);
+  });
+  th.insertBefore(tr,th.firstChild);
+}
+function preencher(th){
+  const tb=th.closest('table'),i=[...th.parentElement.children].indexOf(th);
+  const v=th.querySelector('.fi').value,ehTxt=th.querySelector('input');
+  if(ehTxt&&!v)return;
+  tb.querySelectorAll('tbody tr').forEach(r=>{
+    const c=r.children[i];if(!c)return;
+    const st=c.querySelector('.st'),nv=c.querySelector('.nv');
+    if(st){st.dataset.s=v;st.className='st '+v}
+    else if(nv){nv.dataset.n=v;nv.textContent=v;nv.className='nv'+(v?' n'+v:'')}
+    else{const e=c.querySelector('[contenteditable]');if(e)e.textContent=v}
+  });
+  mudou(th.closest('.wrap'));
+}
+function s5Data(){
+  app.querySelectorAll('[data-s5] table').forEach(t=>{
+    const h=hdr(t);if(!h||h.children.length<3)return;
+    const ths=[...h.children];
+    if(ths.some(x=>/próxima/i.test(x.textContent)))return;
+    let i=ths.findIndex(x=>/ação/i.test(x.textContent));
+    addCol(t,i<0?-1:i,'Data da próxima maturidade');
+  });
+}
+function atualizaTb(){
+  app.querySelectorAll('.wrap').forEach(w=>{
+    const tb=w.querySelector('.tb'),gap=tb&&tb.querySelector('.gap');if(!gap)return;
+    if(w.querySelector('table')&&!tb.querySelector('[data-a=addcol]'))gap.insertAdjacentHTML('beforebegin',BTN_COL);
+    if(!tb.querySelector('[data-a=dup]'))gap.insertAdjacentHTML('beforebegin',BTN_DUP);
+  });
+}
+function preparaTudo(){s5Data();atualizaTb();app.querySelectorAll('table').forEach(refazFill)}
+$('bNova').onclick=()=>{
+  folha('',rowBtns,T('Nova folha')+tabela(C4('Ação','Responsável','Data','Status'),7));
+  const w=app.lastElementChild;atualiza();refazFill(w.querySelector('table'));
+  H.set(w,{p:[limpo(w)],i:0});ativo=w;salvar();
+  w.scrollIntoView({behavior:'smooth',block:'start'});
+};
+
 /* ---------- persistência e histórico ---------- */
 function limpo(el,outer){
   const c=el.cloneNode(true);
@@ -184,6 +270,7 @@ function mover(w,d){
 
 /* ---------- seleção e cores ---------- */
 function selecionar(el){
+  if(el&&el.closest('.fill'))return;
   if(sel)sel.classList.remove('sel');
   sel=el;
   if(el){el.classList.add('sel');info.textContent='Quadrado selecionado: escolha a cor e clique em OK.'}
@@ -206,12 +293,12 @@ $('bLinha').onclick=()=>{
 $('bColuna').onclick=()=>{
   if(!sel)return;const cell=sel.closest('td,th'),tb=sel.closest('table');if(!cell||!tb)return;
   const i=[...cell.parentElement.children].indexOf(cell);
-  tb.querySelectorAll('tr').forEach(r=>{if(r.children[i])r.children[i].style.background=fundo()});
+  tb.querySelectorAll('tr:not(.fill)').forEach(r=>{if(r.children[i])r.children[i].style.background=fundo()});
   mudou(sel.closest('.wrap'));
 };
 $('bTudo').onclick=()=>{
   if(!sel)return;const w=sel.closest('.wrap');if(!w)return;
-  w.querySelectorAll('td,th,.band').forEach(c=>c.style.background=fundo());mudou(w);
+  w.querySelectorAll('td,th:not(.fill),.band').forEach(c=>c.style.background=fundo());mudou(w);
 };
 $('bUndo').onclick=()=>mover(ativo,-1);
 $('bRedo').onclick=()=>mover(ativo,1);
@@ -258,6 +345,9 @@ function baixar(lista,nome){
 
 /* ---------- eventos da área de folhas ---------- */
 app.addEventListener('input',e=>mudou(e.target.closest('.wrap')));
+app.addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&e.target.matches('input.fi')){e.preventDefault();preencher(e.target.closest('th'))}
+});
 app.addEventListener('paste',e=>{
   if(e.target.closest('[contenteditable]')){
     e.preventDefault();
@@ -285,6 +375,31 @@ app.addEventListener('click',e=>{
   if(a==='undo')return mover(w,-1);
   if(a==='redo')return mover(w,1);
   if(a==='print')return imprimirUm(w);
+  if(a==='fillcol')return preencher(b.closest('th'));
+  if(a==='dup'){
+    const c=w.cloneNode(true);c.classList.remove('alvo');
+    c.querySelectorAll('.sel').forEach(x=>x.classList.remove('sel'));
+    w.after(c);H.set(c,{p:[limpo(c)],i:0});ativo=c;salvar();
+    c.scrollIntoView({behavior:'smooth',block:'start'});return;
+  }
+  if(a==='delsheet'){
+    if(app.children.length<2||!confirm('Excluir esta folha inteira?'))return;
+    if(sel&&w.contains(sel))selecionar(null);
+    H.delete(w);w.remove();ativo=null;salvar();return;
+  }
+  if(a==='addcol'||a==='delcol'){
+    const tb=sh.querySelector('table');if(!tb)return;
+    const n=hdr(tb).children.length,i=colSel(tb);
+    if(a==='addcol')addCol(tb,i>=0&&i+1<n?i+1:-1,'Nova coluna');
+    else{
+      if(n<=2)return;
+      const k=i>=0?i:n-1;
+      if(sel&&tb.contains(sel)&&sel.closest('td,th')===sel.closest('tr').children[k])selecionar(null);
+      tb.querySelectorAll('tr').forEach(r=>{if(!r.classList.contains('fill')&&r.children[k])r.children[k].remove()});
+      normaliza(tb,-1);refazFill(tb);
+    }
+    mudou(w);return;
+  }
   if(a==='save'){
     const t=(sh.querySelector('[contenteditable]').textContent||'quadro').trim().replace(/[^\wÀ-ÿ -]/g,'').replace(/\s+/g,'-').toLowerCase();
     return baixar([w],t||'quadro');
@@ -319,7 +434,7 @@ app.addEventListener('click',e=>{
   if(s)app.innerHTML=s;else montar();
   if(!app.querySelector('[data-fmds]'))novas();
   if(!app.querySelector('[data-s5]'))s5();
-  ajusta5s();atualiza();corFaixas();snapInit();
+  ajusta5s();atualiza();corFaixas();preparaTudo();snapInit();
 })();
 </script>
 </body>
