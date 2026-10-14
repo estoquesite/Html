@@ -27,7 +27,7 @@ table{width:100%;border-collapse:separate;border-spacing:0;flex:1;table-layout:f
 th{font-size:14px;padding:6px;border:2px solid #333;background:#eceeee;text-align:center}
 td{padding:4px 8px;font-size:15px;vertical-align:middle;text-align:center;border:2px solid #333}
 th.fill{background:#fff8d6;border:2px dashed #999;padding:3px;display:table-cell;white-space:nowrap}
-th.fill .fi{width:calc(100% - 26px);font-size:12px;padding:2px;border:1px solid #aaa;border-radius:3px;font-family:inherit}
+th.fill .fi{width:calc(100% - 26px);resize:vertical;max-height:60px;font-size:12px;padding:2px;border:1px solid #aaa;border-radius:3px;font-family:inherit}
 th.fill button{width:22px;height:22px;padding:0;border:0;border-radius:3px;background:#2e9e4f;color:#fff;cursor:pointer;font-weight:bold;vertical-align:middle}
 [contenteditable]{outline:none;min-height:1.2em;word-break:break-word;text-align:center}
 [contenteditable]:focus{outline:1px dashed #888}
@@ -105,8 +105,9 @@ function tabela(cols,rows,pre){
 }
 const C4=(a,b,c,d)=>[[a,46,0],[b,22,0],[c,17,0],[d,15,1]];
 const BTN_COL='<button data-a="addcol">+ coluna</button><button data-a="delcol">− coluna</button>';
+const BTN_FILL='<button data-a="fillall" class="novo">✔ Aplicar todas as colunas de uma vez</button>';
 const BTN_DUP='<button data-a="dup" class="novo">⧉ Duplicar folha</button><button data-a="delsheet" class="perigo">🗑 Excluir folha</button>';
-const rowBtns='<button data-a="addrow">+ linha</button><button data-a="delrow">− linha</button>'+BTN_COL+BTN_DUP;
+const rowBtns='<button data-a="addrow">+ linha</button><button data-a="delrow">− linha</button>'+BTN_COL+BTN_FILL+BTN_DUP;
 const tbBase='<button data-a="undo">↶ Desfazer</button><button data-a="redo">↷ Refazer</button><button data-a="print">🖨 Imprimir</button><button data-a="save">💾 Salvar no computador</button>';
 function folha(cls,extra,html){
   const w=document.createElement('div');w.className='wrap';
@@ -201,23 +202,25 @@ function refazFill(tb){
   const op=a=>a.map(x=>`<option value="${x[0]}">${x[1]}</option>`).join('');
   [...hr.children].forEach((h,i)=>{
     const c=b&&b.children[i];let ctl;
-    if(c&&c.querySelector('.st'))ctl='<select class="fi">'+op([['','(limpar)'],['r','🔴 Atrasado'],['y','🟡 Andamento'],['g','🟢 Concluído'],['b','🔵 Análise'],['p','🌸 Cancelado']])+'</select>';
-    else if(c&&c.querySelector('.nv'))ctl='<select class="fi">'+op([['','(limpar)'],['1','1'],['2','2'],['3','3'],['4','4']])+'</select>';
-    else ctl='<input class="fi" placeholder="preencher coluna">';
+    if(c&&c.querySelector('.st'))ctl='<select class="fi">'+op([['__','— não mexer —'],['','(limpar)'],['r','🔴 Atrasado'],['y','🟡 Andamento'],['g','🟢 Concluído'],['b','🔵 Análise'],['p','🌸 Cancelado']])+'</select>';
+    else if(c&&c.querySelector('.nv'))ctl='<select class="fi">'+op([['__','— não mexer —'],['','(limpar)'],['1','1'],['2','2'],['3','3'],['4','4']])+'</select>';
+    else ctl='<textarea class="fi" rows="1" placeholder="preencher coluna (várias linhas = uma por linha da tabela)"></textarea>';
     tr.insertAdjacentHTML('beforeend',`<th class="fill" style="width:${h.style.width}">${ctl}<button data-a="fillcol" title="Aplicar em toda a coluna">↓</button></th>`);
   });
   th.insertBefore(tr,th.firstChild);
 }
 function preencher(th){
   const tb=th.closest('table'),i=[...th.parentElement.children].indexOf(th);
-  const v=th.querySelector('.fi').value,ehTxt=th.querySelector('input');
-  if(ehTxt&&!v)return;
-  tb.querySelectorAll('tbody tr').forEach(r=>{
+  const v=th.querySelector('.fi').value,ehTxt=th.querySelector('textarea');
+  if(v==='__'||(ehTxt&&!v.trim()))return;
+  const linhas=ehTxt?v.replace(/\r/g,'').replace(/\n+$/,'').split('\n'):null;
+  tb.querySelectorAll('tbody tr').forEach((r,k)=>{
     const c=r.children[i];if(!c)return;
+    if(linhas&&linhas.length>1&&k>=linhas.length)return;
     const st=c.querySelector('.st'),nv=c.querySelector('.nv');
     if(st){st.dataset.s=v;st.className='st '+v}
     else if(nv){nv.dataset.n=v;nv.textContent=v;nv.className='nv'+(v?' n'+v:'')}
-    else{const e=c.querySelector('[contenteditable]');if(e)e.textContent=v}
+    else{const e=c.querySelector('[contenteditable]');if(e)e.textContent=linhas?(linhas.length>1?linhas[k]:v):v}
   });
   mudou(th.closest('.wrap'));
 }
@@ -234,6 +237,7 @@ function atualizaTb(){
   app.querySelectorAll('.wrap').forEach(w=>{
     const tb=w.querySelector('.tb'),gap=tb&&tb.querySelector('.gap');if(!gap)return;
     if(w.querySelector('table')&&!tb.querySelector('[data-a=addcol]'))gap.insertAdjacentHTML('beforebegin',BTN_COL);
+    if(w.querySelector('table')&&!tb.querySelector('[data-a=fillall]'))gap.insertAdjacentHTML('beforebegin',BTN_FILL);
     if(!tb.querySelector('[data-a=dup]'))gap.insertAdjacentHTML('beforebegin',BTN_DUP);
   });
 }
@@ -346,7 +350,7 @@ function baixar(lista,nome){
 /* ---------- eventos da área de folhas ---------- */
 app.addEventListener('input',e=>mudou(e.target.closest('.wrap')));
 app.addEventListener('keydown',e=>{
-  if(e.key==='Enter'&&e.target.matches('input.fi')){e.preventDefault();preencher(e.target.closest('th'))}
+  if(e.key==='Enter'&&!e.shiftKey&&e.target.matches('textarea.fi')){e.preventDefault();preencher(e.target.closest('th'))}
 });
 app.addEventListener('paste',e=>{
   if(e.target.closest('[contenteditable]')){
@@ -376,6 +380,14 @@ app.addEventListener('click',e=>{
   if(a==='redo')return mover(w,1);
   if(a==='print')return imprimirUm(w);
   if(a==='fillcol')return preencher(b.closest('th'));
+  if(a==='fillall'){
+    const tb=sh.querySelector('table');if(!tb)return;
+    tb.querySelectorAll('th.fill').forEach(th=>{
+      preencher(th);const c=th.querySelector('.fi');
+      c.value=c.tagName==='SELECT'?'__':'';
+    });
+    return;
+  }
   if(a==='dup'){
     const c=w.cloneNode(true);c.classList.remove('alvo');
     c.querySelectorAll('.sel').forEach(x=>x.classList.remove('sel'));
