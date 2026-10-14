@@ -320,7 +320,7 @@ function duplicarOV(id){
   const n=prompt("Número da nova OV (cópia sem notas fiscais):");if(!n||!n.trim())return;
   const nv=n.trim();
   if(cacheRegistros.some(o=>o.id===nv||String(o.ov.numero).trim()===nv)){alert("Já existe uma OV com o número "+nv+".");return;}
-  const c=JSON.parse(JSON.stringify(it));c.id=nv;c.ov.numero=nv;c.gastos=[];
+  const c=JSON.parse(JSON.stringify(it));c.id=nv;c.ov.numero=nv;c.gastos=[];c.manual={};
   salvarNaBase(c);
 }
 
@@ -432,17 +432,32 @@ function salvarNovaOV(){
 }
 function adicionarNovaOVManual(){abrirModalNovaOV();}
 
-// ---------- cálculo ----------
+// ---------- cálculo (aceita valores editados à mão em it.manual) ----------
 function calc(it){
-  const c=it.status==='CANCELADO',g=(it.gastos||[]).reduce((s,x)=>s+Number(x.pesoTO||0),0);
-  const u=it.ov.precoUnitarioPorTO||(it.ov.qtdLiberadaTO>0?it.ov.valorBRL/it.ov.qtdLiberadaTO:14575.5),vg=g*u;
-  return{c,g,u,s:c?0:Math.max(0,it.ov.qtdLiberadaTO-g),vg,vs:Math.max(0,it.ov.valorBRL-vg),estouro:!c&&g>Number(it.ov.qtdLiberadaTO||0)+0.0005};
+  const c=it.status==='CANCELADO',m=it.manual||{};
+  const g0=(it.gastos||[]).reduce((s,x)=>s+Number(x.pesoTO||0),0);
+  const u=it.ov.precoUnitarioPorTO||(it.ov.qtdLiberadaTO>0?it.ov.valorBRL/it.ov.qtdLiberadaTO:14575.5);
+  const g=m.gastoTO!=null?m.gastoTO:g0;
+  const vg=m.gastoBRL!=null?m.gastoBRL:g*u;
+  const s=c?0:(m.saldoTO!=null?m.saldoTO:Math.max(0,it.ov.qtdLiberadaTO-g));
+  const vs=m.saldoBRL!=null?m.saldoBRL:Math.max(0,it.ov.valorBRL-vg);
+  return{c,g,u,s,vg,vs,estouro:!c&&g>Number(it.ov.qtdLiberadaTO||0)+0.0005};
 }
 
 // ---------- campos editáveis ----------
 function I(id,campo,val,tipo,cls,ph){
   const n=tipo==='num';
   return `<input type="${n?'number':'text'}"${n?' step="any"':''} value="${esc(val)}"${ph?` placeholder="${esc(ph)}"`:''} onchange="editarOV('${id}','${campo}',this.value,'${tipo}')" class="ii ${cls||''}">`;
+}
+// valor calculado que pode ser sobrescrito à mão (âmbar = editado; ↺ volta ao automático)
+function VM(id,campo,valor,dec,cls){
+  const it=achar(id),man=!!(it&&it.manual&&it.manual[campo]!=null);
+  return `<span class="inline-flex items-center gap-1"><input type="number" step="any" value="${Number(valor).toFixed(dec)}" onchange="editarValorCalc('${id}','${campo}',this.value)" class="ii ${cls} ${man?'!bg-amber-100 !border-amber-400':''}" title="${man?'Valor editado manualmente':'Calculado automaticamente (clique para editar)'}">${man?`<button type="button" onclick="editarValorCalc('${id}','${campo}','')" class="text-amber-600 font-black text-xs no-print" title="Voltar ao cálculo automático">↺</button>`:''}</span>`;
+}
+function editarValorCalc(id,campo,v){
+  const it=achar(id);if(!it)return;it.manual=it.manual||{};
+  if(String(v).trim()==='')delete it.manual[campo];else it.manual[campo]=parseNumeroSap(v);
+  salvarNaBase(it);
 }
 function editarOV(id,campo,valor,tipo){
   const it=cacheRegistros.find(o=>o.id===id);if(!it)return;
@@ -531,8 +546,8 @@ function renderizar(){
         <td class="py-1 px-3"><input value="${esc(g.ticket)}" onchange="atualizarGastoLinha('${id}',${i},'ticket',this.value)" class="ii font-semibold text-slate-800 text-xs w-32"></td>
         <td class="py-1 px-3"><input value="${esc(g.placa)}" onchange="atualizarGastoLinha('${id}',${i},'placa',this.value)" class="ii text-slate-600 font-mono text-xs w-28 uppercase"></td>
         <td class="py-1 px-3 text-right"><span class="text-rose-500 font-bold">-</span><input type="number" step="0.001" value="${Number(g.pesoTO).toFixed(3)}" onchange="atualizarGastoLinha('${id}',${i},'pesoTO',this.value)" class="ii text-right font-black text-rose-600 text-xs w-24"> <span class="text-[10px] font-bold text-slate-400">TO</span></td>
-        <td class="py-1 px-3 text-right font-bold text-rose-600 whitespace-nowrap">${fR(Number(g.pesoTO||0)*c.u)}</td>
-        <td class="py-1 px-3 text-center no-print"><button type="button" onclick="removerGasto('${id}',${i})" class="text-rose-400 hover:text-rose-600" title="Remover nota">✕</button></td></tr>`).join('')+`</tbody><tfoot><tr class="bg-slate-50 border-t-2 border-slate-200 font-black text-slate-700"><td colspan="4" class="py-1.5 px-3 text-right text-[10px] uppercase">Total (${it.gastos.length} nota${it.gastos.length>1?'s':''})</td><td class="py-1.5 px-3 text-right text-rose-700 whitespace-nowrap">-${fTO(c.g)}</td><td class="py-1.5 px-3 text-right text-rose-700 whitespace-nowrap">${fR(c.vg)}</td><td class="no-print"></td></tr></tfoot></table></div>`;
+        <td class="py-1 px-3 text-right font-bold text-rose-600 whitespace-nowrap">R$ <input type="number" step="0.01" value="${(g.valorBRL!=null?Number(g.valorBRL):Number(g.pesoTO||0)*c.u).toFixed(2)}" onchange="atualizarGastoLinha('${id}',${i},'valorBRL',this.value)" class="ii text-right text-rose-600 text-xs w-28 ${g.valorBRL!=null?'!bg-amber-100 !border-amber-400':''}" title="${g.valorBRL!=null?'Valor editado manualmente':'Calculado: peso × preço por TO'}"></td>
+        <td class="py-1 px-3 text-center no-print"><button type="button" onclick="removerGasto('${id}',${i})" class="text-rose-400 hover:text-rose-600" title="Remover nota">✕</button></td></tr>`).join('')+`</tbody><tfoot><tr class="bg-slate-50 border-t-2 border-slate-200 font-black text-slate-700"><td colspan="4" class="py-1.5 px-3 text-right text-[10px] uppercase">Total (${it.gastos.length} nota${it.gastos.length>1?'s':''})</td><td class="py-1.5 px-3 text-right text-rose-700 whitespace-nowrap">-${fTO(it.gastos.reduce((s,x)=>s+Number(x.pesoTO||0),0))}</td><td class="py-1.5 px-3 text-right text-rose-700 whitespace-nowrap">${fR(it.gastos.reduce((s,x)=>s+(x.valorBRL!=null?Number(x.valorBRL):Number(x.pesoTO||0)*c.u),0))}</td><td class="no-print"></td></tr></tfoot></table></div>`;
       return `<div class="bg-white rounded-2xl border-2 ${c.estouro?'border-rose-400':t.ovBordaPadrao} shadow-sm overflow-hidden${c.c?' opacity-70':''}">
         <div class="bg-slate-100 border-b border-slate-200 px-5 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
           <div class="flex flex-wrap items-center gap-2">
@@ -557,8 +572,8 @@ function renderizar(){
             <div class="bg-slate-50 border border-slate-200 p-3 rounded-xl"><span class="block text-[10px] font-bold text-slate-400 uppercase mb-1">1. Total Inicial (Soma Linhas)</span>
               <div class="flex items-center gap-1 font-black text-slate-800">${I(id,'ov.qtdLiberadaTO',Number(it.ov.qtdLiberadaTO).toFixed(3),'num','w-28 text-right text-base font-black')} TO</div>
               <div class="flex items-center gap-1 text-xs font-bold text-slate-500 mt-1">R$ ${I(id,'ov.valorBRL',Number(it.ov.valorBRL).toFixed(2),'num','w-32 text-right')}</div></div>
-            <div class="bg-rose-50 border border-rose-200 p-3 rounded-xl"><span class="block text-[10px] font-bold text-rose-600 uppercase mb-1">2. O que JÁ FOI GASTO (Notas)</span><div class="text-base font-black text-rose-700">${fTO(c.g)}</div><div class="text-xs font-bold text-rose-600 mt-1">${fR(c.vg)}</div></div>
-            <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl"><span class="block text-[10px] font-bold text-emerald-700 uppercase mb-1">3. SALDO LIVRE RESTANTE</span><div class="text-base font-black text-emerald-800">${fTO(c.s)}</div><div class="text-xs font-bold text-emerald-700 mt-1">${fR(c.vs)}</div></div>
+            <div class="bg-rose-50 border border-rose-200 p-3 rounded-xl"><span class="block text-[10px] font-bold text-rose-600 uppercase mb-1">2. O que JÁ FOI GASTO (Notas)</span><div class="flex items-center gap-1 font-black text-rose-700">${VM(id,'gastoTO',c.g,3,'w-28 text-right text-base font-black')} TO</div><div class="flex items-center gap-1 text-xs font-bold text-rose-600 mt-1">R$ ${VM(id,'gastoBRL',c.vg,2,'w-32 text-right')}</div></div>
+            <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl"><span class="block text-[10px] font-bold text-emerald-700 uppercase mb-1">3. SALDO LIVRE RESTANTE</span><div class="flex items-center gap-1 font-black text-emerald-800">${VM(id,'saldoTO',c.s,3,'w-28 text-right text-base font-black')} TO</div><div class="flex items-center gap-1 text-xs font-bold text-emerald-700 mt-1">R$ ${VM(id,'saldoBRL',c.vs,2,'w-32 text-right')}</div></div>
           </div>
           <div>
             <div class="flex justify-between text-[10px] font-bold text-slate-500 mb-1"><span>Consumo da OV</span><span>${lib>0?Math.round(c.g/lib*100):0}%</span></div>
@@ -591,7 +606,8 @@ function removerLinhaMaterialOV(id,i){const it=achar(id);if(!it||!it.ov.itens||i
 function atualizarGastoLinha(id,i,campo,v){
   const it=achar(id);if(!it||!it.gastos||!it.gastos[i])return;
   const g=it.gastos[i];
-  g[campo]=campo==='pesoTO'?parseNumeroSap(v):campo==='placa'?String(v).trim().toUpperCase():campo==='data'?v:String(v).trim();
+  g[campo]=(campo==='pesoTO'||campo==='valorBRL')?parseNumeroSap(v):campo==='placa'?String(v).trim().toUpperCase():campo==='data'?v:String(v).trim();
+  if(campo==='pesoTO')delete g.valorBRL; // peso mudou: valor volta ao automático
   salvarNaBase(it); // reordena por data
   if(campo==='data'||campo==='ticket')piscarNotas(id,[],[g.ticket]); // mostra onde a nota foi parar
 }
@@ -781,7 +797,7 @@ function exportarExcel(){
   ordem.forEach(it=>{
     const c=calc(it),ct=it.contrato||{},emp=normalizarNomeEmpresa(it.ov.cliente);ordenarGastos(it);
     resumo.push({'Cliente':emp,'OV':it.ov.numero,'Status':it.status,'Pedido/DRS':it.ov.pedidoDRS||'','Contrato':ct.numero||'','Item contrato':ct.item||'','Qtd contrato (TO)':Number(ct.qtdTotalTO||0),'Valor contrato (R$)':Number(ct.valorTotalBRL||0),'Preço por TO (R$)':Number(c.u||0),'Liberado (TO)':Number(it.ov.qtdLiberadaTO||0),'Liberado (R$)':Number(it.ov.valorBRL||0),'Gasto (TO)':c.g,'Gasto (R$)':c.vg,'Saldo (TO)':c.s,'Saldo (R$)':c.vs,'Qtd notas':(it.gastos||[]).length,'Obs':it.obs||''});
-    (it.gastos||[]).forEach(g=>notas.push({'Cliente':emp,'OV':it.ov.numero,'Data':dt(g.data),'Nº Nota Fiscal / Ticket':g.ticket,'Placa / Remessa':g.placa,'Peso (TO)':Number(g.pesoTO||0),'Valor (R$)':Number(g.pesoTO||0)*c.u}));
+    (it.gastos||[]).forEach(g=>notas.push({'Cliente':emp,'OV':it.ov.numero,'Data':dt(g.data),'Nº Nota Fiscal / Ticket':g.ticket,'Placa / Remessa':g.placa,'Peso (TO)':Number(g.pesoTO||0),'Valor (R$)':g.valorBRL!=null?Number(g.valorBRL):Number(g.pesoTO||0)*c.u}));
     (it.ov.itens||[]).forEach(m=>mats.push({'Cliente':emp,'OV':it.ov.numero,'Item':m.itemSap,'Material':m.material,'Qtd (TO)':Number(m.qtdTO||0),'Qtd (KG)':Math.round(Number(m.qtdTO||0)*1000)}));
   });
   const aba=(rows,larg)=>{const w=XLSX.utils.json_to_sheet(rows,{dateNF:'dd/mm/yyyy'});w['!cols']=larg.map(x=>({wch:x}));return w;};
@@ -808,7 +824,7 @@ function exportarXML(){
       o+='      </materiais>\n';
       o+=`      <totais liberadoTO="${n3(it.ov.qtdLiberadaTO)}" liberadoBRL="${n2(it.ov.valorBRL)}" gastoTO="${n3(c.g)}" gastoBRL="${n2(c.vg)}" saldoTO="${n3(c.s)}" saldoBRL="${n2(c.vs)}"/>\n`;
       o+=`      <notas total="${(it.gastos||[]).length}">\n`;
-      (it.gastos||[]).forEach(g=>{o+=`        <nota data="${x(g.data)}" numero="${x(g.ticket)}" placaRemessa="${x(g.placa)}" pesoTO="${n3(g.pesoTO)}" valorBRL="${n2(Number(g.pesoTO||0)*c.u)}"/>\n`;});
+      (it.gastos||[]).forEach(g=>{o+=`        <nota data="${x(g.data)}" numero="${x(g.ticket)}" placaRemessa="${x(g.placa)}" pesoTO="${n3(g.pesoTO)}" valorBRL="${n2(g.valorBRL!=null?g.valorBRL:Number(g.pesoTO||0)*c.u)}"/>\n`;});
       o+='      </notas>\n';
       if(it.obs)o+=`      <observacoes>${x(it.obs)}</observacoes>\n`;
       o+='    </ov>\n';
