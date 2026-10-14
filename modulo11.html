@@ -44,6 +44,7 @@ tr.piscando-novo td{animation:piscarNovo .6s ease-in-out 4}
     <button type="button" id="btnModoEdicao" onclick="alternarModoEdicao()" class="text-xs font-bold px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white">✏️ Editar Textos</button>
     <button type="button" id="btnRestaurarTextos" onclick="restaurarTextos()" class="text-xs font-bold px-3 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700" title="Volta os textos fixos ao original">↩</button>
     <button type="button" onclick="exportarCSV()" class="text-xs font-bold px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white">📥 CSV</button>
+    <button type="button" onclick="exportarXML()" class="text-xs font-bold px-3 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white" title="Exporta todas as empresas, OVs, materiais e notas em XML">🗂️ XML</button>
     <button type="button" onclick="exportarBackup()" class="text-xs font-bold px-3 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white" title="Baixa um arquivo de segurança com todas as OVs e clientes">⬇️ Backup</button>
     <button type="button" onclick="document.getElementById('inputBackup').click()" class="text-xs font-bold px-3 py-2 rounded-xl bg-sky-100 hover:bg-sky-200 text-sky-800 border border-sky-200" title="Restaura um arquivo de backup">⬆️ Restaurar</button>
     <input type="file" id="inputBackup" accept=".json,application/json" class="hidden" onchange="importarBackup(this)">
@@ -768,6 +769,33 @@ function exportarCSV(){
     csv+=`${q(it.ov.numero)};${q(it.ov.cliente)};${q(it.status)};${q(m)};${it.ov.qtdLiberadaTO};${c.g};${c.s};${q(it.obs)}\r\n`;
   });
   baixarArquivo(`ovs_segregadas_${hoje()}.csv`,'\uFEFF'+csv,'text/csv;charset=utf-8');
+}
+function exportarXML(){
+  if(!cacheRegistros.length&&!listaClientes().length){alert("Não há dados para exportar.");return;}
+  const x=v=>String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&apos;');
+  const n3=v=>Number(v||0).toFixed(3),n2=v=>Number(v||0).toFixed(2);
+  let o='<?xml version="1.0" encoding="UTF-8"?>\n<modulo11 exportadoEm="'+hoje()+'">\n';
+  listaClientes().forEach(emp=>{
+    const ovs=cacheRegistros.filter(i=>normalizarNomeEmpresa(i.ov.cliente)===emp);
+    o+=`  <cliente nome="${x(emp)}" qtdOVs="${ovs.length}">\n`;
+    ovs.forEach(it=>{
+      const c=calc(it),ct=it.contrato||{};ordenarGastos(it);
+      o+=`    <ov numero="${x(it.ov.numero)}" status="${x(it.status)}" pedidoDRS="${x(it.ov.pedidoDRS)}">\n`;
+      o+=`      <contrato numero="${x(ct.numero)}" item="${x(ct.item)}" qtdTotalTO="${n3(ct.qtdTotalTO)}" valorTotalBRL="${n2(ct.valorTotalBRL)}"/>\n`;
+      o+=`      <precoUnitarioPorTO>${n2(c.u)}</precoUnitarioPorTO>\n      <materiais>\n`;
+      (it.ov.itens||[]).forEach(m=>{o+=`        <material item="${x(m.itemSap)}" qtdTO="${n3(m.qtdTO)}">${x(m.material)}</material>\n`;});
+      o+='      </materiais>\n';
+      o+=`      <totais liberadoTO="${n3(it.ov.qtdLiberadaTO)}" liberadoBRL="${n2(it.ov.valorBRL)}" gastoTO="${n3(c.g)}" gastoBRL="${n2(c.vg)}" saldoTO="${n3(c.s)}" saldoBRL="${n2(c.vs)}"/>\n`;
+      o+=`      <notas total="${(it.gastos||[]).length}">\n`;
+      (it.gastos||[]).forEach(g=>{o+=`        <nota data="${x(g.data)}" numero="${x(g.ticket)}" placaRemessa="${x(g.placa)}" pesoTO="${n3(g.pesoTO)}" valorBRL="${n2(Number(g.pesoTO||0)*c.u)}"/>\n`;});
+      o+='      </notas>\n';
+      if(it.obs)o+=`      <observacoes>${x(it.obs)}</observacoes>\n`;
+      o+='    </ov>\n';
+    });
+    o+='  </cliente>\n';
+  });
+  o+='</modulo11>\n';
+  baixarArquivo(`ovs_modulo11_${hoje()}.xml`,o,'application/xml;charset=utf-8');
 }
 function exportarBackup(){
   baixarArquivo(`backup_modulo11_${hoje()}.json`,JSON.stringify({versao:1,data:hoje(),ovs:cacheRegistros,clientes},null,1),'application/json');
