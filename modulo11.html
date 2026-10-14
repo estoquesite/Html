@@ -14,6 +14,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1e293
 .ii:focus{background:#fff;border-color:#0d9488;box-shadow:0 0 0 2px rgba(13,148,136,.3)}
 .modo-edicao [contenteditable="true"]{outline:1px dashed #f59e0b;outline-offset:2px;cursor:text;border-radius:4px}
 .modo-edicao [contenteditable="true"]:focus{outline:2px solid #f59e0b;background:#fffbeb;color:#1e293b}
+.fi{width:100%;border:1px solid #cbd5e1;border-radius:.75rem;padding:.4rem .6rem;font-size:.75rem;font-weight:600;background:#fff;outline:none}
+.fi:focus{border-color:#0d9488;box-shadow:0 0 0 2px rgba(13,148,136,.25)}
 @media print{.no-print{display:none!important}body{background:#fff}}
 </style>
 </head>
@@ -28,7 +30,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1e293
   </div>
   <div class="flex flex-wrap items-center gap-2">
     <span id="badgeConexao" class="text-[11px] font-bold px-2.5 py-1.5 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5"><span id="pontoConexao" class="w-2 h-2 rounded-full bg-emerald-500"></span><span id="textoConexao">Salvo neste aparelho</span></span>
-    <button type="button" onclick="adicionarNovaOVManual()" class="text-xs font-bold px-3.5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white">➕ Nova OV</button>
+    <button type="button" onclick="novoClienteRapido()" class="text-xs font-bold px-3.5 py-2 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white">👤 Novo Cliente</button>
+    <button type="button" onclick="abrirModalNovaOV()" class="text-xs font-bold px-3.5 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white">➕ Nova OV</button>
     <button type="button" onclick="salvarLocal()" id="btnSalvarGeral" class="text-xs font-bold px-3.5 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white">💾 Salvar</button>
     <button type="button" id="btnModoEdicao" onclick="alternarModoEdicao()" class="text-xs font-bold px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white">✏️ Editar Textos</button>
     <button type="button" id="btnRestaurarTextos" onclick="restaurarTextos()" class="text-xs font-bold px-3 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700" title="Volta os textos fixos ao original">↩</button>
@@ -85,6 +88,45 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1e293
 <div id="containerOVs" class="space-y-8"></div>
 </div>
 
+<!-- MODAL NOVA OV (cliente existente ou novo) -->
+<div id="modalNovaOV" class="fixed inset-0 bg-slate-950/75 z-50 hidden flex items-center justify-center p-4">
+  <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
+    <div class="flex justify-between items-center border-b border-slate-100 pb-3">
+      <div><h3 class="font-bold text-slate-900 text-sm">➕ Nova OV</h3><p class="text-[11px] text-slate-500">Vincule a um cliente já cadastrado ou cadastre um cliente novo</p></div>
+      <button type="button" onclick="fecharModalNovaOV()" class="text-slate-400 hover:text-slate-600 text-lg">✕</button>
+    </div>
+    <div class="space-y-3 text-xs">
+      <label class="block"><span class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Cliente</span>
+        <select id="novaOVCliente" onchange="aoTrocarClienteNovaOV()" class="fi"></select></label>
+      <label id="boxNovoCliente" class="block hidden"><span class="block text-[10px] font-bold text-indigo-600 uppercase mb-1">Nome do novo cliente</span>
+        <input id="novaOVClienteNovo" type="text" placeholder="Ex.: EMPRESA XYZ LTDA." class="fi"></label>
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <label class="block"><span class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Nº da OV *</span><input id="novaOVNumero" type="text" inputmode="numeric" placeholder="115939257" class="fi"></label>
+        <label class="block"><span class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Pedido / DRS</span><input id="novaOVDRS" type="text" placeholder="DRS 018-2025" class="fi"></label>
+      </div>
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+        <label class="block"><span class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Contrato</span><input id="novaOVContrato" type="text" class="fi"></label>
+        <label class="block"><span class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Item contrato</span><input id="novaOVContratoItem" type="text" class="fi"></label>
+        <label class="block"><span class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Qtd contrato (TO)</span><input id="novaOVContratoQtd" type="text" inputmode="decimal" class="fi"></label>
+        <label class="block"><span class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Valor contrato (R$)</span><input id="novaOVContratoValor" type="text" inputmode="decimal" class="fi"></label>
+      </div>
+      <div class="bg-slate-50 border border-slate-200 rounded-2xl p-3 space-y-2">
+        <span class="block text-[10px] font-bold text-slate-600 uppercase">Primeiro material da OV (depois você pode ler a VA03 ou adicionar mais linhas)</span>
+        <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+          <input id="novaOVItemSap" type="text" placeholder="Item" value="10" class="fi sm:col-span-2">
+          <input id="novaOVMaterial" type="text" placeholder="Material" class="fi sm:col-span-6">
+          <input id="novaOVQtd" type="text" inputmode="decimal" placeholder="Qtd (TO)" class="fi sm:col-span-2">
+          <input id="novaOVPreco" type="text" inputmode="decimal" placeholder="R$ / TO" class="fi sm:col-span-2">
+        </div>
+      </div>
+    </div>
+    <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+      <button type="button" onclick="fecharModalNovaOV()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100">Cancelar</button>
+      <button type="button" onclick="salvarNovaOV()" class="px-4 py-2 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white">Criar OV</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL VA03 -->
 <div id="modalLeitorOV" class="fixed inset-0 bg-slate-950/75 z-50 hidden flex items-center justify-center p-4">
   <div class="bg-white rounded-3xl max-w-3xl w-full p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
@@ -136,7 +178,8 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1e293
 
 <script>
 const STORAGE_KEY="vale_modulo11_sap_ovs_reconhecimento_v18_diagnostico";
-let cacheRegistros=[],linhasTempLeitorOV=[],notasTempLeitorNotas=[],ovLidaDoPrint=null,ovLidaDasNotas=null;
+const CLIENTES_KEY=STORAGE_KEY+"_clientes";
+let cacheRegistros=[],clientes=[],linhasTempLeitorOV=[],notasTempLeitorNotas=[],ovLidaDoPrint=null,ovLidaDasNotas=null;
 
 const GERDAU={header:"bg-blue-700",bgLight:"bg-blue-50/50",bordaCard:"border-blue-400",texto:"text-blue-900",badge:"bg-blue-800",ovBordaPadrao:"border-blue-300 bg-blue-50/20"};
 const OUTRAS=[
@@ -197,12 +240,16 @@ function atualizarIndicadorStatus(st,txt){
   $('pontoConexao').className=`w-2 h-2 rounded-full bg-${cor}-500`;
 }
 function gravarLocal(){
-  try{localStorage.setItem(STORAGE_KEY,JSON.stringify(cacheRegistros));atualizarIndicadorStatus('online','Salvo às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}));return true;}
+  try{
+    localStorage.setItem(STORAGE_KEY,JSON.stringify(cacheRegistros));
+    localStorage.setItem(CLIENTES_KEY,JSON.stringify(clientes));
+    atualizarIndicadorStatus('online','Salvo às '+new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'}));return true;}
   catch(e){console.error(e);atualizarIndicadorStatus('erro','Erro ao salvar');return false;}
 }
 function carregarRegistros(){
   let salvo=null;
   try{const raw=localStorage.getItem(STORAGE_KEY);if(raw){const a=JSON.parse(raw);if(Array.isArray(a))salvo=a;}}catch(e){}
+  try{const c=JSON.parse(localStorage.getItem(CLIENTES_KEY)||'[]');clientes=Array.isArray(c)?c:[];}catch(e){clientes=[];}
   cacheRegistros=salvo||JSON.parse(JSON.stringify(DADOS_DEFAULT));
   atualizarOpcoesEmpresas();renderizar();
   atualizarIndicadorStatus('online',salvo?'Dados carregados deste aparelho':'Ainda não salvo');
@@ -217,15 +264,97 @@ function salvarNaBase(item){
   if(i!==-1)cacheRegistros[i]=item;else cacheRegistros.unshift(item);
   gravarLocal();atualizarOpcoesEmpresas();renderizar();
 }
-function adicionarNovaOVManual(){
-  const n=prompt("Informe o Número da Nova OV:","115939257");if(!n)return;const num=String(n).trim();
-  salvarNaBase({id:num,status:"ATIVO",contrato:{numero:"0000071823",item:"30",qtdTotalTO:2635,valorTotalBRL:3320100},
-   ov:{numero:num,cliente:"NOVO CLIENTE S.A.",pedidoDRS:"DRS 018-2025",itens:[{itemSap:"40",material:"NOVO MATERIAL",qtdTO:0.3}],qtdLiberadaTO:0.3,valorBRL:4372.65,precoUnitarioPorTO:14575.50},gastos:[]});
-}
 function excluirOV(id){
-  const it=cacheRegistros.find(o=>o.id===id);if(!it||!confirm('Excluir a OV '+it.ov.numero+' e todas as notas dela?'))return;
+  const it=cacheRegistros.find(o=>o.id===id);if(!it||!confirm('Excluir a OV '+it.ov.numero+' e todas as notas dela? (O cliente continua cadastrado)'))return;
+  const emp=normalizarNomeEmpresa(it.ov.cliente);registrarCliente(emp); // garante que o cliente não some ao excluir a última OV
   cacheRegistros=cacheRegistros.filter(o=>o.id!==id);gravarLocal();atualizarOpcoesEmpresas();renderizar();
 }
+
+// ---------- CLIENTES (cadastro) ----------
+function listaClientes(){
+  const s=new Set(clientes.map(normalizarNomeEmpresa));
+  cacheRegistros.forEach(o=>s.add(normalizarNomeEmpresa(o.ov.cliente)));
+  return [...s].sort((a,b)=>a.localeCompare(b,'pt-BR'));
+}
+// Cadastra (se ainda não existir) e devolve o nome oficial. Compara sem diferenciar maiúsculas/minúsculas.
+function registrarCliente(nome){
+  if(!nome||!String(nome).trim())return null;
+  const n=normalizarNomeEmpresa(nome);
+  const ex=listaClientes().find(c=>c.toUpperCase()===n.toUpperCase());
+  if(ex){if(!clientes.includes(ex)){clientes.push(ex);gravarLocal();}return ex;}
+  clientes.push(n);gravarLocal();return n;
+}
+function novoClienteRapido(){
+  const n=prompt("Nome do novo cliente:");if(!n||!n.trim())return;
+  const existia=listaClientes().some(c=>c.toUpperCase()===normalizarNomeEmpresa(n).toUpperCase());
+  const nome=registrarCliente(n);atualizarOpcoesEmpresas();renderizar();
+  if(existia){alert('Esse cliente já está cadastrado: '+nome);}
+  if(confirm('Cliente "'+nome+'" pronto. Deseja criar uma OV para ele agora?'))abrirModalNovaOV(nome);
+}
+function removerCliente(nome){
+  if(cacheRegistros.some(o=>normalizarNomeEmpresa(o.ov.cliente)===nome)){alert('Este cliente ainda tem OVs. Exclua ou mova as OVs antes.');return;}
+  if(!confirm('Remover o cliente "'+nome+'" (sem OVs)?'))return;
+  clientes=clientes.filter(c=>normalizarNomeEmpresa(c)!==nome);
+  if($('filtroEmpresa').value===nome)$('filtroEmpresa').value='TODAS';
+  gravarLocal();atualizarOpcoesEmpresas();renderizar();
+}
+function trocarClienteOV(id,sel){
+  const it=achar(id);if(!it)return;let v=sel.value;
+  if(v==='__novo__'){
+    const n=prompt("Nome do novo cliente:");
+    if(!n||!n.trim()){renderizar();return;}
+    v=registrarCliente(n);
+  }
+  it.ov.cliente=v;salvarNaBase(it);
+}
+
+// ---------- NOVA OV ----------
+function abrirModalNovaOV(clientePre){
+  const sel=$('novaOVCliente'),lista=listaClientes();
+  sel.innerHTML=lista.map(c=>`<option value="${esc(c)}">${esc(c)}</option>`).join('')+'<option value="__novo__">➕ Cadastrar novo cliente…</option>';
+  if(clientePre&&lista.includes(clientePre))sel.value=clientePre;
+  else if(!lista.length)sel.value='__novo__';
+  else if($('filtroEmpresa').value!=='TODAS'&&lista.includes($('filtroEmpresa').value))sel.value=$('filtroEmpresa').value;
+  ['novaOVClienteNovo','novaOVNumero','novaOVDRS','novaOVContrato','novaOVContratoItem','novaOVContratoQtd','novaOVContratoValor','novaOVMaterial','novaOVQtd','novaOVPreco'].forEach(i=>$(i).value='');
+  $('novaOVItemSap').value='10';
+  aoTrocarClienteNovaOV();
+  $('modalNovaOV').classList.remove('hidden');
+  setTimeout(()=>{($('novaOVCliente').value==='__novo__'?$('novaOVClienteNovo'):$('novaOVNumero')).focus();},50);
+}
+function fecharModalNovaOV(){$('modalNovaOV').classList.add('hidden');}
+function aoTrocarClienteNovaOV(){
+  const v=$('novaOVCliente').value,novo=v==='__novo__';
+  $('boxNovoCliente').classList.toggle('hidden',!novo);
+  if(novo)return;
+  // sugere os dados do contrato da última OV desse cliente
+  const ult=cacheRegistros.find(o=>normalizarNomeEmpresa(o.ov.cliente)===v);
+  if(ult){
+    const ct=ult.contrato||{};
+    $('novaOVContrato').value=ct.numero||'';$('novaOVContratoItem').value=ct.item||'';
+    $('novaOVContratoQtd').value=ct.qtdTotalTO||'';$('novaOVContratoValor').value=ct.valorTotalBRL||'';
+    $('novaOVPreco').value=ult.ov.precoUnitarioPorTO||'';
+  }
+}
+function salvarNovaOV(){
+  const sel=$('novaOVCliente').value;
+  const nomeDigitado=sel==='__novo__'?$('novaOVClienteNovo').value:sel;
+  if(!nomeDigitado||!nomeDigitado.trim()){alert("Informe o cliente.");return;}
+  const num=$('novaOVNumero').value.trim();
+  if(!num){alert("Informe o número da OV.");return;}
+  if(cacheRegistros.some(o=>o.id===num||String(o.ov.numero).trim()===num)){alert("Já existe uma OV com o número "+num+". Use outro número.");return;}
+  const cliente=registrarCliente(nomeDigitado);
+  const qtd=parseNumeroSap($('novaOVQtd').value),preco=parseNumeroSap($('novaOVPreco').value);
+  const mat=$('novaOVMaterial').value.trim()||'NOVO MATERIAL';
+  const novo={id:num,status:"ATIVO",
+    contrato:{numero:$('novaOVContrato').value.trim(),item:$('novaOVContratoItem').value.trim(),qtdTotalTO:parseNumeroSap($('novaOVContratoQtd').value),valorTotalBRL:parseNumeroSap($('novaOVContratoValor').value)},
+    ov:{numero:num,cliente:cliente,pedidoDRS:$('novaOVDRS').value.trim(),
+      itens:[{itemSap:$('novaOVItemSap').value.trim()||'10',material:mat,qtdTO:qtd}],
+      qtdLiberadaTO:qtd,valorBRL:qtd*preco,precoUnitarioPorTO:preco},gastos:[]};
+  fecharModalNovaOV();
+  salvarNaBase(novo);
+  $('filtroEmpresa').value=cliente;renderizar(); // já mostra o cliente com a OV nova
+}
+function adicionarNovaOVManual(){abrirModalNovaOV();} // compatibilidade
 
 // ---------- cálculo ----------
 function calc(it){
@@ -241,6 +370,10 @@ function I(id,campo,val,tipo,cls){
 }
 function editarOV(id,campo,valor,tipo){
   const it=cacheRegistros.find(o=>o.id===id);if(!it)return;
+  if(campo==='ov.numero'){
+    const nv=String(valor).trim();
+    if(!nv||cacheRegistros.some(o=>o!==it&&String(o.ov.numero).trim()===nv)){alert("Número de OV vazio ou já usado em outra OV.");renderizar();return;}
+  }
   const p=campo.split('.'),alvo=p.length>1?it[p[0]]:it;
   alvo[p[p.length-1]]=tipo==='num'?parseNumeroSap(valor):String(valor).trim();
   salvarNaBase(it);
@@ -249,7 +382,7 @@ function focarLinha(btn){const i=btn.closest('tr,div[data-row]').querySelector('
 
 function atualizarOpcoesEmpresas(){
   const sel=$('filtroEmpresa'),cont=$('containerCardsEmpresas'),atual=sel.value;
-  const emps=[...new Set(cacheRegistros.map(i=>normalizarNomeEmpresa(i.ov.cliente)))];
+  const emps=listaClientes();
   sel.innerHTML='<option value="TODAS">Todas as Empresas</option>'+emps.map(e=>`<option value="${esc(e)}">${esc(e)}</option>`).join('');
   if(emps.includes(atual))sel.value=atual;
   let k=0;
@@ -261,7 +394,11 @@ function atualizarOpcoesEmpresas(){
       <div class="font-black text-sm ${t.texto} truncate" title="${esc(emp)}">${esc(emp)}</div>
       <div class="mt-2.5 pt-2 border-t border-slate-200 space-y-1 text-xs">
         <div class="flex justify-between"><span class="text-slate-500 font-semibold">Valor Total:</span><span class="font-extrabold text-slate-800">${fR(val)}</span></div>
-        <div class="flex justify-between"><span class="text-slate-500 font-semibold">Saldo Livre Restante:</span><span class="font-black text-emerald-700">${fTO(sal)}</span></div></div></div>`;
+        <div class="flex justify-between"><span class="text-slate-500 font-semibold">Saldo Livre Restante:</span><span class="font-black text-emerald-700">${fTO(sal)}</span></div></div>
+      <div class="mt-2.5 flex items-center justify-between gap-2 no-print">
+        <button type="button" data-emp="${esc(emp)}" onclick="event.stopPropagation();abrirModalNovaOV(this.dataset.emp)" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-white border border-slate-300 text-teal-800 hover:bg-teal-50">➕ Nova OV</button>
+        ${ovs.length===0?`<button type="button" data-emp="${esc(emp)}" onclick="event.stopPropagation();removerCliente(this.dataset.emp)" class="text-[11px] font-bold px-2 py-1 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100" title="Remover cliente sem OVs">🗑️</button>`:''}
+      </div></div>`;
   }).join('');
 }
 function filtrarPorEmpresaCard(e){$('filtroEmpresa').value=e;renderizar();}
@@ -287,11 +424,14 @@ function renderizar(){
   $('statSaldoTopResumo').innerText=fTO(S);$('statSaldoTopValor').innerText=fR(SV);$('statTotalOvsContador').innerText=n+' OV(s)';
 
   const box=$('containerOVs');
-  if(!lista.length){box.innerHTML='<div class="bg-white p-12 text-center rounded-2xl border border-slate-200"><h4 class="font-bold text-slate-700">Nenhum registro encontrado</h4></div>';return;}
+  if(!lista.length){
+    const btn=(fe!=='TODAS'&&!termo)?`<button type="button" data-emp="${esc(fe)}" onclick="abrirModalNovaOV(this.dataset.emp)" class="mt-3 text-xs font-bold px-4 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white no-print">➕ Criar primeira OV de ${esc(fe)}</button>`:'';
+    box.innerHTML=`<div class="bg-white p-12 text-center rounded-2xl border border-slate-200"><h4 class="font-bold text-slate-700">Nenhum registro encontrado</h4>${btn}</div>`;return;}
   const grupos={};lista.forEach(it=>{const e=normalizarNomeEmpresa(it.ov.cliente);(grupos[e]=grupos[e]||[]).push(it);});
   let k=0;
   box.innerHTML=Object.keys(grupos).map(emp=>{
     const t=tema(emp,ehGerdau(emp)?0:k++);
+    const optsCli=listaClientes().map(c=>`<option value="${esc(c)}"${c===emp?' selected':''}>${esc(c)}</option>`).join('')+'<option value="__novo__">➕ Cadastrar novo cliente…</option>';
     const cards=grupos[emp].map(it=>{
       const c=calc(it),id=it.id,ct=it.contrato||(it.contrato={numero:'',item:'',qtdTotalTO:0,valorTotalBRL:0});
       const mats=(it.ov.itens||[]).map((m,i)=>`<div class="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200 text-xs">
@@ -316,7 +456,7 @@ function renderizar(){
           <div class="flex flex-wrap items-center gap-2">
             <span class="${t.badge} text-white font-mono font-bold text-[10px] px-2 py-0.5 rounded inline-flex items-center gap-1">OV ${I(id,'ov.numero',it.ov.numero,'text','w-24 !bg-white/90 text-slate-900 font-mono font-bold text-[10px]')}</span>
             <button type="button" onclick="copiarNumeroOV('${esc(it.ov.numero)}',this)" class="bg-slate-200 hover:bg-slate-300 text-slate-700 px-2 py-0.5 rounded font-mono text-[10px] font-bold no-print">📋 Copiar</button>
-            ${I(id,'ov.cliente',it.ov.cliente,'text','font-bold text-slate-800 w-72 max-w-full')}
+            <select onchange="trocarClienteOV('${id}',this)" class="text-xs font-bold border border-slate-300 rounded-lg px-1.5 py-1 bg-white text-slate-800 w-72 max-w-full" title="Cliente vinculado a esta OV">${optsCli}</select>
             <span class="text-slate-400">|</span>
             <span class="text-slate-600 flex items-center gap-1">DRS: ${I(id,'ov.pedidoDRS',it.ov.pedidoDRS,'text','font-bold w-32')}</span>
           </div>
@@ -343,7 +483,7 @@ function renderizar(){
               <button type="button" onclick="adicionarLinhaPesagemDireta('${id}')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100">+ Lançar Manual</button></div></div>
             ${gastos}</div></div></div>`;
     }).join('');
-    return `<div class="rounded-3xl border-2 ${t.bordaCard} shadow-sm ${t.bgLight} space-y-4 p-5"><div class="${t.header} text-white p-4 rounded-2xl flex justify-between items-center shadow-md"><h3 class="text-base font-black">${esc(emp)}</h3><span class="text-xs bg-white/20 px-3 py-1 rounded-xl font-bold">${grupos[emp].length} OV(s)</span></div><div class="space-y-4">${cards}</div></div>`;
+    return `<div class="rounded-3xl border-2 ${t.bordaCard} shadow-sm ${t.bgLight} space-y-4 p-5"><div class="${t.header} text-white p-4 rounded-2xl flex flex-wrap gap-2 justify-between items-center shadow-md"><h3 class="text-base font-black">${esc(emp)}</h3><div class="flex items-center gap-2"><button type="button" data-emp="${esc(emp)}" onclick="abrirModalNovaOV(this.dataset.emp)" class="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded-xl font-bold no-print">➕ Nova OV deste cliente</button><span class="text-xs bg-white/20 px-3 py-1 rounded-xl font-bold">${grupos[emp].length} OV(s)</span></div></div><div class="space-y-4">${cards}</div></div>`;
   }).join('');
 }
 
@@ -364,7 +504,7 @@ function atualizarGastoLinha(id,i,campo,v){
 }
 function adicionarLinhaPesagemDireta(id){const it=achar(id);if(!it)return;it.gastos=it.gastos||[];it.gastos.push({id:Date.now(),ticket:"NF-"+Math.floor(10000+Math.random()*90000),placa:"RIO-0A00",pesoTO:0.3,data:hoje()});salvarNaBase(it);}
 function removerGasto(id,i){const it=achar(id);if(it&&it.gastos){it.gastos.splice(i,1);salvarNaBase(it);}}
-function carregarDadosExemplo(){if(!confirm("Isso volta para os dados de exemplo e substitui o que está na tela. Deseja continuar?"))return;cacheRegistros=JSON.parse(JSON.stringify(DADOS_DEFAULT));salvarNaBase(cacheRegistros[0]);}
+function carregarDadosExemplo(){if(!confirm("Isso volta para os dados de exemplo e substitui as OVs na tela (os clientes cadastrados são mantidos). Deseja continuar?"))return;cacheRegistros=JSON.parse(JSON.stringify(DADOS_DEFAULT));salvarNaBase(cacheRegistros[0]);}
 
 // ---------- LEITOR 1: VA03 ----------
 function abrirModalLeitorOV(id){
@@ -529,7 +669,7 @@ window.addEventListener('paste',e=>{
 // ---------- modo "Editar Textos" (títulos, rótulos, botões) ----------
 (function(){
   const KEY=STORAGE_KEY+'_textos';
-  const CALC=['btnModoEdicao','btnRestaurarTextos','statTotalOvsContador','statSaldoTopResumo','statSaldoTopValor','totalGeralLiberadoTO','totalGeralLiberadoValor','totalGeralGastoTO','totalGeralGastoValor','totalGeralSaldoTO','totalGeralSaldoValor','badgePctSaldoGeral','textoConexao','progressoLeitorOV','progressoLeitorNotas','badgeNotasDetectadas','alertaComparacaoOV','detalhesLeitorOV','detalhesLeitorNotas','containerOVs','containerCardsEmpresas','btnSalvarGeral'];
+  const CALC=['btnModoEdicao','btnRestaurarTextos','statTotalOvsContador','statSaldoTopResumo','statSaldoTopValor','totalGeralLiberadoTO','totalGeralLiberadoValor','totalGeralGastoTO','totalGeralGastoValor','totalGeralSaldoTO','totalGeralSaldoValor','badgePctSaldoGeral','textoConexao','progressoLeitorOV','progressoLeitorNotas','badgeNotasDetectadas','alertaComparacaoOV','detalhesLeitorOV','detalhesLeitorNotas','containerOVs','containerCardsEmpresas','btnSalvarGeral','modalNovaOV'];
   const SEL=CALC.map(i=>'#'+i).join(',');
   let lista=[],salvo={},modo=false;
   const cand=el=>!(el.closest('script,style,select,textarea,head')||el.closest(SEL)||el.querySelector(SEL))&&[...el.childNodes].some(n=>n.nodeType===3&&n.textContent.trim());
