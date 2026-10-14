@@ -16,6 +16,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1e293
 .modo-edicao [contenteditable="true"]:focus{outline:2px solid #f59e0b;background:#fffbeb;color:#1e293b}
 .fi{width:100%;border:1px solid #cbd5e1;border-radius:.75rem;padding:.4rem .6rem;font-size:.75rem;font-weight:600;background:#fff;outline:none}
 .fi:focus{border-color:#0d9488;box-shadow:0 0 0 2px rgba(13,148,136,.25)}
+.nm{background:rgba(255,255,255,.12);border:1px solid transparent;border-radius:.5rem;padding:2px 8px;color:#fff;font-weight:900;font-size:1rem;outline:none;min-width:0;width:100%}
+.nm:hover{border-color:rgba(255,255,255,.4)}
+.nm:focus{background:rgba(255,255,255,.25);border-color:#fff}
 @media print{.no-print{display:none!important}body{background:#fff}}
 </style>
 </head>
@@ -36,6 +39,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1e293
     <button type="button" id="btnModoEdicao" onclick="alternarModoEdicao()" class="text-xs font-bold px-3 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white">✏️ Editar Textos</button>
     <button type="button" id="btnRestaurarTextos" onclick="restaurarTextos()" class="text-xs font-bold px-3 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700" title="Volta os textos fixos ao original">↩</button>
     <button type="button" onclick="exportarCSV()" class="text-xs font-bold px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white">📥 CSV</button>
+    <button type="button" onclick="exportarBackup()" class="text-xs font-bold px-3 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white" title="Baixa um arquivo de segurança com todas as OVs e clientes">⬇️ Backup</button>
+    <button type="button" onclick="document.getElementById('inputBackup').click()" class="text-xs font-bold px-3 py-2 rounded-xl bg-sky-100 hover:bg-sky-200 text-sky-800 border border-sky-200" title="Restaura um arquivo de backup">⬆️ Restaurar</button>
+    <input type="file" id="inputBackup" accept=".json,application/json" class="hidden" onchange="importarBackup(this)">
   </div>
 </nav>
 
@@ -78,7 +84,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1e293
 </div>
 
 <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-sm flex flex-col md:flex-row gap-3 items-center justify-between no-print">
-  <div class="relative w-full md:w-80"><input type="text" id="filtroTexto" oninput="renderizar()" placeholder="Pesquisar por OV, Contrato, Material ou DRS..." class="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-xl bg-slate-50 outline-none focus:border-teal-600"><span class="absolute left-3 top-2.5 text-xs text-slate-400">🔍</span></div>
+  <div class="relative w-full md:w-80"><input type="text" id="filtroTexto" oninput="renderizar()" placeholder="Pesquisar por OV, Contrato, Material, DRS ou Obs..." class="w-full pl-9 pr-3 py-2 text-xs border border-slate-300 rounded-xl bg-slate-50 outline-none focus:border-teal-600"><span class="absolute left-3 top-2.5 text-xs text-slate-400">🔍</span></div>
   <div class="flex flex-wrap items-center gap-2">
     <select id="filtroEmpresa" onchange="renderizar()" class="text-xs border border-slate-300 bg-slate-50 rounded-xl px-3 py-2 font-semibold text-slate-700 max-w-[220px]"><option value="TODAS">Todas as Empresas</option></select>
     <button type="button" onclick="carregarDadosExemplo()" class="text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 px-3 py-2 rounded-xl">Carregar Padrão</button>
@@ -88,7 +94,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1e293
 <div id="containerOVs" class="space-y-8"></div>
 </div>
 
-<!-- MODAL NOVA OV (cliente existente ou novo) -->
+<!-- MODAL NOVA OV -->
 <div id="modalNovaOV" class="fixed inset-0 bg-slate-950/75 z-50 hidden flex items-center justify-center p-4">
   <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl space-y-4 max-h-[92vh] overflow-y-auto">
     <div class="flex justify-between items-center border-b border-slate-100 pb-3">
@@ -226,7 +232,7 @@ function preProcessarImagemParaOCR(arq,op={}){
   });
 }
 
-const DADOS_DEFAULT=[{id:"115939257",status:"ATIVO",
+const DADOS_DEFAULT=[{id:"115939257",status:"ATIVO",obs:"",
  contrato:{numero:"0000071823",item:"30",qtdTotalTO:2635.00,valorTotalBRL:3320100.00},
  ov:{numero:"115939257",cliente:"AUCOBRE GESTÃO DE RESIDUOS LTDA.",pedidoDRS:"DSR 018-2025",
   itens:[{itemSap:"40",material:"SUCATA DE FIO-CABO DE ALUMÍNIO E...",qtdTO:0.300},{itemSap:"60",material:"SUCATA DE FIO-CABO DE COBRE ENCA...",qtdTO:0.300}],
@@ -266,8 +272,16 @@ function salvarNaBase(item){
 }
 function excluirOV(id){
   const it=cacheRegistros.find(o=>o.id===id);if(!it||!confirm('Excluir a OV '+it.ov.numero+' e todas as notas dela? (O cliente continua cadastrado)'))return;
-  const emp=normalizarNomeEmpresa(it.ov.cliente);registrarCliente(emp); // garante que o cliente não some ao excluir a última OV
+  const emp=normalizarNomeEmpresa(it.ov.cliente);registrarCliente(emp);
   cacheRegistros=cacheRegistros.filter(o=>o.id!==id);gravarLocal();atualizarOpcoesEmpresas();renderizar();
+}
+function duplicarOV(id){
+  const it=cacheRegistros.find(o=>o.id===id);if(!it)return;
+  const n=prompt("Número da nova OV (cópia sem notas fiscais):");if(!n||!n.trim())return;
+  const nv=n.trim();
+  if(cacheRegistros.some(o=>o.id===nv||String(o.ov.numero).trim()===nv)){alert("Já existe uma OV com o número "+nv+".");return;}
+  const c=JSON.parse(JSON.stringify(it));c.id=nv;c.ov.numero=nv;c.gastos=[];
+  salvarNaBase(c);
 }
 
 // ---------- CLIENTES (cadastro) ----------
@@ -276,7 +290,6 @@ function listaClientes(){
   cacheRegistros.forEach(o=>s.add(normalizarNomeEmpresa(o.ov.cliente)));
   return [...s].sort((a,b)=>a.localeCompare(b,'pt-BR'));
 }
-// Cadastra (se ainda não existir) e devolve o nome oficial. Compara sem diferenciar maiúsculas/minúsculas.
 function registrarCliente(nome){
   if(!nome||!String(nome).trim())return null;
   const n=normalizarNomeEmpresa(nome);
@@ -291,11 +304,35 @@ function novoClienteRapido(){
   if(existia){alert('Esse cliente já está cadastrado: '+nome);}
   if(confirm('Cliente "'+nome+'" pronto. Deseja criar uma OV para ele agora?'))abrirModalNovaOV(nome);
 }
-function removerCliente(nome){
-  if(cacheRegistros.some(o=>normalizarNomeEmpresa(o.ov.cliente)===nome)){alert('Este cliente ainda tem OVs. Exclua ou mova as OVs antes.');return;}
-  if(!confirm('Remover o cliente "'+nome+'" (sem OVs)?'))return;
+// Exclui o cliente. Se tiver OVs, avisa e apaga junto (com confirmação dupla).
+function excluirCliente(nome){
+  const ovs=cacheRegistros.filter(o=>normalizarNomeEmpresa(o.ov.cliente)===nome);
+  if(ovs.length){
+    const notas=ovs.reduce((s,o)=>s+(o.gastos||[]).length,0);
+    if(!confirm(`Excluir o cliente "${nome}"?\n\nIsso apaga também ${ovs.length} OV(s) e ${notas} nota(s) fiscal(is) dele.`))return;
+    if(!confirm('Tem certeza? Essa ação não pode ser desfeita (dica: use ⬇️ Backup antes).'))return;
+  }else if(!confirm('Remover o cliente "'+nome+'"?'))return;
+  cacheRegistros=cacheRegistros.filter(o=>normalizarNomeEmpresa(o.ov.cliente)!==nome);
   clientes=clientes.filter(c=>normalizarNomeEmpresa(c)!==nome);
   if($('filtroEmpresa').value===nome)$('filtroEmpresa').value='TODAS';
+  gravarLocal();atualizarOpcoesEmpresas();renderizar();
+}
+function removerCliente(nome){excluirCliente(nome);} // compatibilidade
+// Renomeia o cliente em todas as OVs dele (ou junta com outro cliente já existente).
+function renomearCliente(antigo,novo){
+  if(novo==null)novo=prompt("Novo nome para o cliente:",antigo);
+  if(novo==null)return;
+  novo=String(novo).trim();
+  if(!novo){alert("O nome não pode ficar vazio.");renderizar();return;}
+  const alvo=normalizarNomeEmpresa(novo);
+  if(alvo===antigo){renderizar();return;}
+  const outro=listaClientes().find(c=>c.toUpperCase()===alvo.toUpperCase()&&c!==antigo);
+  if(outro&&!confirm(`Já existe o cliente "${outro}". Juntar as OVs de "${antigo}" nele?`)){renderizar();return;}
+  const final=outro||alvo;
+  cacheRegistros.forEach(o=>{if(normalizarNomeEmpresa(o.ov.cliente)===antigo)o.ov.cliente=final;});
+  clientes=clientes.filter(c=>normalizarNomeEmpresa(c)!==antigo);
+  if(!clientes.some(c=>normalizarNomeEmpresa(c)===final))clientes.push(final);
+  if($('filtroEmpresa').value===antigo)$('filtroEmpresa').value=final;
   gravarLocal();atualizarOpcoesEmpresas();renderizar();
 }
 function trocarClienteOV(id,sel){
@@ -326,7 +363,6 @@ function aoTrocarClienteNovaOV(){
   const v=$('novaOVCliente').value,novo=v==='__novo__';
   $('boxNovoCliente').classList.toggle('hidden',!novo);
   if(novo)return;
-  // sugere os dados do contrato da última OV desse cliente
   const ult=cacheRegistros.find(o=>normalizarNomeEmpresa(o.ov.cliente)===v);
   if(ult){
     const ct=ult.contrato||{};
@@ -345,28 +381,28 @@ function salvarNovaOV(){
   const cliente=registrarCliente(nomeDigitado);
   const qtd=parseNumeroSap($('novaOVQtd').value),preco=parseNumeroSap($('novaOVPreco').value);
   const mat=$('novaOVMaterial').value.trim()||'NOVO MATERIAL';
-  const novo={id:num,status:"ATIVO",
+  const novo={id:num,status:"ATIVO",obs:"",
     contrato:{numero:$('novaOVContrato').value.trim(),item:$('novaOVContratoItem').value.trim(),qtdTotalTO:parseNumeroSap($('novaOVContratoQtd').value),valorTotalBRL:parseNumeroSap($('novaOVContratoValor').value)},
     ov:{numero:num,cliente:cliente,pedidoDRS:$('novaOVDRS').value.trim(),
       itens:[{itemSap:$('novaOVItemSap').value.trim()||'10',material:mat,qtdTO:qtd}],
       qtdLiberadaTO:qtd,valorBRL:qtd*preco,precoUnitarioPorTO:preco},gastos:[]};
   fecharModalNovaOV();
   salvarNaBase(novo);
-  $('filtroEmpresa').value=cliente;renderizar(); // já mostra o cliente com a OV nova
+  $('filtroEmpresa').value=cliente;renderizar();
 }
-function adicionarNovaOVManual(){abrirModalNovaOV();} // compatibilidade
+function adicionarNovaOVManual(){abrirModalNovaOV();}
 
 // ---------- cálculo ----------
 function calc(it){
   const c=it.status==='CANCELADO',g=(it.gastos||[]).reduce((s,x)=>s+Number(x.pesoTO||0),0);
   const u=it.ov.precoUnitarioPorTO||(it.ov.qtdLiberadaTO>0?it.ov.valorBRL/it.ov.qtdLiberadaTO:14575.5),vg=g*u;
-  return{c,g,s:c?0:Math.max(0,it.ov.qtdLiberadaTO-g),vg,vs:Math.max(0,it.ov.valorBRL-vg)};
+  return{c,g,s:c?0:Math.max(0,it.ov.qtdLiberadaTO-g),vg,vs:Math.max(0,it.ov.valorBRL-vg),estouro:!c&&g>Number(it.ov.qtdLiberadaTO||0)+0.0005};
 }
 
 // ---------- campos editáveis ----------
-function I(id,campo,val,tipo,cls){
+function I(id,campo,val,tipo,cls,ph){
   const n=tipo==='num';
-  return `<input type="${n?'number':'text'}"${n?' step="any"':''} value="${esc(val)}" onchange="editarOV('${id}','${campo}',this.value,'${tipo}')" class="ii ${cls||''}">`;
+  return `<input type="${n?'number':'text'}"${n?' step="any"':''} value="${esc(val)}"${ph?` placeholder="${esc(ph)}"`:''} onchange="editarOV('${id}','${campo}',this.value,'${tipo}')" class="ii ${cls||''}">`;
 }
 function editarOV(id,campo,valor,tipo){
   const it=cacheRegistros.find(o=>o.id===id);if(!it)return;
@@ -374,7 +410,7 @@ function editarOV(id,campo,valor,tipo){
     const nv=String(valor).trim();
     if(!nv||cacheRegistros.some(o=>o!==it&&String(o.ov.numero).trim()===nv)){alert("Número de OV vazio ou já usado em outra OV.");renderizar();return;}
   }
-  const p=campo.split('.'),alvo=p.length>1?it[p[0]]:it;
+  const p=campo.split('.'),alvo=p.length>1?(it[p[0]]=it[p[0]]||{}):it;
   alvo[p[p.length-1]]=tipo==='num'?parseNumeroSap(valor):String(valor).trim();
   salvarNaBase(it);
 }
@@ -397,7 +433,10 @@ function atualizarOpcoesEmpresas(){
         <div class="flex justify-between"><span class="text-slate-500 font-semibold">Saldo Livre Restante:</span><span class="font-black text-emerald-700">${fTO(sal)}</span></div></div>
       <div class="mt-2.5 flex items-center justify-between gap-2 no-print">
         <button type="button" data-emp="${esc(emp)}" onclick="event.stopPropagation();abrirModalNovaOV(this.dataset.emp)" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-white border border-slate-300 text-teal-800 hover:bg-teal-50">➕ Nova OV</button>
-        ${ovs.length===0?`<button type="button" data-emp="${esc(emp)}" onclick="event.stopPropagation();removerCliente(this.dataset.emp)" class="text-[11px] font-bold px-2 py-1 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100" title="Remover cliente sem OVs">🗑️</button>`:''}
+        <div class="flex gap-1">
+          <button type="button" data-emp="${esc(emp)}" onclick="event.stopPropagation();renomearCliente(this.dataset.emp)" class="text-[11px] font-bold px-2 py-1 rounded-lg bg-amber-50 text-amber-700 border border-amber-200 hover:bg-amber-100" title="Renomear cliente">✏️</button>
+          <button type="button" data-emp="${esc(emp)}" onclick="event.stopPropagation();excluirCliente(this.dataset.emp)" class="text-[11px] font-black px-2 py-1 rounded-lg bg-rose-50 text-rose-700 border border-rose-200 hover:bg-rose-100" title="Excluir cliente">✕</button>
+        </div>
       </div></div>`;
   }).join('');
 }
@@ -413,7 +452,7 @@ function renderizar(){
     if(fe!=='TODAS'&&normalizarNomeEmpresa(it.ov.cliente)!==fe)return false;
     if(termo){
       const m=(it.ov.itens||[]).map(i=>i.material).join(' ');
-      return [it.ov.numero,it.contrato.numero,it.ov.cliente,it.ov.pedidoDRS,m].some(v=>String(v||'').toLowerCase().includes(termo));
+      return [it.ov.numero,(it.contrato||{}).numero,it.ov.cliente,it.ov.pedidoDRS,it.obs,m].some(v=>String(v||'').toLowerCase().includes(termo));
     }
     return true;
   });
@@ -424,23 +463,25 @@ function renderizar(){
   $('statSaldoTopResumo').innerText=fTO(S);$('statSaldoTopValor').innerText=fR(SV);$('statTotalOvsContador').innerText=n+' OV(s)';
 
   const box=$('containerOVs');
-  if(!lista.length){
-    const btn=(fe!=='TODAS'&&!termo)?`<button type="button" data-emp="${esc(fe)}" onclick="abrirModalNovaOV(this.dataset.emp)" class="mt-3 text-xs font-bold px-4 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white no-print">➕ Criar primeira OV de ${esc(fe)}</button>`:'';
-    box.innerHTML=`<div class="bg-white p-12 text-center rounded-2xl border border-slate-200"><h4 class="font-bold text-slate-700">Nenhum registro encontrado</h4>${btn}</div>`;return;}
   const grupos={};lista.forEach(it=>{const e=normalizarNomeEmpresa(it.ov.cliente);(grupos[e]=grupos[e]||[]).push(it);});
+  // cliente cadastrado sem OV continua aparecendo (com botão X) quando filtrado
+  if(fe!=='TODAS'&&!termo&&!grupos[fe]&&listaClientes().includes(fe))grupos[fe]=[];
+  if(!Object.keys(grupos).length){
+    box.innerHTML=`<div class="bg-white p-12 text-center rounded-2xl border border-slate-200"><h4 class="font-bold text-slate-700">Nenhum registro encontrado</h4></div>`;return;}
   let k=0;
   box.innerHTML=Object.keys(grupos).map(emp=>{
     const t=tema(emp,ehGerdau(emp)?0:k++);
     const optsCli=listaClientes().map(c=>`<option value="${esc(c)}"${c===emp?' selected':''}>${esc(c)}</option>`).join('')+'<option value="__novo__">➕ Cadastrar novo cliente…</option>';
     const cards=grupos[emp].map(it=>{
       const c=calc(it),id=it.id,ct=it.contrato||(it.contrato={numero:'',item:'',qtdTotalTO:0,valorTotalBRL:0});
+      const lib=Number(it.ov.qtdLiberadaTO||0),pct=lib>0?Math.min(100,Math.round(c.g/lib*100)):0;
       const mats=(it.ov.itens||[]).map((m,i)=>`<div class="flex items-center gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200 text-xs">
         <span class="text-[10px] font-bold text-slate-500 bg-white px-1 py-0.5 rounded border border-slate-200 flex items-center">Item <input value="${esc(m.itemSap)}" onchange="atualizarItemMaterial('${id}',${i},'itemSap',this.value)" class="ii w-10 text-center"></span>
         <input value="${esc(m.material)}" onchange="atualizarItemMaterial('${id}',${i},'material',this.value)" class="ii font-bold text-slate-800 flex-1 min-w-0">
         <span class="text-[10px] text-slate-400 font-bold">Qtd:</span>
         <input type="number" step="0.001" value="${Number(m.qtdTO).toFixed(3)}" onchange="atualizarItemMaterial('${id}',${i},'qtdTO',this.value)" class="ii w-20 font-black text-teal-800 text-right"><span class="text-[10px] font-bold text-slate-500">TO</span>
         <span class="text-[10px] text-slate-400">(${Math.round(Number(m.qtdTO)*1000)} KG)</span>
-        <button type="button" onclick="removerLinhaMaterialOV('${id}',${i})" class="text-rose-400 hover:text-rose-600 font-bold no-print">✕</button></div>`).join('');
+        <button type="button" onclick="removerLinhaMaterialOV('${id}',${i})" class="text-rose-400 hover:text-rose-600 font-bold no-print" title="Remover linha">✕</button></div>`).join('');
       const cf=(r,campo,v,tp)=>`<label class="bg-white border border-slate-200 rounded-xl px-2 py-1.5 block"><span class="block text-[9px] font-bold text-slate-400 uppercase">${r}</span>${I(id,campo,v,tp,'font-bold text-slate-700 text-xs w-full')}</label>`;
       const gastos=!(it.gastos||[]).length?'<p class="text-[11px] text-slate-400 italic">Nenhuma nota fiscal lançada. Use o leitor de notas ou lance manualmente.</p>':
        `<div class="overflow-x-auto"><table class="w-full text-left text-xs border border-slate-100"><thead><tr class="bg-slate-50 text-slate-500 text-[10px] uppercase font-bold border-b border-slate-100">
@@ -450,8 +491,8 @@ function renderizar(){
         <td class="py-1 px-3"><input value="${esc(g.ticket)}" onchange="atualizarGastoLinha('${id}',${i},'ticket',this.value)" class="ii font-semibold text-slate-800 text-xs w-32"></td>
         <td class="py-1 px-3"><input value="${esc(g.placa)}" onchange="atualizarGastoLinha('${id}',${i},'placa',this.value)" class="ii text-slate-600 font-mono text-xs w-28 uppercase"></td>
         <td class="py-1 px-3 text-right"><span class="text-rose-500 font-bold">-</span><input type="number" step="0.001" value="${Number(g.pesoTO).toFixed(3)}" onchange="atualizarGastoLinha('${id}',${i},'pesoTO',this.value)" class="ii text-right font-black text-rose-600 text-xs w-24"> <span class="text-[10px] font-bold text-slate-400">TO</span></td>
-        <td class="py-1 px-3 text-center no-print"><button type="button" onclick="removerGasto('${id}',${i})" class="text-rose-400 hover:text-rose-600">✕</button></td></tr>`).join('')+'</tbody></table></div>';
-      return `<div class="bg-white rounded-2xl border-2 ${t.ovBordaPadrao} shadow-sm overflow-hidden">
+        <td class="py-1 px-3 text-center no-print"><button type="button" onclick="removerGasto('${id}',${i})" class="text-rose-400 hover:text-rose-600" title="Remover nota">✕</button></td></tr>`).join('')+'</tbody></table></div>';
+      return `<div class="bg-white rounded-2xl border-2 ${c.estouro?'border-rose-400':t.ovBordaPadrao} shadow-sm overflow-hidden${c.c?' opacity-70':''}">
         <div class="bg-slate-100 border-b border-slate-200 px-5 py-3 flex flex-wrap items-center justify-between gap-3 text-xs">
           <div class="flex flex-wrap items-center gap-2">
             <span class="${t.badge} text-white font-mono font-bold text-[10px] px-2 py-0.5 rounded inline-flex items-center gap-1">OV ${I(id,'ov.numero',it.ov.numero,'text','w-24 !bg-white/90 text-slate-900 font-mono font-bold text-[10px]')}</span>
@@ -462,7 +503,8 @@ function renderizar(){
           </div>
           <div class="flex items-center gap-2 no-print">
             <select onchange="editarOV('${id}','status',this.value)" class="text-[11px] font-bold border border-slate-300 rounded-lg px-1.5 py-1 bg-white"><option value="ATIVO"${c.c?'':' selected'}>ATIVO</option><option value="CANCELADO"${c.c?' selected':''}>CANCELADO</option></select>
-            <button type="button" onclick="excluirOV('${id}')" class="text-xs px-2 py-1 rounded-xl bg-rose-100 text-rose-700 hover:bg-rose-200" title="Excluir esta OV">🗑️</button>
+            <button type="button" onclick="duplicarOV('${id}')" class="text-xs px-2 py-1 rounded-xl bg-slate-200 text-slate-700 hover:bg-slate-300" title="Duplicar esta OV (sem notas)">📄</button>
+            <button type="button" onclick="excluirOV('${id}')" class="text-xs font-black px-2 py-1 rounded-xl bg-rose-100 text-rose-700 hover:bg-rose-200" title="Excluir esta OV">✕</button>
             <button type="button" onclick="abrirModalLeitorOV('${id}')" class="text-xs font-bold px-3 py-1 rounded-xl bg-teal-700 hover:bg-teal-800 text-white">📷 1. Ler Tela OV (VA03)</button>
           </div></div>
         <div class="p-5 space-y-4">
@@ -477,13 +519,21 @@ function renderizar(){
             <div class="bg-rose-50 border border-rose-200 p-3 rounded-xl"><span class="block text-[10px] font-bold text-rose-600 uppercase mb-1">2. O que JÁ FOI GASTO (Notas)</span><div class="text-base font-black text-rose-700">${fTO(c.g)}</div><div class="text-xs font-bold text-rose-600 mt-1">${fR(c.vg)}</div></div>
             <div class="bg-emerald-50 border border-emerald-200 p-3 rounded-xl"><span class="block text-[10px] font-bold text-emerald-700 uppercase mb-1">3. SALDO LIVRE RESTANTE</span><div class="text-base font-black text-emerald-800">${fTO(c.s)}</div><div class="text-xs font-bold text-emerald-700 mt-1">${fR(c.vs)}</div></div>
           </div>
+          <div>
+            <div class="flex justify-between text-[10px] font-bold text-slate-500 mb-1"><span>Consumo da OV</span><span>${lib>0?Math.round(c.g/lib*100):0}%</span></div>
+            <div class="h-2 rounded-full bg-slate-200 overflow-hidden"><div class="h-full ${c.estouro?'bg-rose-600':pct>=80?'bg-amber-500':'bg-teal-600'}" style="width:${pct}%"></div></div>
+            ${c.estouro?`<p class="mt-1 text-[11px] font-bold text-rose-600">⚠️ As notas (${fTO(c.g)}) passaram do total liberado desta OV (${fTO(lib)}).</p>`:''}
+          </div>
+          <label class="block bg-white border border-slate-200 rounded-xl px-2 py-1.5"><span class="block text-[9px] font-bold text-slate-400 uppercase">Observações</span>${I(id,'obs',it.obs||'','text','text-xs w-full text-slate-700','Anotações desta OV...')}</label>
           <div class="border-t border-slate-100 pt-3">
             <div class="flex flex-wrap justify-between items-center gap-2 mb-2"><span class="text-xs font-bold text-slate-700">⚖️ Romaneios / Notas Fiscais Emitidas</span>
               <div class="flex gap-2 no-print"><button type="button" onclick="abrirModalLeitorNotas('${id}')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-rose-50 text-rose-800 border border-rose-200 hover:bg-rose-100">📷 2. Ler Tela de Notas (Fluxo SAP)</button>
               <button type="button" onclick="adicionarLinhaPesagemDireta('${id}')" class="text-[11px] font-bold px-2.5 py-1 rounded-lg bg-slate-50 text-slate-700 border border-slate-200 hover:bg-slate-100">+ Lançar Manual</button></div></div>
             ${gastos}</div></div></div>`;
-    }).join('');
-    return `<div class="rounded-3xl border-2 ${t.bordaCard} shadow-sm ${t.bgLight} space-y-4 p-5"><div class="${t.header} text-white p-4 rounded-2xl flex flex-wrap gap-2 justify-between items-center shadow-md"><h3 class="text-base font-black">${esc(emp)}</h3><div class="flex items-center gap-2"><button type="button" data-emp="${esc(emp)}" onclick="abrirModalNovaOV(this.dataset.emp)" class="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded-xl font-bold no-print">➕ Nova OV deste cliente</button><span class="text-xs bg-white/20 px-3 py-1 rounded-xl font-bold">${grupos[emp].length} OV(s)</span></div></div><div class="space-y-4">${cards}</div></div>`;
+    }).join('')||`<div class="bg-white/80 border border-dashed border-slate-300 rounded-2xl p-6 text-center text-xs text-slate-500">Este cliente ainda não tem OVs.<br><button type="button" data-emp="${esc(emp)}" onclick="abrirModalNovaOV(this.dataset.emp)" class="mt-2 text-xs font-bold px-4 py-2 rounded-xl bg-teal-700 hover:bg-teal-800 text-white no-print">➕ Criar primeira OV</button></div>`;
+    return `<div class="rounded-3xl border-2 ${t.bordaCard} shadow-sm ${t.bgLight} space-y-4 p-5"><div class="${t.header} text-white p-4 rounded-2xl flex flex-wrap gap-2 justify-between items-center shadow-md">
+      <div class="flex-1 min-w-[220px] flex items-center gap-2"><input class="nm" value="${esc(emp)}" data-emp="${esc(emp)}" onchange="renomearCliente(this.dataset.emp,this.value)" title="Clique para editar o nome do cliente"><span class="text-white/60 text-xs no-print">✏️</span></div>
+      <div class="flex items-center gap-2"><button type="button" data-emp="${esc(emp)}" onclick="abrirModalNovaOV(this.dataset.emp)" class="text-xs bg-white/20 hover:bg-white/30 px-3 py-1 rounded-xl font-bold no-print">➕ Nova OV deste cliente</button><span class="text-xs bg-white/20 px-3 py-1 rounded-xl font-bold">${grupos[emp].length} OV(s)</span><button type="button" data-emp="${esc(emp)}" onclick="excluirCliente(this.dataset.emp)" class="text-xs font-black bg-rose-500 hover:bg-rose-600 px-3 py-1 rounded-xl no-print" title="Excluir este cliente">✕ Excluir cliente</button></div></div><div class="space-y-4">${cards}</div></div>`;
   }).join('');
 }
 
@@ -646,15 +696,38 @@ function aplicarNotasNaOV(){
   alert(`✓ ${ok} nota(s) lançada(s)${rep?` (${rep} já existiam e foram ignoradas)`:''}.`);
 }
 
-// ---------- CSV e colar imagem ----------
+// ---------- CSV, backup e colar imagem ----------
+function baixarArquivo(nome,conteudo,tipo){
+  const a=document.createElement("a");a.href=URL.createObjectURL(new Blob([conteudo],{type:tipo}));a.download=nome;
+  document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(a.href),2000);
+}
 function exportarCSV(){
   if(!cacheRegistros.length)return;
-  let csv="data:text/csv;charset=utf-8,OV;Cliente;Materiais;Total (TO);Gasto (TO);Saldo (TO)\r\n";
+  const q=s=>'"'+String(s==null?'':s).replace(/"/g,'""')+'"';
+  let csv="OV;Cliente;Status;Materiais;Total (TO);Gasto (TO);Saldo (TO);Obs\r\n";
   cacheRegistros.forEach(it=>{
     const c=calc(it),m=(it.ov.itens||[]).map(i=>`${i.itemSap}:${i.material}(${i.qtdTO}TO)`).join(' | ');
-    csv+=`"${it.ov.numero}";"${it.ov.cliente}";"${m}";${it.ov.qtdLiberadaTO};${c.g};${c.s}\r\n`;
+    csv+=`${q(it.ov.numero)};${q(it.ov.cliente)};${q(it.status)};${q(m)};${it.ov.qtdLiberadaTO};${c.g};${c.s};${q(it.obs)}\r\n`;
   });
-  const a=document.createElement("a");a.href=encodeURI(csv);a.download=`ovs_segregadas_${hoje()}.csv`;document.body.appendChild(a);a.click();a.remove();
+  baixarArquivo(`ovs_segregadas_${hoje()}.csv`,'\uFEFF'+csv,'text/csv;charset=utf-8');
+}
+function exportarBackup(){
+  baixarArquivo(`backup_modulo11_${hoje()}.json`,JSON.stringify({versao:1,data:hoje(),ovs:cacheRegistros,clientes},null,1),'application/json');
+}
+function importarBackup(inp){
+  const f=inp.files[0];if(!f)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    try{
+      const d=JSON.parse(e.target.result);
+      if(!d||!Array.isArray(d.ovs))throw new Error("Arquivo inválido.");
+      if(!confirm(`Restaurar backup com ${d.ovs.length} OV(s)? Isso substitui os dados atuais desta tela.`))return;
+      cacheRegistros=d.ovs;clientes=Array.isArray(d.clientes)?d.clientes:[];
+      gravarLocal();atualizarOpcoesEmpresas();renderizar();alert("✓ Backup restaurado.");
+    }catch(x){alert("Não foi possível ler o backup: "+x.message);}
+    inp.value='';
+  };
+  r.readAsText(f);
 }
 window.addEventListener('paste',e=>{
   for(const ci of e.clipboardData.items){
