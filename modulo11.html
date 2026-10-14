@@ -6,6 +6,7 @@
 <title>Módulo 11 - Controle de OVs por Empresa</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 *{box-sizing:border-box}
 body{font-family:'Segoe UI',system-ui,sans-serif;background:#f0f4f8;color:#1e293b;min-height:100vh}
@@ -45,6 +46,7 @@ tr.piscando-novo td{animation:piscarNovo .6s ease-in-out 4}
     <button type="button" id="btnRestaurarTextos" onclick="restaurarTextos()" class="text-xs font-bold px-3 py-2 rounded-xl bg-slate-200 hover:bg-slate-300 text-slate-700" title="Volta os textos fixos ao original">↩</button>
     <button type="button" onclick="exportarCSV()" class="text-xs font-bold px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-900 text-white">📥 CSV</button>
     <button type="button" onclick="exportarXML()" class="text-xs font-bold px-3 py-2 rounded-xl bg-orange-600 hover:bg-orange-700 text-white" title="Exporta todas as empresas, OVs, materiais e notas em XML">🗂️ XML</button>
+    <button type="button" onclick="exportarExcel()" class="text-xs font-bold px-3 py-2 rounded-xl bg-green-700 hover:bg-green-800 text-white" title="Exporta resumo das OVs, notas e materiais em Excel (.xlsx)">📗 Excel</button>
     <button type="button" onclick="exportarBackup()" class="text-xs font-bold px-3 py-2 rounded-xl bg-sky-600 hover:bg-sky-700 text-white" title="Baixa um arquivo de segurança com todas as OVs e clientes">⬇️ Backup</button>
     <button type="button" onclick="document.getElementById('inputBackup').click()" class="text-xs font-bold px-3 py-2 rounded-xl bg-sky-100 hover:bg-sky-200 text-sky-800 border border-sky-200" title="Restaura um arquivo de backup">⬆️ Restaurar</button>
     <input type="file" id="inputBackup" accept=".json,application/json" class="hidden" onchange="importarBackup(this)">
@@ -769,6 +771,25 @@ function exportarCSV(){
     csv+=`${q(it.ov.numero)};${q(it.ov.cliente)};${q(it.status)};${q(m)};${it.ov.qtdLiberadaTO};${c.g};${c.s};${q(it.obs)}\r\n`;
   });
   baixarArquivo(`ovs_segregadas_${hoje()}.csv`,'\uFEFF'+csv,'text/csv;charset=utf-8');
+}
+function exportarExcel(){
+  if(typeof XLSX==='undefined'){alert("A biblioteca do Excel não carregou (sem internet?). Tente novamente online.");return;}
+  if(!cacheRegistros.length){alert("Não há dados para exportar.");return;}
+  const dt=s=>{const m=String(s||'').match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?new Date(+m[1],+m[2]-1,+m[3]):'';};
+  const resumo=[],notas=[],mats=[];
+  const ordem=[...cacheRegistros].sort((a,b)=>normalizarNomeEmpresa(a.ov.cliente).localeCompare(normalizarNomeEmpresa(b.ov.cliente),'pt-BR'));
+  ordem.forEach(it=>{
+    const c=calc(it),ct=it.contrato||{},emp=normalizarNomeEmpresa(it.ov.cliente);ordenarGastos(it);
+    resumo.push({'Cliente':emp,'OV':it.ov.numero,'Status':it.status,'Pedido/DRS':it.ov.pedidoDRS||'','Contrato':ct.numero||'','Item contrato':ct.item||'','Qtd contrato (TO)':Number(ct.qtdTotalTO||0),'Valor contrato (R$)':Number(ct.valorTotalBRL||0),'Preço por TO (R$)':Number(c.u||0),'Liberado (TO)':Number(it.ov.qtdLiberadaTO||0),'Liberado (R$)':Number(it.ov.valorBRL||0),'Gasto (TO)':c.g,'Gasto (R$)':c.vg,'Saldo (TO)':c.s,'Saldo (R$)':c.vs,'Qtd notas':(it.gastos||[]).length,'Obs':it.obs||''});
+    (it.gastos||[]).forEach(g=>notas.push({'Cliente':emp,'OV':it.ov.numero,'Data':dt(g.data),'Nº Nota Fiscal / Ticket':g.ticket,'Placa / Remessa':g.placa,'Peso (TO)':Number(g.pesoTO||0),'Valor (R$)':Number(g.pesoTO||0)*c.u}));
+    (it.ov.itens||[]).forEach(m=>mats.push({'Cliente':emp,'OV':it.ov.numero,'Item':m.itemSap,'Material':m.material,'Qtd (TO)':Number(m.qtdTO||0),'Qtd (KG)':Math.round(Number(m.qtdTO||0)*1000)}));
+  });
+  const aba=(rows,larg)=>{const w=XLSX.utils.json_to_sheet(rows,{dateNF:'dd/mm/yyyy'});w['!cols']=larg.map(x=>({wch:x}));return w;};
+  const wb=XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(wb,aba(resumo,[34,12,11,16,13,12,16,18,16,14,14,12,14,12,14,10,30]),'Resumo OVs');
+  XLSX.utils.book_append_sheet(wb,aba(notas.length?notas:[{'Cliente':'','OV':'','Data':'','Nº Nota Fiscal / Ticket':'','Placa / Remessa':'','Peso (TO)':'','Valor (R$)':''}],[34,12,12,22,16,12,16]),'Notas');
+  XLSX.utils.book_append_sheet(wb,aba(mats,[34,12,8,50,10,10]),'Materiais');
+  XLSX.writeFile(wb,`ovs_modulo11_${hoje()}.xlsx`,{cellDates:true});
 }
 function exportarXML(){
   if(!cacheRegistros.length&&!listaClientes().length){alert("Não há dados para exportar.");return;}
