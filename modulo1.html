@@ -28,7 +28,9 @@ button,select,input,textarea{font:inherit}
 .top{display:flex;border:2px solid #000;border-bottom:0;height:112px}
 .tt{display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--tc,#2b6a68);margin-bottom:4px}.tt .ttl{flex:1;border:0;background:transparent;font:700 17px Arial;color:var(--tc,#2b6a68);padding:2px 0}.tt img{height:30px}
 .emo{flex:1.5;padding:4px 8px;font:11px Arial;border-left:2px solid #000;color:#000}.emo u{font-weight:700;font-size:14px;display:block;margin-bottom:2px}.lg{display:flex;gap:6px;align-items:center}.lg p{margin:2px 0}.fcs{display:flex;flex-direction:column;align-items:center;font:8px/8px Arial}.fcs i{font-style:normal}.fcs svg{width:14px;height:14px}.seg+.seg{margin-top:14px}
-td.hol{background:repeating-linear-gradient(45deg,#ccc,#ccc 3px,#fff 3px,#fff 7px)}
+/* FERIADO: hachura feita com SVG (elemento), por isso sai na impressão mesmo sem "gráficos de plano de fundo" */
+td.hol{position:relative;padding:0;background:#fff}
+td.hol svg{position:absolute;left:0;top:0;width:100%;height:100%;display:block}
 .top textarea{flex:1;border:0;resize:none;padding:6px;font:700 17px Arial;background:transparent;color:#000;box-sizing:border-box}
 .top textarea+textarea{border-left:2px solid #000}
 .top textarea:first-child{flex:1.15}
@@ -57,19 +59,25 @@ td.ban input{width:100%;border:0;background:transparent;color:#fff;font:700 13px
 td.x,th.x{width:20px;border:0!important;background:none}
 td.x button{border:0;background:none;color:#b00;cursor:pointer;font-size:14px;padding:0}
 .sh-foot{text-align:right;font-size:11px;color:#555;margin-top:4px}
+.warn{color:#b00;font-size:12px;align-self:center;font-weight:700}
 @media print{
  @page{size:A4 landscape;margin:8mm}
  body{background:#fff}.bar,.sh-act,.x,.sh-foot,body::before{display:none!important}
- #pages{padding:0;gap:0;display:block}.wrap{overflow:visible}
- .sheet{width:100%;box-shadow:none;padding:0;break-after:page}
- .sheet:last-child{break-after:auto}
+ #pages{padding:0;gap:0;display:block}
+ /* cada semana = 1 .wrap; quebra de página entre semanas (antes estava sendo anulada por :last-child) */
+ .wrap{overflow:visible;break-after:page}
+ .wrap:last-child{break-after:auto}
+ .sheet{width:100%;box-shadow:none;padding:0}
+ .seg{break-inside:avoid;max-height:192mm;overflow:hidden}
+ .seg+.seg{break-before:page;margin-top:0}
  td,th{height:6.4mm}td.tc{height:8.5mm}td.dt{height:7.4mm}td.lb{height:5.3mm}
- .top{height:31mm}.seg+.seg{break-before:page;margin-top:0}
+ .top{height:31mm}
  textarea,input{resize:none}
  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
  td.mo:hover{background:none}
 }
 </style></head><body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><pattern id="hp" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><line x1="0" y1="0" x2="0" y2="7" stroke="#444" stroke-width="1.3"/></pattern></defs></svg>
 <div class="bar">
  <button class="p" onclick="window.print()">🖨 Imprimir</button>
  <button onclick="undo()">↶ Desfazer</button><button onclick="redo()">↷ Refazer</button>
@@ -77,18 +85,19 @@ td.x button{border:0;background:none;color:#b00;cursor:pointer;font-size:14px;pa
  <button onclick="addNames()">+ Adicionar</button>
  <button onclick="addSheet()">+ Folha</button>
  <button onclick="renum()">Renumerar</button>
+ <button class="p" onclick="genYear()" title="Cria uma folha para cada semana, da semana atual até o fim do ano, usando os nomes da 1ª folha. Cada semana imprime em 2 páginas (frente e verso).">📅 Semanas até o fim do ano</button>
+ <button onclick="newYear()" title="Limpa tudo e cria as semanas do ano seguinte, mantendo os nomes da 1ª folha.">🎆 Novo ano (limpar)</button>
  <label>Cor <input type="color" id="cor" oninput="S.color=this.value;paint()" onchange="commit()"></label>
- <label>Linhas <input type="number" id="per" min="5" max="200" onchange="setPer(+this.value)"></label>
- <label>Aviso após linha <input type="number" id="ban" min="0" max="200" onchange="S.ban=+this.value;commit()"></label>
+ <label title="Só vale com 'Ajustar à folha' desligado">Linhas <input type="number" id="per" min="5" max="200" onchange="setPer(+this.value)"></label>
+ <label title="Só vale com 'Ajustar à folha' desligado">Aviso após linha <input type="number" id="ban" min="0" max="200" onchange="S.ban=+this.value;commit()"></label>
  <label>Tema <input id="tg" placeholder="Igual p/ todas as colunas" onchange="setTema(this.value)"></label>
  <label>Fundo Data/Turno <input type="color" id="dtc" oninput="S.dt=this.value;paint()" onchange="commit()"></label>
  <span class="sw"><button style="background:#39ff14" title="Verde neon" onclick="setDt('#39ff14')"></button><button style="background:#ff2bd6" title="Rosa neon" onclick="setDt('#ff2bd6')"></button><button style="background:#00f0ff" title="Ciano neon" onclick="setDt('#00f0ff')"></button><button style="background:#fff200" title="Amarelo neon" onclick="setDt('#fff200')"></button><button style="background:#ff6a00" title="Laranja neon" onclick="setDt('#ff6a00')"></button><button style="background:#fff" title="Sem cor" onclick="setDt('#ffffff')"></button></span>
  <label><input type="checkbox" id="neon" onchange="S.neon=this.checked;commit()"> Brilho neon</label>
  <label>Cor título <input type="color" id="tcc" oninput="S.tc=this.value;paint()" onchange="commit()"></label>
  <button onclick="document.getElementById('lg').click()">🖼 Logo</button><input type="file" id="lg" accept="image/*" hidden onchange="setLogo(this)">
- <label title="Completa o fim de cada página com linhas em branco numeradas e põe a faixa preta no fim da 1ª folha"><input type="checkbox" id="fit" onchange="S.fit=this.checked;commit()"> Ajustar à folha</label>
+ <label title="Deixa cada semana com exatamente 2 páginas (frente e verso), completando com linhas em branco numeradas e pondo a faixa preta no fim da 1ª página"><input type="checkbox" id="fit" onchange="S.fit=this.checked;commit()"> Ajustar à folha</label>
  <label>Folga <input type="number" id="sf" min="0" max="40" step="0.5" style="width:52px" onchange="S.safe=+this.value;commit()"> mm</label>
- <button onclick="setCur()">📅 Semana atual</button>
  <label>Semana 1 começa <input type="date" id="w1" onchange="S.w1=this.value;S.sheets.forEach(s=>s.week&&applyWeek(s,s.week));commit()"></label>
  <label>Feriado extra <input type="date" id="hxd"><input id="hxn" placeholder="Nome" style="width:100px"></label><button onclick="addHx()">+ Feriado</button>
  <button onclick="save()">💾 Salvar</button>
@@ -101,6 +110,7 @@ td.x button{border:0;background:none;color:#b00;cursor:pointer;font-size:14px;pa
 <script>
 const KEY='dssma_v2',NC=5;
 const FACE=k=>`<svg viewBox="0 0 16 16" fill="none" stroke="#000" stroke-width="1.1"><circle cx="8" cy="8" r="6.8"/><circle cx="5.6" cy="6.4" r=".6" fill="#000"/><circle cx="10.4" cy="6.4" r=".6" fill="#000"/>${k==1?'<path d="M4.8 9.4q3.2 3 6.4 0"/>':k==2?'<path d="M5 10.4h6"/>':'<path d="M4.8 11.6q3.2-3 6.4 0"/>'}</svg>`;
+const HS='<svg xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"><rect width="100%" height="100%" fill="url(#hp)"/></svg>';
 const DEFT='Anexo 02 – Lista de participação em DSSMA para Público Operacional e Administrativo com Emociograma em meio físico';
 const DEFB1='Supervisor: JOÃO PEDRO\nSupervisor: WILIAN\n\nTurma: G2';
 function topBlock(si,s){const lg=(k,b,t)=>`<div class="lg"><span class="fcs"><i>${k}</i>${FACE(k)}</span><p><b>${b}</b> - ${t}</p></div>`;return `<div class="tt"><input class="ttl" value="${esc(S.title||DEFT)}" onchange="S.title=this.value;commit()">${S.logo?`<img src="${S.logo}">`:''}</div><div class="top"><textarea oninput="S.sheets[${si}].box1=this.value" onchange="commit()">${tx(s.box1)}</textarea><div class="emo"><u>EMOCIOGRAMA:</u>${lg(1,'Estou bem, normal','liberar o trabalhador para as suas atividades')}${lg(2,'Não me sinto bem','não escalar o trabalhador para fazer e/ou participar de serviço perigoso naquele dia')}${lg(3,'Estou péssimo','Não deverá ser escalado para qualquer tipo de atividade, até que seja solucionado o problema')}</div></div>`}
@@ -108,15 +118,15 @@ const faces=(si,ri,ci,m)=>`<div class="fc">`+[1,2,3].map(k=>`<span class="${m==k
 const E=()=>({n:'',m:Array(NC).fill(0),r:Array(NC).fill('')});
 const sheet=(per,names=[])=>({box1:DEFB1,box2:'',cols:Array.from({length:NC},()=>({d:'',t:''})),rows:Array.from({length:Math.max(per,names.length)},(_,i)=>{const r=E();r.n=names[i]||'';return r})});
 function init(){const nm='Alfredo,Allan Souza,André,Atmisto Silva,Bruno Fidelis,Bruno Ricardo,Diego,DIOGO,Dominique,Emerson,Gabriel,Gleivston,Isaque,João Silva Ramos,Juliana,Lucas Braga,Marcos,Mariana,Matheus Brito,Nilton cesar,Pablo,Paulo Henrique,Ricardo,Richard,Robson,Thiago,Wanderson,Willian'.split(',');
- return{dt:'#ffe600',neon:false,color:'#000000',per:78,ban:26,banTxt:'Por favor, vire a folha para realizar o preenchimento.',sheets:[sheet(78,nm)]}}
+ return{dt:'#ffe600',neon:false,color:'#000000',per:35,ban:17,banTxt:'Por favor, vire a folha para realizar o preenchimento.',sheets:[sheet(35,nm)]}}
 let S;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
 S=S&&S.sheets?S:init();
 if(!S.mig){S.mig=1;S.title=S.title||DEFT;S.sheets.forEach(s=>{if(!s.box1)s.box1=DEFB1})}
 let U=[],R=[],last=JSON.stringify(S);
 const $=id=>document.getElementById(id);
-function say(t){$('msg').textContent=t;setTimeout(()=>{if($('msg').textContent===t)$('msg').textContent=''},2800)}
+function say(t){$('msg').textContent=t;setTimeout(()=>{if($('msg').textContent===t)$('msg').textContent=''},3500)}
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
-function commit(re=true){const cur=JSON.stringify(S);if(cur===last)return;U.push(last);if(U.length>100)U.shift();R=[];last=cur;persist();if(re)render()}
+function commit(re=true){const cur=JSON.stringify(S);if(cur===last)return;U.push(last);if(U.length>30)U.shift();R=[];last=cur;persist();if(re)render()}
 function undo(){if(!U.length)return say('Nada para desfazer');R.push(last);last=U.pop();S=JSON.parse(last);persist();render()}
 function redo(){if(!R.length)return say('Nada para refazer');U.push(last);last=R.pop();S=JSON.parse(last);persist();render()}
 function paint(){const st=document.documentElement.style;st.setProperty('--c',S.color);st.setProperty('--dt',S.dt||'#ffe600');st.setProperty('--tc',S.tc||'#2b6a68')}
@@ -132,28 +142,34 @@ function render(){
    s.cols.map(()=>'<td class="lb">Como estou</td><td class="lb">Rubrica</td>').join('')+`</tr></thead>`;
   const rowHtml=(r,ri)=>''+
    `<tr><td class="n">${ri+1}</td><td class="nm" colspan="2"><input value="${esc(r.n)}" oninput="S.sheets[${si}].rows[${ri}].n=this.value" onchange="commit(0)"></td>`+
-   r.m.map((m,ci)=>`${s.cols[ci].h?'<td class="hol" colspan="2"></td>':`<td class="mo">${faces(si,ri,ci,m)}</td><td class="ru"><input value="${esc(r.r[ci])}" oninput="S.sheets[${si}].rows[${ri}].r[${ci}]=this.value" onchange="commit(0)"></td>`}`).join('')+
+   r.m.map((m,ci)=>s.cols[ci].h?`<td class="hol" colspan="2">${HS}</td>`:`<td class="mo">${faces(si,ri,ci,m)}</td><td class="ru"><input value="${esc(r.r[ci])}" oninput="S.sheets[${si}].rows[${ri}].r[${ci}]=this.value" onchange="commit(0)"></td>`).join('')+
    `<td class="x"><button title="Remover linha" onclick="delRow(${si},${ri})">×</button></td></tr>`;
   const bn=`<tr><td class="ban" colspan="13"><input value="${esc(S.banTxt)}" oninput="S.banTxt=this.value" onchange="commit(0)"></td><td class="x"></td></tr>`;
-  const cut=S.fit===false?((S.ban>0&&S.ban<s.rows.length)?S.ban:s.rows.length):fitSheet(s);
+  let parts=[],pg=2;
+  if(S.fit===false){const cut=(S.ban>0&&S.ban<s.rows.length)?S.ban:s.rows.length;parts=cut<s.rows.length?[[0,cut,true],[cut,s.rows.length,false]]:[[0,s.rows.length,false]];pg=parts.length}
+  else{const cs=fitSheet(s);pg=cs.length;let a=0;cs.forEach((c,i)=>{parts.push([a,a+c,i<cs.length-1]);a+=c})}
   const top=topBlock(si,s);
   const tbl=(a,b,ban)=>`<table><colgroup><col style="width:2.2%"><col style="width:19.5%"><col style="width:5.8%">${'<col style="width:5.5%"><col style="width:9%">'.repeat(5)}<col class="x" style="width:20px"></colgroup>${head}<tbody>${s.rows.slice(a,b).map((r,i)=>rowHtml(r,a+i)).join('')}${ban?bn:''}</tbody></table>`;
   h+=`<div class="wrap"><div class="sheet${S.neon?' neon':''}"><div class="sh-act">
    <label style="font-size:12px;display:flex;gap:4px;align-items:center">Semana <input type="number" min="1" max="60" style="width:54px" value="${s.week||''}" onchange="setWeek(${si},+this.value)"></label><span style="font-size:12px;align-self:center">${wk(s)}</span>
    <button onclick="dup(${si})">⧉ Duplicar folha</button><button onclick="mv(${si},-1)">↑</button><button onclick="mv(${si},1)">↓</button>
    <button onclick="sortS(${si})">A–Z</button><button onclick="clrMarks(${si})">Limpar marcas</button>
-   <button onclick="addRow(${si})">+ Linha</button><button onclick="delSheet(${si})">🗑 Excluir folha</button></div>
-   <div class="seg">${top}${tbl(0,cut,cut<s.rows.length)}</div>${cut<s.rows.length?`<div class="seg">${top}${tbl(cut,s.rows.length,false)}</div>`:''}<div class="sh-foot">Folha ${si+1} de ${S.sheets.length}</div></div></div>`;
+   <button onclick="addRow(${si})">+ Linha</button><button onclick="delSheet(${si})">🗑 Excluir folha</button>${pg>2&&S.fit!==false?`<span class="warn">⚠ ${pg} páginas: nomes demais para frente e verso</span>`:''}</div>
+   ${parts.map(p=>`<div class="seg">${top}${tbl(p[0],p[1],p[2])}</div>`).join('')}<div class="sh-foot">Folha ${si+1} de ${S.sheets.length}</div></div></div>`;
  });
  $('pages').innerHTML=h;
 }
 function mood(si,ri,ci,k){const r=S.sheets[si].rows[ri];r.m[ci]=r.m[ci]===k?0:k;commit()}
 function setDt(c){S.dt=c;commit()}
-function fitSheet(s){const sf=S.safe??5,R=6.75,PG=194,hd=22.5,tp=41,c1=Math.floor((PG-tp-hd-sf)/R),cp=Math.floor((PG-hd-sf)/R),cut=c1-1;
- const pad=(n,t)=>{while(t<n)t+=cp;return t};
- const n=s.rows.length;let target,ret;
- if(n<=c1){target=c1;ret=c1}else{target=cut+pad(n-cut,c1);ret=cut}
- while(s.rows.length<target)s.rows.push(E());return ret}
+/* Cada semana = exatamente 2 páginas (frente e verso). Só passa disso se houver nomes demais. */
+function fitSheet(s){const sf=S.safe??5,R=6.75,PG=194,hd=22.5,tp=41,c1=Math.max(3,Math.floor((PG-tp-hd-sf)/R));
+ let used=0;s.rows.forEach((r,i)=>{if(r.n.trim()||r.m.some(Boolean)||r.r.some(x=>x))used=i+1});
+ const mk=p=>Array.from({length:p},(_,i)=>i<p-1?c1-1:c1),sum=a=>a.reduce((x,y)=>x+y,0);
+ let pages=2;while(sum(mk(pages))<used)pages++;
+ const cs=mk(pages),tot=sum(cs);
+ while(s.rows.length<tot)s.rows.push(E());
+ if(s.rows.length>tot)s.rows.length=tot;
+ return cs}
 const WD=['Seg','Ter','Qua','Qui','Sex'],DAY=864e5;
 const ymd=t=>new Date(t).toISOString().slice(0,10);
 const fmt=t=>{const d=new Date(t);return String(d.getUTCDate()).padStart(2,'0')+'/'+String(d.getUTCMonth()+1).padStart(2,'0')+'/'+String(d.getUTCFullYear()).slice(2)};
@@ -167,15 +183,31 @@ function applyWeek(s,n){s.week=n;const m=monday(n);s.cols.forEach((c,i)=>{const 
  if(h){c.d=fmt(t)+' FERIADO';c.t='FERIADO – '+h;s.rows.forEach(r=>{r.m[i]=0;r.r[i]=''})}
  else{c.d=WD[i]+' '+fmt(t);if(was)c.t=''}})}
 function setWeek(si,n){if(!(n>=1&&n<=60)){S.sheets[si].week=0;return commit()}applyWeek(S.sheets[si],n);commit()}
-function setCur(){const now=new Date();let t=Date.UTC(now.getFullYear(),now.getMonth(),now.getDate());const dow=new Date(t).getUTCDay();t-=((dow+6)%7)*DAY;if(dow===0||dow===6)t+=7*DAY;const n=Math.round((t-monday(1))/(7*DAY))+1;if(n<1||n>60)return say('Ajuste a data de início da Semana 1');S.sheets.forEach(s=>applyWeek(s,n));commit();say('Semana '+n+' aplicada')}
+/* ---- Semanas do ano ---- */
+// segundas-feiras do ano y (cada semana pertence ao ano da sua segunda-feira)
+function weeksOfYear(y){let t=Date.UTC(y,0,1);t+=((8-new Date(t).getUTCDay())%7)*DAY;const o=[];while(new Date(t).getUTCFullYear()===y){o.push(t);t+=7*DAY}return o}
+// modelo = nomes e quadro de supervisores da 1ª folha, sem marcas
+function tplOf(){const c=JSON.parse(JSON.stringify(S.sheets[0]));c.rows=c.rows.filter(r=>r.n.trim()).map(r=>({n:r.n,m:Array(NC).fill(0),r:Array(NC).fill('')}));c.cols.forEach(x=>{x.d='';x.t='';x.h=false});delete c.week;return c}
+function build(mons,from){S.w1=ymd(mons[0]);const t=tplOf();S.sheets=[];for(let n=from;n<=mons.length;n++){const c=JSON.parse(JSON.stringify(t));applyWeek(c,n);S.sheets.push(c)}}
+function genYear(){const now=new Date(),y=now.getFullYear(),mons=weeksOfYear(y);
+ let t=Date.UTC(y,now.getMonth(),now.getDate());const dow=new Date(t).getUTCDay();t-=((dow+6)%7)*DAY;if(dow===0||dow===6)t+=7*DAY;
+ const i=mons.findIndex(m=>m>=t);if(i<0)return say('O ano acabou — use "Novo ano (limpar)"');
+ const q=mons.length-i;
+ if(!confirm('Criar '+q+' folhas (semana de '+fmt(mons[i])+' até a de '+fmt(mons[mons.length-1])+'), uma por semana, com os nomes da 1ª folha?\n\nAs folhas atuais serão substituídas. Cada semana imprime em 2 páginas (frente e verso).'))return;
+ build(mons,i+1);commit();say(q+' semanas criadas até o fim de '+y)}
+function newYear(){const y=+prompt('Começar qual ano?',new Date().getFullYear()+1);if(!(y>=2000&&y<=2100))return;
+ const mons=weeksOfYear(y);
+ if(!confirm('Limpar TUDO e criar as '+mons.length+' semanas de '+y+' (1ª semana em '+fmt(mons[0])+')?\n\nOs nomes da 1ª folha são mantidos. Dica: use 💾 Salvar antes para guardar o ano anterior.'))return;
+ S.hx=(S.hx||[]).filter(h=>h.d.startsWith(y+'-'));
+ build(mons,1);commit();say('Ano '+y+' pronto: '+mons.length+' semanas')}
 function addHx(){const d=$('hxd').value,n=$('hxn').value.trim()||'Feriado';if(!d)return say('Escolha a data do feriado');(S.hx=S.hx||[]).push({d,n});$('hxd').value='';$('hxn').value='';S.sheets.forEach(s=>s.week&&applyWeek(s,s.week));commit();say('Feriado adicionado: '+n)}
 function setLogo(el){const f=el.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{S.logo=r.result;commit()};r.readAsDataURL(f);el.value=''}
-function setTema(v){S.sheets.forEach(s=>s.cols.forEach(c=>c.t=v));commit()}
+function setTema(v){S.sheets.forEach(s=>s.cols.forEach(c=>{if(!c.h)c.t=v}));commit()}
 function addSheet(){S.sheets.push(sheet(S.per));commit();say('Folha adicionada')}
 function dup(si){const c=JSON.parse(JSON.stringify(S.sheets[si]));c.cols.forEach(x=>x.d='');if(c.week)applyWeek(c,c.week+1);c.rows.forEach(r=>{r.m=Array(NC).fill(0);r.r=Array(NC).fill('')});S.sheets.splice(si+1,0,c);commit();say('Folha duplicada (nomes mantidos, marcas limpas)')}
 function mv(si,d){const j=si+d;if(j<0||j>=S.sheets.length)return;[S.sheets[si],S.sheets[j]]=[S.sheets[j],S.sheets[si]];commit()}
 function delSheet(si){if(S.sheets.length<2)return say('Mantenha ao menos uma folha');if(confirm('Excluir esta folha?')){S.sheets.splice(si,1);commit()}}
-function clrMarks(si){const s=S.sheets[si];s.rows.forEach(r=>{r.m=Array(NC).fill(0);r.r=Array(NC).fill('')});s.cols.forEach(c=>{c.d='';c.t=''});commit()}
+function clrMarks(si){const s=S.sheets[si];s.rows.forEach(r=>{r.m=Array(NC).fill(0);r.r=Array(NC).fill('')});s.cols.forEach(c=>{c.d='';c.t='';c.h=false});if(s.week)applyWeek(s,s.week);commit()}
 function sortS(si){const rows=S.sheets[si].rows,f=rows.filter(r=>r.n.trim()).sort((a,b)=>a.n.localeCompare(b.n,'pt',{sensitivity:'base'}));S.sheets[si].rows=f.concat(rows.filter(r=>!r.n.trim()));commit()}
 function addRow(si){S.sheets[si].rows.push(E());commit()}
 function delRow(si,ri){S.sheets[si].rows.splice(ri,1);commit()}
