@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Módulo 4 - Aniversariantes da Equipe | Portal Vale v08</title>
+<title>Módulo 4 - Aniversariantes da Equipe | Portal Vale v09</title>
 <style>
 :root{--primary:#db2777;--primary-dark:#be185d;--primary-light:#fce7f3;--primary-border:#f472b6;--primary-bg:#fff5f8;--accent:#f59e0b;--danger:#ef4444;--success:#10b981;--s900:#0f172a;--s700:#334155;--s600:#475569;--s300:#cbd5e1;--s100:#f1f5f9;--s50:#f8fafc}
 *{box-sizing:border-box;margin:0;padding:0}
@@ -29,6 +29,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#fff5f8;color:var(--
 .btn-voltar{background:var(--s600)}.btn-imprimir{background:var(--s900);margin-left:auto}
 .dica{font-size:10px;color:var(--s600);margin-top:8px}
 .folha-a4{width:100%;max-width:1120px;background:#fff;padding:16px 20px;margin:0 auto 20px;box-shadow:0 10px 30px rgba(219,39,119,.08);border-radius:12px;border:1.5px solid var(--primary-border)}
+.barra-folha{display:flex;justify-content:flex-end;gap:6px;margin-bottom:8px}
+.btn-folha{cursor:pointer;padding:5px 10px;font-size:11px;font-weight:700;border:none;border-radius:5px;color:#fff}
+.btn-dup-folha{background:#7c3aed}.btn-del-folha{background:var(--danger)}
 .cabecalho-container,.info-aniver-bar{width:100%;border-collapse:collapse;border:1.5px solid var(--s900);margin-bottom:6px;table-layout:fixed}
 .cabecalho-container td,.info-aniver-bar td{border:1px solid var(--s700);padding:4px 10px;vertical-align:middle;text-align:center}
 .logo-box{width:100px;font-weight:900;font-size:16px;color:#007e7a;letter-spacing:1.5px;background:var(--s50)}
@@ -58,8 +61,9 @@ tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
 @media print{
 @page{size:A4 landscape;margin:4mm 5mm!important}
 html,body{background:#fff!important;margin:0!important;padding:0!important;height:100%!important;-webkit-print-color-adjust:exact!important;print-color-adjust:exact!important}
-.painel-controle,.botoes-acoes,.col-acoes-aniver,#toastNotificacao{display:none!important}
-.folha-a4{box-shadow:none!important;border:none!important;width:100%!important;max-width:100%!important;padding:0!important;margin:0!important;break-after:avoid!important}
+.painel-controle,.botoes-acoes,.col-acoes-aniver,#toastNotificacao,.barra-folha{display:none!important}
+.folha-a4{box-shadow:none!important;border:none!important;width:100%!important;max-width:100%!important;padding:0!important;margin:0!important;break-inside:auto!important}
+.folha-a4:not(:last-child){break-after:page!important}
 .contentor-blocos{grid-template-columns:1fr 1fr!important;gap:6px 12px!important;margin-top:3px!important}
 .bloco-mes{break-inside:avoid!important;margin-bottom:2px!important;border-width:1px!important}
 .td-mes-nome{background:var(--primary)!important;color:#fff!important;font-size:9px!important;padding:2px 4px!important}
@@ -81,7 +85,7 @@ tr.hoje .col-nome-aniver,tr.hoje .col-data-aniver,.col-data-aniver.invalida{back
 
 <div class="painel-controle">
   <div class="topo-modulo-info">
-    <span class="badge-modulo">Módulo 4: Aniversariantes do Ano <span class="tag-v07">v08</span></span>
+    <span class="badge-modulo">Módulo 4: Aniversariantes do Ano <span class="tag-v07">v09</span></span>
     <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
   </div>
   <div class="barra-metricas">
@@ -107,7 +111,7 @@ tr.hoje .col-nome-aniver,tr.hoje .col-data-aniver,.col-data-aniver.invalida{back
     <button type="button" class="btn btn-limpar" onclick="limparTudoAniver()">Limpar</button>
     <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir (Horizontal)</button>
   </div>
-  <p class="dica">💾 Salvamento automático neste navegador. Na data, digite 4 números (ex.: 1105 vira 11/05). Quem faz aniversário hoje aparece em amarelo. Enter desce para a linha de baixo.</p>
+  <p class="dica">💾 Salvamento automático neste navegador. Use "📄 Duplicar folha" em cada página para criar outra folha com os mesmos aniversariantes. Na data, digite 4 números (ex.: 1105 vira 11/05). Quem faz aniversário hoje aparece em amarelo. Enter desce para a linha de baixo.</p>
 </div>
 
 <div id="contentorFolhasAniver"></div>
@@ -140,7 +144,7 @@ function mostrarToast(msg) {
 }
 const mesAtual = () => new Date().getMonth();
 
-/* ---------- dados: internamente cada item é [nome, data]; no arquivo/backup continua "NOME - DD/MM" ---------- */
+/* ---------- dados: cada item é [nome, data]; no arquivo continua "NOME - DD/MM" ---------- */
 function parseItem(s) {
   if (Array.isArray(s)) return [String(s[0] || '').trim(), String(s[1] || '').trim()];
   s = String(s).replace(/\s*-\s*$/, '');
@@ -171,9 +175,10 @@ function organizar(dados) {
   return out;
 }
 
-function capturarDadosAtuais() {
+/* lê uma única folha */
+function capturarFolha(folha) {
   const o = {}; MESES_ANO.forEach(m => o[m] = []);
-  document.querySelectorAll('.bloco-mes').forEach(b => {
+  folha.querySelectorAll('.bloco-mes').forEach(b => {
     const mes = b.getAttribute('data-mes');
     b.querySelectorAll('tbody tr').forEach(tr => {
       const n = tr.querySelector('.col-nome-aniver').innerText.trim();
@@ -182,6 +187,9 @@ function capturarDadosAtuais() {
   });
   return o;
 }
+/* lê todas as folhas (uma por página) */
+const todasFolhas = () => Array.from(document.querySelectorAll('#contentorFolhasAniver .folha-a4'));
+const capturarTodas = () => todasFolhas().map(capturarFolha);
 
 /* ---------- desenho ---------- */
 function linhaHTML(nome, data, mesCell) {
@@ -198,19 +206,33 @@ function criarBlocoMes(mes, itens) {
   }
   return `<div class="bloco-mes ${atual ? 'mes-atual-destaque' : ''}" data-mes="${mes}"><table class="tabela-mes"><tbody>${rows}</tbody></table></div>`;
 }
-function criarEstruturaFolhaAniver(dados) {
+function criarFolha(dados) {
   const f = document.createElement('div'); f.className = 'folha-a4';
   f.innerHTML = `
+  <div class="barra-folha"><button type="button" class="btn-folha btn-dup-folha" data-a="dupfolha" title="Criar cópia desta folha logo abaixo">📄 Duplicar folha</button><button type="button" class="btn-folha btn-del-folha" data-a="delfolha" title="Excluir esta folha">🗑 Excluir folha</button></div>
   <table class="cabecalho-container"><tr><td class="logo-box">VALE</td><td class="titulo-box">🎂 CRONOGRAMA ANUAL DE ANIVERSÁRIOS DA EQUIPE</td>
-    <td class="meta-box"><strong>Ano:</strong> <span class="val-ano">${esc($('anoInputAniver').value.trim() || '2026')}</span><br><span><strong>Página:</strong> 01 / 01</span></td></tr></table>
+    <td class="meta-box"><strong>Ano:</strong> <span class="val-ano">${esc($('anoInputAniver').value.trim() || '2026')}</span><br><span><strong>Página:</strong> <span class="val-pag">01 / 01</span></span></td></tr></table>
   <table class="info-aniver-bar"><tr><td><strong>Área / Gerência:</strong> <span class="val-area campo-editavel" contenteditable="true">${esc($('areaInputAniver').value.trim() || '---')}</span></td></tr></table>
   <div class="contentor-blocos">${MESES_ANO.map(m => criarBlocoMes(m, dados[m] || [])).join('')}</div>`;
   return f;
 }
-function renderizarComDados(dados) {
+/* renderiza todas as folhas a partir de uma lista de dados (uma entrada por página) */
+function renderizarComDados(lista) {
+  if (!lista || !lista.length) lista = [{}];
   const box = $('contentorFolhasAniver'); box.innerHTML = '';
-  box.appendChild(criarEstruturaFolhaAniver(normalizarDados(dados)));
-  atualizarMetricas();
+  lista.forEach(d => box.appendChild(criarFolha(normalizarDados(d))));
+  atualizarPaginas(); atualizarMetricas();
+}
+/* substitui uma folha por outra com novos dados (mantém a posição) */
+function reconstruirFolha(folha, dados) {
+  const nova = criarFolha(normalizarDados(dados));
+  folha.replaceWith(nova);
+  atualizarPaginas();
+  return nova;
+}
+function atualizarPaginas() {
+  const fs = todasFolhas();
+  fs.forEach((f, i) => { const p = f.querySelector('.val-pag'); if (p) p.innerText = pad2(i + 1) + ' / ' + pad2(fs.length); });
 }
 function sincronizarCabecalhosAniver() {
   const ano = $('anoInputAniver').value.trim() || '2026', area = $('areaInputAniver').value.trim() || '---';
@@ -222,22 +244,45 @@ function sincronizarCabecalhosAniver() {
 }
 
 function atualizarMetricas() {
-  const dados = capturarDadosAtuais();
-  let total = 0; for (const m in dados) total += dados[m].length;
+  const dadosFolhas = capturarTodas();
   const nomeMes = MESES_ANO[mesAtual()];
+  let total = 0, doMes = 0;
   const hj = new Date(); hj.setHours(0, 0, 0, 0);
   const prox = [];
-  for (const m in dados) dados[m].forEach(([n, d]) => {
-    const f = fmtData(d); if (!f.ok || !f.d) return;
-    let x = new Date(hj.getFullYear(), f.m - 1, f.d); if (x < hj) x = new Date(hj.getFullYear() + 1, f.m - 1, f.d);
-    const diff = Math.round((x - hj) / 864e5); if (diff <= 7) prox.push({ n, diff });
+  dadosFolhas.forEach(dados => {
+    for (const m in dados) {
+      total += dados[m].length;
+      if (m === nomeMes) doMes += dados[m].length;
+      dados[m].forEach(([n, d]) => {
+        const f = fmtData(d); if (!f.ok || !f.d) return;
+        let x = new Date(hj.getFullYear(), f.m - 1, f.d); if (x < hj) x = new Date(hj.getFullYear() + 1, f.m - 1, f.d);
+        const diff = Math.round((x - hj) / 864e5); if (diff <= 7) prox.push({ n, diff });
+      });
+    }
   });
   prox.sort((a, b) => a.diff - b.diff);
   $('metricaTotal').innerText = `🎂 Total de Aniversariantes: ${total}`;
-  $('metricaMesAtual').innerText = `🎉 Aniversariantes de ${nomeMes}: ${dados[nomeMes].length}`;
+  $('metricaMesAtual').innerText = `🎉 Aniversariantes de ${nomeMes}: ${doMes}`;
   const p = $('metricaProximos');
   p.innerText = `🎈 Hoje e próximos 7 dias: ${prox.length}`;
   p.title = prox.map(x => `${x.n} (${x.diff === 0 ? 'hoje' : 'em ' + x.diff + ' dia(s)'})`).join('\n');
+}
+
+/* ---------- folhas ---------- */
+function duplicarFolha(folha) {
+  const dados = capturarFolha(folha);
+  const copia = criarFolha(normalizarDados(dados));
+  folha.after(copia);
+  atualizarPaginas(); atualizarMetricas(); agendarAutoSave();
+  copia.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  mostrarToast('Folha duplicada com os mesmos aniversariantes.');
+}
+function excluirFolha(folha) {
+  if (todasFolhas().length < 2) { mostrarToast('Não é possível excluir a última folha.'); return; }
+  if (!confirm('Excluir esta folha inteira? Os aniversariantes dela serão removidos.')) return;
+  folha.remove();
+  atualizarPaginas(); atualizarMetricas(); agendarAutoSave();
+  mostrarToast('Folha excluída.');
 }
 
 /* ---------- linhas ---------- */
@@ -274,13 +319,16 @@ function copiarMensagemParabens(btn) {
 
 /* ---------- ordenar / importar ---------- */
 function ordenarAniversariosPorDia(msg = false) {
-  renderizarComDados(organizar(capturarDadosAtuais())); agendarAutoSave();
-  if (msg) mostrarToast('Aniversários reorganizados por mês e dia (conforme a data de cada um).');
+  todasFolhas().forEach(f => reconstruirFolha(f, organizar(capturarFolha(f))));
+  atualizarMetricas(); agendarAutoSave();
+  if (msg) mostrarToast('Aniversários reorganizados por mês e dia em todas as folhas.');
 }
 function distribuirNomesImportados() {
   const texto = $('importarTextoAniver').value;
   if (!texto.trim()) { mostrarToast('Cole os nomes na caixa de texto primeiro!'); return; }
-  const dados = capturarDadosAtuais();
+  let primeira = todasFolhas()[0];
+  if (!primeira) { renderizarComDados([{}]); primeira = todasFolhas()[0]; }
+  const dados = capturarFolha(primeira);
   let add = 0, dup = 0, ruins = 0;
   texto.split('\n').map(l => l.trim()).filter(Boolean).forEach(linha => {
     const m = linha.match(/(\d{1,2})\s*\/\s*([A-Za-zÇç0-9]+)\s*$/) || linha.match(/\s(\d{2})(\d{2})\s*$/);
@@ -293,13 +341,16 @@ function distribuirNomesImportados() {
     if (dados[mes].some(([n, d]) => n === nome && fmtData(d).txt === f.txt)) { dup++; return; }
     dados[mes].push([nome, f.txt]); add++;
   });
-  renderizarComDados(organizar(dados)); agendarAutoSave();
+  reconstruirFolha(primeira, organizar(dados));
+  atualizarMetricas(); agendarAutoSave();
   if (add) $('importarTextoAniver').value = '';
-  mostrarToast(`🎉 ${add} adicionado(s)` + (dup ? `, ${dup} já existia(m)` : '') + (ruins ? `, ${ruins} linha(s) sem data válida` : ''));
+  mostrarToast(`🎉 ${add} adicionado(s) na 1ª folha` + (dup ? `, ${dup} já existia(m)` : '') + (ruins ? `, ${ruins} linha(s) sem data válida` : ''));
 }
 
 /* ---------- salvar / backup ---------- */
-function estado() { return { ano: $('anoInputAniver').value, area: $('areaInputAniver').value, dados: serializar(capturarDadosAtuais()) }; }
+function estado() {
+  return { versao: 9, ano: $('anoInputAniver').value, area: $('areaInputAniver').value, paginas: capturarTodas().map(serializar) };
+}
 function gravar(silencioso) {
   try { localStorage.setItem(CHAVE, JSON.stringify(estado())); if (!silencioso) mostrarToast('Aniversários salvos com sucesso!'); }
   catch (e) { mostrarToast('Não foi possível salvar. Use o Backup.'); }
@@ -307,10 +358,16 @@ function gravar(silencioso) {
 function salvarTudoAniver() { gravar(false); }
 function agendarAutoSave() { clearTimeout(_auto); _auto = setTimeout(() => gravar(true), 1200); }
 function lerSalvo() { try { const s = localStorage.getItem(CHAVE); return s ? JSON.parse(s) : null; } catch (e) { return null; } }
+/* aceita o formato novo (paginas) e o antigo (dados, uma folha só) */
+function listaDeFolhas(d) {
+  if (Array.isArray(d.paginas) && d.paginas.length) return d.paginas;
+  if (d.dados && typeof d.dados === 'object') return [d.dados];
+  return [{}];
+}
 function aplicarEstado(d) {
   if (d.ano !== undefined) $('anoInputAniver').value = d.ano;
   if (d.area !== undefined) $('areaInputAniver').value = d.area;
-  renderizarComDados(d.dados || {});
+  renderizarComDados(listaDeFolhas(d));
 }
 function carregarTudoAniver() {
   const d = lerSalvo();
@@ -330,15 +387,15 @@ function processarArquivoBackup(input) {
   r.onload = e => {
     try {
       const d = JSON.parse(e.target.result);
-      if (!d || typeof d !== 'object' || typeof d.dados !== 'object' || d.dados === null) throw 0;
+      if (!d || typeof d !== 'object' || !(Array.isArray(d.paginas) || (d.dados && typeof d.dados === 'object'))) throw 0;
       aplicarEstado(d); agendarAutoSave(); mostrarToast('Backup restaurado com sucesso!');
     } catch (err) { mostrarToast('Arquivo de backup inválido.'); }
   };
   r.readAsText(file); input.value = '';
 }
 function limparTudoAniver() {
-  if (!confirm('Apagar todos os aniversariantes de todos os meses? Não dá para desfazer (faça um Backup antes, se precisar).')) return;
-  renderizarComDados({}); agendarAutoSave(); mostrarToast('Todos os meses foram limpos.');
+  if (!confirm('Apagar todos os aniversariantes de todas as folhas? Não dá para desfazer (faça um Backup antes, se precisar).')) return;
+  renderizarComDados([{}]); agendarAutoSave(); mostrarToast('Todas as folhas foram limpas.');
 }
 
 /* ---------- interações ---------- */
@@ -349,6 +406,8 @@ caixa.addEventListener('click', e => {
   if (a === 'wpp') copiarMensagemParabens(b);
   else if (a === 'add') { adicionarLinhaAbaixo(b); agendarAutoSave(); }
   else if (a === 'del') limparOuRemoverLinha(b);
+  else if (a === 'dupfolha') duplicarFolha(b.closest('.folha-a4'));
+  else if (a === 'delfolha') excluirFolha(b.closest('.folha-a4'));
 });
 caixa.addEventListener('focusout', e => {
   const c = e.target; if (!c.classList) return;
@@ -380,9 +439,10 @@ window.addEventListener('beforeunload', () => gravar(true));
 
 window.onload = function () {
   const d = lerSalvo();
-  if (d && d.dados) { aplicarEstado(d); mostrarToast('Último trabalho recuperado.'); }
-  else renderizarComDados(organizar(normalizarDados(DADOS_INICIAIS)));
+  if (d && (d.paginas || d.dados)) { aplicarEstado(d); mostrarToast('Último trabalho recuperado.'); }
+  else renderizarComDados([organizar(normalizarDados(DADOS_INICIAIS))]);
 };
 </script>
 </body>
 </html>
+```
