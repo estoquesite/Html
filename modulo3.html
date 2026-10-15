@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Módulo 3 - Cronograma de Férias | Portal Vale v10</title>
+<title>Módulo 3 - Cronograma de Férias | Portal Vale v11</title>
 <!-- Bibliotecas para renderizar o PDF (1 página por folha) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -90,7 +90,7 @@ tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
 
 <div class="painel-controle">
   <div class="topo-modulo-info">
-    <span class="badge-modulo">Módulo 3: Cronograma de Férias <span class="tag-v06">v10</span></span>
+    <span class="badge-modulo">Módulo 3: Cronograma de Férias <span class="tag-v06">v11</span></span>
     <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
   </div>
   <div class="campos-painel">
@@ -143,6 +143,7 @@ const DADOS_F_INICIAIS = [
   "DOMINIQUE SILVA","RICHARD SILVA","EMERSON RIBEIRO DOS SANTOS","ALLAN SOUZA DE CARVALHO","TITO DACAL"];
 const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
 const LINHAS_PADRAO = 22;
+const LARGURA_FOLHA_PX = 1200;
 const $ = id => document.getElementById(id);
 const pad = n => n < 10 ? '0' + n : '' + n;
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -181,7 +182,7 @@ function atualizarContadorNomes() {
   c.classList.toggle('aviso', dup > 0);
 }
 
-/* PDF: 1 PÁGINA A4 PAISAGEM POR FOLHA */
+/* PDF: 1 PÁGINA A4 PAISAGEM POR FOLHA, em alta resolução e sem compressão JPEG */
 async function descarregarPDFCompleto() {
   const folhas = todasFolhas();
   if (!folhas.length) return;
@@ -190,16 +191,25 @@ async function descarregarPDFCompleto() {
 
   const botoesOcultar = document.querySelectorAll('#contentorFolhasFerias .barra-controle-folha, #contentorFolhasFerias .botoes-acoes');
   botoesOcultar.forEach(b => b.style.display = 'none');
-  folhas.forEach(f => f.style.zoom = 1);
+  folhas.forEach(f => { f.style.zoom = 1; f.style.width = LARGURA_FOLHA_PX + 'px'; f.style.margin = '0'; f.style.boxShadow = 'none'; });
 
   try {
     const { jsPDF } = window.jspdf;
     const pdf = new jsPDF('landscape', 'mm', 'a4');
     const margem = 4, larguraDisponivel = 297 - margem * 2, alturaDisponivel = 210 - margem * 2;
+    const escala = Math.max(3, (window.devicePixelRatio || 1) * 2.5);
 
     for (let i = 0; i < folhas.length; i++) {
-      const canvas = await html2canvas(folhas[i], { scale: 2, useCORS: true, backgroundColor: '#ffffff' });
-      const imgData = canvas.toDataURL('image/jpeg', 0.98);
+      const canvas = await html2canvas(folhas[i], {
+        scale: escala,
+        useCORS: true,
+        backgroundColor: '#ffffff',
+        logging: false,
+        windowWidth: LARGURA_FOLHA_PX + 200,
+        scrollX: 0,
+        scrollY: -window.scrollY
+      });
+      const imgData = canvas.toDataURL('image/png');
       const proporcao = canvas.width / canvas.height;
 
       let larguraFinal = larguraDisponivel;
@@ -212,7 +222,7 @@ async function descarregarPDFCompleto() {
       const posY = margem + (alturaDisponivel - alturaFinal) / 2;
 
       if (i > 0) pdf.addPage('a4', 'landscape');
-      pdf.addImage(imgData, 'JPEG', posX, posY, larguraFinal, alturaFinal);
+      pdf.addImage(imgData, 'PNG', posX, posY, larguraFinal, alturaFinal, undefined, 'NONE');
     }
 
     pdf.save(`cronograma_ferias_${$('anoInputFerias').value.trim() || '2026'}.pdf`);
@@ -221,6 +231,7 @@ async function descarregarPDFCompleto() {
     mostrarToast('Erro ao gerar PDF.');
   } finally {
     botoesOcultar.forEach(b => b.style.display = '');
+    folhas.forEach(f => { f.style.width = ''; f.style.margin = ''; f.style.boxShadow = ''; });
     aplicarZoom();
   }
 }
