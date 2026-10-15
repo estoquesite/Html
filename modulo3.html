@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Módulo 3 - Cronograma de Férias | Portal Vale v09</title>
+<title>Módulo 3 - Cronograma de Férias | Portal Vale v10</title>
 <!-- Bibliotecas para renderizar o PDF (1 página por folha) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -72,6 +72,8 @@ table.tabela-ferias tbody tr:hover{background:#fff7fa}
 .celula-ferias{outline:none;font-size:8px;font-weight:700;background:#fff}
 .celula-ferias:focus{background:#fdf2f8;box-shadow:inset 0 0 0 1.5px var(--primary)}
 .celula-ferias.invalida{background:#fee2e2;color:var(--danger)}
+.celula-ferias,.col-saldo,.col-id-texto,.col-nome-texto{min-height:20px;display:block;cursor:text;-webkit-user-select:text;user-select:text}
+.col-nome-texto{min-width:90px}
 .col-saldo{width:45px;font-weight:800;background:var(--primary-bg);outline:none;color:#831843;font-size:9px}
 .col-saldo:focus{background:#fff;box-shadow:inset 0 0 0 1.5px var(--primary)}
 .botoes-acoes{display:flex;gap:2px;opacity:.3;transition:opacity .2s}
@@ -88,7 +90,7 @@ tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
 
 <div class="painel-controle">
   <div class="topo-modulo-info">
-    <span class="badge-modulo">Módulo 3: Cronograma de Férias <span class="tag-v06">v09</span></span>
+    <span class="badge-modulo">Módulo 3: Cronograma de Férias <span class="tag-v06">v10</span></span>
     <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
   </div>
   <div class="campos-painel">
@@ -282,7 +284,7 @@ function limparApenasListaNomes() {
 function criarLinhaFerias(numStr, nome = '') {
   const tds = '<td class="celula-ferias" contenteditable="true" title="Data (4 números = dd/mm)"></td>'.repeat(24);
   return `<td class="col-id"><span class="col-id-texto" contenteditable="true">${numStr}</span></td>` +
-    `<td class="col-nome"><div class="col-nome-container"><span class="col-nome-texto" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()">${esc(nome)}</span>` +
+    `<td class="col-nome"><div class="col-nome-container"><span class="col-nome-texto" contenteditable="true" onblur="this.innerText=this.innerText.trim().toUpperCase()">${esc(nome)}</span>` +
     `<div class="botoes-acoes"><button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixoFerias(this)" title="Adicionar linha abaixo">➕</button><button type="button" class="btn-acao btn-menos-linha" onclick="removerLinhaFerias(this)" title="Remover linha">➖</button><button type="button" class="btn-acao btn-lixeira" onclick="apagarLinhaFerias(this)" title="Apagar nome">🗑️</button></div></div></td>` +
     tds + '<td class="col-saldo" contenteditable="true" title="Saldo de dias">-</td>';
 }
