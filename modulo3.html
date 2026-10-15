@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Módulo 3 - Cronograma de Férias | Portal Vale v08</title>
+<title>Módulo 3 - Cronograma de Férias | Portal Vale v09</title>
 <!-- Bibliotecas para renderizar o PDF (1 página por folha) -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
@@ -47,8 +47,9 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:#fff5f7;color:var(--
 .barra-controle-folha{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:6px;margin-bottom:6px;background:var(--primary-bg);padding:5px 10px;border:1px solid #fbcfe8;border-radius:6px}
 .barra-grupo{display:flex;align-items:center;flex-wrap:wrap;gap:8px}
 .tit-folha{font-size:10.5px;font-weight:800;color:#9d174d;text-transform:uppercase}
-.lbl-seguir{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:#9d174d;cursor:pointer;background:#fff;border:1px solid var(--primary-border);border-radius:4px;padding:3px 8px}
-.lbl-seguir input{width:15px;height:15px;accent-color:var(--primary);cursor:pointer}
+.lbl-seguir{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700;color:#9d174d;background:#fff;border:1px solid var(--primary-border);border-radius:4px;padding:3px 8px}
+.sel-modo{font-family:inherit;font-size:10.5px;font-weight:700;color:#9d174d;border:1px solid var(--primary-border);border-radius:4px;padding:2px 4px;background:#fff;cursor:pointer}
+.num-inicio{width:64px;font-family:inherit;font-size:10.5px;font-weight:700;color:#9d174d;border:1px solid var(--primary-border);border-radius:4px;padding:2px 4px;background:#fff}
 .btn-linha-topo{border-radius:4px;font-size:10px;font-weight:700;padding:3px 8px;cursor:pointer;background:#fff;border:1px solid var(--primary);color:var(--primary)}
 .btn-linha-topo.perigo{border-color:var(--danger);color:var(--danger)}
 .cabecalho-container,.info-ferias-bar,table.tabela-ferias{width:100%;border-collapse:collapse;border:1.2px solid var(--s900);margin-bottom:4px;table-layout:fixed}
@@ -87,7 +88,7 @@ tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
 
 <div class="painel-controle">
   <div class="topo-modulo-info">
-    <span class="badge-modulo">Módulo 3: Cronograma de Férias <span class="tag-v06">v08</span></span>
+    <span class="badge-modulo">Módulo 3: Cronograma de Férias <span class="tag-v06">v09</span></span>
     <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
   </div>
   <div class="campos-painel">
@@ -118,7 +119,7 @@ tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
     <button type="button" class="btn btn-exportar" onclick="document.getElementById('arquivoBackupFerias').click()">⬆️ Restaurar</button>
     <button type="button" class="btn btn-limpar" onclick="limparTudoFerias()">Limpar</button>
   </div>
-  <p class="dica">💡 Use <b>"Nova Folha"</b> para criar mais folhas. Em cada folha (a partir da 2ª) marque ou desmarque <b>"Continuar numeração da folha anterior"</b>: marcado = segue (ex.: 22, 23...); desmarcado = recomeça em 01. O PDF gera 1 página por folha.</p>
+  <p class="dica">💡 Use <b>"Nova Folha"</b> para criar mais folhas. Em cada folha (a partir da 2ª) escolha em <b>"Numeração"</b>: <b>Continua da anterior</b> (ex.: 22, 23...) ou <b>Recomeça em</b> o número que você quiser (ex.: 01, 50...). O PDF gera 1 página por folha.</p>
 </div>
 
 <div class="barra-zoom">
@@ -139,7 +140,7 @@ const DADOS_F_INICIAIS = [
   "ATMISTO SILVA","CAIO HENRIQUE","PABLO MESQUITA","DAVID MARCELO DELGADO DOS SANTOS",
   "DOMINIQUE SILVA","RICHARD SILVA","EMERSON RIBEIRO DOS SANTOS","ALLAN SOUZA DE CARVALHO","TITO DACAL"];
 const MESES = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
-const LINHAS_NOVA_FOLHA = 10;
+const LINHAS_PADRAO = 22;
 const $ = id => document.getElementById(id);
 const pad = n => n < 10 ? '0' + n : '' + n;
 const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -290,18 +291,29 @@ function adicionarLinhaAbaixoFerias(b) { const tr = document.createElement('tr')
 function adicionarLinhaFimFerias(b) { const tr = document.createElement('tr'); tr.innerHTML = criarLinhaFerias('00'); b.closest('.folha-a4').querySelector('.corpo-tabela-ferias').appendChild(tr); reordenarNumFerias(); }
 function removerLinhaFerias(b) { const tr = b.closest('tr'); if (tr.parentNode.querySelectorAll('tr').length > 1) { tr.remove(); reordenarNumFerias(); } }
 
-/* ===== FOLHAS: barra de controle, "Folha X / N" e numeração (segue ou recomeça) ===== */
+/* ===== NUMERAÇÃO POR FOLHA =====
+   data-modo: 'c' = continua da anterior | 'r' = recomeça em data-inicio
+   Os valores ficam no próprio elemento da folha, então são salvos e restaurados. */
+function modoFolha(f) { return f.dataset.modo || (f.dataset.seguir === '0' ? 'r' : 'c'); }
+function inicioFolha(f) { const n = parseInt(f.dataset.inicio || '1', 10); return isNaN(n) || n < 0 ? 1 : n; }
+
 function montarBarraFolha(f, idx) {
-  const seguir = f.dataset.seguir !== '0';
   const barra = f.querySelector('.barra-controle-folha');
   if (!barra) return;
+  const modo = modoFolha(f), inicio = inicioFolha(f);
+  const seletor = idx === 0 ? '' :
+    `<label class="lbl-seguir">Numeração: <select class="sel-modo" onchange="alterarModoFolha(this)">` +
+    `<option value="c" ${modo === 'c' ? 'selected' : ''}>Continua da anterior</option>` +
+    `<option value="r" ${modo === 'r' ? 'selected' : ''}>Recomeça em</option></select></label>`;
+  const inicioCampo = (idx === 0 || modo === 'r')
+    ? `<label class="lbl-seguir">${idx === 0 ? 'Começa em' : 'Nº inicial'} <input type="number" min="0" max="999" class="num-inicio" value="${inicio}" onchange="alterarInicioFolha(this)"></label>`
+    : '';
   barra.innerHTML =
     `<div class="barra-grupo"><span class="tit-folha">Folha ${pad(idx + 1)}</span>` +
     `<button type="button" class="btn-linha-topo" onclick="adicionarLinhaFimFerias(this)">➕ Linha no fim</button></div>` +
-    (idx > 0
-      ? `<div class="barra-grupo"><label class="lbl-seguir"><input type="checkbox" class="chk-seguir" ${seguir ? 'checked' : ''} onchange="alternarSeguirNumeracao(this)"> Continuar numeração da folha anterior</label>` +
-        `<button type="button" class="btn-linha-topo perigo" onclick="removerFolha(this)">🗑 Excluir folha</button></div>`
-      : '');
+    `<div class="barra-grupo">${seletor}${inicioCampo}` +
+    (idx > 0 ? `<button type="button" class="btn-linha-topo perigo" onclick="removerFolha(this)">🗑 Excluir folha</button>` : '') +
+    `</div>`;
 }
 
 function garantirCampoFolha(f) {
@@ -320,16 +332,25 @@ function organizarFolhas() {
     montarBarraFolha(f, idx);
     const vf = f.querySelector('.val-folha');
     if (vf) vf.innerText = `${pad(idx + 1)} / ${pad(total)}`;
-    if (idx > 0 && f.dataset.seguir === '0') contador = 1;
+    if (idx === 0 || modoFolha(f) === 'r') contador = inicioFolha(f);
     f.querySelectorAll('.corpo-tabela-ferias tr .col-id-texto').forEach(s => { s.innerText = pad(contador++); });
   });
 }
 
-function alternarSeguirNumeracao(chk) {
-  const f = chk.closest('.folha-a4');
-  f.dataset.seguir = chk.checked ? '1' : '0';
+function alterarModoFolha(sel) {
+  const f = sel.closest('.folha-a4');
+  f.dataset.modo = sel.value;
+  f.dataset.seguir = sel.value === 'c' ? '1' : '0';
   reordenarNumFerias();
-  mostrarToast(chk.checked ? 'Numeração continua da folha anterior.' : 'Numeração recomeça em 01 nesta folha.');
+  mostrarToast(sel.value === 'c' ? 'Numeração continua da folha anterior.' : 'Numeração recomeça no número informado.');
+}
+
+function alterarInicioFolha(inp) {
+  const f = inp.closest('.folha-a4');
+  const n = Math.max(0, parseInt(inp.value, 10) || 0);
+  f.dataset.inicio = String(n);
+  reordenarNumFerias();
+  mostrarToast(`Numeração começa em ${pad(n)} nesta folha.`);
 }
 
 function reordenarNumFerias(notificar = false) {
@@ -338,8 +359,15 @@ function reordenarNumFerias(notificar = false) {
   agendarAutoSave();
 }
 
+/* Nova folha: mesma quantidade de linhas da 1ª folha, numeração continua por padrão */
+function linhasDaPrimeiraFolha() {
+  const f = todasFolhas()[0];
+  const n = f ? f.querySelectorAll('.corpo-tabela-ferias tr').length : 0;
+  return n || LINHAS_PADRAO;
+}
 function adicionarFolha() {
-  const f = criarTabelaFeriasHTML(Array(LINHAS_NOVA_FOLHA).fill(''));
+  const f = criarTabelaFeriasHTML(Array(linhasDaPrimeiraFolha()).fill(''));
+  f.dataset.modo = 'c';
   f.dataset.seguir = '1';
   $('contentorFolhasFerias').appendChild(f);
   reordenarNumFerias();
@@ -358,7 +386,7 @@ function removerFolha(b) {
 function criarTabelaFeriasHTML(nomes) {
   const lista = nomes.length ? nomes : [''];
   const linhas = lista.map((n, i) => `<tr>${criarLinhaFerias(pad(i + 1), n)}</tr>`).join('');
-  const f = document.createElement('div'); f.className = 'folha-a4'; f.style.zoom = nivelZoom; f.dataset.seguir = '1';
+  const f = document.createElement('div'); f.className = 'folha-a4'; f.style.zoom = nivelZoom; f.dataset.modo = 'c';
   f.innerHTML = `
   <div class="barra-controle-folha"></div>
   <div class="rolagem">
