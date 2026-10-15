@@ -56,9 +56,14 @@ th.fill button{width:22px;height:22px;padding:0;border:0;border-radius:3px;backg
 .sheet.fino .st{width:22px;height:22px}
 .sheet.fino .nv{width:44px;height:24px;font-size:13px;border-radius:6px}
 .sheet.fino .leg{font-size:10px;padding:2px 8px}
-.sheet.fino td,.sheet.fino th{text-align:right;font-weight:bold}
-.sheet.fino [contenteditable]{text-align:right;font-weight:bold}
-.sheet.fino .st,.sheet.fino .nv{margin-left:auto;margin-right:0}
+.sheet.fino td,.sheet.fino th{font-weight:bold}
+.sheet.fino [contenteditable]{font-weight:bold}
+.sheet.fino.al-r td,.sheet.fino.al-r th,.sheet.fino.al-r [contenteditable]{text-align:right}
+.sheet.fino.al-l td,.sheet.fino.al-l th,.sheet.fino.al-l [contenteditable]{text-align:left}
+.sheet.fino.al-c td,.sheet.fino.al-c th,.sheet.fino.al-c [contenteditable]{text-align:center}
+.sheet.fino.al-r .st,.sheet.fino.al-r .nv{margin-left:auto;margin-right:0}
+.sheet.fino.al-l .st,.sheet.fino.al-l .nv{margin-left:0;margin-right:auto}
+.sheet.fino.al-c .st,.sheet.fino.al-c .nv{margin:auto}
 .leg{font-size:11px;padding:4px 8px;text-align:center;border:2px solid #333;border-top:0}
 .tools{display:flex;gap:4px;flex-wrap:wrap;justify-content:center}
 @media print{
@@ -116,6 +121,7 @@ const C4=(a,b,c,d)=>[[a,46,0],[b,22,0],[c,17,0],[d,15,1]];
 const BTN_COL='<button data-a="addcol">+ coluna</button><button data-a="delcol">− coluna</button>';
 const BTN_FILL='<button data-a="fillall" class="novo">✔ Aplicar todas as colunas de uma vez</button>';
 const BTN_DUP='<button data-a="dup" class="novo">⧉ Duplicar folha</button><button data-a="delsheet" class="perigo">🗑 Excluir folha</button>';
+const BTN_AL='<button data-a="al-l">⬅ Esquerda</button><button data-a="al-c">⬌ Centro</button><button data-a="al-r">➡ Direita</button>';
 const rowBtns='<button data-a="addrow">+ linha</button><button data-a="delrow">− linha</button>'+BTN_COL+BTN_FILL+BTN_DUP;
 const tbBase='<button data-a="undo">↶ Desfazer</button><button data-a="redo">↷ Refazer</button><button data-a="print">🖨 Imprimir</button><button data-a="save">💾 Salvar no computador</button>';
 function folha(cls,extra,html){
@@ -158,14 +164,20 @@ function atualiza(){
 }
 function s5(){
   const n=app.children.length;
-  folha('c fino',rowBtns,T('5S – Maturidade por Posto')+tabela([['Posto de Trabalho',24,0],['Responsável',17,0],['Maturidade (1 a 4)',13,2],['Data da próxima maturidade',16,0],['Ação para subir de nível',30,0]],LINHAS_5S)+
+  folha('c fino al-r',rowBtns+BTN_AL,T('5S – Maturidade por Posto')+tabela([['Posto de Trabalho',24,0],['Responsável',17,0],['Maturidade (1 a 4)',13,2],['Data da próxima maturidade',16,0],['Ação para subir de nível',30,0]],LINHAS_5S)+
   '<div class="leg" contenteditable="true">Maturidade: 1 – Inicial &nbsp; 2 – Em desenvolvimento &nbsp; 3 – Estabelecido &nbsp; 4 – Sustentado &nbsp; (clique no quadrado para mudar o nível)</div>');
   [...app.children].slice(n).forEach(w=>w.dataset.s5=1);
 }
-/* garante 16 linhas na folha 5S (também para quadros salvos antes desta versão) */
+/* garante 16 linhas, classes e botões de alinhamento na folha 5S (também para quadros salvos antes desta versão) */
 function ajusta5sLinhas(){
   app.querySelectorAll('[data-s5]').forEach(w=>{
-    const sh=w.querySelector('.sheet');if(sh)sh.classList.add('c','fino');
+    const sh=w.querySelector('.sheet');
+    if(sh){
+      sh.classList.add('c','fino');
+      if(!/\bal-[lcr]\b/.test(sh.className))sh.classList.add('al-r');
+    }
+    const tbEl=w.querySelector('.tb'),gap=tbEl&&tbEl.querySelector('.gap');
+    if(gap&&!tbEl.querySelector('[data-a=al-r]'))gap.insertAdjacentHTML('beforebegin',BTN_AL);
     const tb=w.querySelector('table tbody');if(!tb)return;
     while(tb.querySelectorAll('tr').length<LINHAS_5S){
       const rs=tb.querySelectorAll('tr'),c=rs[rs.length-1].cloneNode(true);
@@ -399,6 +411,9 @@ app.addEventListener('click',e=>{
   }
   const a=b.dataset.a;if(!a)return;
   const sh=w.querySelector('.sheet');
+  if(a==='al-l'||a==='al-c'||a==='al-r'){
+    sh.classList.remove('al-l','al-c','al-r');sh.classList.add(a);mudou(w);return;
+  }
   if(a==='undo')return mover(w,-1);
   if(a==='redo')return mover(w,1);
   if(a==='print')return imprimirUm(w);
