@@ -1,373 +1,166 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Módulo 1 - DDS & Emociograma | Portal Vale v03</title>
+<html lang="pt-BR"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lista de Participação DSSMA</title>
 <style>
-:root{--primary:#007e7a;--primary-dark:#005a57;--primary-light:#e6f4f4;--accent:#f59e0b;--danger:#ef4444;--success:#10b981;--s900:#0f172a;--s700:#334155;--s600:#475569;--s200:#e2e8f0;--s100:#f1f5f9;--s50:#f8fafc}
-*{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:#edf2f7;color:var(--s900);min-height:100vh;padding:14px}
-#toastNotificacao{position:fixed;bottom:24px;right:24px;background:var(--s900);color:#fff;padding:10px 18px;border-radius:6px;font-size:12px;font-weight:600;box-shadow:0 10px 25px -5px rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:.25s;transform:translateY(12px);z-index:9999}
-#toastNotificacao.ativo{opacity:1;transform:none}
-.painel-controle{background:#fff;padding:16px 20px;margin:0 auto 16px;border-radius:10px;box-shadow:0 4px 18px rgba(0,0,0,.04);border:1px solid var(--s200);max-width:1120px}
-.topo-modulo-info{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;border-bottom:2px solid var(--primary);padding-bottom:8px;gap:8px;flex-wrap:wrap}
-.badge-modulo{background:linear-gradient(135deg,var(--primary),var(--primary-dark));color:#fff;font-size:11px;font-weight:800;padding:5px 12px;border-radius:6px;text-transform:uppercase;letter-spacing:.5px}
-.tag-v02{background:var(--accent);color:#fff;font-weight:800;font-size:9.5px;padding:2px 6px;border-radius:4px;margin-left:6px}
-.campos-painel{display:grid;gap:12px;margin-bottom:10px;grid-template-columns:2fr 1fr 1fr}
-.campo-grupo label{display:flex;justify-content:space-between;font-weight:700;margin-bottom:4px;font-size:10.5px;color:var(--s600);text-transform:uppercase}
-.painel-controle input[type=text],.painel-controle textarea{width:100%;font-family:inherit;font-size:12px;padding:7px 10px;border:1px solid #cbd5e1;border-radius:6px;background:var(--s50);outline:none;transition:.2s}
-.painel-controle textarea{height:90px;resize:vertical;text-transform:uppercase}
-.painel-controle input:focus,.painel-controle textarea:focus{border-color:var(--primary);background:#fff;box-shadow:0 0 0 3px rgba(0,126,122,.12)}
-.contador-colaboradores{font-size:10px;font-weight:700;color:var(--primary);text-transform:none}
-.contador-colaboradores.aviso{color:var(--danger)}
-.botoes-painel{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
-.btn{cursor:pointer;padding:7px 12px;font-size:11px;font-weight:700;border:none;border-radius:6px;color:#fff;display:inline-flex;align-items:center;gap:5px;transition:filter .15s,transform .05s;text-decoration:none}
-.btn:hover{filter:brightness(1.08)}.btn:active{transform:translateY(1px)}
-.btn-verde{background:var(--success)}.btn-azul{background:var(--primary)}.btn-add-folha{background:#7c3aed}.btn-renumerar{background:#ea580c}.btn-salvar{background:#2563eb}.btn-carregar{background:#0284c7}.btn-exportar{background:#0891b2}
-.btn-limpar{background:var(--s100);color:var(--s600);border:1px solid #cbd5e1}
-.btn-voltar{background:var(--s600)}.btn-imprimir{background:var(--s900);margin-left:auto}
-.dica{font-size:10px;color:var(--s600);margin-top:6px}
-.rolagem{overflow-x:auto}
-.folha-a4{width:100%;max-width:1120px;background:#fff;padding:12px 14px;margin:0 auto 16px;box-shadow:0 4px 18px rgba(0,0,0,.05);border-radius:8px;border:1px solid var(--s200)}
-.folha-a4 .rolagem>table{min-width:900px}
-.barra-controle-folha{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;background:var(--s50);padding:5px 10px;border:1px solid var(--s200);border-radius:5px;gap:6px;flex-wrap:wrap}
-.grupo-acoes-linhas{display:flex;gap:6px}
-.btn-linha-topo,.btn-remover-folha{border-radius:4px;font-size:10px;font-weight:700;padding:3px 8px;cursor:pointer;background:#fff}
-.btn-linha-topo{border:1px solid var(--primary);color:var(--primary)}
-.btn-remover-folha{color:var(--danger);border:1px solid #fca5a5}
-.cabecalho-container,.info-dds,table.tabela-dds{width:100%;border-collapse:collapse;border:1.2px solid var(--s900);margin-bottom:3px;table-layout:fixed}
-.cabecalho-container td,.info-dds td{border:1px solid var(--s700);padding:3px 6px;text-align:center;vertical-align:middle}
-.logo-box{width:115px;font-weight:900;font-size:16px;color:var(--primary);letter-spacing:1.5px;background:var(--s50)}
-.titulo-box{font-size:10.5px;font-weight:800;text-transform:uppercase}
-.meta-box{width:130px;font-size:8.5px;text-align:left!important;padding-left:8px!important;background:var(--s50)}
-.campo-editavel{outline:none;display:inline-block;min-width:25px;font-size:8.5px;font-weight:600}
-table.tabela-dds th,table.tabela-dds td{border:1px solid var(--s700);text-align:center;vertical-align:middle}
-table.tabela-dds th{background:var(--s50);font-weight:800}
-table.tabela-dds tbody tr:nth-child(even){background:#fafbfc}
-table.tabela-dds tbody tr:hover{background:#f0fafa}
-table.tabela-dds td{height:21.5px;padding:1px 2px}
-.tabela-dds .col-id{width:36px!important;background:var(--s100)!important;font-weight:800}
-.col-id-container,.col-nome-container{display:flex;align-items:center;width:100%}
-.col-id-container{justify-content:center}
-.col-id-texto{outline:none;font-size:9px;font-weight:800;background:#e2e8f0;padding:1px 4px;border-radius:3px;width:100%;text-align:center}
-.col-id-texto:focus{background:#fef3c7}
-.tabela-dds .col-colaborador{width:240px!important;text-align:left}
-.col-nome-container{justify-content:space-between;padding:0 4px;gap:4px}
-.col-nome-texto{flex-grow:1;text-align:left;outline:none;white-space:nowrap;overflow:hidden;font-size:8.5px;font-weight:700;text-transform:uppercase;min-height:11px}
-.col-nome-texto:focus,.col-rubrica:focus{background:#fef3c7}
-.botoes-acoes{display:flex;gap:2px;opacity:.3;transition:opacity .2s}
-tr:hover .botoes-acoes,tr:focus-within .botoes-acoes{opacity:1}
-.btn-acao{background:var(--s100);border:1px solid #cbd5e1;border-radius:3px;cursor:pointer;padding:1px 3px;font-size:8px;line-height:1}
-.btn-lixeira{color:var(--danger);border-color:#fca5a5}.btn-mais-linha{color:var(--success);border-color:#6ee7b7;font-weight:900}.btn-menos-linha{color:var(--accent);border-color:#fcd34d;font-weight:900}
-.th-dia-semana{font-size:8.5px;font-weight:800;text-transform:uppercase;padding:3px 0;background:linear-gradient(180deg,var(--primary-light),#d8ecec)!important;color:var(--primary-dark)}
-.btn-preencher-dia{margin-left:4px;font-size:9px;cursor:pointer;background:none;border:none;color:var(--primary-dark)}
-.btn-preencher-dia:hover{color:var(--success)}
-.th-sub{font-size:7.5px!important;font-weight:800;background:var(--s100)!important;padding:2px 0}
-.col-como-estou{width:55px;min-width:55px;padding:1px!important}
-.col-rubrica{width:45px;min-width:45px;outline:none;font-size:8.5px;background:#fff}
-.grupo-carinhas{display:flex;align-items:center;justify-content:space-evenly;width:100%;gap:1px}
-.carinha-item{display:flex;flex-direction:column;align-items:center;cursor:pointer;user-select:none;line-height:1;padding:1px;border-radius:3px;outline:none}
-.carinha-item:focus-visible{box-shadow:0 0 0 2px var(--primary)}
-.carinha-num{font-size:6px;font-weight:800;color:var(--s600);margin-bottom:.5px}
-.carinha-svg{width:11px;height:11px;display:block}
-.c-verde .rosto{stroke:var(--success);stroke-width:2.2;fill:#ecfdf5}.c-verde .olho{fill:var(--success)}.c-verde .boca{stroke:var(--success);stroke-width:2.2;stroke-linecap:round;fill:none}
-.c-amarela .rosto{stroke:var(--accent);stroke-width:2.2;fill:#fffbeb}.c-amarela .olho{fill:var(--accent)}.c-amarela .boca{stroke:var(--accent);stroke-width:2.2;stroke-linecap:round;fill:none}
-.c-vermelha .rosto{stroke:var(--danger);stroke-width:2.2;fill:#fef2f2}.c-vermelha .olho{fill:var(--danger)}.c-vermelha .boca{stroke:var(--danger);stroke-width:2.2;stroke-linecap:round;fill:none}
-.carinha-item.selecionado-1{background:#d1fae5;outline:1.2px solid var(--success)}
-.carinha-item.selecionado-2{background:#fef3c7;outline:1.2px solid var(--accent)}
-.carinha-item.selecionado-3{background:#fee2e2;outline:1.2px solid var(--danger)}
-.rodape-container{display:grid;grid-template-columns:140px 1.4fr 1.8fr;gap:6px;font-size:7.5px;line-height:1.25;margin-top:4px}
-.box-legenda{border:1px solid #cbd5e1;padding:4px 6px;background:var(--s50);border-radius:5px}
-.box-legenda h4{margin:0 0 2px;font-size:8px;font-weight:800;text-transform:uppercase;border-bottom:1px solid var(--s200);padding-bottom:2px;color:var(--primary-dark)}
-.lista-legenda{list-style:none}.lista-legenda li{margin-bottom:1.5px}
-@media(max-width:700px){.campos-painel{grid-template-columns:1fr}.btn-imprimir{margin-left:0}.rodape-container{grid-template-columns:1fr}}
+:root{--bg:#eef0f3;--bar:#fff;--tx:#1b2430;--bd:#cfd5dd;--ac:#1f4e79;--c:#000;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14181e;--bar:#1e242c;--tx:#e6eaf0;--bd:#38414d;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#14181e;--bar:#1e242c;--tx:#e6eaf0;--bd:#38414d;color-scheme:dark}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--tx);font:14px/1.4 system-ui,Arial,sans-serif}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);background:var(--bar);z-index:10}
+.bar{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--bar);border-bottom:1px solid var(--bd);padding:8px;display:flex;flex-wrap:wrap;gap:6px;align-items:center}
+button,select,input,textarea{font:inherit}
+.bar button,.sh-act button{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:6px;padding:6px 10px;cursor:pointer}
+.bar button:hover,.sh-act button:hover{border-color:var(--ac)}
+.bar button.p{background:var(--ac);color:#fff;border-color:var(--ac)}
+.bar label{display:flex;gap:4px;align-items:center}
+.bar input,.bar select,.bar textarea{background:var(--bg);color:var(--tx);border:1px solid var(--bd);border-radius:6px;padding:5px}
+.bar input[type=number]{width:56px}
+.bar textarea{width:190px;height:34px;resize:vertical}
+.bar input[type=color]{padding:0;width:34px;height:30px}
+#msg{margin-left:auto;font-size:12px;opacity:.7}
+#pages{padding:12px;display:flex;flex-direction:column;align-items:center;gap:14px}
+.wrap{max-width:100%;overflow-x:auto}
+.sheet{background:#fff;color:#000;width:1060px;padding:14px;box-shadow:0 1px 6px #0003;font-family:Arial,Helvetica,sans-serif}
+.sh-act{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px}
+.sh-act button{background:#f3f4f6;color:#111;border-color:#ccc;padding:3px 8px;font-size:12px}
+.top{display:flex;border:2px solid #000;border-bottom:0;height:112px}
+.tt{display:flex;align-items:center;gap:8px;border-bottom:2px solid var(--tc,#2b6a68);margin-bottom:4px}.tt .ttl{flex:1;border:0;background:transparent;font:700 17px Arial;color:var(--tc,#2b6a68);padding:2px 0}.tt img{height:30px}
+.emo{flex:1.5;padding:4px 8px;font:11px Arial;border-left:2px solid #000;color:#000}.emo u{font-weight:700;font-size:14px;display:block;margin-bottom:2px}.lg{display:flex;gap:6px;align-items:center}.lg p{margin:2px 0}.fcs{display:flex;flex-direction:column;align-items:center;font:8px/8px Arial}.fcs i{font-style:normal}.fcs svg{width:14px;height:14px}.seg+.seg{margin-top:14px}
+.top textarea{flex:1;border:0;resize:none;padding:6px;font:700 17px Arial;background:transparent;color:#000;box-sizing:border-box}
+.top textarea+textarea{border-left:2px solid #000}
+.top textarea:first-child{flex:1.15}
+table{border-collapse:collapse;width:100%;table-layout:fixed;border:2px solid #000}
+th,td{border:1px solid #000;padding:0;height:24px;font-size:11px;text-align:center;font-weight:400}
+thead{display:table-header-group}
+tr{break-inside:avoid}
+th.hd{font-weight:700;font-size:11px;border-top:2px solid #000}
+th.vt{writing-mode:vertical-rl;transform:rotate(180deg)}
+td.tc{height:32px;padding:0}
+td.tc textarea{width:100%;height:100%;border:0;resize:none;font:11px Arial;box-sizing:border-box;padding:2px;background:transparent;color:#000}
+.sw{display:flex;gap:4px}.sw button{width:22px;height:22px;border-radius:50%;padding:0!important}
+.sheet.neon td.dt{box-shadow:0 0 10px 2px var(--dt),inset 0 0 8px #fff9;position:relative;z-index:1}
+td.dt{background:var(--dt,#ffe600);font-weight:700}
+td.dt{text-align:left;font-size:10px;height:28px;white-space:nowrap}
+td.dt input{width:calc(100% - 52px);border:0;font:10px Arial;background:transparent;color:#000;padding:0}
+td.lb{font-size:10px;height:20px}
+td.n{font-size:10px;text-align:left;vertical-align:top;padding:1px 2px;width:22px}
+td.nm{text-align:left}
+td.nm input{width:100%;box-sizing:border-box;border:0;background:transparent;font:700 15px Arial;color:#000;padding:0 3px;height:100%}
+td.mo{padding:0;user-select:none}.fc{display:flex;justify-content:space-around;align-items:flex-end;height:100%}.fc span{display:flex;flex-direction:column;align-items:center;cursor:pointer;font:8px/9px Arial;border-radius:4px;padding:0 1px}.fc span:hover{background:#eef5ff}.fc span.on{background:#ffe066;outline:1px solid #000}.fc svg{width:14px;height:14px}
+td.mo:hover{background:#eef5ff}
+td.ru input{width:100%;box-sizing:border-box;border:0;background:transparent;font:11px Arial;color:#000;text-align:center;height:100%}
+td.ban{background:var(--c);color:#fff;font:700 13px Arial;height:22px}
+td.ban input{width:100%;border:0;background:transparent;color:#fff;font:700 13px Arial;text-align:center}
+td.x,th.x{width:20px;border:0!important;background:none}
+td.x button{border:0;background:none;color:#b00;cursor:pointer;font-size:14px;padding:0}
+.sh-foot{text-align:right;font-size:11px;color:#555;margin-top:4px}
 @media print{
-@page{size:A4 landscape;margin:3mm 4mm}
-body{background:#fff!important;padding:0!important}
-.painel-controle,.botoes-acoes,.barra-controle-folha,.btn-preencher-dia,#toastNotificacao{display:none!important}
-.rolagem{overflow:visible}.folha-a4 .rolagem>table{min-width:0}
-.folha-a4{box-shadow:none!important;border:none!important;width:100%!important;max-width:100%!important;padding:0!important;margin:0!important;break-after:page;page-break-after:always}
-.folha-a4:last-child{break-after:auto;page-break-after:auto}
-table.tabela-dds tbody tr:hover{background:inherit}
-*{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ @page{size:A4 landscape;margin:8mm}
+ body{background:#fff}.bar,.sh-act,.x,.sh-foot,body::before{display:none!important}
+ #pages{padding:0;gap:0;display:block}.wrap{overflow:visible}
+ .sheet{width:100%;box-shadow:none;padding:0;break-after:page}
+ .sheet:last-child{break-after:auto}
+ td,th{height:6.4mm}td.tc{height:8.5mm}td.dt{height:7.4mm}td.lb{height:5.3mm}
+ .top{height:31mm}.seg+.seg{break-before:page;margin-top:0}
+ textarea,input{resize:none}
+ *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ td.mo:hover{background:none}
 }
-</style>
-</head>
-<body>
-<div id="toastNotificacao" role="status" aria-live="polite">Mensagem</div>
-<input type="file" id="arquivoBackupDDS" style="display:none" accept=".json" onchange="processarArquivoBackup(this)">
-
-<div class="painel-controle">
-  <div class="topo-modulo-info">
-    <span class="badge-modulo">Módulo 1: DDS & Emociograma <span class="tag-v02">v03</span></span>
-    <a href="index.html" class="btn btn-voltar">⬅ Voltar ao Menu</a>
-  </div>
-  <div class="campos-painel">
-    <div class="campo-grupo"><label for="periodoInputDDS">Período:</label><input type="text" id="periodoInputDDS" placeholder="21/09 a 25/09" oninput="sincronizarCabecalhos()"></div>
-    <div class="campo-grupo"><label for="semanaInputDDS">Semana:</label><input type="text" id="semanaInputDDS" placeholder="38" inputmode="numeric" oninput="sincronizarCabecalhos()"></div>
-    <div class="campo-grupo"><label for="anoInputDDS">Ano:</label><input type="text" id="anoInputDDS" value="2026" inputmode="numeric" oninput="sincronizarCabecalhos()"></div>
-  </div>
-  <div class="campo-grupo">
-    <label for="nomesInputDDS"><span>Lista de Colaboradores (A-Z automático):</span><span id="contadorColaboradores" class="contador-colaboradores">0 colaboradores | 1 folha(s)</span></label>
-    <textarea id="nomesInputDDS" oninput="atualizarContadorNomes()" placeholder="COLE OS NOMES AQUI (UM POR LINHA)..."></textarea>
-  </div>
-  <div class="botoes-painel">
-    <button type="button" class="btn btn-verde" onclick="aplicarDadosDDS('verde')">Gerar c/ Carinha 1 (A-Z)</button>
-    <button type="button" class="btn btn-azul" onclick="aplicarDadosDDS('limpo')">Gerar Limpo (A-Z)</button>
-    <button type="button" class="btn btn-add-folha" onclick="adicionarFolhaManualDDS()">📄➕ Folha Extra</button>
-    <button type="button" class="btn btn-renumerar" onclick="reordenarNumDDS(true)">🔢 Renumerar</button>
-    <button type="button" class="btn btn-salvar" onclick="salvarTudoDDS()">💾 Salvar</button>
-    <button type="button" class="btn btn-carregar" onclick="carregarTudoDDS()">📂 Carregar</button>
-    <button type="button" class="btn btn-exportar" onclick="exportarBackupJSON()">⬇️ Backup</button>
-    <button type="button" class="btn btn-exportar" onclick="document.getElementById('arquivoBackupDDS').click()">⬆️ Restaurar</button>
-    <button type="button" class="btn btn-limpar" onclick="limparTudoDDS()">Limpar</button>
-    <button type="button" class="btn btn-imprimir" onclick="window.print()">🖨️ Imprimir</button>
-  </div>
-  <p class="dica">💾 Salvamento automático ativo neste navegador. Use Backup para guardar um arquivo. Enter move para a linha de baixo.</p>
+</style></head><body>
+<div class="bar">
+ <button class="p" onclick="window.print()">🖨 Imprimir</button>
+ <button onclick="undo()">↶ Desfazer</button><button onclick="redo()">↷ Refazer</button>
+ <textarea id="nn" placeholder="Nomes (um por linha)"></textarea>
+ <button onclick="addNames()">+ Adicionar</button>
+ <button onclick="addSheet()">+ Folha</button>
+ <button onclick="renum()">Renumerar</button>
+ <label>Cor <input type="color" id="cor" oninput="S.color=this.value;paint()" onchange="commit()"></label>
+ <label>Linhas <input type="number" id="per" min="5" max="200" onchange="setPer(+this.value)"></label>
+ <label>Aviso após linha <input type="number" id="ban" min="0" max="200" onchange="S.ban=+this.value;commit()"></label>
+ <label>Tema <input id="tg" placeholder="Igual p/ todas as colunas" onchange="setTema(this.value)"></label>
+ <label>Fundo Data/Turno <input type="color" id="dtc" oninput="S.dt=this.value;paint()" onchange="commit()"></label>
+ <span class="sw"><button style="background:#39ff14" title="Verde neon" onclick="setDt('#39ff14')"></button><button style="background:#ff2bd6" title="Rosa neon" onclick="setDt('#ff2bd6')"></button><button style="background:#00f0ff" title="Ciano neon" onclick="setDt('#00f0ff')"></button><button style="background:#fff200" title="Amarelo neon" onclick="setDt('#fff200')"></button><button style="background:#ff6a00" title="Laranja neon" onclick="setDt('#ff6a00')"></button><button style="background:#fff" title="Sem cor" onclick="setDt('#ffffff')"></button></span>
+ <label><input type="checkbox" id="neon" onchange="S.neon=this.checked;commit()"> Brilho neon</label>
+ <label>Cor título <input type="color" id="tcc" oninput="S.tc=this.value;paint()" onchange="commit()"></label>
+ <button onclick="document.getElementById('lg').click()">🖼 Logo</button><input type="file" id="lg" accept="image/*" hidden onchange="setLogo(this)">
+ <button onclick="save()">💾 Salvar</button>
+ <button onclick="document.getElementById('f').click()">📂 Carregar</button>
+ <input type="file" id="f" accept=".json" hidden onchange="load_(this)">
+ <button onclick="if(confirm('Apagar tudo e voltar ao modelo inicial?')){S=init();commit()}">Limpar tudo</button>
+ <span id="msg"></span>
 </div>
-
-<div id="contentorFolhasDDS"></div>
-
+<div id="pages"></div>
 <script>
-const TOTAL_LINHAS_DDS = 24, CHAVE = 'valedds_v02';
-const $ = id => document.getElementById(id);
-const pad = n => n < 10 ? '0' + n : '' + n;
-let _toast, _auto;
-
-function mostrarToast(msg) {
-  const t = $('toastNotificacao'); t.innerText = msg; t.classList.add('ativo');
-  clearTimeout(_toast); _toast = setTimeout(() => t.classList.remove('ativo'), 2600);
+const KEY='dssma_v2',NC=5;
+const FACE=k=>`<svg viewBox="0 0 16 16" fill="none" stroke="#000" stroke-width="1.1"><circle cx="8" cy="8" r="6.8"/><circle cx="5.6" cy="6.4" r=".6" fill="#000"/><circle cx="10.4" cy="6.4" r=".6" fill="#000"/>${k==1?'<path d="M4.8 9.4q3.2 3 6.4 0"/>':k==2?'<path d="M5 10.4h6"/>':'<path d="M4.8 11.6q3.2-3 6.4 0"/>'}</svg>`;
+const DEFT='Anexo 02 – Lista de participação em DSSMA para Público Operacional e Administrativo com Emociograma em meio físico';
+const DEFB1='Supervisor: JOÃO PEDRO\nSupervisor: WILIAN\n\nTurma: G2';
+function topBlock(si,s){const lg=(k,b,t)=>`<div class="lg"><span class="fcs"><i>${k}</i>${FACE(k)}</span><p><b>${b}</b> - ${t}</p></div>`;return `<div class="tt"><input class="ttl" value="${esc(S.title||DEFT)}" onchange="S.title=this.value;commit()">${S.logo?`<img src="${S.logo}">`:''}</div><div class="top"><textarea oninput="S.sheets[${si}].box1=this.value" onchange="commit()">${tx(s.box1)}</textarea><div class="emo"><u>EMOCIOGRAMA:</u>${lg(1,'Estou bem, normal','liberar o trabalhador para as suas atividades')}${lg(2,'Não me sinto bem','não escalar o trabalhador para fazer e/ou participar de serviço perigoso naquele dia')}${lg(3,'Estou péssimo','Não deverá ser escalado para qualquer tipo de atividade, até que seja solucionado o problema')}</div></div>`}
+const faces=(si,ri,ci,m)=>`<div class="fc">`+[1,2,3].map(k=>`<span class="${m==k?'on':''}" onclick="mood(${si},${ri},${ci},${k})">${k}${FACE(k)}</span>`).join('')+`</div>`;
+const E=()=>({n:'',m:Array(NC).fill(0),r:Array(NC).fill('')});
+const sheet=(per,names=[])=>({box1:DEFB1,box2:'',cols:Array.from({length:NC},()=>({d:'',t:''})),rows:Array.from({length:Math.max(per,names.length)},(_,i)=>{const r=E();r.n=names[i]||'';return r})});
+function init(){const nm='Alfredo,Allan Souza,André,Atmisto Silva,Bruno Fidelis,Bruno Ricardo,Diego,DIOGO,Dominique,Emerson,Gabriel,Gleivston,Isaque,João Silva Ramos,Juliana,Lucas Braga,Marcos,Mariana,Matheus Brito,Nilton cesar,Pablo,Paulo Henrique,Ricardo,Richard,Robson,Thiago,Wanderson,Willian'.split(',');
+ return{dt:'#ffe600',neon:false,color:'#000000',per:78,ban:26,banTxt:'Por favor, vire a folha para realizar o preenchimento.',sheets:[sheet(78,nm)]}}
+let S;try{S=JSON.parse(localStorage.getItem(KEY))}catch(e){}
+S=S&&S.sheets?S:init();
+if(!S.mig){S.mig=1;S.title=S.title||DEFT;S.sheets.forEach(s=>{if(!s.box1)s.box1=DEFB1})}
+let U=[],R=[],last=JSON.stringify(S);
+const $=id=>document.getElementById(id);
+function say(t){$('msg').textContent=t;setTimeout(()=>{if($('msg').textContent===t)$('msg').textContent=''},2800)}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(S))}catch(e){}}
+function commit(re=true){const cur=JSON.stringify(S);if(cur===last)return;U.push(last);if(U.length>100)U.shift();R=[];last=cur;persist();if(re)render()}
+function undo(){if(!U.length)return say('Nada para desfazer');R.push(last);last=U.pop();S=JSON.parse(last);persist();render()}
+function redo(){if(!R.length)return say('Nada para refazer');U.push(last);last=R.pop();S=JSON.parse(last);persist();render()}
+function paint(){const st=document.documentElement.style;st.setProperty('--c',S.color);st.setProperty('--dt',S.dt||'#ffe600');st.setProperty('--tc',S.tc||'#2b6a68')}
+const esc=s=>String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;');
+const tx=s=>String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+function render(){
+ paint();$('cor').value=S.color;$('dtc').value=S.dt||'#ffe600';$('neon').checked=!!S.neon;$('tcc').value=S.tc||'#2b6a68';$('per').value=S.per;$('ban').value=S.ban;
+ let h='';
+ S.sheets.forEach((s,si)=>{
+  const head=`<thead><tr><th class="hd" rowspan="3" style="width:22px">N°</th><th class="hd" rowspan="3" style="width:150px">NOME</th><th class="hd vt" rowspan="3" style="width:26px">TEMA</th>`+
+   s.cols.map((c,ci)=>`<td class="tc" colspan="2"><textarea oninput="S.sheets[${si}].cols[${ci}].t=this.value" onchange="commit()">${tx(c.t)}</textarea></td>`).join('')+`<th class="x" rowspan="3"></th></tr><tr>`+
+   s.cols.map((c,ci)=>`<td class="dt" colspan="2">Data / Turno: <input value="${esc(c.d)}" oninput="S.sheets[${si}].cols[${ci}].d=this.value" onchange="commit()"></td>`).join('')+`</tr><tr>`+
+   s.cols.map(()=>'<td class="lb">Como estou</td><td class="lb">Rubrica</td>').join('')+`</tr></thead>`;
+  const rowHtml=(r,ri)=>''+
+   `<tr><td class="n">${ri+1}</td><td class="nm" colspan="2"><input value="${esc(r.n)}" oninput="S.sheets[${si}].rows[${ri}].n=this.value" onchange="commit(0)"></td>`+
+   r.m.map((m,ci)=>`<td class="mo">${faces(si,ri,ci,m)}</td><td class="ru"><input value="${esc(r.r[ci])}" oninput="S.sheets[${si}].rows[${ri}].r[${ci}]=this.value" onchange="commit(0)"></td>`).join('')+
+   `<td class="x"><button title="Remover linha" onclick="delRow(${si},${ri})">×</button></td></tr>`;
+  const bn=`<tr><td class="ban" colspan="13"><input value="${esc(S.banTxt)}" oninput="S.banTxt=this.value" onchange="commit(0)"></td><td class="x"></td></tr>`;
+  const cut=(S.ban>0&&S.ban<s.rows.length)?S.ban:s.rows.length;
+  const top=topBlock(si,s);
+  const tbl=(a,b,ban)=>`<table><colgroup><col style="width:2.2%"><col style="width:19.5%"><col style="width:5.8%">${'<col style="width:5.5%"><col style="width:9%">'.repeat(5)}<col class="x" style="width:20px"></colgroup>${head}<tbody>${s.rows.slice(a,b).map((r,i)=>rowHtml(r,a+i)).join('')}${ban?bn:''}</tbody></table>`;
+  h+=`<div class="wrap"><div class="sheet${S.neon?' neon':''}"><div class="sh-act">
+   <button onclick="dup(${si})">⧉ Duplicar folha</button><button onclick="mv(${si},-1)">↑</button><button onclick="mv(${si},1)">↓</button>
+   <button onclick="sortS(${si})">A–Z</button><button onclick="clrMarks(${si})">Limpar marcas</button>
+   <button onclick="addRow(${si})">+ Linha</button><button onclick="delSheet(${si})">🗑 Excluir folha</button></div>
+   <div class="seg">${top}${tbl(0,cut,cut<s.rows.length)}</div>${cut<s.rows.length?`<div class="seg">${top}${tbl(cut,s.rows.length,false)}</div>`:''}<div class="sh-foot">Folha ${si+1} de ${S.sheets.length}</div></div></div>`;
+ });
+ $('pages').innerHTML=h;
 }
-function esc(s) { return s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
-
-function sincronizarCabecalhos() {
-  const v = { '.info-periodo': $('periodoInputDDS').value, '.info-semana': $('semanaInputDDS').value, '.info-ano': $('anoInputDDS').value };
-  document.querySelectorAll('#contentorFolhasDDS .folha-a4').forEach(f => {
-    for (const k in v) { const el = f.querySelector(k); if (el) el.innerText = v[k]; }
-  });
-  agendarAutoSave();
-}
-
-function lerNomes() {
-  return $('nomesInputDDS').value.toUpperCase().split('\n').map(l => l.trim()).filter(Boolean);
-}
-function atualizarContadorNomes() {
-  const ta = $('nomesInputDDS'), pos = ta.selectionStart;
-  ta.value = ta.value.toUpperCase(); ta.setSelectionRange(pos, pos);
-  const nomes = lerNomes(), total = nomes.length;
-  const dup = total - new Set(nomes).size;
-  const folhas = Math.max(1, Math.ceil(total / TOTAL_LINHAS_DDS));
-  const c = $('contadorColaboradores');
-  c.innerText = `${total} colaborador(es) | ${folhas} folha(s)` + (dup ? ` | ⚠ ${dup} repetido(s)` : '');
-  c.classList.toggle('aviso', dup > 0);
-}
-
-function svgCarinha(tipo) {
-  const boca = tipo === 1 ? '<path class="boca" d="M 9.5 18 C 12 23 20 23 22.5 18"/>'
-             : tipo === 2 ? '<line class="boca" x1="10" y1="20" x2="22" y2="20"/>'
-             : '<path class="boca" d="M 9.5 22 C 12 17 20 17 22.5 22"/>';
-  return `<svg class="carinha-svg" viewBox="0 0 32 32"><circle class="rosto" cx="16" cy="16" r="14"/><circle class="olho" cx="11.5" cy="12.5" r="1.7"/><circle class="olho" cx="20.5" cy="12.5" r="1.7"/>${boca}</svg>`;
-}
-function gerarBlocoComoEstou(sel = null) {
-  const cfg = [[1,'c-verde','Plenas condições'],[2,'c-amarela','Alterado'],[3,'c-vermelha','Sem condições']];
-  return '<div class="grupo-carinhas">' + cfg.map(([n, cor, tit]) =>
-    `<div class="carinha-item ${cor} ${sel === n ? 'selecionado-' + n : ''}" role="button" tabindex="0" onclick="alternarDestaque(this,${n})" title="${tit}"><span class="carinha-num">${n}</span>${svgCarinha(n)}</div>`
-  ).join('') + '</div>';
-}
-function alternarDestaque(el, tipo) {
-  const ja = el.classList.contains('selecionado-' + tipo);
-  el.closest('.grupo-carinhas').querySelectorAll('.carinha-item').forEach(i => i.classList.remove('selecionado-1','selecionado-2','selecionado-3'));
-  if (!ja) el.classList.add('selecionado-' + tipo);
-}
-function preencherColunaDia(botao, idx) {
-  botao.closest('.folha-a4').querySelectorAll('.corpo-tabela-folha tr').forEach(tr => {
-    const c = tr.querySelectorAll('.col-como-estou')[idx];
-    const v = c && c.querySelector('.c-verde');
-    if (v) { v.closest('.grupo-carinhas').querySelectorAll('.carinha-item').forEach(i => i.classList.remove('selecionado-1','selecionado-2','selecionado-3')); v.classList.add('selecionado-1'); }
-  });
-  mostrarToast('Coluna do dia preenchida com Carinha 1');
-  agendarAutoSave();
-}
-
-function criarHTMLLinhaDDS(numStr, nome = '', val = null) {
-  const dia = `<td class="col-como-estou">${gerarBlocoComoEstou(val)}</td><td class="col-rubrica" contenteditable="true" title="Rubrica"></td>`;
-  return `<td class="col-id"><div class="col-id-container"><span class="col-id-texto" contenteditable="true" title="Editar número">${numStr}</span></div></td>
-  <td class="col-colaborador"><div class="col-nome-container"><span class="col-nome-texto" contenteditable="true" oninput="this.innerText=this.innerText.toUpperCase()" title="Nome do colaborador">${esc(nome)}</span>
-  <div class="botoes-acoes"><button type="button" class="btn-acao btn-mais-linha" onclick="adicionarLinhaAbaixoDDS(this)" title="Adicionar linha abaixo">➕</button><button type="button" class="btn-acao btn-menos-linha" onclick="removerLinhaAtualDDS(this)" title="Remover linha">➖</button><button type="button" class="btn-acao btn-lixeira" onclick="apagarLinhaDDS(this)" title="Apagar nome">🗑️</button></div></div></td>${dia.repeat(5)}`;
-}
-
-function apagarLinhaDDS(b) { b.closest('tr').querySelector('.col-nome-texto').innerText = ''; agendarAutoSave(); }
-
-function reordenarNumDDS(notificar = false) {
-  let n = 1;
-  document.querySelectorAll('#contentorFolhasDDS .corpo-tabela-folha tr .col-id-texto').forEach(s => { s.innerText = pad(n++); });
-  if (notificar) mostrarToast('Numeração sequencial atualizada (contínua entre folhas)');
-  agendarAutoSave();
-}
-function adicionarLinhaAbaixoDDS(b) {
-  const tr = b.closest('tr'), nova = document.createElement('tr');
-  nova.innerHTML = criarHTMLLinhaDDS('00'); tr.after(nova); reordenarNumDDS();
-}
-function removerLinhaAtualDDS(b) {
-  const tr = b.closest('tr');
-  if (tr.parentNode.querySelectorAll('tr').length <= 1) return;
-  tr.remove(); reordenarNumDDS();
-}
-function adicionarLinhaFimDDS(b) {
-  const nova = document.createElement('tr'); nova.innerHTML = criarHTMLLinhaDDS('00');
-  b.closest('.folha-a4').querySelector('.corpo-tabela-folha').appendChild(nova); reordenarNumDDS();
-}
-function removerLinhaFimDDS(b) {
-  const l = b.closest('.folha-a4').querySelectorAll('.corpo-tabela-folha tr');
-  if (l.length <= 1) return;
-  l[l.length - 1].remove(); reordenarNumDDS();
-}
-function removerFolhaDDS(b) {
-  if (document.querySelectorAll('#contentorFolhasDDS .folha-a4').length <= 1) { mostrarToast('Mantenha pelo menos uma folha.'); return; }
-  if (!confirm('Remover esta folha e todos os dados dela?')) return;
-  b.closest('.folha-a4').remove(); atualizarPaginacaoDDS(); reordenarNumDDS();
-}
-
-function criarEstruturaFolhaDDS(nomes, padrao, tot, offset = 0) {
-  let linhas = '';
-  for (let i = 0; i < tot; i++) linhas += `<tr>${criarHTMLLinhaDDS(pad(offset + i + 1), nomes[i] ? nomes[i].trim().toUpperCase() : '', padrao ? 1 : null)}</tr>`;
-  const dias = ['Segunda','Terça','Quarta','Quinta','Sexta'];
-  const f = document.createElement('div'); f.className = 'folha-a4';
-  f.innerHTML = `
-  <div class="barra-controle-folha">
-    <div class="grupo-acoes-linhas"><button type="button" class="btn-linha-topo" onclick="adicionarLinhaFimDDS(this)">➕ Linha no Fim</button><button type="button" class="btn-linha-topo" onclick="removerLinhaFimDDS(this)">➖ Remover Última</button></div>
-    <button type="button" class="btn-remover-folha" onclick="removerFolhaDDS(this)">Remover Folha ✕</button>
-  </div>
-  <div class="rolagem">
-  <table class="cabecalho-container"><tr><td class="logo-box">VALE</td><td class="titulo-box">DIÁLOGO DIÁRIO DE SEGURANÇA (DDS) E EMOCIOGRAMA</td><td class="meta-box"><span class="indicador-folha"><strong>Folha:</strong> 01 / 01</span></td></tr></table>
-  <table class="info-dds"><tr>
-    <td><strong>Período:</strong> <span class="campo-editavel info-periodo" contenteditable="true">${esc($('periodoInputDDS').value)}</span></td>
-    <td><strong>Semana:</strong> <span class="campo-editavel info-semana" contenteditable="true">${esc($('semanaInputDDS').value)}</span></td>
-    <td><strong>Ano:</strong> <span class="campo-editavel info-ano" contenteditable="true">${esc($('anoInputDDS').value)}</span></td>
-  </tr></table>
-  <table class="tabela-dds"><thead>
-    <tr><th rowspan="2" class="col-id">Nº</th><th rowspan="2" class="col-colaborador" style="padding-left:6px;text-align:left">Colaborador</th>
-    ${dias.map((d, i) => `<th colspan="2" class="th-dia-semana">${d} <button type="button" class="btn-preencher-dia" onclick="preencherColunaDia(this,${i})" title="Preencher ${d} com 1">⚡</button></th>`).join('')}</tr>
-    <tr>${'<th class="th-sub">Estou</th><th class="th-sub">Rub</th>'.repeat(5)}</tr>
-  </thead><tbody class="corpo-tabela-folha">${linhas}</tbody></table>
-  <div class="rodape-container">
-    <div class="box-legenda"><h4>Legenda:</h4><ul class="lista-legenda"><li><strong>FE</strong> = Feriado</li><li><strong>AT</strong> = Atestado Médico</li><li><strong>CO</strong> = Compensação</li><li><strong>FA</strong> = Falta</li><li><strong>FR</strong> = Férias</li><li><strong>FO</strong> = Folga</li></ul></div>
-    <div class="box-legenda"><h4>Ação tomada:</h4><ul class="lista-legenda"><li><strong>EST/SUP</strong> = Estratégia/Suprimentos</li><li><strong>ADM</strong> = Administrativo</li><li><strong>ENG</strong> = Engenharia</li><li><strong>EST</strong> = Estratégia</li><li><strong>OP</strong> = Operação</li><li><strong>HOFF</strong> = Home Office</li><li><strong>AE</strong> = Área Externa</li></ul></div>
-    <div class="box-legenda"><h4>Emociograma:</h4><ul class="lista-legenda"><li><strong>1:</strong> Funcionário em plenas condições físicas e psicológicas de exercer suas funções.</li><li><strong>2:</strong> Funcionário com estado físico ou psicológico alterado, porém em condições de exercer suas atividades compatíveis com seu estado físico ou psicológico. Requer acompanhamento.</li><li><strong>3:</strong> Funcionário sem condições físicas ou psicológicas de exercer suas atividades compatíveis com sua área.</li></ul></div>
-  </div></div>`;
-  return f;
-}
-
-function atualizarPaginacaoDDS() {
-  const f = document.querySelectorAll('#contentorFolhasDDS .folha-a4');
-  f.forEach((folha, i) => {
-    const ind = folha.querySelector('.indicador-folha');
-    if (ind) ind.innerHTML = `<strong>Folha:</strong> ${pad(i + 1)} / ${pad(f.length)}`;
-  });
-}
-function adicionarFolhaManualDDS() {
-  const tot = document.querySelectorAll('#contentorFolhasDDS .corpo-tabela-folha tr').length;
-  $('contentorFolhasDDS').appendChild(criarEstruturaFolhaDDS([], null, TOTAL_LINHAS_DDS, tot));
-  atualizarPaginacaoDDS(); reordenarNumDDS();
-}
-
-function temDadosPreenchidos() {
-  const box = $('contentorFolhasDDS');
-  return [...box.querySelectorAll('.col-nome-texto,.col-rubrica')].some(e => e.innerText.trim()) || box.querySelector('.carinha-item[class*="selecionado-"]');
-}
-function aplicarDadosDDS(modo) {
-  if (temDadosPreenchidos() && !confirm('Gerar novas folhas vai substituir o que já está preenchido. Continuar?')) return;
-  const box = $('contentorFolhasDDS'); box.innerHTML = '';
-  const nomes = lerNomes().sort((a, b) => a.localeCompare(b, 'pt-BR'));
-  $('nomesInputDDS').value = nomes.join('\n'); atualizarContadorNomes();
-  const blocos = [];
-  if (!nomes.length) blocos.push([]); else for (let i = 0; i < nomes.length; i += TOTAL_LINHAS_DDS) blocos.push(nomes.slice(i, i + TOTAL_LINHAS_DDS));
-  blocos.forEach((b, i) => box.appendChild(criarEstruturaFolhaDDS(b, modo === 'verde', TOTAL_LINHAS_DDS, i * TOTAL_LINHAS_DDS)));
-  atualizarPaginacaoDDS(); reordenarNumDDS();
-  mostrarToast('Folhas geradas em A-Z com sequência contínua');
-}
-
-function obterEstadoCompleto() {
-  return { periodo: $('periodoInputDDS').value, semana: $('semanaInputDDS').value, ano: $('anoInputDDS').value, nomes: $('nomesInputDDS').value, html: $('contentorFolhasDDS').innerHTML };
-}
-function gravar(silencioso) {
-  try { localStorage.setItem(CHAVE, JSON.stringify(obterEstadoCompleto())); if (!silencioso) mostrarToast('DDS salvo com sucesso!'); }
-  catch (e) { mostrarToast('Não foi possível salvar. Use o Backup.'); }
-}
-function salvarTudoDDS() { gravar(false); }
-function agendarAutoSave() { clearTimeout(_auto); _auto = setTimeout(() => gravar(true), 1200); }
-function lerSalvo() { try { const s = localStorage.getItem(CHAVE); return s ? JSON.parse(s) : null; } catch (e) { return null; } }
-function carregarTudoDDS() {
-  const d = lerSalvo();
-  if (!d) { mostrarToast('Nenhum dado salvo encontrado.'); return; }
-  restaurarEstado(d); mostrarToast('Dados carregados com sucesso!');
-}
-function restaurarEstado(d) {
-  if (d.periodo !== undefined) $('periodoInputDDS').value = d.periodo;
-  if (d.semana !== undefined) $('semanaInputDDS').value = d.semana;
-  if (d.ano !== undefined) $('anoInputDDS').value = d.ano;
-  if (d.nomes !== undefined) $('nomesInputDDS').value = d.nomes;
-  if (d.html !== undefined) $('contentorFolhasDDS').innerHTML = d.html;
-  if (!document.querySelector('#contentorFolhasDDS .folha-a4')) adicionarFolhaManualDDS();
-  atualizarContadorNomes(); atualizarPaginacaoDDS(); reordenarNumDDS();
-}
-function exportarBackupJSON() {
-  const blob = new Blob([JSON.stringify(obterEstadoCompleto(), null, 2)], { type: 'application/json' });
-  const url = URL.createObjectURL(blob), a = document.createElement('a');
-  a.href = url; a.download = `backup_dds_semana_${$('semanaInputDDS').value.trim() || 'atual'}.json`;
-  document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-  mostrarToast('Backup exportado com sucesso!');
-}
-function processarArquivoBackup(input) {
-  const file = input.files[0]; if (!file) return;
-  const r = new FileReader();
-  r.onload = e => {
-    try {
-      const d = JSON.parse(e.target.result);
-      if (typeof d !== 'object' || d === null || (d.html === undefined && d.nomes === undefined)) throw 0;
-      restaurarEstado(d); mostrarToast('Backup restaurado com sucesso!');
-    } catch (err) { mostrarToast('Arquivo de backup inválido.'); }
-  };
-  r.readAsText(file); input.value = '';
-}
-function limparTudoDDS() {
-  if (!confirm('Apagar todas as folhas e nomes? Esta ação não pode ser desfeita (exporte um Backup antes se precisar).')) return;
-  $('nomesInputDDS').value = '';
-  $('contentorFolhasDDS').innerHTML = '';
-  atualizarContadorNomes(); adicionarFolhaManualDDS();
-  mostrarToast('Área resetada.');
-}
-
-/* Interações: colar texto puro, Enter desce, teclado nas carinhas, autosave */
-const caixa = $('contentorFolhasDDS');
-caixa.addEventListener('paste', e => {
-  if (!e.target.isContentEditable) return;
-  e.preventDefault();
-  const t = (e.clipboardData || window.clipboardData).getData('text').replace(/\s*\n\s*/g, ' ');
-  document.execCommand('insertText', false, t);
-});
-caixa.addEventListener('keydown', e => {
-  const t = e.target;
-  if (t.classList.contains('carinha-item') && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); t.click(); return; }
-  if (e.key === 'Enter' && t.isContentEditable) {
-    e.preventDefault();
-    const tr = t.closest('tr'), prox = tr && tr.nextElementSibling;
-    if (prox) {
-      const cls = ['col-nome-texto','col-id-texto','col-rubrica'].find(c => t.classList.contains(c));
-      const alvo = cls && prox.querySelectorAll('.' + cls)[[...tr.querySelectorAll('.' + cls)].indexOf(t)];
-      if (alvo) alvo.focus();
-    } else t.blur();
-  }
-});
-['input', 'click'].forEach(ev => caixa.addEventListener(ev, agendarAutoSave));
-window.addEventListener('beforeunload', () => gravar(true));
-
-window.onload = function () {
-  const d = lerSalvo();
-  if (d && d.html) { restaurarEstado(d); mostrarToast('Último trabalho recuperado.'); }
-  else { adicionarFolhaManualDDS(); atualizarContadorNomes(); }
-};
-</script>
-</body>
-</html>
+function mood(si,ri,ci,k){const r=S.sheets[si].rows[ri];r.m[ci]=r.m[ci]===k?0:k;commit()}
+function setDt(c){S.dt=c;commit()}
+function setLogo(el){const f=el.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{S.logo=r.result;commit()};r.readAsDataURL(f);el.value=''}
+function setTema(v){S.sheets.forEach(s=>s.cols.forEach(c=>c.t=v));commit()}
+function addSheet(){S.sheets.push(sheet(S.per));commit();say('Folha adicionada')}
+function dup(si){const c=JSON.parse(JSON.stringify(S.sheets[si]));c.cols.forEach(x=>x.d='');c.rows.forEach(r=>{r.m=Array(NC).fill(0);r.r=Array(NC).fill('')});S.sheets.splice(si+1,0,c);commit();say('Folha duplicada (nomes mantidos, marcas limpas)')}
+function mv(si,d){const j=si+d;if(j<0||j>=S.sheets.length)return;[S.sheets[si],S.sheets[j]]=[S.sheets[j],S.sheets[si]];commit()}
+function delSheet(si){if(S.sheets.length<2)return say('Mantenha ao menos uma folha');if(confirm('Excluir esta folha?')){S.sheets.splice(si,1);commit()}}
+function clrMarks(si){const s=S.sheets[si];s.rows.forEach(r=>{r.m=Array(NC).fill(0);r.r=Array(NC).fill('')});s.cols.forEach(c=>{c.d='';c.t=''});commit()}
+function sortS(si){const rows=S.sheets[si].rows,f=rows.filter(r=>r.n.trim()).sort((a,b)=>a.n.localeCompare(b.n,'pt',{sensitivity:'base'}));S.sheets[si].rows=f.concat(rows.filter(r=>!r.n.trim()));commit()}
+function addRow(si){S.sheets[si].rows.push(E());commit()}
+function delRow(si,ri){S.sheets[si].rows.splice(ri,1);commit()}
+function addNames(){
+ const list=$('nn').value.split('\n').map(x=>x.trim()).filter(Boolean);if(!list.length)return say('Digite ao menos um nome');
+ list.forEach(n=>{let r=null;for(const s of S.sheets){r=s.rows.find(x=>!x.n.trim());if(r)break}
+  if(!r){const s=S.sheets[S.sheets.length-1];r=E();s.rows.push(r)}r.n=n});
+ $('nn').value='';commit();say(list.length+' nome(s) adicionado(s)')}
+function renum(){S.sheets.forEach(s=>{const f=s.rows.filter(r=>r.n.trim()),e=s.rows.filter(r=>!r.n.trim());s.rows=f.concat(e)});commit();say('Nomes reagrupados do 1 em diante, sem linhas vazias no meio')}
+function setPer(n){if(n<5||n>200)return;S.per=n;S.sheets.forEach(s=>{while(s.rows.length<n)s.rows.push(E());while(s.rows.length>n&&!s.rows[s.rows.length-1].n.trim())s.rows.pop()});commit()}
+function save(){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([JSON.stringify(S,null,1)],{type:'application/json'}));a.download='dssma_lista.json';a.click();say('Arquivo salvo')}
+function load_(el){const f=el.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const d=JSON.parse(r.result);if(!d.sheets||!d.sheets[0].cols)throw 0;S=d;commit();say('Lista carregada')}catch(e){say('Arquivo inválido')}};r.readAsText(f);el.value=''}
+document.addEventListener('keydown',e=>{if((e.ctrlKey||e.metaKey)&&!e.shiftKey&&e.key==='z'&&!/INPUT|TEXTAREA/.test(document.activeElement.tagName)){e.preventDefault();undo()}});
+render();
+</script></body></html>
