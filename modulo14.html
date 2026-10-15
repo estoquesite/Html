@@ -51,6 +51,14 @@ th.fill button{width:22px;height:22px;padding:0;border:0;border-radius:3px;backg
 .nv{width:56px;height:36px;border-radius:8px;border:2px solid #333;background:#fff;cursor:pointer;display:block;margin:auto;padding:0;font-size:20px;font-weight:bold}
 .nv.n1{background:#e0393e;color:#fff}.nv.n2{background:#f29b3a}.nv.n3{background:#f7e94a}.nv.n4{background:#3c9d4e;color:#fff}
 .sheet.c .nv{height:28px;font-size:16px}
+.sheet.fino td{padding:0 6px;font-size:13px;line-height:1.1}
+.sheet.fino th{font-size:12px;padding:3px 6px}
+.sheet.fino .st{width:22px;height:22px}
+.sheet.fino .nv{width:44px;height:24px;font-size:13px;border-radius:6px}
+.sheet.fino .leg{font-size:10px;padding:2px 8px}
+.sheet.fino td,.sheet.fino th{text-align:right;font-weight:bold}
+.sheet.fino [contenteditable]{text-align:right;font-weight:bold}
+.sheet.fino .st,.sheet.fino .nv{margin-left:auto;margin-right:0}
 .leg{font-size:11px;padding:4px 8px;text-align:center;border:2px solid #333;border-top:0}
 .tools{display:flex;gap:4px;flex-wrap:wrap;justify-content:center}
 @media print{
@@ -94,6 +102,7 @@ const app=document.getElementById('app'),info=document.getElementById('info');
 const $=id=>document.getElementById(id);
 let sel=null,ativo=null,timer=null;
 const H=new Map();
+const LINHAS_5S=16;
 
 const E=(t='')=>`<div contenteditable="true">${t}</div>`;
 const nvBtn=`<button class="nv" data-n="" title="Clique para mudar o nível (1 a 4)"></button>`;
@@ -149,9 +158,23 @@ function atualiza(){
 }
 function s5(){
   const n=app.children.length;
-  folha('',rowBtns,T('5S – Maturidade por Posto')+tabela([['Posto de Trabalho',24,0],['Responsável',17,0],['Maturidade (1 a 4)',13,2],['Data da próxima maturidade',16,0],['Ação para subir de nível',30,0]],10)+
+  folha('c fino',rowBtns,T('5S – Maturidade por Posto')+tabela([['Posto de Trabalho',24,0],['Responsável',17,0],['Maturidade (1 a 4)',13,2],['Data da próxima maturidade',16,0],['Ação para subir de nível',30,0]],LINHAS_5S)+
   '<div class="leg" contenteditable="true">Maturidade: 1 – Inicial &nbsp; 2 – Em desenvolvimento &nbsp; 3 – Estabelecido &nbsp; 4 – Sustentado &nbsp; (clique no quadrado para mudar o nível)</div>');
   [...app.children].slice(n).forEach(w=>w.dataset.s5=1);
+}
+/* garante 16 linhas na folha 5S (também para quadros salvos antes desta versão) */
+function ajusta5sLinhas(){
+  app.querySelectorAll('[data-s5]').forEach(w=>{
+    const sh=w.querySelector('.sheet');if(sh)sh.classList.add('c','fino');
+    const tb=w.querySelector('table tbody');if(!tb)return;
+    while(tb.querySelectorAll('tr').length<LINHAS_5S){
+      const rs=tb.querySelectorAll('tr'),c=rs[rs.length-1].cloneNode(true);
+      c.querySelectorAll('[contenteditable]').forEach(x=>x.innerHTML='');
+      c.querySelectorAll('.st').forEach(x=>{x.dataset.s='';x.className='st'});
+      c.querySelectorAll('.nv').forEach(x=>{x.dataset.n='';x.textContent='';x.className='nv'});
+      tb.appendChild(c);
+    }
+  });
 }
 function ajusta5s(){
   app.querySelectorAll('[data-s5] table').forEach(t=>{
@@ -446,7 +469,7 @@ app.addEventListener('click',e=>{
   if(s)app.innerHTML=s;else montar();
   if(!app.querySelector('[data-fmds]'))novas();
   if(!app.querySelector('[data-s5]'))s5();
-  ajusta5s();atualiza();corFaixas();preparaTudo();snapInit();
+  ajusta5s();ajusta5sLinhas();atualiza();corFaixas();preparaTudo();snapInit();
 })();
 </script>
 </body>
