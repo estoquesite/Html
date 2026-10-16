@@ -32,7 +32,7 @@
   .falta { animation:pf 1.2s infinite alternate; border-color:#f59e0b !important; }
   .dark .falta { animation-name:pfd; }
 
-  /* compras pendentes há 45 dias ou mais */
+  /* compras com 45 dias ou mais */
   @keyframes pv { from { background:rgba(239,68,68,.38); } to { background:rgba(239,68,68,.05); } }
   tr.velha > td { animation:pv 1s infinite alternate; }
   tr.velha > td:first-child { border-left:5px solid #dc2626; }
@@ -79,7 +79,7 @@
     <div class="card"><span class="lbl">Itens exibidos</span><h3 id="cItens" class="text-xl font-black text-indigo-600">0</h3></div>
     <div class="card"><span class="lbl">Total exibido</span><h3 id="cTotal" class="text-xl font-black text-emerald-600">R$ 0,00</h3></div>
     <div class="card"><span class="lbl">Principal solicitante</span><h3 id="cTop" class="text-base font-black truncate uppercase">—</h3></div>
-    <button id="cVelBox" class="card text-left" title="Filtrar pendentes há 45 dias ou mais"><span class="lbl">🚨 Pendentes há 45 dias ou mais</span><h3 id="cVel" class="text-base font-black text-rose-600">0</h3></button>
+    <button id="cVelBox" class="card text-left" title="Filtrar compras com 45 dias ou mais"><span class="lbl">🚨 Compras com 45 dias ou mais</span><h3 id="cVel" class="text-base font-black text-rose-600">0</h3></button>
   </div>
 
   <!-- VALORES POR MÊS -->
@@ -162,7 +162,7 @@
     <input id="fValor" type="number" step="0.01" class="inp" placeholder="💲 Valor exato (R$)">
     <select id="fSol" class="inp"><option value="">Todos os solicitantes</option></select>
     <select id="fEntrega" class="inp">
-      <option value="">Todas as entregas</option><option value="p">Pendentes</option><option value="a">⏰ Atrasadas (+10 dias)</option><option value="v">🚨 Pendentes há 45 dias ou mais</option><option value="e">Entregues</option>
+      <option value="">Todas as entregas</option><option value="p">Pendentes</option><option value="a">⏰ Atrasadas (+10 dias)</option><option value="v">🚨 Compras com 45 dias ou mais</option><option value="e">Entregues</option>
     </select>
     <select id="fMes" class="inp"><option value="">Todos os meses</option></select>
     <select id="fOrdem" class="inp">
@@ -268,7 +268,7 @@ const novoId = () => Date.now() + Math.floor(Math.random() * 1000);
 const urlOk = u => /^https?:\/\//i.test(u || '');
 const chaveDup = i => [norm(i.solicitante), norm(i.produto), Number(i.total || 0).toFixed(2), Number(i.qtd || 1)].join('_');
 const atrasada = i => !i.entregue && i.data && maisDias(i.data, 10) < hoje();
-const velha = i => !i.entregue && i.data && maisDias(i.data, DIAS_ALERTA) <= hoje();     // pendente há 45 dias ou mais
+const velha = i => i.data && maisDias(i.data, DIAS_ALERTA) <= hoje();     // compra com 45 dias ou mais (entregue ou não)
 const diasDesde = s => Math.floor((new Date(hoje() + 'T00:00:00') - new Date(s + 'T00:00:00')) / 86400000);
 const mesLbl = m => `${m.slice(5)}/${m.slice(0, 4)}`;
 // cor estável por solicitante (mesmo nome = mesma cor, sem depender de acento/caixa)
@@ -286,12 +286,12 @@ function status(ok) {
 }
 const salvarLocal = () => { try { localStorage.setItem(LS, JSON.stringify(compras)); } catch (e) { console.warn(e); } };
 
-// lembrete ao abrir: avisa uma única vez quantas compras estão pendentes há 45 dias ou mais
+// lembrete ao abrir: avisa uma única vez quantas compras têm 45 dias ou mais
 function avisarVelhas() {
   if (avisouVelhas) return;
   avisouVelhas = true;
   const vv = compras.filter(velha);
-  if (vv.length) toast(`🚨 ${vv.length} compra(s) pendente(s) há 45 dias ou mais. Cobre a entrega!`, true);
+  if (vv.length) toast(`🚨 ${vv.length} compra(s) com 45 dias ou mais.`, true);
 }
 
 /* ---------- Solicitantes: nome padronizado ---------- */
@@ -634,7 +634,7 @@ function render() {
       <td class="p-2 max-w-xs"><div class="flex items-center gap-2">${subs.length ? `<button data-a="exp" class="bg-indigo-100 dark:bg-indigo-900 px-1.5 rounded text-[10px] font-black">${aberto ? '➖' : '➕'}</button>` : ''}
         <span class="truncate ${i.entregue ? 'line-through' : ''}">${esc(i.produto)}</span>
         ${dup ? '<span class="text-[9px] font-black bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded whitespace-nowrap">⚠ POSSÍVEL DUPLICADA</span>' : ''}
-        ${vel ? `<span class="text-[9px] font-black bg-rose-600 text-white px-1.5 py-0.5 rounded whitespace-nowrap">🚨 ${diasDesde(i.data)} DIAS SEM ENTREGA</span>` : atr ? '<span class="text-[9px] font-black bg-rose-100 text-rose-800 px-1.5 py-0.5 rounded whitespace-nowrap">⏰ ATRASADA</span>' : ''}</div></td>
+        ${vel ? `<span class="text-[9px] font-black bg-rose-600 text-white px-1.5 py-0.5 rounded whitespace-nowrap">🚨 ${diasDesde(i.data)} DIAS${i.entregue ? '' : ' SEM ENTREGA'}</span>` : atr ? '<span class="text-[9px] font-black bg-rose-100 text-rose-800 px-1.5 py-0.5 rounded whitespace-nowrap">⏰ ATRASADA</span>' : ''}</div></td>
       <td class="p-2 text-indigo-700 dark:text-indigo-300 whitespace-nowrap">${esc(i.local || '-')}</td>
       <td class="p-2 whitespace-nowrap">${esc(i.projeto || '-')}</td>
       <td class="p-2 text-center font-bold">${esc(i.qtd)}</td>
@@ -668,7 +668,7 @@ function render() {
   const top = Object.entries(cont).sort((a, b) => b[1] - a[1])[0];
   $('cTop').innerHTML = top ? `<span class="pc text-sm" style="--h:${hue(top[0])}">${esc(mapa[top[0]])} (${top[1]})</span>` : '—';
 
-  // pendentes há 45 dias ou mais
+  // compras com 45 dias ou mais
   const vv = compras.filter(velha), vvTot = vv.reduce((a, i) => a + Number(i.total || 0), 0);
   $('cVel').textContent = vv.length ? `${vv.length} compra(s) · ${brl(vvTot)}` : 'Nenhuma 👍';
   $('cVelBox').classList.toggle('alertaV', vv.length > 0);
