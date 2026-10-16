@@ -3,23 +3,54 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Módulo 7 - Compras Cartão Corporativo | Portal Vale v1.2</title>
+<title>Módulo 7 - Compras Cartão Corporativo | Portal Vale v1.3</title>
 <script src="https://cdn.tailwindcss.com"></script>
 <script>tailwind.config = { darkMode: 'class' }</script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
   body { font-family: 'Segoe UI', system-ui, sans-serif; }
   .lbl { display:block; font-size:10px; font-weight:700; text-transform:uppercase; color:#64748b; margin-bottom:3px; }
-  .inp { width:100%; font-size:12px; padding:8px; border-radius:10px; border:1px solid #cbd5e1; background:#fff; font-weight:700; color:inherit; }
-  .dark .inp { background:#0f172a; border-color:#475569; }
+  /* bordas mais definidas */
+  .inp { width:100%; font-size:12px; padding:8px; border-radius:10px; border:1.5px solid #94a3b8; background:#fff; font-weight:700; color:inherit; }
+  .inp:hover { border-color:#64748b; }
+  .dark .inp { background:#0f172a; border-color:#64748b; }
+  .dark .inp:hover { border-color:#94a3b8; }
   .up { text-transform:uppercase; }
   .btn { font-size:12px; font-weight:700; padding:8px 12px; border-radius:12px; cursor:pointer; white-space:nowrap; }
-  .card { background:#fff; border:1px solid #e2e8f0; border-radius:16px; padding:16px; }
-  .dark .card { background:#1e293b; border-color:#334155; }
+  .card { background:#fff; border:1.5px solid #94a3b8; border-radius:16px; padding:16px; box-shadow:0 1px 2px rgba(15,23,42,.08); }
+  .dark .card { background:#1e293b; border-color:#64748b; box-shadow:none; }
+  .tb { border-collapse:collapse; border:1.5px solid #94a3b8; }
+  .tb th, .tb td { border:1px solid #cbd5e1; }
+  .tb thead th { border-bottom:2px solid #94a3b8; background:#f1f5f9; }
+  .dark .tb { border-color:#64748b; }
+  .dark .tb th, .dark .tb td { border-color:#475569; }
+  .dark .tb thead th { border-bottom-color:#64748b; background:#0f172a; }
+
+  /* campo obrigatório piscando (solicitante / total vazio) */
   @keyframes pf { from { background:#fef9c3; } to { background:#fff; } }
+  @keyframes pfd { from { background:#713f12; } to { background:#0f172a; } }
   .falta { animation:pf 1.2s infinite alternate; border-color:#f59e0b !important; }
+  .dark .falta { animation-name:pfd; }
+
+  /* compras pendentes há mais de 45 dias */
+  @keyframes pv { from { background:rgba(239,68,68,.38); } to { background:rgba(239,68,68,.05); } }
+  tr.velha > td { animation:pv 1s infinite alternate; }
+  tr.velha > td:first-child { border-left:5px solid #dc2626; }
+  .alertaV { animation:pv 1s infinite alternate; border-color:#dc2626 !important; }
+
+  /* cor por solicitante */
+  .pc { display:inline-block; padding:2px 8px; border-radius:999px; font-weight:800; white-space:nowrap;
+        background:hsl(var(--h) 85% 90%); color:hsl(var(--h) 65% 26%); border:1.5px solid hsl(var(--h) 55% 55%); }
+  .dark .pc { background:hsl(var(--h) 40% 22%); color:hsl(var(--h) 90% 88%); border-color:hsl(var(--h) 55% 55%); }
+  .card.pc-card { background:hsl(var(--h) 85% 95%); border-color:hsl(var(--h) 50% 55%); border-left:7px solid hsl(var(--h) 65% 48%); }
+  .dark .card.pc-card { background:hsl(var(--h) 35% 17%); border-color:hsl(var(--h) 45% 45%); border-left:7px solid hsl(var(--h) 65% 55%); }
+
   :focus-visible { outline:2px solid #6366f1; outline-offset:2px; }
-  @media (prefers-reduced-motion: reduce) { .falta { animation:none; background:#fef9c3; } }
+  @media (prefers-reduced-motion: reduce) {
+    .falta { animation:none; background:#fef9c3; }
+    .dark .falta { background:#713f12; }
+    tr.velha > td, .alertaV { animation:none; background:rgba(239,68,68,.25); }
+  }
 </style>
 </head>
 <body class="bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 min-h-screen p-4 sm:p-6 transition-colors">
@@ -44,16 +75,35 @@
     </div>
   </header>
 
-  <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+  <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
     <div class="card"><span class="lbl">Itens exibidos</span><h3 id="cItens" class="text-xl font-black text-indigo-600">0</h3></div>
     <div class="card"><span class="lbl">Total exibido</span><h3 id="cTotal" class="text-xl font-black text-emerald-600">R$ 0,00</h3></div>
     <div class="card"><span class="lbl">Principal solicitante</span><h3 id="cTop" class="text-base font-black truncate uppercase">—</h3></div>
+    <button id="cVelBox" class="card text-left" title="Filtrar pendentes há mais de 45 dias"><span class="lbl">🚨 Pendentes há +45 dias</span><h3 id="cVel" class="text-base font-black text-rose-600">0</h3></button>
   </div>
-  <div id="cardsPessoas" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2"></div>
+
+  <!-- VALORES POR MÊS -->
+  <section class="card !p-3 space-y-2">
+    <div class="flex items-center justify-between gap-2">
+      <span class="lbl !mb-0">📅 Valores por mês <span class="normal-case font-semibold text-slate-400">(clique para filtrar)</span></span>
+      <span id="mesTotal" class="text-[11px] font-black text-emerald-600"></span>
+    </div>
+    <div id="cardsMeses" class="flex gap-2 overflow-x-auto pb-1"></div>
+  </section>
+
+  <!-- SOLICITANTES (recolhível) -->
+  <section class="card !p-3 space-y-2">
+    <div class="flex flex-wrap items-center justify-between gap-2">
+      <button id="bPes" class="btn bg-slate-100 dark:bg-slate-700" aria-expanded="true" aria-controls="cardsPessoas">▾ 👥 Solicitantes <span id="pCount" class="text-slate-500"></span></button>
+      <div class="flex items-center gap-2"><label class="lbl !mb-0" for="pMes">Mês</label>
+        <select id="pMes" class="inp !w-auto"><option value="">Todos os meses</option></select></div>
+    </div>
+    <div id="cardsPessoas" class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2"></div>
+  </section>
 
   <!-- ENTRADA -->
   <section class="card !p-0 overflow-hidden">
-    <div class="flex gap-1 p-2 bg-slate-50 dark:bg-slate-900/50 border-b border-slate-200 dark:border-slate-700 overflow-x-auto" id="abas">
+    <div class="flex gap-1 p-2 bg-slate-50 dark:bg-slate-900/50 border-b-2 border-slate-300 dark:border-slate-600 overflow-x-auto" id="abas">
       <button class="btn flex-1" data-tab="manual">✍️ Digitar manual</button>
       <button class="btn flex-1" data-tab="nota">📋 Nota fiscal / vários itens</button>
       <button class="btn flex-1" data-tab="link">🔗 Links / mensagem</button>
@@ -112,7 +162,7 @@
     <input id="fValor" type="number" step="0.01" class="inp" placeholder="💲 Valor exato (R$)">
     <select id="fSol" class="inp"><option value="">Todos os solicitantes</option></select>
     <select id="fEntrega" class="inp">
-      <option value="">Todas as entregas</option><option value="p">Pendentes</option><option value="a">⏰ Atrasadas (+10 dias)</option><option value="e">Entregues</option>
+      <option value="">Todas as entregas</option><option value="p">Pendentes</option><option value="a">⏰ Atrasadas (+10 dias)</option><option value="v">🚨 Pendentes há +45 dias</option><option value="e">Entregues</option>
     </select>
     <select id="fMes" class="inp"><option value="">Todos os meses</option></select>
     <select id="fOrdem" class="inp">
@@ -136,14 +186,14 @@
       <h3 class="text-xs font-bold uppercase">📋 Histórico de compras</h3>
       <span id="contador" class="text-[11px] text-slate-400 font-bold"></span>
     </div>
-    <div class="overflow-x-auto">
-      <table class="w-full text-left text-xs">
-        <thead><tr class="border-b border-slate-100 dark:border-slate-700 text-slate-400 font-bold uppercase text-[10px]">
+    <div class="overflow-x-auto rounded-lg">
+      <table class="tb w-full text-left text-xs">
+        <thead><tr class="text-slate-500 font-bold uppercase text-[10px]">
           <th class="p-2"><input type="checkbox" id="chkAll" aria-label="Selecionar todos"></th>
           <th class="p-2">Data</th><th class="p-2">Solicitante</th><th class="p-2">Produto</th><th class="p-2">Local</th><th class="p-2">Projeto</th>
           <th class="p-2 text-center">Qtd</th><th class="p-2 text-right">Unit.</th><th class="p-2 text-right">Total</th><th class="p-2 text-center">Entrega</th><th class="p-2 text-center">Link</th><th class="p-2 text-center">Ações</th>
         </tr></thead>
-        <tbody id="tbody" class="divide-y divide-slate-100 dark:divide-slate-700/60 uppercase"></tbody>
+        <tbody id="tbody" class="uppercase"></tbody>
       </table>
     </div>
     <div id="maisBox" class="text-center hidden"><button id="bMais" class="btn bg-slate-100 dark:bg-slate-700">⬇ Mostrar mais</button></div>
@@ -196,7 +246,8 @@
 <script>
 const SB_URL = "https://gloxtswcksbczinpwtzu.supabase.co";
 const SB_KEY = "sb_publishable_0kEiqthWKZZwjM120wQIYw_Hba7qeLc";
-const T = 'compras_corporativas', LS = 'compras_corporativas_base', LSD = 'compras_corporativas_fila_exclusao';
+const T = 'compras_corporativas', LS = 'compras_corporativas_base', LSD = 'compras_corporativas_fila_exclusao', LSP = 'compras_pessoas_aberto';
+const DIAS_ALERTA = 45;
 let compras = [], pend = [], sb = null, exp = {}, limite = 100;
 const sel = new Set();
 
@@ -217,6 +268,11 @@ const novoId = () => Date.now() + Math.floor(Math.random() * 1000);
 const urlOk = u => /^https?:\/\//i.test(u || '');
 const chaveDup = i => [norm(i.solicitante), norm(i.produto), Number(i.total || 0).toFixed(2), Number(i.qtd || 1)].join('_');
 const atrasada = i => !i.entregue && i.data && maisDias(i.data, 10) < hoje();
+const velha = i => !i.entregue && i.data && maisDias(i.data, DIAS_ALERTA) < hoje();     // pendente há mais de 45 dias
+const diasDesde = s => Math.floor((new Date(hoje() + 'T00:00:00') - new Date(s + 'T00:00:00')) / 86400000);
+const mesLbl = m => `${m.slice(5)}/${m.slice(0, 4)}`;
+// cor estável por solicitante (mesmo nome = mesma cor, sem depender de acento/caixa)
+const hue = v => { const k = norm(v); if (!k) return 215; let h = 7; for (const c of k) h = (h * 31 + c.charCodeAt(0)) >>> 0; return (h * 47) % 360; };
 
 function toast(m, erro) {
   const t = $('toast'); t.textContent = m;
@@ -240,9 +296,10 @@ function mapaNomes() {                       // chave sem acento -> grafia mais 
 }
 const canon = v => { const n = limpa(v); return n ? (mapaNomes()[norm(n)] || n) : ''; };
 
-function agrupar() {
+function agrupar(mes) {                      // mes opcional (AAAA-MM): resume só aquele mês
   const mapa = mapaNomes(), g = {};
   compras.forEach(i => {
+    if (mes && (i.data || '').slice(0, 7) !== mes) return;
     const k = norm(i.solicitante);
     const x = (g[k] ??= { k, nome: k ? mapa[k] : 'SEM SOLICITANTE', n: 0, p: 0, v: 0, qtd: 0, vars: new Set() });
     x.n++; x.v += Number(i.total || 0); x.qtd += Number(i.qtd || 1); if (!i.entregue) x.p++;
@@ -327,12 +384,13 @@ async function salvarTudo() {
 }
 
 /* ---------- Linhas de item (manual, pendentes, edição) ---------- */
+// O campo Total pisca enquanto estiver vazio (preenchimento obrigatório)
 const rowHTML = (v = {}, remover = false) => `
-  <div data-row class="grid grid-cols-2 sm:grid-cols-12 gap-2 items-end p-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/40">
+  <div data-row class="grid grid-cols-2 sm:grid-cols-12 gap-2 items-end p-3 rounded-xl border-2 border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-900/40">
     <div class="col-span-2 sm:col-span-4"><label class="lbl">Produto / serviço</label><input data-f="prod" class="inp up" value="${esc(v.produto)}"></div>
     <div class="col-span-2 sm:col-span-3"><label class="lbl">Projeto</label><input data-f="proj" class="inp up" value="${esc(v.projeto)}"></div>
     <div class="sm:col-span-1"><label class="lbl">Qtd</label><input data-f="qtd" type="number" min="1" class="inp text-center" value="${v.qtd || 1}"></div>
-    <div class="sm:col-span-2"><label class="lbl text-emerald-600">Total (R$)</label><input data-f="total" type="number" step="0.01" class="inp" value="${v.total || ''}"></div>
+    <div class="sm:col-span-2"><label class="lbl text-emerald-600">Total (R$) (*)</label><input data-f="total" type="number" step="0.01" class="inp ${parseFloat(v.total) > 0 ? '' : 'falta'}" value="${v.total || ''}"></div>
     <div class="sm:col-span-2"><label class="lbl">Unitário</label><input data-f="unit" type="number" step="0.01" class="inp" value="${v.unit || ''}"></div>
     ${remover ? '<button data-rm class="col-span-2 sm:col-span-12 text-[10px] text-rose-600 font-bold text-right">✕ Remover item</button>' : ''}
   </div>`;
@@ -352,6 +410,8 @@ document.addEventListener('input', e => {
   const s = (k, v) => r.querySelector(`[data-f=${k}]`).value = v > 0 ? v.toFixed(2) : '';
   const q = g('qtd') || 1;
   f === 'unit' ? s('total', q * g('unit')) : s('unit', g('total') / q);
+  const ti = r.querySelector('[data-f=total]');
+  ti.classList.toggle('falta', !(parseFloat(ti.value) > 0));
   if (e.target.closest('#eRows')) somaEdit();
 });
 // Ao sair do campo solicitante, encaixa na grafia já existente (evita JOAO / João / João )
@@ -368,7 +428,11 @@ function lerLinhas(cont) {
     if (!total) total = qtd * unit;
     if (!unit) unit = total / qtd;
     const produto = up(g('prod'));
-    if (!produto || total <= 0) { toast('Informe produto e valor em todos os itens.', true); return null; }
+    if (!produto || total <= 0) {
+      toast('Informe produto e valor total em todos os itens.', true);
+      r.querySelector(!produto ? '[data-f=prod]' : '[data-f=total]').focus();
+      return null;
+    }
     itens.push({ produto, projeto: up(g('proj')), qtd, unit, total });
   }
   return itens;
@@ -523,7 +587,7 @@ async function excluir(ids) {
 }
 
 /* ---------- Render ---------- */
-function filtrar() {
+function filtrar(semMes) {
   const q = norm($('fBusca').value), v = parseFloat($('fValor').value), s = norm($('fSol').value),
         e = $('fEntrega').value, m = $('fMes').value, o = $('fOrdem').value;
   const lista = compras.filter(i => {
@@ -531,7 +595,8 @@ function filtrar() {
     if (e === 'p' && i.entregue) return false;
     if (e === 'e' && !i.entregue) return false;
     if (e === 'a' && !atrasada(i)) return false;
-    if (m && (i.data || '').slice(0, 7) !== m) return false;
+    if (e === 'v' && !velha(i)) return false;
+    if (!semMes && m && (i.data || '').slice(0, 7) !== m) return false;
     if (q && ![i.produto, i.local, i.solicitante, i.projeto].some(x => norm(x).includes(q)) && !(i.sub_itens || []).some(x => norm(x.produto).includes(q))) return false;
     if (v > 0 && ![i.total, i.unit, ...(i.sub_itens || []).flatMap(x => [x.total, x.unit])].some(x => Math.abs(Number(x) - v) < 0.005)) return false;
     return true;
@@ -546,20 +611,21 @@ function filtrar() {
 }
 
 function render() {
+  const mSel = $('fMes').value;
   const lista = filtrar(), vis = lista.slice(0, limite), dups = {};
   compras.forEach(i => dups[chaveDup(i)] = (dups[chaveDup(i)] || 0) + 1);
   const ids = new Set(compras.map(c => String(c.id))); [...sel].forEach(id => { if (!ids.has(id)) sel.delete(id); });
 
   $('tbody').innerHTML = vis.length ? vis.map(i => {
-    const subs = i.sub_itens || [], aberto = !!exp[i.id], dup = dups[chaveDup(i)] > 1, atr = atrasada(i);
-    let h = `<tr class="${i.entregue ? 'opacity-60' : ''} ${sel.has(String(i.id)) ? 'bg-indigo-50 dark:bg-indigo-950/40' : ''}" data-id="${esc(i.id)}">
+    const subs = i.sub_itens || [], aberto = !!exp[i.id], dup = dups[chaveDup(i)] > 1, atr = atrasada(i), vel = velha(i);
+    let h = `<tr class="${i.entregue ? 'opacity-60' : ''} ${vel ? 'velha' : ''} ${sel.has(String(i.id)) ? 'bg-indigo-50 dark:bg-indigo-950/40' : ''}" data-id="${esc(i.id)}">
       <td class="p-2"><input type="checkbox" data-a="sel" ${sel.has(String(i.id)) ? 'checked' : ''} aria-label="Selecionar"></td>
       <td class="p-2 whitespace-nowrap">${fd(i.data)}</td>
-      <td class="p-2 font-bold whitespace-nowrap">${esc(i.solicitante)}</td>
+      <td class="p-2 whitespace-nowrap">${i.solicitante ? `<span class="pc text-[11px]" style="--h:${hue(i.solicitante)}">${esc(i.solicitante)}</span>` : '<span class="text-slate-400">—</span>'}</td>
       <td class="p-2 max-w-xs"><div class="flex items-center gap-2">${subs.length ? `<button data-a="exp" class="bg-indigo-100 dark:bg-indigo-900 px-1.5 rounded text-[10px] font-black">${aberto ? '➖' : '➕'}</button>` : ''}
         <span class="truncate ${i.entregue ? 'line-through' : ''}">${esc(i.produto)}</span>
         ${dup ? '<span class="text-[9px] font-black bg-amber-100 text-amber-800 px-1.5 py-0.5 rounded whitespace-nowrap">⚠ POSSÍVEL DUPLICADA</span>' : ''}
-        ${atr ? '<span class="text-[9px] font-black bg-rose-100 text-rose-800 px-1.5 py-0.5 rounded whitespace-nowrap">⏰ ATRASADA</span>' : ''}</div></td>
+        ${vel ? `<span class="text-[9px] font-black bg-rose-600 text-white px-1.5 py-0.5 rounded whitespace-nowrap">🚨 ${diasDesde(i.data)} DIAS SEM ENTREGA</span>` : atr ? '<span class="text-[9px] font-black bg-rose-100 text-rose-800 px-1.5 py-0.5 rounded whitespace-nowrap">⏰ ATRASADA</span>' : ''}</div></td>
       <td class="p-2 text-indigo-700 dark:text-indigo-300 whitespace-nowrap">${esc(i.local || '-')}</td>
       <td class="p-2 whitespace-nowrap">${esc(i.projeto || '-')}</td>
       <td class="p-2 text-center font-bold">${esc(i.qtd)}</td>
@@ -591,30 +657,53 @@ function render() {
   const mapa = mapaNomes(), cont = {};
   lista.forEach(i => { const k = norm(i.solicitante); if (k) cont[k] = (cont[k] || 0) + 1; });
   const top = Object.entries(cont).sort((a, b) => b[1] - a[1])[0];
-  $('cTop').textContent = top ? `${mapa[top[0]]} (${top[1]})` : '—';
+  $('cTop').innerHTML = top ? `<span class="pc text-sm" style="--h:${hue(top[0])}">${esc(mapa[top[0]])} (${top[1]})</span>` : '—';
 
-  // solicitantes: cartões, filtro e sugestões
-  const gr = agrupar(), nomes = gr.filter(g => g.k).map(g => g.nome), selSol = $('fSol'), atual = norm(selSol.value);
+  // pendentes há mais de 45 dias
+  const vv = compras.filter(velha), vvTot = vv.reduce((a, i) => a + Number(i.total || 0), 0);
+  $('cVel').textContent = vv.length ? `${vv.length} compra(s) · ${brl(vvTot)}` : 'Nenhuma 👍';
+  $('cVelBox').classList.toggle('alertaV', vv.length > 0);
+
+  // meses disponíveis (filtro principal + seletor dos solicitantes)
+  const meses = [...new Set(compras.map(c => (c.data || '').slice(0, 7)).filter(Boolean))].sort().reverse();
+  const optMes = '<option value="">Todos os meses</option>' + meses.map(m => `<option value="${m}">${mesLbl(m)}</option>`).join('');
+  const mAtual = meses.includes(mSel) ? mSel : '';
+  $('fMes').innerHTML = optMes; $('fMes').value = mAtual;
+  $('pMes').innerHTML = optMes; $('pMes').value = mAtual;
+
+  // valores por mês (respeita os demais filtros, menos o de mês)
+  const mm = {};
+  filtrar(true).forEach(i => {
+    const m = (i.data || '').slice(0, 7); if (!m) return;
+    const x = (mm[m] ??= { n: 0, v: 0, p: 0 }); x.n++; x.v += Number(i.total || 0); if (!i.entregue) x.p++;
+  });
+  const ordMeses = Object.keys(mm).sort().reverse(), totalMeses = ordMeses.reduce((a, m) => a + mm[m].v, 0);
+  $('mesTotal').textContent = ordMeses.length ? `Soma dos meses: ${brl(totalMeses)}` : '';
+  $('cardsMeses').innerHTML = ordMeses.map(m => `<button data-m="${m}" class="card !p-2.5 text-left shrink-0 min-w-[130px] hover:border-indigo-500 ${m === mAtual ? 'ring-2 ring-indigo-500 !bg-indigo-50 dark:!bg-indigo-950' : ''}">
+    <span class="text-[10px] font-black uppercase block text-slate-500">📅 ${mesLbl(m)}</span>
+    <span class="text-sm font-black text-emerald-600 block">${brl(mm[m].v)}</span>
+    <span class="text-[10px] text-slate-500 block">${mm[m].n} compra(s)${mm[m].p ? ` · <b class="text-amber-600">${mm[m].p} pend.</b>` : ''}</span></button>`).join('')
+    || '<span class="text-xs text-slate-400 italic">Sem compras com data para somar.</span>';
+
+  // solicitantes: cartões coloridos (por mês, se escolhido), filtro e sugestões
+  const gr = agrupar(mAtual), nomes = agrupar().filter(g => g.k).map(g => g.nome), selSol = $('fSol'), atual = norm(selSol.value);
   selSol.innerHTML = '<option value="">Todos os solicitantes</option>' + nomes.map(n => `<option>${esc(n)}</option>`).join('');
   selSol.value = nomes.find(n => norm(n) === atual) || '';
   $('dlSol').innerHTML = nomes.map(n => `<option value="${esc(n)}">`).join('');
-  $('cardsPessoas').innerHTML = gr.map(g => `<button data-p="${esc(g.nome)}" class="card !p-2.5 text-left hover:border-indigo-400 ${g.k && norm(selSol.value) === g.k ? '!border-indigo-500 !border-2' : ''}">
+  $('pCount').textContent = `(${gr.length}${mAtual ? ' em ' + mesLbl(mAtual) : ''})`;
+  $('cardsPessoas').innerHTML = gr.map(g => `<button data-p="${esc(g.nome)}" style="--h:${hue(g.nome)}" class="card pc-card !p-2.5 text-left hover:brightness-95 ${g.k && norm(selSol.value) === g.k ? 'ring-2 ring-indigo-500' : ''}">
     <span class="text-[10px] font-black uppercase block truncate">👤 ${esc(g.nome)}</span>
-    <span class="text-[10px] text-slate-500 block">${g.n} compra(s)${g.p ? ` · <b class="text-amber-600">${g.p} pend.</b>` : ''}</span>
-    <span class="flex justify-between text-[11px] font-black mt-1"><span class="text-indigo-600">${g.qtd} un</span><span class="text-emerald-600">${brl(g.v)}</span></span></button>`).join('');
-
-  // meses disponíveis
-  const meses = [...new Set(compras.map(c => (c.data || '').slice(0, 7)).filter(Boolean))].sort().reverse(), mAtual = $('fMes').value;
-  $('fMes').innerHTML = '<option value="">Todos os meses</option>' + meses.map(m => `<option value="${m}">${m.slice(5)}/${m.slice(0, 4)}</option>`).join('');
-  $('fMes').value = meses.includes(mAtual) ? mAtual : '';
+    <span class="text-[10px] text-slate-500 dark:text-slate-300 block">${g.n} compra(s)${g.p ? ` · <b class="text-amber-600">${g.p} pend.</b>` : ''}</span>
+    <span class="flex justify-between text-[11px] font-black mt-1"><span class="text-indigo-600 dark:text-indigo-300">${g.qtd} un</span><span class="text-emerald-600">${brl(g.v)}</span></span></button>`).join('')
+    || '<span class="text-xs text-slate-400 italic col-span-full">Nenhum solicitante neste período.</span>';
 }
 
 /* ---------- Gerenciar solicitantes ---------- */
 function renderGer() {
   $('gLista').innerHTML = agrupar().filter(g => g.k).map(g => {
     const vars = [...g.vars].filter(v => v !== g.nome);
-    return `<div data-g class="flex flex-wrap items-center gap-2 p-2 rounded-xl border border-slate-200 dark:border-slate-700" data-k="${esc(g.k)}">
-      <div class="flex-1 min-w-[150px]"><div class="text-xs font-black uppercase">${esc(g.nome)}</div>
+    return `<div data-g class="flex flex-wrap items-center gap-2 p-2 rounded-xl border-2 border-slate-300 dark:border-slate-600" data-k="${esc(g.k)}">
+      <div class="flex-1 min-w-[150px]"><div class="text-xs font-black uppercase"><span class="pc" style="--h:${hue(g.nome)}">${esc(g.nome)}</span></div>
         <div class="text-[10px] text-slate-500">${g.n} compra(s) · ${brl(g.v)}</div>
         ${vars.length ? `<div class="text-[10px] text-amber-600 font-bold">variações: ${vars.map(esc).join(', ')}</div>` : ''}</div>
       <input class="inp up !w-44" value="${esc(g.nome)}" list="dlSol" autocomplete="off" aria-label="Novo nome">
@@ -706,11 +795,17 @@ async function limparDuplicadas() {
 /* ---------- Eventos ---------- */
 function aba(nome) {
   ['manual', 'nota', 'link'].forEach(n => $('aba-' + n).classList.toggle('hidden', n !== nome));
-  document.querySelectorAll('#abas [data-tab]').forEach(b => b.className = 'btn flex-1 ' + (b.dataset.tab === nome ? 'bg-white dark:bg-slate-800 text-indigo-600 shadow-sm border border-slate-200 dark:border-slate-700' : 'text-slate-500'));
+  document.querySelectorAll('#abas [data-tab]').forEach(b => b.className = 'btn flex-1 ' + (b.dataset.tab === nome ? 'bg-white dark:bg-slate-800 text-indigo-600 shadow-sm border-2 border-slate-300 dark:border-slate-600' : 'text-slate-500'));
 }
 function tema(escuro) {
   document.documentElement.classList.toggle('dark', escuro); $('bTema').textContent = escuro ? '☀️' : '🌙';
   try { localStorage.setItem('tema_portal', escuro ? 'dark' : 'light'); } catch {}
+}
+function painelPessoas(aberto) {              // abre/fecha a área de solicitantes (lembra a escolha)
+  $('cardsPessoas').classList.toggle('hidden', !aberto);
+  $('bPes').setAttribute('aria-expanded', aberto);
+  $('bPes').firstChild.textContent = (aberto ? '▾' : '▸') + ' 👥 Solicitantes ';
+  try { localStorage.setItem(LSP, aberto ? '1' : '0'); } catch {}
 }
 const refiltrar = () => { limite = 100; render(); };
 
@@ -718,12 +813,20 @@ window.addEventListener('DOMContentLoaded', () => {
   let escuro = false;
   try { const s = localStorage.getItem('tema_portal'); escuro = s ? s === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; } catch {}
   tema(escuro);
+  let aberto = true; try { aberto = localStorage.getItem(LSP) !== '0'; } catch {}
   $('mData').value = $('nData').value = hoje();
   resetManual(); aba('manual');
   try { compras = JSON.parse(localStorage.getItem(LS)) || []; } catch { compras = []; }
-  render(); status(false); $('badgeNuvem').textContent = '';
+  render(); painelPessoas(aberto); status(false); $('badgeNuvem').textContent = '';
 
   $('bTema').onclick = () => tema(!document.documentElement.classList.contains('dark'));
+  $('bPes').onclick = () => painelPessoas($('cardsPessoas').classList.contains('hidden'));
+  $('pMes').onchange = e => { $('fMes').value = e.target.value; refiltrar(); };
+  $('cardsMeses').onclick = e => {
+    const b = e.target.closest('[data-m]'); if (!b) return;
+    $('fMes').value = $('fMes').value === b.dataset.m ? '' : b.dataset.m; refiltrar();
+  };
+  $('cVelBox').onclick = () => { const f = $('fEntrega'); f.value = f.value === 'v' ? '' : 'v'; $('fOrdem').value = 'dt_a'; refiltrar(); };
   $('abas').onclick = e => { const b = e.target.closest('[data-tab]'); if (b) aba(b.dataset.tab); };
   $('bAddRow').onclick = () => { $('mRows').insertAdjacentHTML('beforeend', rowHTML({}, true)); $('mRows').lastElementChild.querySelector('[data-f=prod]').focus(); };
   $('mRows').onclick = e => { if (e.target.matches('[data-rm]')) e.target.closest('[data-row]').remove(); };
