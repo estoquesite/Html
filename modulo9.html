@@ -21,8 +21,9 @@
 
         #leitor-camera video { border-radius: 12px; object-fit: cover !important; width: 100% !important; }
 
-        /* Tabela: texto normal, sem piscar */
-        .pisca-destaque { font-weight: 900; display: inline-block; }
+        /* Tabela: cor suave, sem negrito */
+        .txt-cor { color: #b45309; font-weight: 500; display: inline-block; }
+        .dark .txt-cor { color: #fbbf24; }
 
         /* Formulário: amarelinho piscando bem fraquinho */
         @keyframes pulsoAmareloSuave {
@@ -34,6 +35,14 @@
             animation: pulsoAmareloSuave 2.5s infinite alternate ease-in-out;
         }
 
+        /* Nome do colaborador (grupo da tabela): piscadinha bem fraquinha */
+        .chip-colab {
+            border: 1.5px solid #fde68a; color: #b45309; font-weight: 600;
+            padding: 2px 10px; border-radius: 8px; display: inline-block;
+            animation: pulsoAmareloSuave 2.5s infinite alternate ease-in-out;
+        }
+        .dark .chip-colab { color: #fbbf24; }
+
         /* Duplicidade na tabela: só uma bordinha fraca pulsando */
         @keyframes bordaDuplicado {
             0%   { border-color: rgba(239, 68, 68, 0.2); }
@@ -41,8 +50,8 @@
         }
         .alerta-duplicado {
             border: 1.5px solid #ef4444;
-            color: #b91c1c;
-            padding: 2px 8px; border-radius: 6px; display: inline-block; font-weight: 900;
+            color: #b91c1c; font-weight: 500;
+            padding: 2px 8px; border-radius: 6px; display: inline-block;
             animation: bordaDuplicado 1.4s infinite alternate ease-in-out;
         }
     </style>
@@ -148,7 +157,7 @@
 
             <form id="notebookForm" onsubmit="salvarNotebook(event)" class="space-y-4">
                 <div>
-                    <h3 class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 mb-2 tracking-wider">1. Identificação, Recebimento & Entrega</h3>
+                    <h3 class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 mb-2 tracking-wider">1. Identificação & Movimento</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                         <div>
                             <div class="flex justify-between items-center mb-1">
@@ -173,19 +182,22 @@
                         </div>
 
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Colaborador (quem recebeu / retirou)</label>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Colaborador</label>
                             <input type="text" id="colaborador" placeholder="Nome do colaborador" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Data de Recebimento *</label>
-                            <input type="date" id="dataRecebimento" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Movimento *</label>
+                            <select id="movimento" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                                <option value="Recebimento">Recebimento (notebook entrou)</option>
+                                <option value="Entrega">Entrega (notebook saiu)</option>
+                            </select>
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Data de Entrega</label>
-                            <input type="date" id="dataEntrega" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Data *</label>
+                            <input type="date" id="dataMov" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
                         </div>
                     </div>
-                    <p class="text-[10px] text-slate-400 mt-2">Se informar colaborador e data de entrega com status "Em estoque", o sistema muda sozinho para "Em uso".</p>
+                    <p class="text-[10px] text-slate-400 mt-2">Entrega para um colaborador com status "Em estoque" muda sozinho para "Em uso". Para lançar outro notebook do mesmo colaborador, use o botão "+ Adicionar outro".</p>
                 </div>
 
                 <div>
@@ -205,7 +217,10 @@
                     </div>
                 </div>
 
-                <div class="flex justify-end pt-2">
+                <div class="flex flex-wrap justify-end gap-2 pt-2">
+                    <button type="button" onclick="salvarNotebook(null, true)" class="bg-purple-600 hover:bg-purple-700 text-white font-black py-3 px-5 rounded-xl text-xs transition shadow-md flex items-center gap-2 cursor-pointer" title="Salva e mantém colaborador, movimento e data para o próximo notebook">
+                        <span>＋</span><span>Adicionar outro (mesmo colaborador)</span>
+                    </button>
                     <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white font-black py-3 px-8 rounded-xl text-xs transition shadow-md flex items-center gap-2 cursor-pointer">
                         <span>💾</span><span>Salvar Registro</span>
                     </button>
@@ -216,7 +231,7 @@
         <!-- TABELA -->
         <div class="bloco-destacado bg-white dark:bg-slate-800 p-5 rounded-2xl space-y-3">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-                <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">📋 Notebooks Cadastrados</h3>
+                <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">📋 Notebooks Cadastrados (agrupado por colaborador)</h3>
                 <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
                     <select id="filtroStatus" onchange="renderizarTabela()" class="text-xs px-3 py-1.5 border border-slate-300 dark:border-slate-600 dark:bg-slate-900 rounded-lg outline-none font-bold"></select>
                     <div class="relative w-full sm:w-72">
@@ -232,10 +247,8 @@
                         <tr class="border-b border-slate-100 dark:border-slate-700 text-slate-400 font-bold uppercase text-[10px]">
                             <th class="py-2.5 px-3">Serial</th>
                             <th class="py-2.5 px-3">Patrimônio</th>
+                            <th class="py-2.5 px-3">Movimento / Data</th>
                             <th class="py-2.5 px-3 text-center">Status</th>
-                            <th class="py-2.5 px-3">Colaborador</th>
-                            <th class="py-2.5 px-3 text-center">Entrega</th>
-                            <th class="py-2.5 px-3">Recebimento</th>
                             <th class="py-2.5 px-3">Observação</th>
                             <th class="py-2.5 px-3 text-center">Ações</th>
                         </tr>
@@ -308,10 +321,10 @@
                     <select id="editTipo" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></select></div>
                 <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Colaborador (quem recebeu / retirou)</label>
                     <input type="text" id="editColaborador" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
-                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Data de Recebimento</label>
-                    <input type="date" id="editDataRecebimento" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none"></div>
-                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Data de Entrega</label>
-                    <input type="date" id="editDataEntrega" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none"></div>
+                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Movimento</label>
+                    <select id="editMovimento" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"><option value="Recebimento">Recebimento</option><option value="Entrega">Entrega</option></select></div>
+                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Data</label>
+                    <input type="date" id="editData" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none"></div>
                 <div class="sm:col-span-2 md:col-span-3"><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Status</label>
                     <select id="editStatus" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></select></div>
                 <div class="sm:col-span-2 md:col-span-3"><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Observação</label>
@@ -336,12 +349,13 @@
 
         const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         const vazio = (v) => !v || v === '-';
-        const entregue = (n) => !vazio(n.colaborador) && !vazio(n.dataEntrega);
+        const entregue = (n) => !vazio(n.colaborador) && n.movimento === 'Entrega';
+        const dataHoje = () => new Date().toISOString().split('T')[0];
         const ehDefeito = (st) => /danific|quebrad|manuten|defeit/i.test(st || '');
         const ehEstoque = (st) => /estoque/i.test(st || '');
 
         window.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('dataRecebimento').value = new Date().toISOString().split('T')[0];
+            document.getElementById('dataMov').value = dataHoje();
             carregarListaStatus();
             carregarListaTipos();
             atualizarSelectsStatus();
@@ -643,8 +657,10 @@
         }
 
         // ================= SALVAR =================
-        function salvarNotebook(e) {
-            e.preventDefault();
+        function salvarNotebook(e, manter = false) {
+            if (e) e.preventDefault();
+            const form = document.getElementById('notebookForm');
+            if (!form.checkValidity()) { form.reportValidity(); return; }
 
             const serial = document.getElementById('serial').value.trim().toUpperCase();
             const patrimonio = document.getElementById('patrimonio').value.trim().toUpperCase();
@@ -659,11 +675,11 @@
                 serial,
                 patrimonio,
                 tipo: document.getElementById('tipo').value || "Notebook",
-                dataRecebimento: document.getElementById('dataRecebimento').value,
+                movimento: document.getElementById('movimento').value,
+                data: document.getElementById('dataMov').value,
                 observacao: document.getElementById('observacao').value.trim(),
                 status: document.getElementById('status').value,
-                colaborador: document.getElementById('colaborador').value.trim().toUpperCase() || "-",
-                dataEntrega: document.getElementById('dataEntrega').value || "-"
+                colaborador: document.getElementById('colaborador').value.trim().toUpperCase() || "-"
             };
 
             if (entregue(item) && ehEstoque(item.status)) item.status = 'Em uso';
@@ -671,10 +687,14 @@
             notebooks.unshift(item);
             salvarNoLocalStorage();
             renderizarTabela();
-            mostrarAviso(`Notebook ${item.serial} gravado com sucesso!`);
+            mostrarAviso(manter
+                ? `Notebook ${item.serial} gravado! Pode lançar o próximo de ${item.colaborador === '-' ? 'mesmo movimento' : item.colaborador}.`
+                : `Notebook ${item.serial} gravado com sucesso!`);
 
-            ['serial', 'patrimonio', 'colaborador', 'dataEntrega', 'observacao'].forEach(id => document.getElementById(id).value = '');
+            const limpar = manter ? ['serial', 'patrimonio', 'observacao'] : ['serial', 'patrimonio', 'colaborador', 'observacao'];
+            limpar.forEach(id => document.getElementById(id).value = '');
             verificarDuplicidadeAoDigitar();
+            document.getElementById('serial').focus();
         }
 
         function salvarManual() {
@@ -699,10 +719,10 @@
             document.getElementById('editSerial').value = item.serial;
             document.getElementById('editPatrimonio').value = item.patrimonio;
             preencherSelectTipo(document.getElementById('editTipo'), item.tipo);
-            document.getElementById('editDataRecebimento').value = item.dataRecebimento || '';
+            document.getElementById('editMovimento').value = item.movimento || 'Recebimento';
+            document.getElementById('editData').value = item.data || '';
             preencherSelectGenerico(document.getElementById('editStatus'), item.status);
             document.getElementById('editColaborador').value = vazio(item.colaborador) ? '' : item.colaborador;
-            document.getElementById('editDataEntrega').value = vazio(item.dataEntrega) ? '' : item.dataEntrega;
             document.getElementById('editObservacao').value = item.observacao || '';
 
             document.getElementById('modalEdicaoNotebook').classList.remove('hidden');
@@ -722,10 +742,10 @@
                 serial: document.getElementById('editSerial').value.trim().toUpperCase(),
                 patrimonio: document.getElementById('editPatrimonio').value.trim().toUpperCase(),
                 tipo: document.getElementById('editTipo').value || "Notebook",
-                dataRecebimento: document.getElementById('editDataRecebimento').value,
+                movimento: document.getElementById('editMovimento').value,
+                data: document.getElementById('editData').value,
                 status: document.getElementById('editStatus').value,
                 colaborador: document.getElementById('editColaborador').value.trim().toUpperCase() || "-",
-                dataEntrega: document.getElementById('editDataEntrega').value || "-",
                 observacao: document.getElementById('editObservacao').value.trim()
             };
             if (entregue(atualizado) && ehEstoque(atualizado.status)) atualizado.status = 'Em uso';
@@ -768,60 +788,67 @@
             );
 
             if (lista.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-slate-400 italic">Nenhum notebook encontrado.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-slate-400 italic">Nenhum notebook encontrado.</td></tr>`;
                 return;
             }
 
+            // Agrupa por colaborador (sem colaborador vai para o fim)
+            const grupos = new Map();
             lista.forEach(n => {
-                const dupSerial = !vazio(n.serial) && notebooks.filter(i => i.serial === n.serial).length > 1;
-                const dupPat = !vazio(n.patrimonio) && notebooks.filter(i => i.patrimonio === n.patrimonio).length > 1;
-                const foiEntregue = entregue(n);
-                const noEstoque = ehEstoque(n.status) && !foiEntregue;
+                const chave = vazio(n.colaborador) ? '' : n.colaborador;
+                if (!grupos.has(chave)) grupos.set(chave, []);
+                grupos.get(chave).push(n);
+            });
+            const chaves = [...grupos.keys()].sort((a, b) => a === '' ? 1 : (b === '' ? -1 : a.localeCompare(b, 'pt-BR')));
 
-                const serialFormatado = dupSerial
-                    ? `<span class="alerta-duplicado" title="⚠️ SERIAL DUPLICADO">⚠️ ${esc(n.serial)}</span>`
-                    : `<span class="pisca-destaque">${esc(n.serial)}</span>`;
+            chaves.forEach(ch => {
+                const itens = grupos.get(ch);
 
-                const patFormatado = dupPat
-                    ? `<span class="alerta-duplicado" title="⚠️ PATRIMÔNIO DUPLICADO">⚠️ #${esc(n.patrimonio)}</span>`
-                    : `<span class="pisca-destaque">#${esc(n.patrimonio)}</span>`;
+                const cab = document.createElement('tr');
+                cab.className = "bg-amber-50/60 dark:bg-slate-900/60";
+                cab.innerHTML = `
+                    <td colspan="6" class="py-2 px-3">
+                        ${ch ? `<span class="chip-colab">👤 ${esc(ch)}</span>` : `<span class="text-[11px] text-slate-500">📦 SEM COLABORADOR (ESTOQUE)</span>`}
+                        <span class="ml-2 text-[10px] text-slate-400">${itens.length} ${itens.length === 1 ? 'item' : 'itens'}</span>
+                    </td>`;
+                tbody.appendChild(cab);
 
-                const colaboradorFormatado = vazio(n.colaborador)
-                    ? `<span class="text-slate-400">-</span>`
-                    : `<span class="pisca-destaque">👤 ${esc(n.colaborador)}</span>`;
+                itens.forEach(n => {
+                    const dupSerial = !vazio(n.serial) && notebooks.filter(i => i.serial === n.serial).length > 1;
+                    const dupPat = !vazio(n.patrimonio) && notebooks.filter(i => i.patrimonio === n.patrimonio).length > 1;
 
-                const statusFormatado = `<span class="pisca-destaque text-[10px]">${esc(n.status)}</span>`;
+                    const serialFormatado = dupSerial
+                        ? `<span class="alerta-duplicado" title="⚠️ SERIAL DUPLICADO">⚠️ ${esc(n.serial)}</span>`
+                        : `<span class="txt-cor">${esc(n.serial)}</span>`;
 
-                const entregaTxt = foiEntregue
-                    ? `<span class="pisca-destaque text-[10px]">${formatarData(n.dataEntrega)}</span>`
-                    : (noEstoque
-                        ? '<span class="pisca-destaque text-[10px]">NO ESTOQUE</span>'
-                        : '<span class="pisca-destaque text-[10px]">NÃO ENTREGUE</span>');
+                    const patFormatado = dupPat
+                        ? `<span class="alerta-duplicado" title="⚠️ PATRIMÔNIO DUPLICADO">⚠️ #${esc(n.patrimonio)}</span>`
+                        : `<span class="txt-cor">#${esc(n.patrimonio)}</span>`;
 
-                const recebTxt = vazio(n.dataRecebimento)
-                    ? '<span class="text-slate-300">-</span>'
-                    : `<span class="pisca-destaque text-[10px]">${formatarData(n.dataRecebimento)}</span>`;
+                    const ehEntrega = n.movimento === 'Entrega';
+                    const movTxt = `
+                        <span class="text-[11px] font-medium ${ehEntrega ? 'text-blue-700 dark:text-blue-300' : 'text-emerald-700 dark:text-emerald-300'}">${ehEntrega ? '📤 Entrega' : '📥 Recebimento'}</span>
+                        <span class="block text-[11px] text-slate-600 dark:text-slate-300">${formatarData(n.data)}</span>`;
 
-                const obs = n.observacao
-                    ? `<span class="normal-case text-slate-600 dark:text-slate-300 block max-w-[220px] truncate" title="${esc(n.observacao)}">${esc(n.observacao)}</span>`
-                    : '<span class="text-slate-300">-</span>';
+                    const obs = n.observacao
+                        ? `<span class="normal-case text-slate-600 dark:text-slate-300 block max-w-[220px] truncate" title="${esc(n.observacao)}">${esc(n.observacao)}</span>`
+                        : '<span class="text-slate-300">-</span>';
 
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/40 transition";
-                tr.innerHTML = `
-                    <td class="py-2.5 px-3 font-mono whitespace-nowrap">${serialFormatado}</td>
-                    <td class="py-2.5 px-3 font-bold whitespace-nowrap">${patFormatado}<span class="block text-[9px] text-slate-400 font-semibold mt-1">${esc(n.tipo || 'Notebook')}</span></td>
-                    <td class="py-2.5 px-3 text-center whitespace-nowrap">${statusFormatado}</td>
-                    <td class="py-2.5 px-3 whitespace-nowrap font-semibold">${colaboradorFormatado}</td>
-                    <td class="py-2.5 px-3 text-center whitespace-nowrap font-bold">${entregaTxt}</td>
-                    <td class="py-2.5 px-3 whitespace-nowrap text-[11px]">${recebTxt}</td>
-                    <td class="py-2.5 px-3 text-[11px]">${obs}</td>
-                    <td class="py-2.5 px-3 text-center whitespace-nowrap">
-                        <button onclick="abrirModalEdicao(${n.id})" class="text-indigo-600 hover:text-indigo-800 font-bold p-1 mr-1.5 cursor-pointer" title="Editar">✏️</button>
-                        <button onclick="removerNotebook(${n.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1 cursor-pointer" title="Eliminar">✕</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/40 transition";
+                    tr.innerHTML = `
+                        <td class="py-2.5 px-3 font-mono whitespace-nowrap">${serialFormatado}</td>
+                        <td class="py-2.5 px-3 whitespace-nowrap">${patFormatado}<span class="block text-[9px] text-slate-400 mt-1">${esc(n.tipo || 'Notebook')}</span></td>
+                        <td class="py-2.5 px-3 whitespace-nowrap">${movTxt}</td>
+                        <td class="py-2.5 px-3 text-center whitespace-nowrap text-[11px] font-medium text-slate-600 dark:text-slate-300">${esc(n.status)}</td>
+                        <td class="py-2.5 px-3 text-[11px]">${obs}</td>
+                        <td class="py-2.5 px-3 text-center whitespace-nowrap">
+                            <button onclick="abrirModalEdicao(${n.id})" class="text-indigo-600 hover:text-indigo-800 p-1 mr-1.5 cursor-pointer" title="Editar">✏️</button>
+                            <button onclick="removerNotebook(${n.id})" class="text-rose-500 hover:text-rose-700 p-1 cursor-pointer" title="Eliminar">✕</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
             });
         }
 
@@ -864,6 +891,7 @@
                 const col = (nomes) => cab.findIndex(h => nomes.includes(h));
                 const iSerial = col(['SERIAL']), iPat = col(['PATRIMONIO']), iTipo = col(['TIPO', 'TIPO_EQUIPAMENTO']),
                       iStatus = col(['STATUS']), iColab = col(['COLABORADOR']),
+                      iMov = col(['MOVIMENTO']), iData = col(['DATA']),
                       iRec = col(['DATA_RECEBIMENTO', 'DATA_ENTRADA']),
                       iEnt = col(['DATA_ENTREGA', 'DATA_SAIDA']),
                       iObs = col(['OBSERVACAO']);
@@ -875,15 +903,25 @@
                     const p = parseLinhaCSV(linhas[i], delim);
                     const g = (idx, def = '') => (idx >= 0 && p[idx] !== undefined && p[idx] !== '') ? p[idx] : def;
                     if (!g(iSerial)) continue;
+
+                    const colab = g(iColab, '-').toUpperCase();
+                    let mov = g(iMov), data = g(iData);
+                    if (!data) { // arquivo no formato antigo (duas datas)
+                        const ent = g(iEnt, '-');
+                        if (colab !== '-' && ent !== '-') { mov = 'Entrega'; data = ent; }
+                        else { mov = mov || 'Recebimento'; data = g(iRec, dataHoje()); }
+                    }
+                    mov = /entreg/i.test(mov) ? 'Entrega' : 'Recebimento';
+
                     novos.push({
                         id: Date.now() + i,
                         serial: g(iSerial).toUpperCase(),
                         patrimonio: g(iPat, '-').toUpperCase(),
                         tipo: g(iTipo, 'Notebook'),
                         status: g(iStatus, 'Em estoque'),
-                        colaborador: g(iColab, '-').toUpperCase(),
-                        dataRecebimento: g(iRec, new Date().toISOString().split('T')[0]),
-                        dataEntrega: g(iEnt, '-'),
+                        colaborador: colab,
+                        movimento: mov,
+                        data: data,
                         observacao: g(iObs, '')
                     });
                 }
@@ -906,28 +944,35 @@
         function exportarCSV() {
             if (notebooks.length === 0) return alert("Lista vazia!");
             const q = (v) => `"${String(v ?? '').replace(/"/g, '""').replace(/\r?\n/g, ' ')}"`;
-            let csv = "\uFEFFSERIAL;PATRIMONIO;TIPO;STATUS;COLABORADOR;DATA_RECEBIMENTO;DATA_ENTREGA;OBSERVACAO\n";
+            let csv = "\uFEFFSERIAL;PATRIMONIO;TIPO;STATUS;COLABORADOR;MOVIMENTO;DATA;OBSERVACAO\n";
             notebooks.forEach(n => {
-                csv += [n.serial, n.patrimonio, n.tipo, n.status, n.colaborador, n.dataRecebimento, n.dataEntrega, n.observacao].map(q).join(';') + "\n";
+                csv += [n.serial, n.patrimonio, n.tipo, n.status, n.colaborador, n.movimento, n.data, n.observacao].map(q).join(';') + "\n";
             });
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const a = document.createElement('a');
             a.href = URL.createObjectURL(blob);
-            a.download = `notebooks_${new Date().toISOString().split('T')[0]}.csv`;
+            a.download = `notebooks_${dataHoje()}.csv`;
             a.click();
         }
 
         // ================= ARMAZENAMENTO LOCAL =================
         function normalizarRegistro(n) {
+            const colab = n.colaborador || '-';
+            let mov = n.movimento, data = n.data;
+            if (!mov || !data) { // migra registros antigos (duas datas) para o formato novo
+                const ent = n.dataEntrega || n.dataSaida || '-';
+                if (colab !== '-' && ent !== '-') { mov = 'Entrega'; data = ent; }
+                else { mov = mov || 'Recebimento'; data = n.dataRecebimento || n.dataEntrada || ''; }
+            }
             return {
                 id: n.id || Date.now() + Math.random(),
                 serial: n.serial || '',
                 patrimonio: n.patrimonio || '',
                 tipo: n.tipo || 'Notebook',
                 status: n.status || 'Em estoque',
-                colaborador: n.colaborador || '-',
-                dataRecebimento: n.dataRecebimento || n.dataEntrada || '',
-                dataEntrega: n.dataEntrega || n.dataSaida || '-',
+                colaborador: colab,
+                movimento: mov,
+                data: data,
                 observacao: n.observacao || ''
             };
         }
