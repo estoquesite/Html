@@ -21,24 +21,29 @@
 
         #leitor-camera video { border-radius: 12px; object-fit: cover !important; width: 100% !important; }
 
-        @keyframes piscaDestaque {
-            0%   { background-color: #fdf4ff; color: #a21caf; border-color: #d946ef; box-shadow: 0 0 4px rgba(217, 70, 239, 0.4); }
-            100% { background-color: #d946ef; color: #ffffff; border-color: #a21caf; box-shadow: 0 0 14px rgba(217, 70, 239, 0.95); }
+        /* Tabela: texto normal, sem piscar */
+        .pisca-destaque { font-weight: 900; display: inline-block; }
+
+        /* Formulário: amarelinho piscando bem fraquinho */
+        @keyframes pulsoAmareloSuave {
+            0%   { border-color: #fde68a; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
+            100% { border-color: #f59e0b; box-shadow: 0 0 6px 0 rgba(245, 158, 11, 0.25); }
         }
-        .pisca-destaque {
-            animation: piscaDestaque 0.9s infinite alternate ease-in-out;
-            border: 1.5px solid #d946ef;
-            padding: 2px 8px; border-radius: 6px; font-weight: 900; display: inline-block;
+        .campo-amarelo {
+            border: 1.5px solid #fde68a !important;
+            animation: pulsoAmareloSuave 2.5s infinite alternate ease-in-out;
         }
 
-        @keyframes brilhaDuplicado {
-            0%   { background-color: #fef2f2; color: #b91c1c; border-color: #ef4444; box-shadow: 0 0 4px rgba(239, 68, 68, 0.4); }
-            100% { background-color: #dc2626; color: #ffffff; border-color: #7f1d1d; box-shadow: 0 0 16px rgba(239, 68, 68, 0.95); }
+        /* Duplicidade na tabela: só uma bordinha fraca pulsando */
+        @keyframes bordaDuplicado {
+            0%   { border-color: rgba(239, 68, 68, 0.2); }
+            100% { border-color: rgba(239, 68, 68, 0.85); }
         }
         .alerta-duplicado {
-            animation: brilhaDuplicado 0.5s infinite alternate ease-in-out;
-            border: 2px dashed #ef4444;
+            border: 1.5px solid #ef4444;
+            color: #b91c1c;
             padding: 2px 8px; border-radius: 6px; display: inline-block; font-weight: 900;
+            animation: bordaDuplicado 1.4s infinite alternate ease-in-out;
         }
     </style>
 </head>
@@ -342,6 +347,11 @@
             atualizarSelectsStatus();
             atualizarSelectsTipo();
             carregarDoLocalStorage();
+
+            // Campos do formulário (exceto serial e patrimônio) com amarelinho piscando fraco
+            document.querySelectorAll('#notebookForm input:not([type=hidden]), #notebookForm select, #notebookForm textarea').forEach(el => {
+                if (el.id !== 'serial' && el.id !== 'patrimonio') el.classList.add('campo-amarelo');
+            });
         });
 
         function mostrarAviso(msg, tipo = "sucesso") {
