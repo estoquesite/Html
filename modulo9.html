@@ -4,27 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Módulo 9 - Controle de Notebooks | Portal Vale</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Leitor Oficial HTML5 QR/Barcode com suporte a Code-128 e Code-39 -->
     <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-    <!-- SDK Oficial do Supabase -->
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
-            theme: {
-                extend: {
-                    colors: {
-                        vale: {
-                            DEFAULT: '#007e7a',
-                            dark: '#005a57',
-                            light: '#e6f4f4',
-                            amber: '#f59e0b'
-                        }
-                    }
-                }
-            }
+            theme: { extend: { colors: { vale: { DEFAULT: '#007e7a', dark: '#005a57', light: '#e6f4f4', amber: '#f59e0b' } } } }
         }
     </script>
     <style>
@@ -37,57 +22,28 @@
             box-shadow: 0 4px 14px -2px rgba(245, 158, 11, 0.18), 0 2px 6px rgba(0, 0, 0, 0.04) !important;
         }
 
-        #leitor-camera video {
-            border-radius: 12px;
-            object-fit: cover !important;
-            width: 100% !important;
-        }
+        #leitor-camera video { border-radius: 12px; object-fit: cover !important; width: 100% !important; }
 
-        /* ANIMAÇÃO PISCAR DO USUÁRIO ENTREGUE */
         @keyframes piscarUsuarioEntregue {
-            0%, 100% {
-                background-color: #dbeafe;
-                color: #1e40af;
-                box-shadow: 0 0 8px rgba(59, 130, 246, 0.6);
-            }
-            50% {
-                background-color: #ffffff;
-                color: #1d4ed8;
-            }
+            0%, 100% { background-color: #dbeafe; color: #1e40af; box-shadow: 0 0 8px rgba(59, 130, 246, 0.6); }
+            50% { background-color: #ffffff; color: #1d4ed8; }
         }
         .piscar-usuario-forte {
             animation: piscarUsuarioEntregue 1.1s infinite alternate ease-in-out;
             border: 1.5px solid #3b82f6 !important;
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-weight: 900 !important;
-            display: inline-block;
+            padding: 2px 8px; border-radius: 6px; font-weight: 900 !important; display: inline-block;
         }
 
-        /* ANIMAÇÃO PISCAR DO SERIAL PENDENTE */
         @keyframes piscarSerialPendente {
-            0%, 100% {
-                background-color: #fef3c7;
-                border-color: #d97706;
-                color: #b45309;
-                box-shadow: 0 0 8px rgba(245, 158, 11, 0.6);
-            }
-            50% {
-                background-color: #ffffff;
-                border-color: #f59e0b;
-                color: #78350f;
-            }
+            0%, 100% { background-color: #fef3c7; border-color: #d97706; color: #b45309; box-shadow: 0 0 8px rgba(245, 158, 11, 0.6); }
+            50% { background-color: #ffffff; border-color: #f59e0b; color: #78350f; }
         }
         .piscar-serial-pendente {
             animation: piscarSerialPendente 1s infinite alternate ease-in-out;
             border: 1.5px dashed #d97706 !important;
-            padding: 2px 8px;
-            border-radius: 6px;
-            font-weight: 900 !important;
-            display: inline-block;
+            padding: 2px 8px; border-radius: 6px; font-weight: 900 !important; display: inline-block;
         }
 
-        /* ALERTA DUPLICADO */
         @keyframes brilhaDuplicado {
             0%, 100% { border-color: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
             50% { border-color: #f59e0b; box-shadow: 0 0 4px rgba(245, 158, 11, 0.4); }
@@ -95,12 +51,8 @@
         .alerta-duplicado {
             animation: brilhaDuplicado 1.2s infinite alternate ease-in-out;
             border: 2px dashed #ef4444 !important;
-            padding: 2px 6px;
-            border-radius: 6px;
-            display: inline-block;
-            background: #fef2f2;
-            color: #b91c1c !important;
-            font-weight: 800;
+            padding: 2px 6px; border-radius: 6px; display: inline-block;
+            background: #fef2f2; color: #b91c1c !important; font-weight: 800;
         }
     </style>
 </head>
@@ -111,115 +63,82 @@
         <!-- CABEÇALHO -->
         <header class="bloco-destacado flex flex-wrap justify-between items-center bg-white dark:bg-slate-800 p-4 rounded-2xl gap-3">
             <div class="flex items-center gap-3">
-                <div class="w-11 h-11 bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 rounded-2xl flex items-center justify-center text-2xl font-black shadow-inner">
-                    💻
-                </div>
+                <div class="w-11 h-11 bg-amber-50 dark:bg-amber-950/60 text-amber-600 dark:text-amber-400 rounded-2xl flex items-center justify-center text-2xl font-black shadow-inner">💻</div>
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200">Módulo 9</span>
                         <h1 class="text-sm sm:text-base font-black text-slate-900 dark:text-white uppercase tracking-wide">Controle de Notebooks & Periféricos</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
-                        <p class="text-xs text-slate-500">Gestão de Equipamentos • Nuvem Supabase</p>
-                        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span id="badgeNuvemStatus" class="text-[10px] font-bold text-emerald-600">Base Ativa</span>
+                        <p class="text-xs text-slate-500">Gestão de Equipamentos • Armazenamento Local</p>
+                        <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+                        <span id="badgeStatus" class="text-[10px] font-bold text-emerald-600">Modo Local</span>
                     </div>
                 </div>
             </div>
-            
-            <div class="flex flex-wrap items-center gap-2">
-                <a href="index.html" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1">
-                    ⬅ Menu
-                </a>
 
-                <!-- GERENCIAR STATUS -->
+            <div class="flex flex-wrap items-center gap-2">
+                <a href="index.html" class="bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1">⬅ Menu</a>
+
                 <button onclick="abrirModalStatus()" class="bg-purple-600 hover:bg-purple-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5 cursor-pointer">
-                    <span>⚙️</span>
-                    <span>Gerenciar Status</span>
+                    <span>⚙️</span><span>Gerenciar Status</span>
                 </button>
 
-                <!-- RECUPERAR PLANILHA -->
-                <label class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95" title="Carregar arquivo CSV/Excel salvo">
-                    <span>📂</span>
-                    <span>Recuperar CSV</span>
+                <label class="bg-amber-600 hover:bg-amber-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95" title="Carregar arquivo CSV salvo">
+                    <span>📂</span><span>Recuperar CSV</span>
                     <input type="file" id="inputRecuperarCSV" accept=".csv,.txt" class="hidden" onchange="importarCSVNotebooks(this.files)">
                 </label>
 
-                <!-- SALVAR DEFINITIVO NA NUVEM -->
-                <button onclick="salvarTudoNaNuvem()" class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1.5 cursor-pointer" title="Grava toda a lista local no Supabase">
-                    <span>☁️</span>
-                    <span>Salvar na Nuvem (Subir Tudo)</span>
+                <!-- BOTÃO SALVAR -->
+                <button onclick="salvarManual()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-xs font-black transition shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95" title="Salva todos os registros neste navegador">
+                    <span>💾</span><span>Salvar</span>
                 </button>
 
-                <!-- SINCRONIZAR -->
-                <button onclick="carregarDoSupabase()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-2 rounded-xl text-xs font-bold transition flex items-center gap-1 cursor-pointer shadow-sm" title="Baixa registros da nuvem sem apagar locais">
-                    🔄 Sincronizar
-                </button>
-
-                <!-- EXPORTAR CSV -->
-                <button onclick="exportarCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer">
+                <button onclick="exportarCSV()" class="bg-emerald-600 hover:bg-emerald-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold transition shadow-sm flex items-center gap-1 cursor-pointer" title="Baixa um arquivo de backup">
                     📥 CSV
                 </button>
             </div>
         </header>
 
-        <!-- AVISO DE STATUS -->
         <div id="alertaSistema" class="hidden p-3 rounded-xl text-xs font-bold text-center transition-all"></div>
 
-        <!-- QUADRO DO SCANNER -->
+        <!-- SCANNER -->
         <div class="bloco-destacado bg-white dark:bg-slate-800 p-4 rounded-2xl space-y-3">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
                 <div>
                     <h2 class="text-sm font-black text-amber-800 dark:text-amber-300 uppercase flex items-center gap-2">
-                        <span>⚡</span>
-                        <span>Leitor de Código de Barras da Etiqueta</span>
+                        <span>⚡</span><span>Leitor de Código de Barras da Etiqueta</span>
                     </h2>
-                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-                        Aponte a câmera para o código de barras ou envie a foto da placa da Vale/DXC.
-                    </p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Aponte a câmera para o código de barras ou envie a foto da placa da Vale/DXC.</p>
                 </div>
-
                 <div class="flex flex-wrap gap-2 w-full sm:w-auto">
-                    <button type="button" onclick="iniciarLeitorCamera()" id="btnIniciarCamera" class="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-black px-4 py-2.5 rounded-xl cursor-pointer shadow-md transition">
-                        <span>📹</span>
-                        <span>Abrir Câmera</span>
+                    <button type="button" onclick="iniciarLeitorCamera()" class="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-amber-600 hover:bg-amber-700 text-white text-xs font-black px-4 py-2.5 rounded-xl cursor-pointer shadow-md transition">
+                        <span>📹</span><span>Abrir Câmera</span>
                     </button>
-
                     <label class="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600 text-xs font-bold px-4 py-2.5 rounded-xl cursor-pointer shadow-sm transition">
-                        <span>🖼️</span>
-                        <span>Ler Foto da Etiqueta</span>
+                        <span>🖼️</span><span>Ler Foto da Etiqueta</span>
                         <input type="file" id="inputArquivoFoto" accept="image/*" class="hidden" onchange="lerCodigoDeFoto(this.files)">
                     </label>
                 </div>
             </div>
 
-            <!-- JANELA DE VÍDEO DO SCANNER -->
             <div id="boxCameraWrapper" class="hidden max-w-sm mx-auto bg-slate-900 rounded-2xl p-2.5 text-center space-y-2 border-2 border-amber-500">
                 <div id="leitor-camera" class="w-full rounded-xl overflow-hidden min-h-[240px]"></div>
                 <p class="text-[11px] text-amber-300 font-bold animate-pulse">Enquadre as barras pretas na linha central</p>
-                <button type="button" onclick="pararLeitorCamera()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-5 py-1.5 rounded-xl shadow cursor-pointer">
-                    ✕ Fechar Câmera
-                </button>
+                <button type="button" onclick="pararLeitorCamera()" class="bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold px-5 py-1.5 rounded-xl shadow cursor-pointer">✕ Fechar Câmera</button>
             </div>
         </div>
 
-        <!-- FORMULÁRIO DE CADASTRO -->
+        <!-- FORMULÁRIO -->
         <div class="bloco-destacado bg-white dark:bg-slate-800 p-5 rounded-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
-                <span class="text-xs font-black text-slate-800 dark:text-slate-200 uppercase flex items-center gap-2">
-                    <span>📝</span>
-                    <span>Novo Registro de Equipamento</span>
-                </span>
+                <span class="text-xs font-black text-slate-800 dark:text-slate-200 uppercase flex items-center gap-2"><span>📝</span><span>Novo Registro de Equipamento</span></span>
                 <span class="text-[10px] font-bold text-slate-400">Verificação automática de duplicidade</span>
             </div>
 
             <form id="notebookForm" onsubmit="salvarNotebook(event)" class="space-y-4">
-                
-                <!-- 1. IDENTIFICAÇÃO -->
                 <div>
-                    <h3 class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 mb-2 tracking-wider">
-                        1. Identificação do Equipamento
-                    </h3>
+                    <h3 class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 mb-2 tracking-wider">1. Identificação do Equipamento</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
                         <div>
                             <div class="flex justify-between items-center mb-1">
@@ -246,11 +165,8 @@
                     </div>
                 </div>
 
-                <!-- 2. RECEBIMENTO -->
                 <div>
-                    <h3 class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 mb-2 tracking-wider">
-                        2. Dados de Recebimento
-                    </h3>
+                    <h3 class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 mb-2 tracking-wider">2. Dados de Recebimento</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Data Entrada *</label>
@@ -276,11 +192,8 @@
                     </div>
                 </div>
 
-                <!-- 3. SAÍDA E STATUS -->
                 <div>
-                    <h3 class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 mb-2 tracking-wider">
-                        3. Entrega & Status Operacional
-                    </h3>
+                    <h3 class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 mb-2 tracking-wider">3. Entrega & Status Operacional</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 text-xs">
                         <div>
                             <div class="flex justify-between items-center mb-1">
@@ -313,19 +226,16 @@
 
                 <div class="flex justify-end pt-2">
                     <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white font-black py-3 px-8 rounded-xl text-xs transition shadow-md flex items-center gap-2 cursor-pointer">
-                        <span>💾</span>
-                        <span>Salvar Registro</span>
+                        <span>💾</span><span>Salvar Registro</span>
                     </button>
                 </div>
             </form>
         </div>
 
-        <!-- BUSCA E TABELA COM HISTÓRICO COMPLETO -->
+        <!-- TABELA -->
         <div class="bloco-destacado bg-white dark:bg-slate-800 p-5 rounded-2xl space-y-3">
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">
-                    📋 Equipamentos Cadastrados & Histórico
-                </h3>
+                <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">📋 Equipamentos Cadastrados & Histórico</h3>
                 <div class="relative w-full sm:w-72">
                     <input type="text" id="inputBusca" oninput="renderizarTabela()" placeholder="Buscar serial, patrimônio, colaborador..." class="uppercase-input w-full text-xs pl-8 pr-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg outline-none font-bold">
                     <span class="absolute left-2.5 top-1.5 text-slate-400 text-xs">🔍</span>
@@ -353,146 +263,86 @@
 
     </div>
 
-    <!-- MODAL DE GERENCIAMENTO DE STATUS -->
+    <!-- MODAL STATUS -->
     <div id="modalGerenciarStatus" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 border-2 border-purple-400 dark:border-purple-600 w-full max-w-md rounded-2xl p-5 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
-                <h3 class="text-sm font-black text-purple-600 dark:text-purple-400 uppercase flex items-center gap-1.5">
-                    <span>⚙️</span> Gerenciar Status dos Notebooks
-                </h3>
+                <h3 class="text-sm font-black text-purple-600 dark:text-purple-400 uppercase flex items-center gap-1.5"><span>⚙️</span> Gerenciar Status dos Notebooks</h3>
                 <button onclick="fecharModalStatus()" class="text-slate-400 hover:text-slate-600 font-black text-sm">✕</button>
             </div>
-
             <div class="flex gap-2">
                 <input type="text" id="inputNovoStatus" placeholder="Novo status (ex: Em trânsito, Reserva...)" class="uppercase-input flex-1 text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl outline-none font-bold">
-                <button type="button" onclick="adicionarNovoStatus()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow">
-                    + Adicionar
-                </button>
+                <button type="button" onclick="adicionarNovoStatus()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow">+ Adicionar</button>
             </div>
-
             <div>
                 <span class="block text-[10px] font-bold text-slate-400 uppercase mb-2">Status Disponíveis no Sistema:</span>
                 <div id="listaStatusContainer" class="space-y-1.5 max-h-56 overflow-y-auto"></div>
             </div>
-
             <div class="flex justify-end pt-2 border-t border-slate-100 dark:border-slate-700">
-                <button type="button" onclick="fecharModalStatus()" class="bg-slate-800 text-white px-4 py-1.5 rounded-xl text-xs font-bold">
-                    Fechar
-                </button>
+                <button type="button" onclick="fecharModalStatus()" class="bg-slate-800 text-white px-4 py-1.5 rounded-xl text-xs font-bold">Fechar</button>
             </div>
         </div>
     </div>
 
-    <!-- MODAL DE EDIÇÃO (LÁPIS ✏) -->
+    <!-- MODAL EDIÇÃO -->
     <div id="modalEdicaoNotebook" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 border-2 border-amber-400 dark:border-amber-600 w-full max-w-2xl rounded-2xl p-5 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
-                <h3 class="text-sm font-black text-amber-600 dark:text-amber-400 uppercase flex items-center gap-1.5">
-                    <span>✏️</span> Editar Equipamento & Entrega
-                </h3>
+                <h3 class="text-sm font-black text-amber-600 dark:text-amber-400 uppercase flex items-center gap-1.5"><span>✏️</span> Editar Equipamento & Entrega</h3>
                 <button onclick="fecharModalEdicao()" class="text-slate-400 hover:text-slate-600 font-black text-sm">✕</button>
             </div>
 
-            <input type="hidden" id="editItemIndex">
             <input type="hidden" id="editItemId">
 
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Serial</label>
-                    <input type="text" id="editSerial" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Patrimônio</label>
-                    <input type="text" id="editPatrimonio" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Marca</label>
-                    <input type="text" id="editMarca" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Modelo</label>
-                    <input type="text" id="editModelo" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Status</label>
-                    <select id="editStatus" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></select>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Colaborador</label>
-                    <input type="text" id="editColaborador" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Setor</label>
-                    <input type="text" id="editSetor" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Data Saída</label>
-                    <input type="date" id="editDataSaida" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none">
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Termo Assinado?</label>
+                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Serial</label>
+                    <input type="text" id="editSerial" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
+                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Patrimônio</label>
+                    <input type="text" id="editPatrimonio" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
+                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Marca</label>
+                    <input type="text" id="editMarca" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
+                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Modelo</label>
+                    <input type="text" id="editModelo" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
+                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Status</label>
+                    <select id="editStatus" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></select></div>
+                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Colaborador</label>
+                    <input type="text" id="editColaborador" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
+                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Setor</label>
+                    <input type="text" id="editSetor" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
+                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Data Saída</label>
+                    <input type="date" id="editDataSaida" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none"></div>
+                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Termo Assinado?</label>
                     <select id="editTermoAssinado" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
                         <option value="Não">Pendente / Não</option>
                         <option value="Sim">Sim, Assinado</option>
-                    </select>
-                </div>
+                    </select></div>
             </div>
 
             <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-700">
-                <button type="button" onclick="fecharModalEdicao()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition">
-                    Cancelar
-                </button>
-                <button type="button" onclick="guardarEdicaoNotebook()" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2 rounded-xl text-xs font-black transition shadow-md flex items-center gap-1.5">
-                    <span>💾</span> Guardar Alterações
-                </button>
+                <button type="button" onclick="fecharModalEdicao()" class="px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition">Cancelar</button>
+                <button type="button" onclick="guardarEdicaoNotebook()" class="bg-amber-600 hover:bg-amber-700 text-white px-5 py-2 rounded-xl text-xs font-black transition shadow-md flex items-center gap-1.5"><span>💾</span> Guardar Alterações</button>
             </div>
         </div>
     </div>
 
-    <!-- SCRIPT GERAL -->
     <script>
-        const SUPABASE_URL = "https://gloxtswcksbczinpwtzu.supabase.co";
-        const SUPABASE_KEY = "sb_publishable_0kEiqthWKZZwjM120wQIYw_Hba7qeLc";
-
-        const STATUS_PADRAO = [
-            "Em estoque",
-            "Em uso",
-            "Em manutenção",
-            "Baixado"
-        ];
+        const STATUS_PADRAO = ["Em estoque", "Em uso", "Em manutenção", "Baixado"];
 
         let listaStatus = [];
-        let supabaseClient = null;
         let html5QrScanner = null;
         let notebooks = [];
 
         window.addEventListener('DOMContentLoaded', () => {
-            const hoje = new Date().toISOString().split('T')[0];
-            document.getElementById('dataEntrada').value = hoje;
-
+            document.getElementById('dataEntrada').value = new Date().toISOString().split('T')[0];
             carregarListaStatus();
             atualizarSelectsStatus();
-
-            // 1. Carrega localmente
             carregarDoLocalStorage();
-
-            // 2. Conecta ao Supabase
-            if (window.supabase) {
-                try {
-                    supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-                    carregarDoSupabase();
-                } catch(e) {
-                    console.warn("Modo local ativo");
-                }
-            }
         });
 
         function mostrarAviso(msg, tipo = "sucesso") {
             const el = document.getElementById('alertaSistema');
             el.innerText = msg;
-            el.className = `p-3 rounded-xl text-xs font-bold text-center transition-all ${
-                tipo === 'sucesso' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'
-            }`;
+            el.className = `p-3 rounded-xl text-xs font-bold text-center transition-all ${tipo === 'sucesso' ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}`;
             el.classList.remove('hidden');
             setTimeout(() => el.classList.add('hidden'), 5000);
         }
@@ -510,11 +360,11 @@
             } catch (e) {}
         }
 
-        // ================= GERENCIAMENTO DE STATUS =================
+        // ================= STATUS =================
         function carregarListaStatus() {
             const salvas = localStorage.getItem('modulo9_status_custom');
             if (salvas) {
-                try { listaStatus = JSON.parse(salvas); } catch(e) { listaStatus = [...STATUS_PADRAO]; }
+                try { listaStatus = JSON.parse(salvas); } catch (e) { listaStatus = [...STATUS_PADRAO]; }
             } else {
                 listaStatus = [...STATUS_PADRAO];
             }
@@ -527,12 +377,8 @@
         function atualizarSelectsStatus() {
             const selForm = document.getElementById('status');
             const selEdit = document.getElementById('editStatus');
-
-            const valForm = selForm ? selForm.value : "";
-            const valEdit = selEdit ? selEdit.value : "";
-
-            preencherSelectGenerico(selForm, valForm || "Em estoque");
-            preencherSelectGenerico(selEdit, valEdit || "Em estoque");
+            preencherSelectGenerico(selForm, (selForm && selForm.value) || "Em estoque");
+            preencherSelectGenerico(selEdit, (selEdit && selEdit.value) || "Em estoque");
         }
 
         function preencherSelectGenerico(selectEl, valorSelecionado) {
@@ -560,15 +406,12 @@
         function renderizarListaStatusModal() {
             const container = document.getElementById('listaStatusContainer');
             container.innerHTML = '';
-
             listaStatus.forEach((st, idx) => {
                 const itemDiv = document.createElement('div');
                 itemDiv.className = "flex justify-between items-center bg-slate-50 dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-xs";
                 itemDiv.innerHTML = `
                     <span class="font-bold uppercase text-slate-700 dark:text-slate-300">${st}</span>
-                    <button type="button" onclick="excluirStatus(${idx})" class="text-rose-500 hover:text-rose-700 font-bold px-2 py-0.5 rounded text-[11px] cursor-pointer" title="Excluir este status">
-                        ✕ Excluir
-                    </button>
+                    <button type="button" onclick="excluirStatus(${idx})" class="text-rose-500 hover:text-rose-700 font-bold px-2 py-0.5 rounded text-[11px] cursor-pointer" title="Excluir este status">✕ Excluir</button>
                 `;
                 container.appendChild(itemDiv);
             });
@@ -577,16 +420,8 @@
         function adicionarNovoStatus() {
             const input = document.getElementById('inputNovoStatus');
             const val = input.value.trim();
-            if (!val) {
-                alert("Digite o nome do status!");
-                return;
-            }
-
-            if (listaStatus.includes(val)) {
-                alert("Este status já existe!");
-                return;
-            }
-
+            if (!val) { alert("Digite o nome do status!"); return; }
+            if (listaStatus.includes(val)) { alert("Este status já existe!"); return; }
             listaStatus.push(val);
             salvarListaStatus();
             atualizarSelectsStatus();
@@ -596,11 +431,7 @@
         }
 
         function excluirStatus(index) {
-            if (listaStatus.length <= 1) {
-                alert("Você precisa manter pelo menos um status cadastrado!");
-                return;
-            }
-
+            if (listaStatus.length <= 1) { alert("Você precisa manter pelo menos um status cadastrado!"); return; }
             const removido = listaStatus[index];
             if (confirm(`Deseja realmente excluir o status "${removido}"?`)) {
                 listaStatus.splice(index, 1);
@@ -611,44 +442,27 @@
             }
         }
 
-        // ================= VERIFICAÇÃO DE DUPLICIDADE EM TEMPO REAL =================
+        // ================= DUPLICIDADE =================
         function verificarDuplicidadeAoDigitar() {
             const serialDig = document.getElementById('serial').value.trim().toUpperCase();
             const patDig = document.getElementById('patrimonio').value.trim().toUpperCase();
 
-            const avisoSerial = document.getElementById('avisoDuplicadoSerial');
-            const avisoPat = document.getElementById('avisoDuplicadoPatrimonio');
+            const dupSerial = serialDig && notebooks.some(n => n.serial === serialDig && n.status !== 'Baixado');
+            document.getElementById('avisoDuplicadoSerial').classList.toggle('hidden', !dupSerial);
+            document.getElementById('serial').classList.toggle('border-rose-500', !!dupSerial);
 
-            const duplicadoSerial = serialDig && notebooks.some(n => n.serial === serialDig && n.status !== 'Baixado');
-            if (duplicadoSerial) {
-                avisoSerial.classList.remove('hidden');
-                document.getElementById('serial').classList.add('border-rose-500');
-            } else {
-                avisoSerial.classList.add('hidden');
-                document.getElementById('serial').classList.remove('border-rose-500');
-            }
-
-            const duplicadoPat = patDig && notebooks.some(n => n.patrimonio === patDig && n.status !== 'Baixado');
-            if (duplicadoPat) {
-                avisoPat.classList.remove('hidden');
-                document.getElementById('patrimonio').classList.add('border-rose-500');
-            } else {
-                avisoPat.classList.add('hidden');
-                document.getElementById('patrimonio').classList.remove('border-rose-500');
-            }
+            const dupPat = patDig && notebooks.some(n => n.patrimonio === patDig && n.status !== 'Baixado');
+            document.getElementById('avisoDuplicadoPatrimonio').classList.toggle('hidden', !dupPat);
+            document.getElementById('patrimonio').classList.toggle('border-rose-500', !!dupPat);
         }
 
-        // ================= LEITOR AO VIVO (CÂMERA) =================
+        // ================= LEITOR =================
         async function iniciarLeitorCamera() {
-            const wrapper = document.getElementById('boxCameraWrapper');
-            wrapper.classList.remove('hidden');
-
-            if (html5QrScanner) {
-                await pararLeitorCamera();
-            }
+            document.getElementById('boxCameraWrapper').classList.remove('hidden');
+            if (html5QrScanner) await pararLeitorCamera();
+            document.getElementById('boxCameraWrapper').classList.remove('hidden');
 
             html5QrScanner = new Html5Qrcode("leitor-camera");
-
             const config = {
                 fps: 15,
                 qrbox: { width: 300, height: 120 },
@@ -669,18 +483,15 @@
                     pararLeitorCamera();
                 },
                 () => {}
-            ).catch(err => {
-                alert("Erro ao aceder à câmera: Permissão negada ou câmera ocupada.");
+            ).catch(() => {
+                alert("Erro ao acessar a câmera: permissão negada ou câmera ocupada.");
                 pararLeitorCamera();
             });
         }
 
         async function pararLeitorCamera() {
             if (html5QrScanner) {
-                try {
-                    await html5QrScanner.stop();
-                    html5QrScanner.clear();
-                } catch(e) {}
+                try { await html5QrScanner.stop(); html5QrScanner.clear(); } catch (e) {}
                 html5QrScanner = null;
             }
             document.getElementById('boxCameraWrapper').classList.add('hidden');
@@ -689,25 +500,17 @@
         async function lerCodigoDeFoto(files) {
             if (!files || files.length === 0) return;
             const file = files[0];
-            mostrarAviso("A procurar código de barras na fotografia...", "sucesso");
+            mostrarAviso("Procurando código de barras na fotografia...", "sucesso");
 
             const scannerArquivo = new Html5Qrcode("leitor-camera");
             scannerArquivo.scanFile(file, true)
-                .then(decodedText => {
-                    tocarBip();
-                    aplicarCodigoLido(decodedText);
-                })
-                .catch(() => {
-                    mostrarAviso("Não foi possível detectar o código. Tente 'Abrir Câmera'.", "erro");
-                });
+                .then(decodedText => { tocarBip(); aplicarCodigoLido(decodedText); })
+                .catch(() => mostrarAviso("Não foi possível detectar o código. Tente 'Abrir Câmera'.", "erro"));
         }
 
         function aplicarCodigoLido(codigo) {
             let limpo = (codigo || "").trim().toUpperCase();
-            limpo = limpo.replace(/^(SERIAL|ASSET|SN|BR)[-:\s]*/i, (match) => {
-                if (match.startsWith("BR")) return "BR";
-                return "";
-            });
+            limpo = limpo.replace(/^(SERIAL|ASSET|SN|BR)[-:\s]*/i, (match) => match.startsWith("BR") ? "BR" : "");
 
             if (limpo.startsWith("BR")) {
                 document.getElementById('patrimonio').value = limpo;
@@ -719,7 +522,7 @@
             verificarDuplicidadeAoDigitar();
         }
 
-        // ================= SALVAMENTO E GESTÃO =================
+        // ================= SALVAR =================
         function salvarNotebook(e) {
             e.preventDefault();
 
@@ -728,10 +531,8 @@
 
             const repetido = notebooks.find(n => (n.serial === serial || n.patrimonio === patrimonio) && n.status !== 'Baixado');
             if (repetido) {
-                const pendenteEntrega = repetido.status !== 'Em uso' ? ' (EQUIPAMENTO PENDENTE DE ENTREGA)' : '';
-                if (!confirm(`⚠️ ALERTA DE DUPLICIDADE: O Serial ou Patrimônio já existe na base${pendenteEntrega}!\nDeseja salvar mesmo assim?`)) {
-                    return;
-                }
+                const pendente = repetido.status !== 'Em uso' ? ' (EQUIPAMENTO PENDENTE DE ENTREGA)' : '';
+                if (!confirm(`⚠️ ALERTA DE DUPLICIDADE: o Serial ou Patrimônio já existe na base${pendente}!\nDeseja salvar mesmo assim?`)) return;
             }
 
             const item = {
@@ -756,30 +557,35 @@
             renderizarTabela();
             mostrarAviso(`Notebook ${item.serial} gravado com sucesso!`);
 
-            inserirNoSupabase(item);
-
-            document.getElementById('serial').value = '';
-            document.getElementById('patrimonio').value = '';
-            document.getElementById('colaborador').value = '';
-            document.getElementById('setor').value = '';
-            document.getElementById('dataSaida').value = '';
+            ['serial', 'patrimonio', 'colaborador', 'setor', 'dataSaida'].forEach(id => document.getElementById(id).value = '');
             verificarDuplicidadeAoDigitar();
         }
 
-        // ================= MODAL DE EDIÇÃO =================
-        function abrirModalEdicao(index) {
-            const item = notebooks[index];
+        // Botão SALVAR do cabeçalho
+        function salvarManual() {
+            if (salvarNoLocalStorage()) {
+                mostrarAviso(`✅ Dados salvos! ${notebooks.length} equipamento(s) gravado(s) neste navegador.`);
+            } else {
+                mostrarAviso("Erro ao salvar. Verifique se o navegador permite armazenamento local.", "erro");
+            }
+        }
+
+        function atualizarBadgeSalvo() {
+            const hora = new Date().toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
+            document.getElementById('badgeStatus').innerText = `Modo Local • salvo às ${hora}`;
+        }
+
+        // ================= EDIÇÃO =================
+        function abrirModalEdicao(id) {
+            const item = notebooks.find(n => n.id === id);
             if (!item) return;
 
-            document.getElementById('editItemIndex').value = index;
             document.getElementById('editItemId').value = item.id;
             document.getElementById('editSerial').value = item.serial;
             document.getElementById('editPatrimonio').value = item.patrimonio;
             document.getElementById('editMarca').value = item.marca;
             document.getElementById('editModelo').value = item.modelo;
-
             preencherSelectGenerico(document.getElementById('editStatus'), item.status);
-
             document.getElementById('editColaborador').value = item.colaborador === '-' ? '' : item.colaborador;
             document.getElementById('editSetor').value = item.setor === '-' ? '' : item.setor;
             document.getElementById('editDataSaida').value = item.dataSaida === '-' ? '' : item.dataSaida;
@@ -792,11 +598,12 @@
             document.getElementById('modalEdicaoNotebook').classList.add('hidden');
         }
 
-        async function guardarEdicaoNotebook() {
-            const index = parseInt(document.getElementById('editItemIndex').value, 10);
-            if (isNaN(index) || !notebooks[index]) return;
+        function guardarEdicaoNotebook() {
+            const id = Number(document.getElementById('editItemId').value);
+            const index = notebooks.findIndex(n => n.id === id);
+            if (index < 0) return;
 
-            const itemAtualizado = {
+            notebooks[index] = {
                 ...notebooks[index],
                 serial: document.getElementById('editSerial').value.trim().toUpperCase(),
                 patrimonio: document.getElementById('editPatrimonio').value.trim().toUpperCase(),
@@ -809,25 +616,23 @@
                 termoAssinado: document.getElementById('editTermoAssinado').value
             };
 
-            notebooks[index] = itemAtualizado;
             salvarNoLocalStorage();
             renderizarTabela();
             fecharModalEdicao();
             mostrarAviso("Equipamento atualizado com sucesso!");
-
-            await atualizarNoSupabase(itemAtualizado);
         }
 
+        // ================= TABELA =================
         function renderizarTabela() {
             const tbody = document.getElementById('tabelaNotebooksCorpo');
             tbody.innerHTML = '';
             const busca = document.getElementById('inputBusca').value.trim().toUpperCase();
 
-            const lista = notebooks.filter(n => 
-                n.serial.includes(busca) || 
-                n.patrimonio.includes(busca) || 
-                n.colaborador.includes(busca) ||
-                n.setor.includes(busca)
+            const lista = notebooks.filter(n =>
+                (n.serial || '').includes(busca) ||
+                (n.patrimonio || '').includes(busca) ||
+                (n.colaborador || '').includes(busca) ||
+                (n.setor || '').includes(busca)
             );
 
             if (lista.length === 0) {
@@ -835,10 +640,10 @@
                 return;
             }
 
-            lista.forEach((n, idx) => {
-                const totalDuplicadosSerial = notebooks.filter(item => item.serial === n.serial).length;
-                const totalDuplicadosPat = notebooks.filter(item => item.patrimonio === n.patrimonio).length;
-                const ehDuplicado = totalDuplicadosSerial > 1 || totalDuplicadosPat > 1;
+            lista.forEach(n => {
+                const dupSerial = notebooks.filter(i => i.serial === n.serial).length;
+                const dupPat = notebooks.filter(i => i.patrimonio === n.patrimonio).length;
+                const ehDuplicado = dupSerial > 1 || dupPat > 1;
 
                 const naoEntregue = n.status === 'Em estoque' || n.dataSaida === '-';
 
@@ -846,10 +651,10 @@
                 if (ehDuplicado) {
                     serialFormatado = `<span class="alerta-duplicado" title="⚠️ DUPLICADO">${n.serial}</span>`;
                 } else if (naoEntregue) {
-                    serialFormatado = `<span class="piscar-serial-pendente" title="⚠️️ NÃO ENTREGUE - PENDENTE">${n.serial}</span>`;
+                    serialFormatado = `<span class="piscar-serial-pendente" title="NÃO ENTREGUE - PENDENTE">${n.serial}</span>`;
                 }
 
-                let colaboradorFormatado = n.colaborador;
+                let colaboradorFormatado;
                 if (!naoEntregue && n.colaborador && n.colaborador !== '-') {
                     colaboradorFormatado = `<span class="piscar-usuario-forte" title="Equipamento Entregue">👤 ${n.colaborador}</span>`;
                 } else {
@@ -859,12 +664,8 @@
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/40 transition";
                 tr.innerHTML = `
-                    <td class="py-2.5 px-3 font-mono whitespace-nowrap">
-                        ${serialFormatado}
-                    </td>
-                    <td class="py-2.5 px-3 font-bold text-amber-600 dark:text-amber-400 whitespace-nowrap">
-                        #${n.patrimonio}
-                    </td>
+                    <td class="py-2.5 px-3 font-mono whitespace-nowrap">${serialFormatado}</td>
+                    <td class="py-2.5 px-3 font-bold text-amber-600 dark:text-amber-400 whitespace-nowrap">#${n.patrimonio}</td>
                     <td class="py-2.5 px-3 whitespace-nowrap">${n.marca} ${n.modelo}</td>
                     <td class="py-2.5 px-3 text-center whitespace-nowrap">
                         <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-600">${n.status}</span>
@@ -872,14 +673,12 @@
                     <td class="py-2.5 px-3 whitespace-nowrap font-semibold">
                         ${colaboradorFormatado} <span class="text-slate-400 text-[10px]">(${n.setor})</span>
                     </td>
-                    <td class="py-2.5 px-3 text-center whitespace-nowrap font-bold ${n.termoAssinado === 'Sim' ? 'text-emerald-600' : 'text-rose-500'}">
-                        ${n.termoAssinado}
-                    </td>
+                    <td class="py-2.5 px-3 text-center whitespace-nowrap font-bold ${n.termoAssinado === 'Sim' ? 'text-emerald-600' : 'text-rose-500'}">${n.termoAssinado}</td>
                     <td class="py-2.5 px-3 text-center whitespace-nowrap font-bold">
                         ${naoEntregue ? '<span class="text-rose-500 bg-rose-50 px-2 py-0.5 rounded text-[10px]">NÃO ENTREGUE</span>' : '<span class="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded text-[10px]">ENTREGUE</span>'}
                     </td>
                     <td class="py-2.5 px-3 text-center whitespace-nowrap">
-                        <button onclick="abrirModalEdicao(${idx})" class="text-indigo-600 hover:text-indigo-800 font-bold p-1 mr-1.5 cursor-pointer" title="Editar">✏️</button>
+                        <button onclick="abrirModalEdicao(${n.id})" class="text-indigo-600 hover:text-indigo-800 font-bold p-1 mr-1.5 cursor-pointer" title="Editar">✏️</button>
                         <button onclick="removerNotebook(${n.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1 cursor-pointer" title="Eliminar">✕</button>
                     </td>
                 `;
@@ -887,185 +686,58 @@
             });
         }
 
-        async function removerNotebook(id) {
+        function removerNotebook(id) {
             if (confirm("Deseja realmente eliminar este equipamento?")) {
                 notebooks = notebooks.filter(n => n.id !== id);
                 salvarNoLocalStorage();
                 renderizarTabela();
-                await removerDoSupabase(id);
                 mostrarAviso("Equipamento eliminado com sucesso!");
             }
         }
 
-        // ================= SUPABASE & NUVEM =================
-        async function salvarTudoNaNuvem() {
-            if (!supabaseClient) {
-                alert("Conexão com a nuvem indisponível.");
-                return;
-            }
-            if (notebooks.length === 0) {
-                alert("Não há dados locais para enviar.");
-                return;
-            }
-
-            mostrarAviso("Sincronizando registros com a nuvem...", "sucesso");
-
-            try {
-                const dadosMapeados = notebooks.map(n => ({
-                    serial: n.serial,
-                    patrimonio: n.patrimonio,
-                    marca: n.marca,
-                    modelo: n.modelo,
-                    data_entrada: n.dataEntrada,
-                    origem: n.origem,
-                    conservacao: n.conservacao,
-                    conferente: n.conferente,
-                    status: n.status,
-                    colaborador: n.colaborador,
-                    setor: n.setor,
-                    data_saida: n.dataSaida,
-                    termo_assinado: n.termoAssinado
-                }));
-
-                const { error } = await supabaseClient.from('controle_notebooks').upsert(dadosMapeados, { onConflict: 'serial' });
-                if (error) throw error;
-
-                mostrarAviso(`✅ Sucesso! ${notebooks.length} equipamentos guardados na nuvem.`);
-            } catch (err) {
-                mostrarAviso("Erro ao enviar para a nuvem: " + err.message, "erro");
-            }
-        }
-
-        async function carregarDoSupabase() {
-            if (!supabaseClient) return;
-            try {
-                const { data, error } = await supabaseClient.from('controle_notebooks').select('*').order('id', { ascending: false });
-                if (!error && data && data.length > 0) {
-                    notebooks = data.map(item => ({
-                        id: item.id || Date.now(),
-                        serial: item.serial,
-                        patrimonio: item.patrimonio,
-                        marca: item.marca,
-                        modelo: item.modelo,
-                        dataEntrada: item.data_entrada,
-                        origem: item.origem,
-                        conservacao: item.conservacao,
-                        conferente: item.conferente,
-                        status: item.status,
-                        colaborador: item.colaborador,
-                        setor: item.setor,
-                        dataSaida: item.data_saida,
-                        termoAssinado: item.termo_assinado
-                    }));
-
-                    salvarNoLocalStorage();
-                    renderizarTabela();
-                    mostrarAviso(`✅ Sincronizado! ${data.length} equipamentos carregados da nuvem.`);
-                }
-            } catch (e) {
-                console.warn("Aviso nuvem:", e);
-            }
-        }
-
-        async function inserirNoSupabase(item) {
-            if (!supabaseClient) return;
-            try {
-                await supabaseClient.from('controle_notebooks').insert([{
-                    serial: item.serial,
-                    patrimonio: item.patrimonio,
-                    marca: item.marca,
-                    modelo: item.modelo,
-                    data_entrada: item.dataEntrada,
-                    origem: item.origem,
-                    conservacao: item.conservacao,
-                    conferente: item.conferente,
-                    status: item.status,
-                    colaborador: item.colaborador,
-                    setor: item.setor,
-                    data_saida: item.dataSaida,
-                    termo_assinado: item.termoAssinado
-                }]);
-            } catch (e) {}
-        }
-
-        async function atualizarNoSupabase(item) {
-            if (!supabaseClient) return;
-            try {
-                await supabaseClient.from('controle_notebooks').update({
-                    patrimonio: item.patrimonio,
-                    marca: item.marca,
-                    modelo: item.modelo,
-                    status: item.status,
-                    colaborador: item.colaborador,
-                    setor: item.setor,
-                    data_saida: item.dataSaida,
-                    termo_assinado: item.termoAssinado
-                }).eq('serial', item.serial);
-            } catch (e) {}
-        }
-
-        async function removerDoSupabase(id) {
-            if (!supabaseClient) return;
-            try {
-                await supabaseClient.from('controle_notebooks').delete().eq('id', id);
-            } catch (e) {}
-        }
-
-        // ================= IMPORTAR CSV / RECUPERAÇÃO =================
+        // ================= IMPORTAR / EXPORTAR CSV =================
         function importarCSVNotebooks(files) {
             if (!files || files.length === 0) return;
-            const file = files[0];
-
             const reader = new FileReader();
-            reader.onload = function(e) {
-                const linhas = e.target.result.split(/\r?\n/).filter(l => l.trim().length > 0);
+            reader.onload = function (e) {
+                const linhas = e.target.result.replace(/^\uFEFF/, '').split(/\r?\n/).filter(l => l.trim().length > 0);
                 if (linhas.length <= 1) return alert("Arquivo vazio.");
 
                 const delim = linhas[0].includes(';') ? ';' : ',';
-                let novos = [];
+                const novos = [];
 
                 for (let i = 1; i < linhas.length; i++) {
-                    const partes = linhas[i].split(delim).map(col => col.replace(/^"|"$/g, '').trim());
-                    if (partes.length >= 4) {
+                    const p = linhas[i].split(delim).map(col => col.replace(/^"|"$/g, '').trim());
+                    if (p.length >= 4) {
                         novos.push({
                             id: Date.now() + i,
-                            serial: partes[0] || "S/N",
-                            patrimonio: partes[1] || "-",
-                            marca: partes[2] || "DELL",
-                            modelo: partes[3] || "LATITUDE",
-                            status: partes[4] || "Em estoque",
-                            colaborador: partes[5] || "-",
-                            dataEntrada: partes[6] || new Date().toISOString().split('T')[0],
-                            dataSaida: partes[7] || "-",
-                            origem: partes[8] || "DXC / VALE EUC PROGRAM",
+                            serial: (p[0] || "S/N").toUpperCase(),
+                            patrimonio: (p[1] || "-").toUpperCase(),
+                            marca: p[2] || "DELL",
+                            modelo: p[3] || "LATITUDE",
+                            status: p[4] || "Em estoque",
+                            colaborador: p[5] || "-",
+                            dataEntrada: p[6] || new Date().toISOString().split('T')[0],
+                            dataSaida: p[7] || "-",
+                            origem: p[8] || "DXC / VALE EUC PROGRAM",
                             conservacao: "Usado (Bom Estado)",
                             conferente: "IMPORTAÇÃO",
-                            setor: partes[9] || "-",
-                            termoAssinado: partes[10] || "Não"
+                            setor: p[9] || "-",
+                            termoAssinado: p[10] || "Não"
                         });
                     }
                 }
 
                 if (novos.length > 0) {
+                    if (notebooks.length > 0 && !confirm(`Isso substituirá os ${notebooks.length} registros atuais por ${novos.length} do arquivo. Continuar?`)) return;
                     notebooks = novos;
                     salvarNoLocalStorage();
                     renderizarTabela();
-                    mostrarAviso(`🎉 SUCESSO! ${novos.length} equipamentos recuperados do arquivo!`);
+                    mostrarAviso(`🎉 ${novos.length} equipamentos recuperados do arquivo!`);
                 }
             };
-            reader.readAsText(file, "UTF-8");
-        }
-
-        function salvarNoLocalStorage() {
-            localStorage.setItem('modulo9_notebooks_base', JSON.stringify(notebooks));
-        }
-
-        function carregarDoLocalStorage() {
-            const salvo = localStorage.getItem('modulo9_notebooks_base');
-            if (salvo) {
-                try { notebooks = JSON.parse(salvo); } catch(e) { notebooks = []; }
-            }
-            renderizarTabela();
+            reader.readAsText(files[0], "UTF-8");
+            document.getElementById('inputRecuperarCSV').value = '';
         }
 
         function exportarCSV() {
@@ -1075,11 +747,29 @@
                 csv += `"${n.serial}";"${n.patrimonio}";"${n.marca}";"${n.modelo}";"${n.status}";"${n.colaborador}";"${n.dataEntrada}";"${n.dataSaida}";"${n.origem}";"${n.setor}";"${n.termoAssinado}"\n`;
             });
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-            const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
-            a.href = url;
+            a.href = URL.createObjectURL(blob);
             a.download = `notebooks_${new Date().toISOString().split('T')[0]}.csv`;
             a.click();
+        }
+
+        // ================= ARMAZENAMENTO LOCAL =================
+        function salvarNoLocalStorage() {
+            try {
+                localStorage.setItem('modulo9_notebooks_base', JSON.stringify(notebooks));
+                atualizarBadgeSalvo();
+                return true;
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function carregarDoLocalStorage() {
+            const salvo = localStorage.getItem('modulo9_notebooks_base');
+            if (salvo) {
+                try { notebooks = JSON.parse(salvo); } catch (e) { notebooks = []; }
+            }
+            renderizarTabela();
         }
     </script>
 </body>
