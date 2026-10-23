@@ -7,10 +7,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
     <script>
-        tailwind.config = {
-            darkMode: 'class',
-            theme: { extend: { colors: { vale: { DEFAULT: '#007e7a', dark: '#005a57', light: '#e6f4f4', amber: '#f59e0b' } } } }
-        }
+        tailwind.config = { darkMode: 'class' }
     </script>
     <style>
         * { box-sizing: border-box; }
@@ -24,35 +21,24 @@
 
         #leitor-camera video { border-radius: 12px; object-fit: cover !important; width: 100% !important; }
 
-        @keyframes piscarUsuarioEntregue {
-            0%, 100% { background-color: #dbeafe; color: #1e40af; box-shadow: 0 0 8px rgba(59, 130, 246, 0.6); }
-            50% { background-color: #ffffff; color: #1d4ed8; }
+        @keyframes piscaDestaque {
+            0%   { background-color: #fdf4ff; color: #a21caf; border-color: #d946ef; box-shadow: 0 0 4px rgba(217, 70, 239, 0.4); }
+            100% { background-color: #d946ef; color: #ffffff; border-color: #a21caf; box-shadow: 0 0 14px rgba(217, 70, 239, 0.95); }
         }
-        .piscar-usuario-forte {
-            animation: piscarUsuarioEntregue 1.1s infinite alternate ease-in-out;
-            border: 1.5px solid #3b82f6 !important;
-            padding: 2px 8px; border-radius: 6px; font-weight: 900 !important; display: inline-block;
-        }
-
-        @keyframes piscarSerialPendente {
-            0%, 100% { background-color: #fef3c7; border-color: #d97706; color: #b45309; box-shadow: 0 0 8px rgba(245, 158, 11, 0.6); }
-            50% { background-color: #ffffff; border-color: #f59e0b; color: #78350f; }
-        }
-        .piscar-serial-pendente {
-            animation: piscarSerialPendente 1s infinite alternate ease-in-out;
-            border: 1.5px dashed #d97706 !important;
-            padding: 2px 8px; border-radius: 6px; font-weight: 900 !important; display: inline-block;
+        .pisca-destaque {
+            animation: piscaDestaque 0.9s infinite alternate ease-in-out;
+            border: 1.5px solid #d946ef;
+            padding: 2px 8px; border-radius: 6px; font-weight: 900; display: inline-block;
         }
 
         @keyframes brilhaDuplicado {
-            0%, 100% { border-color: #ef4444; box-shadow: 0 0 8px rgba(239, 68, 68, 0.6); }
-            50% { border-color: #f59e0b; box-shadow: 0 0 4px rgba(245, 158, 11, 0.4); }
+            0%   { background-color: #fef2f2; color: #b91c1c; border-color: #ef4444; box-shadow: 0 0 4px rgba(239, 68, 68, 0.4); }
+            100% { background-color: #dc2626; color: #ffffff; border-color: #7f1d1d; box-shadow: 0 0 16px rgba(239, 68, 68, 0.95); }
         }
         .alerta-duplicado {
-            animation: brilhaDuplicado 1.2s infinite alternate ease-in-out;
-            border: 2px dashed #ef4444 !important;
-            padding: 2px 6px; border-radius: 6px; display: inline-block;
-            background: #fef2f2; color: #b91c1c !important; font-weight: 800;
+            animation: brilhaDuplicado 0.5s infinite alternate ease-in-out;
+            border: 2px dashed #ef4444;
+            padding: 2px 8px; border-radius: 6px; display: inline-block; font-weight: 900;
         }
     </style>
 </head>
@@ -67,7 +53,7 @@
                 <div>
                     <div class="flex items-center gap-2">
                         <span class="text-[10px] font-black uppercase px-2 py-0.5 rounded bg-amber-100 dark:bg-amber-900 text-amber-800 dark:text-amber-200">Módulo 9</span>
-                        <h1 class="text-sm sm:text-base font-black text-slate-900 dark:text-white uppercase tracking-wide">Controle de Notebooks & Periféricos</h1>
+                        <h1 class="text-sm sm:text-base font-black text-slate-900 dark:text-white uppercase tracking-wide">Controle de Notebooks</h1>
                     </div>
                     <div class="flex items-center gap-2 mt-0.5">
                         <p class="text-xs text-slate-500">Gestão de Equipamentos • Armazenamento Local</p>
@@ -89,7 +75,6 @@
                     <input type="file" id="inputRecuperarCSV" accept=".csv,.txt" class="hidden" onchange="importarCSVNotebooks(this.files)">
                 </label>
 
-                <!-- BOTÃO SALVAR -->
                 <button onclick="salvarManual()" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-xs font-black transition shadow-sm flex items-center gap-1.5 cursor-pointer active:scale-95" title="Salva todos os registros neste navegador">
                     <span>💾</span><span>Salvar</span>
                 </button>
@@ -101,6 +86,26 @@
         </header>
 
         <div id="alertaSistema" class="hidden p-3 rounded-xl text-xs font-bold text-center transition-all"></div>
+
+        <!-- CONTADORES -->
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-3 text-center">
+                <div id="contTotal" class="text-2xl font-black text-slate-800 dark:text-white">0</div>
+                <div class="text-[10px] font-bold uppercase text-slate-400">Total</div>
+            </div>
+            <div class="bg-amber-50 dark:bg-amber-950/40 border border-amber-300 rounded-2xl p-3 text-center">
+                <div id="contEstoque" class="text-2xl font-black text-amber-700 dark:text-amber-400">0</div>
+                <div class="text-[10px] font-bold uppercase text-amber-700 dark:text-amber-400">No Estoque</div>
+            </div>
+            <div class="bg-blue-50 dark:bg-blue-950/40 border border-blue-300 rounded-2xl p-3 text-center">
+                <div id="contEntregues" class="text-2xl font-black text-blue-700 dark:text-blue-400">0</div>
+                <div class="text-[10px] font-bold uppercase text-blue-700 dark:text-blue-400">Entregues</div>
+            </div>
+            <div class="bg-rose-50 dark:bg-rose-950/40 border border-rose-300 rounded-2xl p-3 text-center">
+                <div id="contDefeito" class="text-2xl font-black text-rose-700 dark:text-rose-400">0</div>
+                <div class="text-[10px] font-bold uppercase text-rose-700 dark:text-rose-400">Com Defeito / Manutenção</div>
+            </div>
+        </div>
 
         <!-- SCANNER -->
         <div class="bloco-destacado bg-white dark:bg-slate-800 p-4 rounded-2xl space-y-3">
@@ -132,14 +137,14 @@
         <!-- FORMULÁRIO -->
         <div class="bloco-destacado bg-white dark:bg-slate-800 p-5 rounded-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
-                <span class="text-xs font-black text-slate-800 dark:text-slate-200 uppercase flex items-center gap-2"><span>📝</span><span>Novo Registro de Equipamento</span></span>
+                <span class="text-xs font-black text-slate-800 dark:text-slate-200 uppercase flex items-center gap-2"><span>📝</span><span>Novo Registro de Notebook</span></span>
                 <span class="text-[10px] font-bold text-slate-400">Verificação automática de duplicidade</span>
             </div>
 
             <form id="notebookForm" onsubmit="salvarNotebook(event)" class="space-y-4">
                 <div>
-                    <h3 class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 mb-2 tracking-wider">1. Identificação do Equipamento</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
+                    <h3 class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 mb-2 tracking-wider">1. Identificação, Recebimento & Entrega</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                         <div>
                             <div class="flex justify-between items-center mb-1">
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase">Nº de Série (Serial) *</label>
@@ -155,71 +160,42 @@
                             <input type="text" id="patrimonio" oninput="verificarDuplicidadeAoDigitar()" placeholder="Ex: BR2357387" required class="uppercase-input w-full p-2.5 bg-amber-50/60 dark:bg-slate-900 border-2 border-amber-400 rounded-xl font-black text-amber-700 dark:text-amber-400 outline-none">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Marca *</label>
-                            <input type="text" id="marca" value="DELL" placeholder="Ex: DELL, LENOVO" required class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase">Tipo de Equipamento *</label>
+                                <button type="button" onclick="abrirModalTipos()" class="text-[11px] bg-purple-100 hover:bg-purple-200 text-purple-700 font-black w-6 h-5 rounded-md leading-none cursor-pointer" title="Adicionar outro tipo">+</button>
+                            </div>
+                            <select id="tipo" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none"></select>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Colaborador (quem recebeu / retirou)</label>
+                            <input type="text" id="colaborador" placeholder="Nome do colaborador" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Modelo *</label>
-                            <input type="text" id="modelo" value="LATITUDE" placeholder="Ex: LATITUDE 3420" required class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Data de Recebimento *</label>
+                            <input type="date" id="dataRecebimento" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Data de Entrega</label>
+                            <input type="date" id="dataEntrega" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
                         </div>
                     </div>
+                    <p class="text-[10px] text-slate-400 mt-2">Se informar colaborador e data de entrega com status "Em estoque", o sistema muda sozinho para "Em uso".</p>
                 </div>
 
                 <div>
-                    <h3 class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 mb-2 tracking-wider">2. Dados de Recebimento</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Data Entrada *</label>
-                            <input type="date" id="dataEntrada" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Origem / Fornecedor</label>
-                            <input type="text" id="origem" value="DXC / VALE EUC PROGRAM" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Estado de Conservação</label>
-                            <select id="conservacao" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
-                                <option value="Novo">Novo</option>
-                                <option value="Usado (Bom Estado)" selected>Usado (Bom Estado)</option>
-                                <option value="Avarias Leves">Avarias Leves</option>
-                                <option value="Danificado / Manutenção">Danificado / Manutenção</option>
-                            </select>
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Conferido por (TI) *</label>
-                            <input type="text" id="conferente" placeholder="Técnico responsável" required class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
-                        </div>
-                    </div>
-                </div>
-
-                <div>
-                    <h3 class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 mb-2 tracking-wider">3. Entrega & Status Operacional</h3>
-                    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-3 text-xs">
+                    <h3 class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 mb-2 tracking-wider">2. Status & Observação</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                         <div>
                             <div class="flex justify-between items-center mb-1">
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase">Status Atual *</label>
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase">Status *</label>
                                 <button type="button" onclick="abrirModalStatus()" class="text-[9px] text-purple-600 font-bold hover:underline">+ Gerenciar</button>
                             </div>
                             <select id="status" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none"></select>
                         </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Colaborador (Usuário)</label>
-                            <input type="text" id="colaborador" placeholder="Nome do colaborador" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Setor</label>
-                            <input type="text" id="setor" placeholder="Ex: Operação" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Data Saída</label>
-                            <input type="date" id="dataSaida" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
-                        </div>
-                        <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Termo Assinado?</label>
-                            <select id="termoAssinado" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
-                                <option value="Não">Pendente / Não</option>
-                                <option value="Sim">Sim, Assinado</option>
-                            </select>
+                        <div class="sm:col-span-2">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Observação (defeito / detalhes do equipamento)</label>
+                            <textarea id="observacao" rows="2" placeholder="Ex: tela trincada, não liga, teclado com tecla faltando, sem carregador..." class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-semibold dark:text-white outline-none resize-y"></textarea>
                         </div>
                     </div>
                 </div>
@@ -234,11 +210,14 @@
 
         <!-- TABELA -->
         <div class="bloco-destacado bg-white dark:bg-slate-800 p-5 rounded-2xl space-y-3">
-            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3">
-                <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">📋 Equipamentos Cadastrados & Histórico</h3>
-                <div class="relative w-full sm:w-72">
-                    <input type="text" id="inputBusca" oninput="renderizarTabela()" placeholder="Buscar serial, patrimônio, colaborador..." class="uppercase-input w-full text-xs pl-8 pr-3 py-1.5 border border-slate-300 dark:border-slate-600 rounded-lg outline-none font-bold">
-                    <span class="absolute left-2.5 top-1.5 text-slate-400 text-xs">🔍</span>
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
+                <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">📋 Notebooks Cadastrados</h3>
+                <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                    <select id="filtroStatus" onchange="renderizarTabela()" class="text-xs px-3 py-1.5 border border-slate-300 dark:border-slate-600 dark:bg-slate-900 rounded-lg outline-none font-bold"></select>
+                    <div class="relative w-full sm:w-72">
+                        <input type="text" id="inputBusca" oninput="renderizarTabela()" placeholder="Buscar serial, patrimônio, colaborador..." class="uppercase-input w-full text-xs pl-8 pr-3 py-1.5 border border-slate-300 dark:border-slate-600 dark:bg-slate-900 rounded-lg outline-none font-bold">
+                        <span class="absolute left-2.5 top-1.5 text-slate-400 text-xs">🔍</span>
+                    </div>
                 </div>
             </div>
 
@@ -248,11 +227,11 @@
                         <tr class="border-b border-slate-100 dark:border-slate-700 text-slate-400 font-bold uppercase text-[10px]">
                             <th class="py-2.5 px-3">Serial</th>
                             <th class="py-2.5 px-3">Patrimônio</th>
-                            <th class="py-2.5 px-3">Equipamento</th>
                             <th class="py-2.5 px-3 text-center">Status</th>
-                            <th class="py-2.5 px-3">Colaborador / Usuário</th>
-                            <th class="py-2.5 px-3 text-center">Termo</th>
-                            <th class="py-2.5 px-3 text-center">Entregue?</th>
+                            <th class="py-2.5 px-3">Colaborador</th>
+                            <th class="py-2.5 px-3 text-center">Entrega</th>
+                            <th class="py-2.5 px-3">Recebimento</th>
+                            <th class="py-2.5 px-3">Observação</th>
                             <th class="py-2.5 px-3 text-center">Ações</th>
                         </tr>
                     </thead>
@@ -267,7 +246,7 @@
     <div id="modalGerenciarStatus" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 border-2 border-purple-400 dark:border-purple-600 w-full max-w-md rounded-2xl p-5 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
-                <h3 class="text-sm font-black text-purple-600 dark:text-purple-400 uppercase flex items-center gap-1.5"><span>⚙️</span> Gerenciar Status dos Notebooks</h3>
+                <h3 class="text-sm font-black text-purple-600 dark:text-purple-400 uppercase flex items-center gap-1.5"><span>⚙️</span> Gerenciar Status</h3>
                 <button onclick="fecharModalStatus()" class="text-slate-400 hover:text-slate-600 font-black text-sm">✕</button>
             </div>
             <div class="flex gap-2">
@@ -275,7 +254,7 @@
                 <button type="button" onclick="adicionarNovoStatus()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow">+ Adicionar</button>
             </div>
             <div>
-                <span class="block text-[10px] font-bold text-slate-400 uppercase mb-2">Status Disponíveis no Sistema:</span>
+                <span class="block text-[10px] font-bold text-slate-400 uppercase mb-2">Status disponíveis:</span>
                 <div id="listaStatusContainer" class="space-y-1.5 max-h-56 overflow-y-auto"></div>
             </div>
             <div class="flex justify-end pt-2 border-t border-slate-100 dark:border-slate-700">
@@ -284,11 +263,32 @@
         </div>
     </div>
 
+    <!-- MODAL TIPOS -->
+    <div id="modalTipos" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-slate-800 border-2 border-purple-400 dark:border-purple-600 w-full max-w-md rounded-2xl p-5 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
+                <h3 class="text-sm font-black text-purple-600 dark:text-purple-400 uppercase flex items-center gap-1.5"><span>🖥️</span> Tipos de Equipamento</h3>
+                <button onclick="fecharModalTipos()" class="text-slate-400 hover:text-slate-600 font-black text-sm">✕</button>
+            </div>
+            <div class="flex gap-2">
+                <input type="text" id="inputNovoTipo" placeholder="Novo tipo (ex: Monitor, Impressora...)" class="uppercase-input flex-1 text-xs p-2 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl outline-none font-bold">
+                <button type="button" onclick="adicionarNovoTipo()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition shadow">+ Adicionar</button>
+            </div>
+            <div>
+                <span class="block text-[10px] font-bold text-slate-400 uppercase mb-2">Tipos disponíveis:</span>
+                <div id="listaTiposContainer" class="space-y-1.5 max-h-56 overflow-y-auto"></div>
+            </div>
+            <div class="flex justify-end pt-2 border-t border-slate-100 dark:border-slate-700">
+                <button type="button" onclick="fecharModalTipos()" class="bg-slate-800 text-white px-4 py-1.5 rounded-xl text-xs font-bold">Fechar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL EDIÇÃO -->
     <div id="modalEdicaoNotebook" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white dark:bg-slate-800 border-2 border-amber-400 dark:border-amber-600 w-full max-w-2xl rounded-2xl p-5 shadow-2xl space-y-4">
+        <div class="bg-white dark:bg-slate-800 border-2 border-amber-400 dark:border-amber-600 w-full max-w-2xl rounded-2xl p-5 shadow-2xl space-y-4 max-h-[95vh] overflow-y-auto">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
-                <h3 class="text-sm font-black text-amber-600 dark:text-amber-400 uppercase flex items-center gap-1.5"><span>✏️</span> Editar Equipamento & Entrega</h3>
+                <h3 class="text-sm font-black text-amber-600 dark:text-amber-400 uppercase flex items-center gap-1.5"><span>✏️</span> Editar Notebook</h3>
                 <button onclick="fecharModalEdicao()" class="text-slate-400 hover:text-slate-600 font-black text-sm">✕</button>
             </div>
 
@@ -299,23 +299,18 @@
                     <input type="text" id="editSerial" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
                 <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Patrimônio</label>
                     <input type="text" id="editPatrimonio" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
-                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Marca</label>
-                    <input type="text" id="editMarca" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
-                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Modelo</label>
-                    <input type="text" id="editModelo" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
-                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Status</label>
-                    <select id="editStatus" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></select></div>
-                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Colaborador</label>
+                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tipo de Equipamento</label>
+                    <select id="editTipo" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></select></div>
+                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Colaborador (quem recebeu / retirou)</label>
                     <input type="text" id="editColaborador" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
-                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Setor</label>
-                    <input type="text" id="editSetor" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
-                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Data Saída</label>
-                    <input type="date" id="editDataSaida" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none"></div>
-                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Termo Assinado?</label>
-                    <select id="editTermoAssinado" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                        <option value="Não">Pendente / Não</option>
-                        <option value="Sim">Sim, Assinado</option>
-                    </select></div>
+                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Data de Recebimento</label>
+                    <input type="date" id="editDataRecebimento" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none"></div>
+                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Data de Entrega</label>
+                    <input type="date" id="editDataEntrega" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none"></div>
+                <div class="sm:col-span-2 md:col-span-3"><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Status</label>
+                    <select id="editStatus" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></select></div>
+                <div class="sm:col-span-2 md:col-span-3"><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Observação</label>
+                    <textarea id="editObservacao" rows="3" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-semibold outline-none resize-y"></textarea></div>
             </div>
 
             <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-700">
@@ -326,16 +321,26 @@
     </div>
 
     <script>
-        const STATUS_PADRAO = ["Em estoque", "Em uso", "Em manutenção", "Baixado"];
+        const STATUS_PADRAO = ["Em estoque", "Em uso", "Danificado / Quebrado", "Em manutenção", "Baixado"];
 
         let listaStatus = [];
         let html5QrScanner = null;
         let notebooks = [];
+        const TIPOS_PADRAO = ["Notebook", "Desktop", "Tablet", "Celular"];
+        let listaTipos = [];
+
+        const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+        const vazio = (v) => !v || v === '-';
+        const entregue = (n) => !vazio(n.colaborador) && !vazio(n.dataEntrega);
+        const ehDefeito = (st) => /danific|quebrad|manuten|defeit/i.test(st || '');
+        const ehEstoque = (st) => /estoque/i.test(st || '');
 
         window.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('dataEntrada').value = new Date().toISOString().split('T')[0];
+            document.getElementById('dataRecebimento').value = new Date().toISOString().split('T')[0];
             carregarListaStatus();
+            carregarListaTipos();
             atualizarSelectsStatus();
+            atualizarSelectsTipo();
             carregarDoLocalStorage();
         });
 
@@ -365,8 +370,14 @@
             const salvas = localStorage.getItem('modulo9_status_custom');
             if (salvas) {
                 try { listaStatus = JSON.parse(salvas); } catch (e) { listaStatus = [...STATUS_PADRAO]; }
+                if (!localStorage.getItem('modulo9_status_v2')) {
+                    if (!listaStatus.includes("Danificado / Quebrado")) listaStatus.push("Danificado / Quebrado");
+                    localStorage.setItem('modulo9_status_v2', '1');
+                    salvarListaStatus();
+                }
             } else {
                 listaStatus = [...STATUS_PADRAO];
+                localStorage.setItem('modulo9_status_v2', '1');
             }
         }
 
@@ -379,12 +390,23 @@
             const selEdit = document.getElementById('editStatus');
             preencherSelectGenerico(selForm, (selForm && selForm.value) || "Em estoque");
             preencherSelectGenerico(selEdit, (selEdit && selEdit.value) || "Em estoque");
+
+            const filtro = document.getElementById('filtroStatus');
+            const atual = filtro.value;
+            filtro.innerHTML = '<option value="">Todos os status</option>';
+            listaStatus.forEach(st => {
+                const opt = document.createElement('option');
+                opt.value = st; opt.innerText = st;
+                if (st === atual) opt.selected = true;
+                filtro.appendChild(opt);
+            });
         }
 
         function preencherSelectGenerico(selectEl, valorSelecionado) {
             if (!selectEl) return;
             selectEl.innerHTML = '';
-            listaStatus.forEach(st => {
+            const lista = listaStatus.includes(valorSelecionado) || !valorSelecionado ? listaStatus : [...listaStatus, valorSelecionado];
+            lista.forEach(st => {
                 const opt = document.createElement('option');
                 opt.value = st;
                 opt.innerText = st;
@@ -410,7 +432,7 @@
                 const itemDiv = document.createElement('div');
                 itemDiv.className = "flex justify-between items-center bg-slate-50 dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-xs";
                 itemDiv.innerHTML = `
-                    <span class="font-bold uppercase text-slate-700 dark:text-slate-300">${st}</span>
+                    <span class="font-bold uppercase text-slate-700 dark:text-slate-300">${esc(st)}</span>
                     <button type="button" onclick="excluirStatus(${idx})" class="text-rose-500 hover:text-rose-700 font-bold px-2 py-0.5 rounded text-[11px] cursor-pointer" title="Excluir este status">✕ Excluir</button>
                 `;
                 container.appendChild(itemDiv);
@@ -442,6 +464,94 @@
             }
         }
 
+        // ================= TIPOS DE EQUIPAMENTO =================
+        function carregarListaTipos() {
+            const salvos = localStorage.getItem('modulo9_tipos_custom');
+            if (salvos) {
+                try { listaTipos = JSON.parse(salvos); } catch (e) { listaTipos = [...TIPOS_PADRAO]; }
+            } else {
+                listaTipos = [...TIPOS_PADRAO];
+            }
+            if (!Array.isArray(listaTipos) || listaTipos.length === 0) listaTipos = [...TIPOS_PADRAO];
+        }
+
+        function salvarListaTipos() {
+            localStorage.setItem('modulo9_tipos_custom', JSON.stringify(listaTipos));
+        }
+
+        function preencherSelectTipo(selectEl, valorSelecionado) {
+            if (!selectEl) return;
+            selectEl.innerHTML = '';
+            const lista = (!valorSelecionado || listaTipos.includes(valorSelecionado)) ? listaTipos : [...listaTipos, valorSelecionado];
+            lista.forEach(t => {
+                const opt = document.createElement('option');
+                opt.value = t;
+                opt.innerText = t;
+                if (t === valorSelecionado) opt.selected = true;
+                selectEl.appendChild(opt);
+            });
+        }
+
+        function atualizarSelectsTipo() {
+            const selForm = document.getElementById('tipo');
+            const selEdit = document.getElementById('editTipo');
+            preencherSelectTipo(selForm, (selForm && selForm.value) || listaTipos[0]);
+            preencherSelectTipo(selEdit, (selEdit && selEdit.value) || listaTipos[0]);
+        }
+
+        function abrirModalTipos() {
+            renderizarListaTiposModal();
+            document.getElementById('inputNovoTipo').value = '';
+            document.getElementById('modalTipos').classList.remove('hidden');
+            setTimeout(() => document.getElementById('inputNovoTipo').focus(), 50);
+        }
+
+        function fecharModalTipos() {
+            document.getElementById('modalTipos').classList.add('hidden');
+        }
+
+        function renderizarListaTiposModal() {
+            const container = document.getElementById('listaTiposContainer');
+            container.innerHTML = '';
+            listaTipos.forEach((t, idx) => {
+                const itemDiv = document.createElement('div');
+                itemDiv.className = "flex justify-between items-center bg-slate-50 dark:bg-slate-900 p-2 rounded-lg border border-slate-200 dark:border-slate-700 text-xs";
+                itemDiv.innerHTML = `
+                    <span class="font-bold uppercase text-slate-700 dark:text-slate-300">${esc(t)}</span>
+                    <button type="button" onclick="excluirTipo(${idx})" class="text-rose-500 hover:text-rose-700 font-bold px-2 py-0.5 rounded text-[11px] cursor-pointer" title="Excluir este tipo">✕ Excluir</button>
+                `;
+                container.appendChild(itemDiv);
+            });
+        }
+
+        function adicionarNovoTipo() {
+            const input = document.getElementById('inputNovoTipo');
+            let val = input.value.trim();
+            if (!val) { alert("Digite o nome do tipo!"); return; }
+            val = val.charAt(0).toUpperCase() + val.slice(1).toLowerCase();
+            if (listaTipos.some(t => t.toLowerCase() === val.toLowerCase())) { alert("Este tipo já existe!"); return; }
+            listaTipos.push(val);
+            salvarListaTipos();
+            atualizarSelectsTipo();
+            document.getElementById('tipo').value = val;
+            renderizarListaTiposModal();
+            input.value = '';
+            mostrarAviso(`Novo tipo "${val}" cadastrado!`);
+        }
+
+        function excluirTipo(index) {
+            if (listaTipos.length <= 1) { alert("Você precisa manter pelo menos um tipo cadastrado!"); return; }
+            const removido = listaTipos[index];
+            if (confirm(`Deseja realmente excluir o tipo "${removido}"?`)) {
+                const atualForm = document.getElementById('tipo').value;
+                listaTipos.splice(index, 1);
+                salvarListaTipos();
+                preencherSelectTipo(document.getElementById('tipo'), atualForm === removido ? listaTipos[0] : atualForm);
+                renderizarListaTiposModal();
+                mostrarAviso(`Tipo "${removido}" removido!`);
+            }
+        }
+
         // ================= DUPLICIDADE =================
         function verificarDuplicidadeAoDigitar() {
             const serialDig = document.getElementById('serial').value.trim().toUpperCase();
@@ -458,7 +568,6 @@
 
         // ================= LEITOR =================
         async function iniciarLeitorCamera() {
-            document.getElementById('boxCameraWrapper').classList.remove('hidden');
             if (html5QrScanner) await pararLeitorCamera();
             document.getElementById('boxCameraWrapper').classList.remove('hidden');
 
@@ -506,6 +615,7 @@
             scannerArquivo.scanFile(file, true)
                 .then(decodedText => { tocarBip(); aplicarCodigoLido(decodedText); })
                 .catch(() => mostrarAviso("Não foi possível detectar o código. Tente 'Abrir Câmera'.", "erro"));
+            document.getElementById('inputArquivoFoto').value = '';
         }
 
         function aplicarCodigoLido(codigo) {
@@ -531,40 +641,35 @@
 
             const repetido = notebooks.find(n => (n.serial === serial || n.patrimonio === patrimonio) && n.status !== 'Baixado');
             if (repetido) {
-                const pendente = repetido.status !== 'Em uso' ? ' (EQUIPAMENTO PENDENTE DE ENTREGA)' : '';
-                if (!confirm(`⚠️ ALERTA DE DUPLICIDADE: o Serial ou Patrimônio já existe na base${pendente}!\nDeseja salvar mesmo assim?`)) return;
+                if (!confirm(`⚠️ ALERTA DE DUPLICIDADE: o Serial ou Patrimônio já existe na base (status: ${repetido.status})!\nDeseja salvar mesmo assim?`)) return;
             }
 
             const item = {
                 id: Date.now(),
                 serial,
                 patrimonio,
-                marca: document.getElementById('marca').value.trim().toUpperCase(),
-                modelo: document.getElementById('modelo').value.trim().toUpperCase(),
-                dataEntrada: document.getElementById('dataEntrada').value,
-                origem: document.getElementById('origem').value.trim().toUpperCase(),
-                conservacao: document.getElementById('conservacao').value,
-                conferente: document.getElementById('conferente').value.trim().toUpperCase(),
+                tipo: document.getElementById('tipo').value || "Notebook",
+                dataRecebimento: document.getElementById('dataRecebimento').value,
+                observacao: document.getElementById('observacao').value.trim(),
                 status: document.getElementById('status').value,
                 colaborador: document.getElementById('colaborador').value.trim().toUpperCase() || "-",
-                setor: document.getElementById('setor').value.trim().toUpperCase() || "-",
-                dataSaida: document.getElementById('dataSaida').value || "-",
-                termoAssinado: document.getElementById('termoAssinado').value
+                dataEntrega: document.getElementById('dataEntrega').value || "-"
             };
+
+            if (entregue(item) && ehEstoque(item.status)) item.status = 'Em uso';
 
             notebooks.unshift(item);
             salvarNoLocalStorage();
             renderizarTabela();
             mostrarAviso(`Notebook ${item.serial} gravado com sucesso!`);
 
-            ['serial', 'patrimonio', 'colaborador', 'setor', 'dataSaida'].forEach(id => document.getElementById(id).value = '');
+            ['serial', 'patrimonio', 'colaborador', 'dataEntrega', 'observacao'].forEach(id => document.getElementById(id).value = '');
             verificarDuplicidadeAoDigitar();
         }
 
-        // Botão SALVAR do cabeçalho
         function salvarManual() {
             if (salvarNoLocalStorage()) {
-                mostrarAviso(`✅ Dados salvos! ${notebooks.length} equipamento(s) gravado(s) neste navegador.`);
+                mostrarAviso(`✅ Dados salvos! ${notebooks.length} notebook(s) gravado(s) neste navegador.`);
             } else {
                 mostrarAviso("Erro ao salvar. Verifique se o navegador permite armazenamento local.", "erro");
             }
@@ -583,13 +688,12 @@
             document.getElementById('editItemId').value = item.id;
             document.getElementById('editSerial').value = item.serial;
             document.getElementById('editPatrimonio').value = item.patrimonio;
-            document.getElementById('editMarca').value = item.marca;
-            document.getElementById('editModelo').value = item.modelo;
+            preencherSelectTipo(document.getElementById('editTipo'), item.tipo);
+            document.getElementById('editDataRecebimento').value = item.dataRecebimento || '';
             preencherSelectGenerico(document.getElementById('editStatus'), item.status);
-            document.getElementById('editColaborador').value = item.colaborador === '-' ? '' : item.colaborador;
-            document.getElementById('editSetor').value = item.setor === '-' ? '' : item.setor;
-            document.getElementById('editDataSaida').value = item.dataSaida === '-' ? '' : item.dataSaida;
-            document.getElementById('editTermoAssinado').value = item.termoAssinado;
+            document.getElementById('editColaborador').value = vazio(item.colaborador) ? '' : item.colaborador;
+            document.getElementById('editDataEntrega').value = vazio(item.dataEntrega) ? '' : item.dataEntrega;
+            document.getElementById('editObservacao').value = item.observacao || '';
 
             document.getElementById('modalEdicaoNotebook').classList.remove('hidden');
         }
@@ -603,80 +707,105 @@
             const index = notebooks.findIndex(n => n.id === id);
             if (index < 0) return;
 
-            notebooks[index] = {
+            const atualizado = {
                 ...notebooks[index],
                 serial: document.getElementById('editSerial').value.trim().toUpperCase(),
                 patrimonio: document.getElementById('editPatrimonio').value.trim().toUpperCase(),
-                marca: document.getElementById('editMarca').value.trim().toUpperCase(),
-                modelo: document.getElementById('editModelo').value.trim().toUpperCase(),
+                tipo: document.getElementById('editTipo').value || "Notebook",
+                dataRecebimento: document.getElementById('editDataRecebimento').value,
                 status: document.getElementById('editStatus').value,
                 colaborador: document.getElementById('editColaborador').value.trim().toUpperCase() || "-",
-                setor: document.getElementById('editSetor').value.trim().toUpperCase() || "-",
-                dataSaida: document.getElementById('editDataSaida').value || "-",
-                termoAssinado: document.getElementById('editTermoAssinado').value
+                dataEntrega: document.getElementById('editDataEntrega').value || "-",
+                observacao: document.getElementById('editObservacao').value.trim()
             };
+            if (entregue(atualizado) && ehEstoque(atualizado.status)) atualizado.status = 'Em uso';
 
+            notebooks[index] = atualizado;
             salvarNoLocalStorage();
             renderizarTabela();
             fecharModalEdicao();
-            mostrarAviso("Equipamento atualizado com sucesso!");
+            mostrarAviso("Notebook atualizado com sucesso!");
         }
 
         // ================= TABELA =================
+        function atualizarContadores() {
+            document.getElementById('contTotal').innerText = notebooks.length;
+            document.getElementById('contEstoque').innerText = notebooks.filter(n => ehEstoque(n.status)).length;
+            document.getElementById('contEntregues').innerText = notebooks.filter(n => entregue(n)).length;
+            document.getElementById('contDefeito').innerText = notebooks.filter(n => ehDefeito(n.status)).length;
+        }
+
+        function formatarData(d) {
+            if (vazio(d)) return '-';
+            const p = d.split('-');
+            return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : d;
+        }
+
         function renderizarTabela() {
+            atualizarContadores();
             const tbody = document.getElementById('tabelaNotebooksCorpo');
             tbody.innerHTML = '';
             const busca = document.getElementById('inputBusca').value.trim().toUpperCase();
+            const filtroSt = document.getElementById('filtroStatus').value;
 
             const lista = notebooks.filter(n =>
-                (n.serial || '').includes(busca) ||
-                (n.patrimonio || '').includes(busca) ||
-                (n.colaborador || '').includes(busca) ||
-                (n.setor || '').includes(busca)
+                (!filtroSt || n.status === filtroSt) &&
+                ((n.serial || '').includes(busca) ||
+                 (n.patrimonio || '').includes(busca) ||
+                 (n.tipo || '').toUpperCase().includes(busca) ||
+                 (n.colaborador || '').includes(busca) ||
+                 (n.observacao || '').toUpperCase().includes(busca))
             );
 
             if (lista.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-slate-400 italic">Nenhum equipamento registrado.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-5 text-slate-400 italic">Nenhum notebook encontrado.</td></tr>`;
                 return;
             }
 
             lista.forEach(n => {
-                const dupSerial = notebooks.filter(i => i.serial === n.serial).length;
-                const dupPat = notebooks.filter(i => i.patrimonio === n.patrimonio).length;
-                const ehDuplicado = dupSerial > 1 || dupPat > 1;
+                const dupSerial = !vazio(n.serial) && notebooks.filter(i => i.serial === n.serial).length > 1;
+                const dupPat = !vazio(n.patrimonio) && notebooks.filter(i => i.patrimonio === n.patrimonio).length > 1;
+                const foiEntregue = entregue(n);
+                const noEstoque = ehEstoque(n.status) && !foiEntregue;
 
-                const naoEntregue = n.status === 'Em estoque' || n.dataSaida === '-';
+                const serialFormatado = dupSerial
+                    ? `<span class="alerta-duplicado" title="⚠️ SERIAL DUPLICADO">⚠️ ${esc(n.serial)}</span>`
+                    : `<span class="pisca-destaque">${esc(n.serial)}</span>`;
 
-                let serialFormatado = n.serial;
-                if (ehDuplicado) {
-                    serialFormatado = `<span class="alerta-duplicado" title="⚠️ DUPLICADO">${n.serial}</span>`;
-                } else if (naoEntregue) {
-                    serialFormatado = `<span class="piscar-serial-pendente" title="NÃO ENTREGUE - PENDENTE">${n.serial}</span>`;
-                }
+                const patFormatado = dupPat
+                    ? `<span class="alerta-duplicado" title="⚠️ PATRIMÔNIO DUPLICADO">⚠️ #${esc(n.patrimonio)}</span>`
+                    : `<span class="pisca-destaque">#${esc(n.patrimonio)}</span>`;
 
-                let colaboradorFormatado;
-                if (!naoEntregue && n.colaborador && n.colaborador !== '-') {
-                    colaboradorFormatado = `<span class="piscar-usuario-forte" title="Equipamento Entregue">👤 ${n.colaborador}</span>`;
-                } else {
-                    colaboradorFormatado = `<span>${n.colaborador}</span>`;
-                }
+                const colaboradorFormatado = vazio(n.colaborador)
+                    ? `<span class="text-slate-400">-</span>`
+                    : `<span class="pisca-destaque">👤 ${esc(n.colaborador)}</span>`;
+
+                const statusFormatado = `<span class="pisca-destaque text-[10px]">${esc(n.status)}</span>`;
+
+                const entregaTxt = foiEntregue
+                    ? `<span class="pisca-destaque text-[10px]">${formatarData(n.dataEntrega)}</span>`
+                    : (noEstoque
+                        ? '<span class="pisca-destaque text-[10px]">NO ESTOQUE</span>'
+                        : '<span class="pisca-destaque text-[10px]">NÃO ENTREGUE</span>');
+
+                const recebTxt = vazio(n.dataRecebimento)
+                    ? '<span class="text-slate-300">-</span>'
+                    : `<span class="pisca-destaque text-[10px]">${formatarData(n.dataRecebimento)}</span>`;
+
+                const obs = n.observacao
+                    ? `<span class="normal-case text-slate-600 dark:text-slate-300 block max-w-[220px] truncate" title="${esc(n.observacao)}">${esc(n.observacao)}</span>`
+                    : '<span class="text-slate-300">-</span>';
 
                 const tr = document.createElement('tr');
                 tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/40 transition";
                 tr.innerHTML = `
                     <td class="py-2.5 px-3 font-mono whitespace-nowrap">${serialFormatado}</td>
-                    <td class="py-2.5 px-3 font-bold text-amber-600 dark:text-amber-400 whitespace-nowrap">#${n.patrimonio}</td>
-                    <td class="py-2.5 px-3 whitespace-nowrap">${n.marca} ${n.modelo}</td>
-                    <td class="py-2.5 px-3 text-center whitespace-nowrap">
-                        <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-300 dark:border-slate-600">${n.status}</span>
-                    </td>
-                    <td class="py-2.5 px-3 whitespace-nowrap font-semibold">
-                        ${colaboradorFormatado} <span class="text-slate-400 text-[10px]">(${n.setor})</span>
-                    </td>
-                    <td class="py-2.5 px-3 text-center whitespace-nowrap font-bold ${n.termoAssinado === 'Sim' ? 'text-emerald-600' : 'text-rose-500'}">${n.termoAssinado}</td>
-                    <td class="py-2.5 px-3 text-center whitespace-nowrap font-bold">
-                        ${naoEntregue ? '<span class="text-rose-500 bg-rose-50 px-2 py-0.5 rounded text-[10px]">NÃO ENTREGUE</span>' : '<span class="text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded text-[10px]">ENTREGUE</span>'}
-                    </td>
+                    <td class="py-2.5 px-3 font-bold whitespace-nowrap">${patFormatado}<span class="block text-[9px] text-slate-400 font-semibold mt-1">${esc(n.tipo || 'Notebook')}</span></td>
+                    <td class="py-2.5 px-3 text-center whitespace-nowrap">${statusFormatado}</td>
+                    <td class="py-2.5 px-3 whitespace-nowrap font-semibold">${colaboradorFormatado}</td>
+                    <td class="py-2.5 px-3 text-center whitespace-nowrap font-bold">${entregaTxt}</td>
+                    <td class="py-2.5 px-3 whitespace-nowrap text-[11px]">${recebTxt}</td>
+                    <td class="py-2.5 px-3 text-[11px]">${obs}</td>
                     <td class="py-2.5 px-3 text-center whitespace-nowrap">
                         <button onclick="abrirModalEdicao(${n.id})" class="text-indigo-600 hover:text-indigo-800 font-bold p-1 mr-1.5 cursor-pointer" title="Editar">✏️</button>
                         <button onclick="removerNotebook(${n.id})" class="text-rose-500 hover:text-rose-700 font-bold p-1 cursor-pointer" title="Eliminar">✕</button>
@@ -687,15 +816,32 @@
         }
 
         function removerNotebook(id) {
-            if (confirm("Deseja realmente eliminar este equipamento?")) {
+            if (confirm("Deseja realmente eliminar este notebook?")) {
                 notebooks = notebooks.filter(n => n.id !== id);
                 salvarNoLocalStorage();
                 renderizarTabela();
-                mostrarAviso("Equipamento eliminado com sucesso!");
+                mostrarAviso("Notebook eliminado com sucesso!");
             }
         }
 
-        // ================= IMPORTAR / EXPORTAR CSV =================
+        // ================= CSV =================
+        function parseLinhaCSV(linha, delim) {
+            const out = []; let cur = '', q = false;
+            for (let i = 0; i < linha.length; i++) {
+                const c = linha[i];
+                if (q) {
+                    if (c === '"') { if (linha[i + 1] === '"') { cur += '"'; i++; } else q = false; }
+                    else cur += c;
+                } else {
+                    if (c === '"') q = true;
+                    else if (c === delim) { out.push(cur); cur = ''; }
+                    else cur += c;
+                }
+            }
+            out.push(cur);
+            return out.map(s => s.trim());
+        }
+
         function importarCSVNotebooks(files) {
             if (!files || files.length === 0) return;
             const reader = new FileReader();
@@ -704,36 +850,43 @@
                 if (linhas.length <= 1) return alert("Arquivo vazio.");
 
                 const delim = linhas[0].includes(';') ? ';' : ',';
-                const novos = [];
+                const cab = parseLinhaCSV(linhas[0], delim).map(h => h.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/\s+/g, '_'));
+                const col = (nomes) => cab.findIndex(h => nomes.includes(h));
+                const iSerial = col(['SERIAL']), iPat = col(['PATRIMONIO']), iTipo = col(['TIPO', 'TIPO_EQUIPAMENTO']),
+                      iStatus = col(['STATUS']), iColab = col(['COLABORADOR']),
+                      iRec = col(['DATA_RECEBIMENTO', 'DATA_ENTRADA']),
+                      iEnt = col(['DATA_ENTREGA', 'DATA_SAIDA']),
+                      iObs = col(['OBSERVACAO']);
 
+                if (iSerial < 0) return alert("Cabeçalho não reconhecido: falta a coluna SERIAL.");
+
+                const novos = [];
                 for (let i = 1; i < linhas.length; i++) {
-                    const p = linhas[i].split(delim).map(col => col.replace(/^"|"$/g, '').trim());
-                    if (p.length >= 4) {
-                        novos.push({
-                            id: Date.now() + i,
-                            serial: (p[0] || "S/N").toUpperCase(),
-                            patrimonio: (p[1] || "-").toUpperCase(),
-                            marca: p[2] || "DELL",
-                            modelo: p[3] || "LATITUDE",
-                            status: p[4] || "Em estoque",
-                            colaborador: p[5] || "-",
-                            dataEntrada: p[6] || new Date().toISOString().split('T')[0],
-                            dataSaida: p[7] || "-",
-                            origem: p[8] || "DXC / VALE EUC PROGRAM",
-                            conservacao: "Usado (Bom Estado)",
-                            conferente: "IMPORTAÇÃO",
-                            setor: p[9] || "-",
-                            termoAssinado: p[10] || "Não"
-                        });
-                    }
+                    const p = parseLinhaCSV(linhas[i], delim);
+                    const g = (idx, def = '') => (idx >= 0 && p[idx] !== undefined && p[idx] !== '') ? p[idx] : def;
+                    if (!g(iSerial)) continue;
+                    novos.push({
+                        id: Date.now() + i,
+                        serial: g(iSerial).toUpperCase(),
+                        patrimonio: g(iPat, '-').toUpperCase(),
+                        tipo: g(iTipo, 'Notebook'),
+                        status: g(iStatus, 'Em estoque'),
+                        colaborador: g(iColab, '-').toUpperCase(),
+                        dataRecebimento: g(iRec, new Date().toISOString().split('T')[0]),
+                        dataEntrega: g(iEnt, '-'),
+                        observacao: g(iObs, '')
+                    });
                 }
 
                 if (novos.length > 0) {
                     if (notebooks.length > 0 && !confirm(`Isso substituirá os ${notebooks.length} registros atuais por ${novos.length} do arquivo. Continuar?`)) return;
                     notebooks = novos;
+                    novos.forEach(n => { if (!listaTipos.some(t => t.toLowerCase() === n.tipo.toLowerCase())) listaTipos.push(n.tipo); });
+                    salvarListaTipos();
+                    atualizarSelectsTipo();
                     salvarNoLocalStorage();
                     renderizarTabela();
-                    mostrarAviso(`🎉 ${novos.length} equipamentos recuperados do arquivo!`);
+                    mostrarAviso(`🎉 ${novos.length} notebooks recuperados do arquivo!`);
                 }
             };
             reader.readAsText(files[0], "UTF-8");
@@ -742,9 +895,10 @@
 
         function exportarCSV() {
             if (notebooks.length === 0) return alert("Lista vazia!");
-            let csv = "\uFEFFSERIAL;PATRIMONIO;MARCA;MODELO;STATUS;COLABORADOR;DATA_ENTRADA;DATA_SAIDA;ORIGEM;SETOR;TERMO\n";
+            const q = (v) => `"${String(v ?? '').replace(/"/g, '""').replace(/\r?\n/g, ' ')}"`;
+            let csv = "\uFEFFSERIAL;PATRIMONIO;TIPO;STATUS;COLABORADOR;DATA_RECEBIMENTO;DATA_ENTREGA;OBSERVACAO\n";
             notebooks.forEach(n => {
-                csv += `"${n.serial}";"${n.patrimonio}";"${n.marca}";"${n.modelo}";"${n.status}";"${n.colaborador}";"${n.dataEntrada}";"${n.dataSaida}";"${n.origem}";"${n.setor}";"${n.termoAssinado}"\n`;
+                csv += [n.serial, n.patrimonio, n.tipo, n.status, n.colaborador, n.dataRecebimento, n.dataEntrega, n.observacao].map(q).join(';') + "\n";
             });
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const a = document.createElement('a');
@@ -754,6 +908,20 @@
         }
 
         // ================= ARMAZENAMENTO LOCAL =================
+        function normalizarRegistro(n) {
+            return {
+                id: n.id || Date.now() + Math.random(),
+                serial: n.serial || '',
+                patrimonio: n.patrimonio || '',
+                tipo: n.tipo || 'Notebook',
+                status: n.status || 'Em estoque',
+                colaborador: n.colaborador || '-',
+                dataRecebimento: n.dataRecebimento || n.dataEntrada || '',
+                dataEntrega: n.dataEntrega || n.dataSaida || '-',
+                observacao: n.observacao || ''
+            };
+        }
+
         function salvarNoLocalStorage() {
             try {
                 localStorage.setItem('modulo9_notebooks_base', JSON.stringify(notebooks));
@@ -767,7 +935,7 @@
         function carregarDoLocalStorage() {
             const salvo = localStorage.getItem('modulo9_notebooks_base');
             if (salvo) {
-                try { notebooks = JSON.parse(salvo); } catch (e) { notebooks = []; }
+                try { notebooks = JSON.parse(salvo).map(normalizarRegistro); } catch (e) { notebooks = []; }
             }
             renderizarTabela();
         }
