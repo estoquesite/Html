@@ -35,7 +35,7 @@
             animation: pulsoAmareloSuave 2.5s infinite alternate ease-in-out;
         }
 
-        /* Nome do colaborador (grupo da tabela): piscadinha bem fraquinha */
+        /* Nome do colaborador (grupo da tabela) */
         .chip-colab {
             border: 1.5px solid #fde68a; color: #b45309; font-weight: 600;
             padding: 2px 10px; border-radius: 8px; display: inline-block;
@@ -43,7 +43,13 @@
         }
         .dark .chip-colab { color: #fbbf24; }
 
-        /* Duplicidade na tabela: só uma bordinha fraca pulsando */
+        /* Grupo por motivo */
+        .chip-motivo {
+            color: #fff; font-weight: 700; padding: 2px 10px; border-radius: 8px;
+            display: inline-block; font-size: 12px;
+        }
+
+        /* Duplicidade na tabela */
         @keyframes bordaDuplicado {
             0%   { border-color: rgba(239, 68, 68, 0.2); }
             100% { border-color: rgba(239, 68, 68, 0.85); }
@@ -178,7 +184,7 @@
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase">Tipo de Equipamento *</label>
                                 <button type="button" onclick="abrirModalTipos()" class="text-[11px] bg-purple-100 hover:bg-purple-200 text-purple-700 font-black w-6 h-5 rounded-md leading-none cursor-pointer" title="Adicionar outro tipo">+</button>
                             </div>
-                            <select id="tipo" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none"></select>
+                            <select id="tipo" class="campo-sel w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none"></select>
                         </div>
 
                         <div>
@@ -186,32 +192,46 @@
                             <input type="text" id="colaborador" placeholder="Nome do colaborador" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
                         </div>
                         <div>
-                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Movimento *</label>
-                            <select id="movimento" onchange="ajustarStatusPorMovimento('movimento','status')" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
-                                <option value="Recebimento">Recebimento (notebook entrou)</option>
-                                <option value="Entrega">Entrega (notebook saiu)</option>
-                                <option value="Devolução">Devolução (colaborador devolveu)</option>
-                            </select>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase">Movimento *</label>
+                                <button type="button" onclick="abrirModalNova('mov')" class="text-[11px] bg-purple-100 hover:bg-purple-200 text-purple-700 font-black w-6 h-5 rounded-md leading-none cursor-pointer" title="Adicionar outro movimento">+</button>
+                            </div>
+                            <select id="movimento" onchange="ajustarStatusPorMovimento('movimento','status')" class="campo-sel w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none"></select>
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Data *</label>
                             <input type="date" id="dataMov" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
                         </div>
                     </div>
-                    <p class="text-[10px] text-slate-400 mt-2">Entrega para um colaborador com status "Em estoque" muda sozinho para "Em uso". Devolução volta o status para "Em estoque" e mantém o nome do colaborador no histórico. Para lançar outro notebook do mesmo colaborador, use o botão "+ Adicionar outro".</p>
+                    <p class="text-[10px] text-slate-400 mt-2">Recebimento: o colaborador entregou o notebook. Entrega: o notebook saiu para um colaborador com status "Em estoque", que muda sozinho para "Em uso". Devolução para TI: o colaborador devolveu ao TI, e o status volta para "Em estoque" mantendo o nome no histórico. Para lançar outro notebook do mesmo colaborador, use "+ Adicionar outro".</p>
                 </div>
 
                 <div>
-                    <h3 class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 mb-2 tracking-wider">2. Status & Observação</h3>
+                    <h3 class="text-[11px] font-black uppercase text-amber-600 dark:text-amber-400 mb-2 tracking-wider">2. Status, Motivo, Chamado & Observação</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                         <div>
                             <div class="flex justify-between items-center mb-1">
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase">Status *</label>
-                                <button type="button" onclick="abrirModalStatus()" class="text-[9px] text-purple-600 font-bold hover:underline">+ Gerenciar</button>
+                                <button type="button" onclick="abrirModalStatus()" class="text-[11px] bg-purple-100 hover:bg-purple-200 text-purple-700 font-black w-6 h-5 rounded-md leading-none cursor-pointer" title="Gerenciar status">+</button>
                             </div>
-                            <select id="status" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none"></select>
+                            <select id="status" class="campo-sel w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none"></select>
                         </div>
-                        <div class="sm:col-span-2">
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase">Motivo</label>
+                                <button type="button" onclick="abrirModalNova('motivo')" class="text-[11px] bg-purple-100 hover:bg-purple-200 text-purple-700 font-black w-6 h-5 rounded-md leading-none cursor-pointer" title="Adicionar motivo">+</button>
+                            </div>
+                            <select id="motivo" class="campo-sel w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none"></select>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Nº do chamado</label>
+                            <input type="text" id="chamado" placeholder="Ex: INC0012345" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                        </div>
+                        <div class="sm:col-span-3">
+                            <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Link do chamado</label>
+                            <input type="text" id="linkChamado" placeholder="Cole o link do chamado (https://...)" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-semibold dark:text-white outline-none">
+                        </div>
+                        <div class="sm:col-span-3">
                             <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Observação (defeito / detalhes do equipamento)</label>
                             <textarea id="observacao" rows="2" placeholder="Ex: tela trincada, não liga, teclado com tecla faltando, sem carregador..." class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-semibold dark:text-white outline-none resize-y"></textarea>
                         </div>
@@ -219,7 +239,7 @@
                 </div>
 
                 <div class="flex flex-wrap justify-end gap-2 pt-2">
-                    <button type="button" onclick="salvarNotebook(null, true)" class="bg-purple-600 hover:bg-purple-700 text-white font-black py-3 px-5 rounded-xl text-xs transition shadow-md flex items-center gap-2 cursor-pointer" title="Salva e mantém colaborador, movimento e data para o próximo notebook">
+                    <button type="button" onclick="salvarNotebook(null, true)" class="bg-purple-600 hover:bg-purple-700 text-white font-black py-3 px-5 rounded-xl text-xs transition shadow-md flex items-center gap-2 cursor-pointer" title="Salva e mantém colaborador, movimento, data e chamado para o próximo notebook">
                         <span>＋</span><span>Adicionar outro (mesmo colaborador)</span>
                     </button>
                     <button type="submit" class="bg-amber-600 hover:bg-amber-700 text-white font-black py-3 px-8 rounded-xl text-xs transition shadow-md flex items-center gap-2 cursor-pointer">
@@ -232,11 +252,15 @@
         <!-- TABELA -->
         <div class="bloco-destacado bg-white dark:bg-slate-800 p-5 rounded-2xl space-y-3">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
-                <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">📋 Notebooks Cadastrados (agrupado por colaborador)</h3>
+                <h3 class="text-xs font-bold uppercase text-slate-700 dark:text-slate-300">📋 Notebooks Cadastrados</h3>
                 <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                    <select id="agruparPor" onchange="renderizarTabela()" class="text-xs px-3 py-1.5 border border-slate-300 dark:border-slate-600 dark:bg-slate-900 rounded-lg outline-none font-bold">
+                        <option value="colaborador">Agrupar por colaborador</option>
+                        <option value="motivo">Agrupar por motivo</option>
+                    </select>
                     <select id="filtroStatus" onchange="renderizarTabela()" class="text-xs px-3 py-1.5 border border-slate-300 dark:border-slate-600 dark:bg-slate-900 rounded-lg outline-none font-bold"></select>
                     <div class="relative w-full sm:w-72">
-                        <input type="text" id="inputBusca" oninput="renderizarTabela()" placeholder="Buscar serial, patrimônio, colaborador..." class="uppercase-input w-full text-xs pl-8 pr-3 py-1.5 border border-slate-300 dark:border-slate-600 dark:bg-slate-900 rounded-lg outline-none font-bold">
+                        <input type="text" id="inputBusca" oninput="renderizarTabela()" placeholder="Buscar patrimônio, serial, chamado, colaborador..." class="uppercase-input w-full text-xs pl-8 pr-3 py-1.5 border border-slate-300 dark:border-slate-600 dark:bg-slate-900 rounded-lg outline-none font-bold">
                         <span class="absolute left-2.5 top-1.5 text-slate-400 text-xs">🔍</span>
                     </div>
                 </div>
@@ -249,6 +273,7 @@
                             <th class="py-2.5 px-3">Patrimônio</th>
                             <th class="py-2.5 px-3">Serial</th>
                             <th class="py-2.5 px-3">Movimento / Data</th>
+                            <th class="py-2.5 px-3">Motivo / Chamado</th>
                             <th class="py-2.5 px-3 text-center">Status</th>
                             <th class="py-2.5 px-3">Observação</th>
                             <th class="py-2.5 px-3 text-center">Ações</th>
@@ -262,7 +287,7 @@
     </div>
 
     <!-- MODAL STATUS -->
-    <div id="modalGerenciarStatus" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div id="modalGerenciarStatus" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 border-2 border-purple-400 dark:border-purple-600 w-full max-w-md rounded-2xl p-5 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                 <h3 class="text-sm font-black text-purple-600 dark:text-purple-400 uppercase flex items-center gap-1.5"><span>⚙️</span> Gerenciar Status</h3>
@@ -283,7 +308,7 @@
     </div>
 
     <!-- MODAL TIPOS -->
-    <div id="modalTipos" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div id="modalTipos" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 border-2 border-purple-400 dark:border-purple-600 w-full max-w-md rounded-2xl p-5 shadow-2xl space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
                 <h3 class="text-sm font-black text-purple-600 dark:text-purple-400 uppercase flex items-center gap-1.5"><span>🖥️</span> Tipos de Equipamento</h3>
@@ -303,6 +328,25 @@
         </div>
     </div>
 
+    <!-- MODAL NOVA OPÇÃO (movimento / motivo) -->
+    <div id="modalNova" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-[60] flex items-center justify-center p-4 hidden">
+        <div class="bg-white dark:bg-slate-800 border-2 border-purple-400 dark:border-purple-600 w-full max-w-sm rounded-2xl p-5 shadow-2xl space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 dark:border-slate-700 pb-2">
+                <h3 id="tituloNova" class="text-sm font-black text-purple-600 dark:text-purple-400 uppercase">Nova opção</h3>
+                <button onclick="fecharModalNova()" class="text-slate-400 hover:text-slate-600 font-black text-sm">✕</button>
+            </div>
+            <input type="text" id="inputNova" placeholder="Digite o nome" class="w-full text-xs p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl outline-none font-bold dark:text-white">
+            <div id="wrapCorNova" class="hidden">
+                <span class="block text-[10px] font-bold text-slate-400 uppercase mb-2">Cor do motivo</span>
+                <div id="paletaCores" class="flex flex-wrap gap-2"></div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2 border-t border-slate-100 dark:border-slate-700">
+                <button type="button" onclick="fecharModalNova()" class="px-4 py-1.5 rounded-xl text-xs font-bold text-slate-600 hover:bg-slate-100 transition">Cancelar</button>
+                <button type="button" onclick="salvarNova()" class="bg-purple-600 hover:bg-purple-700 text-white px-4 py-1.5 rounded-xl text-xs font-bold transition shadow">+ Adicionar</button>
+            </div>
+        </div>
+    </div>
+
     <!-- MODAL EDIÇÃO -->
     <div id="modalEdicaoNotebook" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
         <div class="bg-white dark:bg-slate-800 border-2 border-amber-400 dark:border-amber-600 w-full max-w-2xl rounded-2xl p-5 shadow-2xl space-y-4 max-h-[95vh] overflow-y-auto">
@@ -318,20 +362,42 @@
                     <input type="text" id="editPatrimonio" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
                 <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Serial</label>
                     <input type="text" id="editSerial" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
-                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tipo de Equipamento</label>
-                    <select id="editTipo" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></select></div>
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase">Tipo de Equipamento</label>
+                        <button type="button" onclick="abrirModalTipos()" class="text-[11px] bg-purple-100 hover:bg-purple-200 text-purple-700 font-black w-6 h-5 rounded-md leading-none cursor-pointer" title="Adicionar tipo">+</button>
+                    </div>
+                    <select id="editTipo" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></select>
+                </div>
                 <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Colaborador (quem recebeu / retirou)</label>
                     <input type="text" id="editColaborador" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
-                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Movimento</label>
-                    <select id="editMovimento" onchange="ajustarStatusPorMovimento('editMovimento','editStatus')" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
-                        <option value="Recebimento">Recebimento</option>
-                        <option value="Entrega">Entrega</option>
-                        <option value="Devolução">Devolução</option>
-                    </select></div>
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase">Movimento</label>
+                        <button type="button" onclick="abrirModalNova('mov')" class="text-[11px] bg-purple-100 hover:bg-purple-200 text-purple-700 font-black w-6 h-5 rounded-md leading-none cursor-pointer" title="Adicionar movimento">+</button>
+                    </div>
+                    <select id="editMovimento" onchange="ajustarStatusPorMovimento('editMovimento','editStatus')" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></select>
+                </div>
                 <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Data</label>
                     <input type="date" id="editData" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none"></div>
-                <div class="sm:col-span-2 md:col-span-3"><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Status</label>
-                    <select id="editStatus" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></select></div>
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase">Status</label>
+                        <button type="button" onclick="abrirModalStatus()" class="text-[11px] bg-purple-100 hover:bg-purple-200 text-purple-700 font-black w-6 h-5 rounded-md leading-none cursor-pointer" title="Gerenciar status">+</button>
+                    </div>
+                    <select id="editStatus" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></select>
+                </div>
+                <div>
+                    <div class="flex justify-between items-center mb-1">
+                        <label class="block text-[10px] font-bold text-slate-400 uppercase">Motivo</label>
+                        <button type="button" onclick="abrirModalNova('motivo')" class="text-[11px] bg-purple-100 hover:bg-purple-200 text-purple-700 font-black w-6 h-5 rounded-md leading-none cursor-pointer" title="Adicionar motivo">+</button>
+                    </div>
+                    <select id="editMotivo" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></select>
+                </div>
+                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nº do chamado</label>
+                    <input type="text" id="editChamado" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
+                <div class="sm:col-span-2 md:col-span-3"><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Link do chamado</label>
+                    <input type="text" id="editLinkChamado" placeholder="https://..." class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-semibold outline-none"></div>
                 <div class="sm:col-span-2 md:col-span-3"><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Observação</label>
                     <textarea id="editObservacao" rows="3" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-semibold outline-none resize-y"></textarea></div>
             </div>
@@ -345,29 +411,62 @@
 
     <script>
         const STATUS_PADRAO = ["Em estoque", "Em uso", "Danificado / Quebrado", "Em manutenção", "Baixado"];
+        const TIPOS_PADRAO = ["Notebook", "Desktop", "Tablet", "Celular"];
+        const MOV_PADRAO = ["Recebimento", "Entrega", "Devolução para TI"];
+        const MOTIVOS_PADRAO = [
+            { nome: "Novo equipamento", cor: "#22c55e" },
+            { nome: "Troca por defeito", cor: "#ef4444" },
+            { nome: "Manutenção", cor: "#f59e0b" },
+            { nome: "Substituição", cor: "#3b82f6" },
+            { nome: "Desligamento", cor: "#64748b" }
+        ];
+        const PALETA = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#14b8a6", "#3b82f6", "#a855f7", "#ec4899", "#64748b"];
 
         let listaStatus = [];
+        let listaTipos = [];
+        let listaMov = [...MOV_PADRAO];
+        let listaMotivos = [...MOTIVOS_PADRAO];
         let html5QrScanner = null;
         let notebooks = [];
-        const TIPOS_PADRAO = ["Notebook", "Desktop", "Tablet", "Celular"];
-        let listaTipos = [];
+        let tipoNova = null;
+        let corNovaSel = PALETA[0];
 
         const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
         const vazio = (v) => !v || v === '-';
+        const v = (id) => document.getElementById(id).value;
         const entregue = (n) => !vazio(n.colaborador) && n.movimento === 'Entrega';
         const dataHoje = () => new Date().toISOString().split('T')[0];
         const ehDefeito = (st) => /danific|quebrad|manuten|defeit/i.test(st || '');
         const ehEstoque = (st) => /estoque/i.test(st || '');
-        const normalizarMov = (m) => /entreg/i.test(m || '') ? 'Entrega' : (/devolu/i.test(m || '') ? 'Devolução' : 'Recebimento');
+
+        const normalizarMov = (m) => {
+            const s = String(m || '').trim();
+            if (listaMov.includes(s)) return s;
+            if (/devolu/i.test(s)) return 'Devolução para TI';
+            if (/entreg/i.test(s)) return 'Entrega';
+            if (/receb/i.test(s)) return 'Recebimento';
+            return s || 'Recebimento';
+        };
+
+        const normLink = (s) => {
+            const t = String(s || '').trim();
+            if (!t) return '';
+            return /^https?:\/\//i.test(t) ? t : 'https://' + t;
+        };
+
+        const corMotivo = (nome) => {
+            const m = listaMotivos.find(x => x.nome === nome);
+            return m ? m.cor : '#94a3b8';
+        };
 
         function statusAutomatico(mov, colab, status) {
             if (mov === 'Entrega' && !vazio(colab) && ehEstoque(status)) return 'Em uso';
-            if (mov === 'Devolução') return 'Em estoque';
+            if (mov === 'Devolução para TI') return 'Em estoque';
             return status;
         }
 
         function ajustarStatusPorMovimento(idMov, idStatus) {
-            if (document.getElementById(idMov).value === 'Devolução') {
+            if (v(idMov) === 'Devolução para TI') {
                 document.getElementById(idStatus).value = 'Em estoque';
             }
         }
@@ -376,11 +475,10 @@
             document.getElementById('dataMov').value = dataHoje();
             carregarListaStatus();
             carregarListaTipos();
-            atualizarSelectsStatus();
-            atualizarSelectsTipo();
+            carregarListasExtras();
+            atualizarTodosSelects();
             carregarDoLocalStorage();
 
-            // Campos do formulário (exceto serial e patrimônio) com amarelinho piscando fraco
             document.querySelectorAll('#notebookForm input:not([type=hidden]), #notebookForm select, #notebookForm textarea').forEach(el => {
                 if (el.id !== 'serial' && el.id !== 'patrimonio') el.classList.add('campo-amarelo');
             });
@@ -407,6 +505,108 @@
             } catch (e) {}
         }
 
+        // ================= LISTAS GENÉRICAS =================
+        // Preenche um select com a lista. Mantém o valor atual; se não existir na lista, acrescenta.
+        function preencherSelectLista(sel, lista, valor, vazioTxt) {
+            if (!sel) return;
+            const itens = lista.map(x => typeof x === 'string' ? x : x.nome);
+            const atual = (valor ?? '') + '';
+            if (atual && !itens.includes(atual)) itens.push(atual);
+            sel.innerHTML = '';
+            if (vazioTxt) sel.appendChild(new Option(vazioTxt, ''));
+            itens.forEach(x => sel.appendChild(new Option(x, x)));
+            sel.value = atual || (vazioTxt ? '' : (itens[0] || ''));
+        }
+
+        function atualizarTodosSelects() {
+            preencherSelectLista(document.getElementById('status'), listaStatus, v('status'));
+            preencherSelectLista(document.getElementById('editStatus'), listaStatus, v('editStatus'));
+            preencherSelectLista(document.getElementById('tipo'), listaTipos, v('tipo'));
+            preencherSelectLista(document.getElementById('editTipo'), listaTipos, v('editTipo'));
+            preencherSelectLista(document.getElementById('movimento'), listaMov, v('movimento') || 'Recebimento');
+            preencherSelectLista(document.getElementById('editMovimento'), listaMov, v('editMovimento') || 'Recebimento');
+            preencherSelectLista(document.getElementById('motivo'), listaMotivos, v('motivo'), '— sem motivo —');
+            preencherSelectLista(document.getElementById('editMotivo'), listaMotivos, v('editMotivo'), '— sem motivo —');
+
+            const filtro = document.getElementById('filtroStatus');
+            const atualF = filtro.value;
+            filtro.innerHTML = '';
+            filtro.appendChild(new Option('Todos os status', ''));
+            listaStatus.forEach(st => filtro.appendChild(new Option(st, st)));
+            filtro.value = atualF;
+        }
+
+        // ================= PERSISTÊNCIA DE LISTAS =================
+        function carregarListasExtras() {
+            try {
+                const m = JSON.parse(localStorage.getItem('modulo9_mov_custom') || '[]');
+                listaMov = [...MOV_PADRAO, ...m.filter(x => !MOV_PADRAO.includes(x))];
+            } catch (e) { listaMov = [...MOV_PADRAO]; }
+            try {
+                const mo = JSON.parse(localStorage.getItem('modulo9_motivos') || 'null');
+                listaMotivos = Array.isArray(mo) && mo.length ? mo : [...MOTIVOS_PADRAO];
+            } catch (e) { listaMotivos = [...MOTIVOS_PADRAO]; }
+        }
+
+        function salvarExtras() {
+            localStorage.setItem('modulo9_mov_custom', JSON.stringify(listaMov.filter(m => !MOV_PADRAO.includes(m))));
+            localStorage.setItem('modulo9_motivos', JSON.stringify(listaMotivos));
+        }
+
+        // ================= NOVA OPÇÃO (movimento / motivo) =================
+        function abrirModalNova(tipo) {
+            tipoNova = tipo;
+            const ehMotivo = tipo === 'motivo';
+            document.getElementById('tituloNova').innerText = ehMotivo ? 'Novo motivo' : 'Novo movimento';
+            document.getElementById('inputNova').value = '';
+            document.getElementById('wrapCorNova').classList.toggle('hidden', !ehMotivo);
+            corNovaSel = PALETA[0];
+            if (ehMotivo) renderPaleta();
+            document.getElementById('modalNova').classList.remove('hidden');
+            setTimeout(() => document.getElementById('inputNova').focus(), 50);
+        }
+
+        function fecharModalNova() {
+            document.getElementById('modalNova').classList.add('hidden');
+        }
+
+        function renderPaleta() {
+            const c = document.getElementById('paletaCores');
+            c.innerHTML = '';
+            PALETA.forEach(cor => {
+                const b = document.createElement('button');
+                b.type = 'button';
+                b.style.background = cor;
+                b.className = 'w-7 h-7 rounded-full border-2 transition ' + (cor === corNovaSel ? 'border-slate-900 dark:border-white scale-110' : 'border-transparent');
+                b.onclick = () => { corNovaSel = cor; renderPaleta(); };
+                c.appendChild(b);
+            });
+        }
+
+        function salvarNova() {
+            const val = document.getElementById('inputNova').value.trim();
+            if (!val) { alert("Digite um nome!"); return; }
+
+            if (tipoNova === 'mov') {
+                if (listaMov.some(m => m.toLowerCase() === val.toLowerCase())) { alert("Este movimento já existe!"); return; }
+                listaMov.push(val);
+                salvarExtras();
+                atualizarTodosSelects();
+                document.getElementById('movimento').value = val;
+                document.getElementById('editMovimento').value = val;
+                mostrarAviso(`Movimento "${val}" cadastrado!`);
+            } else {
+                if (listaMotivos.some(m => m.nome.toLowerCase() === val.toLowerCase())) { alert("Este motivo já existe!"); return; }
+                listaMotivos.push({ nome: val, cor: corNovaSel });
+                salvarExtras();
+                atualizarTodosSelects();
+                document.getElementById('motivo').value = val;
+                document.getElementById('editMotivo').value = val;
+                mostrarAviso(`Motivo "${val}" cadastrado!`);
+            }
+            fecharModalNova();
+        }
+
         // ================= STATUS =================
         function carregarListaStatus() {
             const salvas = localStorage.getItem('modulo9_status_custom');
@@ -425,36 +625,6 @@
 
         function salvarListaStatus() {
             localStorage.setItem('modulo9_status_custom', JSON.stringify(listaStatus));
-        }
-
-        function atualizarSelectsStatus() {
-            const selForm = document.getElementById('status');
-            const selEdit = document.getElementById('editStatus');
-            preencherSelectGenerico(selForm, (selForm && selForm.value) || "Em estoque");
-            preencherSelectGenerico(selEdit, (selEdit && selEdit.value) || "Em estoque");
-
-            const filtro = document.getElementById('filtroStatus');
-            const atual = filtro.value;
-            filtro.innerHTML = '<option value="">Todos os status</option>';
-            listaStatus.forEach(st => {
-                const opt = document.createElement('option');
-                opt.value = st; opt.innerText = st;
-                if (st === atual) opt.selected = true;
-                filtro.appendChild(opt);
-            });
-        }
-
-        function preencherSelectGenerico(selectEl, valorSelecionado) {
-            if (!selectEl) return;
-            selectEl.innerHTML = '';
-            const lista = listaStatus.includes(valorSelecionado) || !valorSelecionado ? listaStatus : [...listaStatus, valorSelecionado];
-            lista.forEach(st => {
-                const opt = document.createElement('option');
-                opt.value = st;
-                opt.innerText = st;
-                if (st === valorSelecionado) opt.selected = true;
-                selectEl.appendChild(opt);
-            });
         }
 
         function abrirModalStatus() {
@@ -488,7 +658,7 @@
             if (listaStatus.includes(val)) { alert("Este status já existe!"); return; }
             listaStatus.push(val);
             salvarListaStatus();
-            atualizarSelectsStatus();
+            atualizarTodosSelects();
             renderizarListaStatusModal();
             input.value = '';
             mostrarAviso(`Novo status "${val}" cadastrado!`);
@@ -500,7 +670,9 @@
             if (confirm(`Deseja realmente excluir o status "${removido}"?`)) {
                 listaStatus.splice(index, 1);
                 salvarListaStatus();
-                atualizarSelectsStatus();
+                if (v('status') === removido) document.getElementById('status').value = listaStatus[0];
+                if (v('editStatus') === removido) document.getElementById('editStatus').value = listaStatus[0];
+                atualizarTodosSelects();
                 renderizarListaStatusModal();
                 mostrarAviso(`Status "${removido}" removido!`);
             }
@@ -519,26 +691,6 @@
 
         function salvarListaTipos() {
             localStorage.setItem('modulo9_tipos_custom', JSON.stringify(listaTipos));
-        }
-
-        function preencherSelectTipo(selectEl, valorSelecionado) {
-            if (!selectEl) return;
-            selectEl.innerHTML = '';
-            const lista = (!valorSelecionado || listaTipos.includes(valorSelecionado)) ? listaTipos : [...listaTipos, valorSelecionado];
-            lista.forEach(t => {
-                const opt = document.createElement('option');
-                opt.value = t;
-                opt.innerText = t;
-                if (t === valorSelecionado) opt.selected = true;
-                selectEl.appendChild(opt);
-            });
-        }
-
-        function atualizarSelectsTipo() {
-            const selForm = document.getElementById('tipo');
-            const selEdit = document.getElementById('editTipo');
-            preencherSelectTipo(selForm, (selForm && selForm.value) || listaTipos[0]);
-            preencherSelectTipo(selEdit, (selEdit && selEdit.value) || listaTipos[0]);
         }
 
         function abrirModalTipos() {
@@ -574,7 +726,7 @@
             if (listaTipos.some(t => t.toLowerCase() === val.toLowerCase())) { alert("Este tipo já existe!"); return; }
             listaTipos.push(val);
             salvarListaTipos();
-            atualizarSelectsTipo();
+            atualizarTodosSelects();
             document.getElementById('tipo').value = val;
             renderizarListaTiposModal();
             input.value = '';
@@ -585,10 +737,11 @@
             if (listaTipos.length <= 1) { alert("Você precisa manter pelo menos um tipo cadastrado!"); return; }
             const removido = listaTipos[index];
             if (confirm(`Deseja realmente excluir o tipo "${removido}"?`)) {
-                const atualForm = document.getElementById('tipo').value;
                 listaTipos.splice(index, 1);
                 salvarListaTipos();
-                preencherSelectTipo(document.getElementById('tipo'), atualForm === removido ? listaTipos[0] : atualForm);
+                if (v('tipo') === removido) document.getElementById('tipo').value = listaTipos[0];
+                if (v('editTipo') === removido) document.getElementById('editTipo').value = listaTipos[0];
+                atualizarTodosSelects();
                 renderizarListaTiposModal();
                 mostrarAviso(`Tipo "${removido}" removido!`);
             }
@@ -596,8 +749,8 @@
 
         // ================= DUPLICIDADE =================
         function verificarDuplicidadeAoDigitar() {
-            const serialDig = document.getElementById('serial').value.trim().toUpperCase();
-            const patDig = document.getElementById('patrimonio').value.trim().toUpperCase();
+            const serialDig = v('serial').trim().toUpperCase();
+            const patDig = v('patrimonio').trim().toUpperCase();
 
             const dupSerial = serialDig && notebooks.some(n => n.serial === serialDig && n.status !== 'Baixado');
             document.getElementById('avisoDuplicadoSerial').classList.toggle('hidden', !dupSerial);
@@ -680,8 +833,8 @@
             const form = document.getElementById('notebookForm');
             if (!form.checkValidity()) { form.reportValidity(); return; }
 
-            const serial = document.getElementById('serial').value.trim().toUpperCase();
-            const patrimonio = document.getElementById('patrimonio').value.trim().toUpperCase();
+            const serial = v('serial').trim().toUpperCase();
+            const patrimonio = v('patrimonio').trim().toUpperCase();
 
             const repetido = notebooks.find(n =>
                 n.status !== 'Baixado' &&
@@ -695,12 +848,15 @@
                 id: Date.now(),
                 serial: serial || '-',
                 patrimonio,
-                tipo: document.getElementById('tipo').value || "Notebook",
-                movimento: document.getElementById('movimento').value,
-                data: document.getElementById('dataMov').value,
-                observacao: document.getElementById('observacao').value.trim(),
-                status: document.getElementById('status').value,
-                colaborador: document.getElementById('colaborador').value.trim().toUpperCase() || "-"
+                tipo: v('tipo') || "Notebook",
+                movimento: normalizarMov(v('movimento')),
+                data: v('dataMov'),
+                observacao: v('observacao').trim(),
+                status: v('status'),
+                colaborador: v('colaborador').trim().toUpperCase() || "-",
+                motivo: v('motivo'),
+                chamado: v('chamado').trim().toUpperCase(),
+                linkChamado: normLink(v('linkChamado'))
             };
 
             item.status = statusAutomatico(item.movimento, item.colaborador, item.status);
@@ -712,7 +868,9 @@
                 ? `Notebook ${item.patrimonio} gravado! Pode lançar o próximo de ${item.colaborador === '-' ? 'mesmo movimento' : item.colaborador}.`
                 : `Notebook ${item.patrimonio} gravado com sucesso!`);
 
-            const limpar = manter ? ['serial', 'patrimonio', 'observacao'] : ['serial', 'patrimonio', 'colaborador', 'observacao'];
+            const limpar = manter
+                ? ['serial', 'patrimonio', 'observacao']
+                : ['serial', 'patrimonio', 'colaborador', 'observacao', 'chamado', 'linkChamado'];
             limpar.forEach(id => document.getElementById(id).value = '');
             verificarDuplicidadeAoDigitar();
             document.getElementById('patrimonio').focus();
@@ -739,10 +897,13 @@
             document.getElementById('editItemId').value = item.id;
             document.getElementById('editSerial').value = vazio(item.serial) ? '' : item.serial;
             document.getElementById('editPatrimonio').value = item.patrimonio;
-            preencherSelectTipo(document.getElementById('editTipo'), item.tipo);
-            document.getElementById('editMovimento').value = normalizarMov(item.movimento);
+            preencherSelectLista(document.getElementById('editTipo'), listaTipos, item.tipo);
+            preencherSelectLista(document.getElementById('editMovimento'), listaMov, normalizarMov(item.movimento));
             document.getElementById('editData').value = item.data || '';
-            preencherSelectGenerico(document.getElementById('editStatus'), item.status);
+            preencherSelectLista(document.getElementById('editStatus'), listaStatus, item.status);
+            preencherSelectLista(document.getElementById('editMotivo'), listaMotivos, item.motivo || '', '— sem motivo —');
+            document.getElementById('editChamado').value = item.chamado || '';
+            document.getElementById('editLinkChamado').value = item.linkChamado || '';
             document.getElementById('editColaborador').value = vazio(item.colaborador) ? '' : item.colaborador;
             document.getElementById('editObservacao').value = item.observacao || '';
 
@@ -754,21 +915,23 @@
         }
 
         function guardarEdicaoNotebook() {
-            const id = Number(document.getElementById('editItemId').value);
+            const id = Number(v('editItemId'));
             const index = notebooks.findIndex(n => n.id === id);
             if (index < 0) return;
 
-            const serialEdit = document.getElementById('editSerial').value.trim().toUpperCase();
             const atualizado = {
                 ...notebooks[index],
-                serial: serialEdit || '-',
-                patrimonio: document.getElementById('editPatrimonio').value.trim().toUpperCase(),
-                tipo: document.getElementById('editTipo').value || "Notebook",
-                movimento: document.getElementById('editMovimento').value,
-                data: document.getElementById('editData').value,
-                status: document.getElementById('editStatus').value,
-                colaborador: document.getElementById('editColaborador').value.trim().toUpperCase() || "-",
-                observacao: document.getElementById('editObservacao').value.trim()
+                serial: v('editSerial').trim().toUpperCase() || '-',
+                patrimonio: v('editPatrimonio').trim().toUpperCase(),
+                tipo: v('editTipo') || "Notebook",
+                movimento: normalizarMov(v('editMovimento')),
+                data: v('editData'),
+                status: v('editStatus'),
+                colaborador: v('editColaborador').trim().toUpperCase() || "-",
+                motivo: v('editMotivo'),
+                chamado: v('editChamado').trim().toUpperCase(),
+                linkChamado: normLink(v('editLinkChamado')),
+                observacao: v('editObservacao').trim()
             };
             atualizado.status = statusAutomatico(atualizado.movimento, atualizado.colaborador, atualizado.status);
 
@@ -797,8 +960,9 @@
             atualizarContadores();
             const tbody = document.getElementById('tabelaNotebooksCorpo');
             tbody.innerHTML = '';
-            const busca = document.getElementById('inputBusca').value.trim().toUpperCase();
-            const filtroSt = document.getElementById('filtroStatus').value;
+            const busca = v('inputBusca').trim().toUpperCase();
+            const filtroSt = v('filtroStatus');
+            const agrupar = v('agruparPor');
 
             const lista = notebooks.filter(n =>
                 (!filtroSt || n.status === filtroSt) &&
@@ -806,31 +970,53 @@
                  (n.patrimonio || '').includes(busca) ||
                  (n.tipo || '').toUpperCase().includes(busca) ||
                  (n.colaborador || '').includes(busca) ||
+                 (n.motivo || '').toUpperCase().includes(busca) ||
+                 (n.chamado || '').includes(busca) ||
                  (n.observacao || '').toUpperCase().includes(busca))
             );
 
             if (lista.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="6" class="text-center py-5 text-slate-400 italic">Nenhum notebook encontrado.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-5 text-slate-400 italic">Nenhum notebook encontrado.</td></tr>`;
                 return;
             }
 
-            // Agrupa por colaborador (sem colaborador vai para o fim)
+            const chaveDe = (n) => agrupar === 'motivo'
+                ? (vazio(n.motivo) ? '' : n.motivo)
+                : (vazio(n.colaborador) ? '' : n.colaborador);
+
             const grupos = new Map();
             lista.forEach(n => {
-                const chave = vazio(n.colaborador) ? '' : n.colaborador;
+                const chave = chaveDe(n);
                 if (!grupos.has(chave)) grupos.set(chave, []);
                 grupos.get(chave).push(n);
             });
             const chaves = [...grupos.keys()].sort((a, b) => a === '' ? 1 : (b === '' ? -1 : a.localeCompare(b, 'pt-BR')));
 
+            const rotulosMov = {
+                'Entrega': ['📤 Entrega', 'text-blue-700 dark:text-blue-300'],
+                'Devolução para TI': ['↩️ Devolução para TI', 'text-amber-700 dark:text-amber-300'],
+                'Recebimento': ['📥 Recebimento', 'text-emerald-700 dark:text-emerald-300']
+            };
+
             chaves.forEach(ch => {
                 const itens = grupos.get(ch);
+
+                let titulo;
+                if (agrupar === 'motivo') {
+                    titulo = ch
+                        ? `<span class="chip-motivo" style="background:${corMotivo(ch)}">📌 ${esc(ch)}</span>`
+                        : `<span class="text-[11px] text-slate-500">SEM MOTIVO</span>`;
+                } else {
+                    titulo = ch
+                        ? `<span class="chip-colab">👤 ${esc(ch)}</span>`
+                        : `<span class="text-[11px] text-slate-500">📦 SEM COLABORADOR (ESTOQUE)</span>`;
+                }
 
                 const cab = document.createElement('tr');
                 cab.className = "bg-amber-50/60 dark:bg-slate-900/60";
                 cab.innerHTML = `
-                    <td colspan="6" class="py-2 px-3">
-                        ${ch ? `<span class="chip-colab">👤 ${esc(ch)}</span>` : `<span class="text-[11px] text-slate-500">📦 SEM COLABORADOR (ESTOQUE)</span>`}
+                    <td colspan="7" class="py-2 px-3">
+                        ${titulo}
                         <span class="ml-2 text-[10px] text-slate-400">${itens.length} ${itens.length === 1 ? 'item' : 'itens'}</span>
                     </td>`;
                 tbody.appendChild(cab);
@@ -849,15 +1035,21 @@
                         ? `<span class="alerta-duplicado" title="⚠️ PATRIMÔNIO DUPLICADO">⚠️ #${esc(n.patrimonio)}</span>`
                         : `<span class="txt-cor">#${esc(n.patrimonio)}</span>`;
 
-                    const rotulosMov = {
-                        'Entrega': ['📤 Entrega', 'text-blue-700 dark:text-blue-300'],
-                        'Devolução': ['↩️ Devolução', 'text-amber-700 dark:text-amber-300'],
-                        'Recebimento': ['📥 Recebimento', 'text-emerald-700 dark:text-emerald-300']
-                    };
-                    const [rotuloMov, corMov] = rotulosMov[normalizarMov(n.movimento)];
+                    const m = normalizarMov(n.movimento);
+                    const [rotuloMov, corMov] = rotulosMov[m] || [`📌 ${m}`, 'text-purple-700 dark:text-purple-300'];
                     const movTxt = `
-                        <span class="text-[11px] font-medium ${corMov}">${rotuloMov}</span>
+                        <span class="text-[11px] font-medium ${corMov}">${esc(rotuloMov)}</span>
                         <span class="block text-[11px] text-slate-600 dark:text-slate-300">${formatarData(n.data)}</span>`;
+
+                    const motivoHtml = n.motivo
+                        ? `<span class="inline-block px-2 py-0.5 rounded-md text-[10px] font-bold text-white" style="background:${corMotivo(n.motivo)}">${esc(n.motivo)}</span>`
+                        : `<span class="text-slate-300">-</span>`;
+
+                    const chamadoHtml = n.chamado
+                        ? (n.linkChamado
+                            ? `<a href="${esc(n.linkChamado)}" target="_blank" rel="noopener" class="block mt-1 text-[11px] text-blue-600 dark:text-blue-400 underline">🎫 ${esc(n.chamado)}</a>`
+                            : `<span class="block mt-1 text-[11px] text-slate-600 dark:text-slate-300">🎫 ${esc(n.chamado)}</span>`)
+                        : '';
 
                     const obs = n.observacao
                         ? `<span class="normal-case text-slate-600 dark:text-slate-300 block max-w-[220px] truncate" title="${esc(n.observacao)}">${esc(n.observacao)}</span>`
@@ -865,10 +1057,12 @@
 
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/40 transition";
+                    tr.style.borderLeft = n.motivo ? `4px solid ${corMotivo(n.motivo)}` : '4px solid transparent';
                     tr.innerHTML = `
                         <td class="py-2.5 px-3 whitespace-nowrap">${patFormatado}<span class="block text-[9px] text-slate-400 mt-1">${esc(n.tipo || 'Notebook')}</span></td>
                         <td class="py-2.5 px-3 font-mono whitespace-nowrap">${serialFormatado}</td>
                         <td class="py-2.5 px-3 whitespace-nowrap">${movTxt}</td>
+                        <td class="py-2.5 px-3 whitespace-nowrap">${motivoHtml}${chamadoHtml}</td>
                         <td class="py-2.5 px-3 text-center whitespace-nowrap text-[11px] font-medium text-slate-600 dark:text-slate-300">${esc(n.status)}</td>
                         <td class="py-2.5 px-3 text-[11px]">${obs}</td>
                         <td class="py-2.5 px-3 text-center whitespace-nowrap">
@@ -923,9 +1117,11 @@
                       iMov = col(['MOVIMENTO']), iData = col(['DATA']),
                       iRec = col(['DATA_RECEBIMENTO', 'DATA_ENTRADA']),
                       iEnt = col(['DATA_ENTREGA', 'DATA_SAIDA']),
-                      iObs = col(['OBSERVACAO']);
+                      iObs = col(['OBSERVACAO']),
+                      iMotivo = col(['MOTIVO']), iChamado = col(['CHAMADO', 'NUMERO_CHAMADO']),
+                      iLink = col(['LINK_CHAMADO', 'LINK']);
 
-                if (iPat < 0) return alert("Cabeçalho não reconhecido: falta a coluna PATRIMONIO.");
+                if (iPat < 0 && iSerial < 0) return alert("Cabeçalho não reconhecido: falta a coluna PATRIMONIO.");
 
                 const novos = [];
                 for (let i = 1; i < linhas.length; i++) {
@@ -953,16 +1149,27 @@
                         colaborador: colab,
                         movimento: mov,
                         data: data,
-                        observacao: g(iObs, '')
+                        observacao: g(iObs, ''),
+                        motivo: g(iMotivo, ''),
+                        chamado: g(iChamado, '').toUpperCase(),
+                        linkChamado: normLink(g(iLink, ''))
                     });
                 }
 
                 if (novos.length > 0) {
                     if (notebooks.length > 0 && !confirm(`Isso substituirá os ${notebooks.length} registros atuais por ${novos.length} do arquivo. Continuar?`)) return;
                     notebooks = novos;
-                    novos.forEach(n => { if (!listaTipos.some(t => t.toLowerCase() === n.tipo.toLowerCase())) listaTipos.push(n.tipo); });
+
+                    novos.forEach(n => {
+                        if (!listaTipos.some(t => t.toLowerCase() === n.tipo.toLowerCase())) listaTipos.push(n.tipo);
+                        if (n.movimento && !listaMov.includes(n.movimento)) listaMov.push(n.movimento);
+                        if (n.motivo && !listaMotivos.some(m => m.nome === n.motivo)) {
+                            listaMotivos.push({ nome: n.motivo, cor: PALETA[listaMotivos.length % PALETA.length] });
+                        }
+                    });
                     salvarListaTipos();
-                    atualizarSelectsTipo();
+                    salvarExtras();
+                    atualizarTodosSelects();
                     salvarNoLocalStorage();
                     renderizarTabela();
                     mostrarAviso(`🎉 ${novos.length} notebooks recuperados do arquivo!`);
@@ -974,10 +1181,11 @@
 
         function exportarCSV() {
             if (notebooks.length === 0) return alert("Lista vazia!");
-            const q = (v) => `"${String(v ?? '').replace(/"/g, '""').replace(/\r?\n/g, ' ')}"`;
-            let csv = "\uFEFFPATRIMONIO;SERIAL;TIPO;STATUS;COLABORADOR;MOVIMENTO;DATA;OBSERVACAO\n";
+            const q = (x) => `"${String(x ?? '').replace(/"/g, '""').replace(/\r?\n/g, ' ')}"`;
+            let csv = "\uFEFFPATRIMONIO;SERIAL;TIPO;STATUS;COLABORADOR;MOVIMENTO;DATA;MOTIVO;CHAMADO;LINK_CHAMADO;OBSERVACAO\n";
             notebooks.forEach(n => {
-                csv += [n.patrimonio, n.serial, n.tipo, n.status, n.colaborador, n.movimento, n.data, n.observacao].map(q).join(';') + "\n";
+                csv += [n.patrimonio, n.serial, n.tipo, n.status, n.colaborador, n.movimento, n.data,
+                        n.motivo, n.chamado, n.linkChamado, n.observacao].map(q).join(';') + "\n";
             });
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const a = document.createElement('a');
@@ -987,6 +1195,8 @@
         }
 
         // ================= ARMAZENAMENTO LOCAL =================
+        function salvarListaTiposLocal() { salvarListaTipos(); }
+
         function normalizarRegistro(n) {
             const colab = n.colaborador || '-';
             let mov = n.movimento, data = n.data;
@@ -1004,7 +1214,10 @@
                 colaborador: colab,
                 movimento: normalizarMov(mov),
                 data: data,
-                observacao: n.observacao || ''
+                observacao: n.observacao || '',
+                motivo: n.motivo || '',
+                chamado: n.chamado || '',
+                linkChamado: n.linkChamado || ''
             };
         }
 
