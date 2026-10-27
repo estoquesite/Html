@@ -25,7 +25,7 @@
         .txt-cor { color: #b45309; font-weight: 500; display: inline-block; }
         .dark .txt-cor { color: #fbbf24; }
 
-        /* Formulário: amarelinho piscando bem fraquinho */
+        /* Campos piscando: amarelinho bem fraquinho */
         @keyframes pulsoAmareloSuave {
             0%   { border-color: #fde68a; box-shadow: 0 0 0 0 rgba(245, 158, 11, 0); }
             100% { border-color: #f59e0b; box-shadow: 0 0 6px 0 rgba(245, 158, 11, 0.25); }
@@ -170,7 +170,7 @@
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase">Patrimônio (Asset) *</label>
                                 <span id="avisoDuplicadoPatrimonio" class="text-[9px] font-black text-rose-600 hidden animate-pulse">DUPLICADO!</span>
                             </div>
-                            <input type="text" id="patrimonio" oninput="verificarDuplicidadeAoDigitar()" placeholder="Ex: BR2357387" required class="uppercase-input w-full p-2.5 bg-amber-50/60 dark:bg-slate-900 border-2 border-amber-400 rounded-xl font-black text-amber-700 dark:text-amber-400 outline-none">
+                            <input type="text" id="patrimonio" oninput="verificarDuplicidadeAoDigitar()" placeholder="Ex: BR2357387" required class="uppercase-input campo-amarelo w-full p-2.5 bg-amber-50/60 dark:bg-slate-900 rounded-xl font-black text-amber-700 dark:text-amber-400 outline-none">
                         </div>
                         <div>
                             <div class="flex justify-between items-center mb-1">
@@ -184,26 +184,26 @@
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase">Tipo de Equipamento *</label>
                                 <button type="button" onclick="abrirModalTipos()" class="text-[11px] bg-purple-100 hover:bg-purple-200 text-purple-700 font-black w-6 h-5 rounded-md leading-none cursor-pointer" title="Adicionar outro tipo">+</button>
                             </div>
-                            <select id="tipo" class="campo-sel w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none"></select>
+                            <select id="tipo" class="campo-amarelo campo-sel w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none"></select>
                         </div>
 
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Colaborador</label>
-                            <input type="text" id="colaborador" placeholder="Nome do colaborador" class="uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                            <input type="text" id="colaborador" placeholder="Nome do colaborador" class="campo-amarelo uppercase-input w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
                         </div>
                         <div>
                             <div class="flex justify-between items-center mb-1">
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase">Movimento *</label>
                                 <button type="button" onclick="abrirModalNova('mov')" class="text-[11px] bg-purple-100 hover:bg-purple-200 text-purple-700 font-black w-6 h-5 rounded-md leading-none cursor-pointer" title="Adicionar outro movimento">+</button>
                             </div>
-                            <select id="movimento" onchange="ajustarStatusPorMovimento('movimento','status')" class="campo-sel w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none"></select>
+                            <select id="movimento" onchange="ajustarStatusPorMovimento('movimento','status')" class="campo-amarelo campo-sel w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none"></select>
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Data *</label>
-                            <input type="date" id="dataMov" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                            <input type="date" id="dataMov" required class="campo-amarelo w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
                         </div>
                     </div>
-                    <p class="text-[10px] text-slate-400 mt-2">Recebimento: o colaborador entregou o notebook. Entrega: o notebook saiu para um colaborador com status "Em estoque", que muda sozinho para "Em uso". Devolução para TI: o colaborador devolveu ao TI, e o status volta para "Em estoque" mantendo o nome no histórico. Para lançar outro notebook do mesmo colaborador, use "+ Adicionar outro".</p>
+                    <p class="text-[10px] text-slate-400 mt-2">Recebimento: o colaborador entregou o notebook. Entrega: o notebook saiu para um colaborador. Devolução para TI: o colaborador devolveu ao TI, e o status sugerido volta para "Em estoque". Você pode trocar o status a qualquer momento. Para lançar outro notebook do mesmo colaborador, use "+ Adicionar outro".</p>
                 </div>
 
                 <div>
@@ -214,14 +214,14 @@
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase">Status *</label>
                                 <button type="button" onclick="abrirModalStatus()" class="text-[11px] bg-purple-100 hover:bg-purple-200 text-purple-700 font-black w-6 h-5 rounded-md leading-none cursor-pointer" title="Gerenciar status">+</button>
                             </div>
-                            <select id="status" class="campo-sel w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none"></select>
+                            <select id="status" class="campo-amarelo campo-sel w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none"></select>
                         </div>
                         <div>
                             <div class="flex justify-between items-center mb-1">
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase">Motivo</label>
                                 <button type="button" onclick="abrirModalNova('motivo')" class="text-[11px] bg-purple-100 hover:bg-purple-200 text-purple-700 font-black w-6 h-5 rounded-md leading-none cursor-pointer" title="Adicionar motivo">+</button>
                             </div>
-                            <select id="motivo" class="campo-sel w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none"></select>
+                            <select id="motivo" class="campo-amarelo campo-sel w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none"></select>
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Nº do chamado</label>
@@ -359,7 +359,7 @@
 
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
                 <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Patrimônio</label>
-                    <input type="text" id="editPatrimonio" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
+                    <input type="text" id="editPatrimonio" class="campo-amarelo uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 rounded-xl dark:text-white font-bold outline-none"></div>
                 <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Serial</label>
                     <input type="text" id="editSerial" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
                 <div>
@@ -367,32 +367,32 @@
                         <label class="block text-[10px] font-bold text-slate-400 uppercase">Tipo de Equipamento</label>
                         <button type="button" onclick="abrirModalTipos()" class="text-[11px] bg-purple-100 hover:bg-purple-200 text-purple-700 font-black w-6 h-5 rounded-md leading-none cursor-pointer" title="Adicionar tipo">+</button>
                     </div>
-                    <select id="editTipo" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></select>
+                    <select id="editTipo" class="campo-amarelo w-full p-2 bg-slate-50 dark:bg-slate-900 rounded-xl dark:text-white font-bold outline-none"></select>
                 </div>
                 <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Colaborador (quem recebeu / retirou)</label>
-                    <input type="text" id="editColaborador" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
+                    <input type="text" id="editColaborador" class="campo-amarelo uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 rounded-xl dark:text-white font-bold outline-none"></div>
                 <div>
                     <div class="flex justify-between items-center mb-1">
                         <label class="block text-[10px] font-bold text-slate-400 uppercase">Movimento</label>
                         <button type="button" onclick="abrirModalNova('mov')" class="text-[11px] bg-purple-100 hover:bg-purple-200 text-purple-700 font-black w-6 h-5 rounded-md leading-none cursor-pointer" title="Adicionar movimento">+</button>
                     </div>
-                    <select id="editMovimento" onchange="ajustarStatusPorMovimento('editMovimento','editStatus')" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></select>
+                    <select id="editMovimento" class="campo-amarelo w-full p-2 bg-slate-50 dark:bg-slate-900 rounded-xl dark:text-white font-bold outline-none"></select>
                 </div>
                 <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Data</label>
-                    <input type="date" id="editData" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none"></div>
+                    <input type="date" id="editData" class="campo-amarelo w-full p-2 bg-slate-50 dark:bg-slate-900 rounded-xl dark:text-white outline-none"></div>
                 <div>
                     <div class="flex justify-between items-center mb-1">
                         <label class="block text-[10px] font-bold text-slate-400 uppercase">Status</label>
                         <button type="button" onclick="abrirModalStatus()" class="text-[11px] bg-purple-100 hover:bg-purple-200 text-purple-700 font-black w-6 h-5 rounded-md leading-none cursor-pointer" title="Gerenciar status">+</button>
                     </div>
-                    <select id="editStatus" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></select>
+                    <select id="editStatus" class="campo-amarelo w-full p-2 bg-slate-50 dark:bg-slate-900 rounded-xl dark:text-white font-bold outline-none"></select>
                 </div>
                 <div>
                     <div class="flex justify-between items-center mb-1">
                         <label class="block text-[10px] font-bold text-slate-400 uppercase">Motivo</label>
                         <button type="button" onclick="abrirModalNova('motivo')" class="text-[11px] bg-purple-100 hover:bg-purple-200 text-purple-700 font-black w-6 h-5 rounded-md leading-none cursor-pointer" title="Adicionar motivo">+</button>
                     </div>
-                    <select id="editMotivo" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></select>
+                    <select id="editMotivo" class="campo-amarelo w-full p-2 bg-slate-50 dark:bg-slate-900 rounded-xl dark:text-white font-bold outline-none"></select>
                 </div>
                 <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Nº do chamado</label>
                     <input type="text" id="editChamado" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
@@ -432,7 +432,7 @@
         let corNovaSel = PALETA[0];
 
         const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-        const vazio = (v) => !v || v === '-';
+        const vazio = (val) => !val || val === '-';
         const v = (id) => document.getElementById(id).value;
         const entregue = (n) => !vazio(n.colaborador) && n.movimento === 'Entrega';
         const dataHoje = () => new Date().toISOString().split('T')[0];
@@ -459,16 +459,20 @@
             return m ? m.cor : '#94a3b8';
         };
 
-        function statusAutomatico(mov, colab, status) {
+        // Sugestão automática só é aplicada ao GRAVAR um registro novo.
+        // Depois de gravado, o status fica livre para ser alterado na edição.
+        function statusSugerido(mov, colab, status) {
             if (mov === 'Entrega' && !vazio(colab) && ehEstoque(status)) return 'Em uso';
             if (mov === 'Devolução para TI') return 'Em estoque';
             return status;
         }
 
+        // Ao trocar o movimento no formulário, sugere o status (sem travar o campo).
         function ajustarStatusPorMovimento(idMov, idStatus) {
-            if (v(idMov) === 'Devolução para TI') {
-                document.getElementById(idStatus).value = 'Em estoque';
-            }
+            const mov = v(idMov);
+            const st = document.getElementById(idStatus);
+            if (mov === 'Devolução para TI') st.value = 'Em estoque';
+            else if (mov === 'Entrega' && ehEstoque(st.value)) st.value = 'Em uso';
         }
 
         window.addEventListener('DOMContentLoaded', () => {
@@ -479,8 +483,11 @@
             atualizarTodosSelects();
             carregarDoLocalStorage();
 
+            // Serial continua sem piscar; os demais campos piscam
             document.querySelectorAll('#notebookForm input:not([type=hidden]), #notebookForm select, #notebookForm textarea').forEach(el => {
-                if (el.id !== 'serial' && el.id !== 'patrimonio') el.classList.add('campo-amarelo');
+                if (el.id !== 'serial' && el.id !== 'linkChamado' && el.id !== 'chamado' && el.id !== 'observacao') {
+                    el.classList.add('campo-amarelo');
+                }
             });
         });
 
@@ -506,7 +513,6 @@
         }
 
         // ================= LISTAS GENÉRICAS =================
-        // Preenche um select com a lista. Mantém o valor atual; se não existir na lista, acrescenta.
         function preencherSelectLista(sel, lista, valor, vazioTxt) {
             if (!sel) return;
             const itens = lista.map(x => typeof x === 'string' ? x : x.nome);
@@ -844,22 +850,26 @@
                 if (!confirm(`⚠️ ALERTA DE DUPLICIDADE: o Serial ou Patrimônio já existe na base (status: ${repetido.status})!\nDeseja salvar mesmo assim?`)) return;
             }
 
+            const colab = v('colaborador').trim().toUpperCase() || "-";
+            const mov = normalizarMov(v('movimento'));
+            let status = v('status');
+            // Sugestão automática só na gravação inicial
+            status = statusSugerido(mov, colab, status);
+
             const item = {
                 id: Date.now(),
                 serial: serial || '-',
                 patrimonio,
                 tipo: v('tipo') || "Notebook",
-                movimento: normalizarMov(v('movimento')),
+                movimento: mov,
                 data: v('dataMov'),
                 observacao: v('observacao').trim(),
-                status: v('status'),
-                colaborador: v('colaborador').trim().toUpperCase() || "-",
+                status,
+                colaborador: colab,
                 motivo: v('motivo'),
                 chamado: v('chamado').trim().toUpperCase(),
                 linkChamado: normLink(v('linkChamado'))
             };
-
-            item.status = statusAutomatico(item.movimento, item.colaborador, item.status);
 
             notebooks.unshift(item);
             salvarNoLocalStorage();
@@ -919,6 +929,7 @@
             const index = notebooks.findIndex(n => n.id === id);
             if (index < 0) return;
 
+            // Na edição o status é exatamente o que o usuário escolheu
             const atualizado = {
                 ...notebooks[index],
                 serial: v('editSerial').trim().toUpperCase() || '-',
@@ -933,7 +944,6 @@
                 linkChamado: normLink(v('editLinkChamado')),
                 observacao: v('editObservacao').trim()
             };
-            atualizado.status = statusAutomatico(atualizado.movimento, atualizado.colaborador, atualizado.status);
 
             notebooks[index] = atualizado;
             salvarNoLocalStorage();
@@ -1195,8 +1205,6 @@
         }
 
         // ================= ARMAZENAMENTO LOCAL =================
-        function salvarListaTiposLocal() { salvarListaTipos(); }
-
         function normalizarRegistro(n) {
             const colab = n.colaborador || '-';
             let mov = n.movimento, data = n.data;
