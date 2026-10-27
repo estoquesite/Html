@@ -161,17 +161,17 @@
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                         <div>
                             <div class="flex justify-between items-center mb-1">
-                                <label class="block text-[10px] font-bold text-slate-500 uppercase">Nº de Série (Serial) *</label>
-                                <span id="avisoDuplicadoSerial" class="text-[9px] font-black text-rose-600 hidden animate-pulse">DUPLICADO!</span>
-                            </div>
-                            <input type="text" id="serial" oninput="verificarDuplicidadeAoDigitar()" placeholder="Ex: GQ5WS54" required class="uppercase-input w-full p-2.5 bg-amber-50/60 dark:bg-slate-900 border-2 border-amber-400 rounded-xl font-black text-amber-700 dark:text-amber-400 outline-none">
-                        </div>
-                        <div>
-                            <div class="flex justify-between items-center mb-1">
                                 <label class="block text-[10px] font-bold text-slate-500 uppercase">Patrimônio (Asset) *</label>
                                 <span id="avisoDuplicadoPatrimonio" class="text-[9px] font-black text-rose-600 hidden animate-pulse">DUPLICADO!</span>
                             </div>
                             <input type="text" id="patrimonio" oninput="verificarDuplicidadeAoDigitar()" placeholder="Ex: BR2357387" required class="uppercase-input w-full p-2.5 bg-amber-50/60 dark:bg-slate-900 border-2 border-amber-400 rounded-xl font-black text-amber-700 dark:text-amber-400 outline-none">
+                        </div>
+                        <div>
+                            <div class="flex justify-between items-center mb-1">
+                                <label class="block text-[10px] font-bold text-slate-500 uppercase">Nº de Série (Serial)</label>
+                                <span id="avisoDuplicadoSerial" class="text-[9px] font-black text-rose-600 hidden animate-pulse">DUPLICADO!</span>
+                            </div>
+                            <input type="text" id="serial" oninput="verificarDuplicidadeAoDigitar()" placeholder="Ex: GQ5WS54" class="uppercase-input w-full p-2.5 bg-amber-50/60 dark:bg-slate-900 border-2 border-amber-400 rounded-xl font-black text-amber-700 dark:text-amber-400 outline-none">
                         </div>
                         <div>
                             <div class="flex justify-between items-center mb-1">
@@ -246,8 +246,8 @@
                 <table class="w-full text-left text-xs border-collapse">
                     <thead>
                         <tr class="border-b border-slate-100 dark:border-slate-700 text-slate-400 font-bold uppercase text-[10px]">
-                            <th class="py-2.5 px-3">Serial</th>
                             <th class="py-2.5 px-3">Patrimônio</th>
+                            <th class="py-2.5 px-3">Serial</th>
                             <th class="py-2.5 px-3">Movimento / Data</th>
                             <th class="py-2.5 px-3 text-center">Status</th>
                             <th class="py-2.5 px-3">Observação</th>
@@ -314,10 +314,10 @@
             <input type="hidden" id="editItemId">
 
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 text-xs">
-                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Serial</label>
-                    <input type="text" id="editSerial" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
                 <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Patrimônio</label>
                     <input type="text" id="editPatrimonio" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
+                <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Serial</label>
+                    <input type="text" id="editSerial" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
                 <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Tipo de Equipamento</label>
                     <select id="editTipo" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></select></div>
                 <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Colaborador (quem recebeu / retirou)</label>
@@ -683,14 +683,17 @@
             const serial = document.getElementById('serial').value.trim().toUpperCase();
             const patrimonio = document.getElementById('patrimonio').value.trim().toUpperCase();
 
-            const repetido = notebooks.find(n => (n.serial === serial || n.patrimonio === patrimonio) && n.status !== 'Baixado');
+            const repetido = notebooks.find(n =>
+                n.status !== 'Baixado' &&
+                ((serial && n.serial === serial) || (patrimonio && n.patrimonio === patrimonio))
+            );
             if (repetido) {
                 if (!confirm(`⚠️ ALERTA DE DUPLICIDADE: o Serial ou Patrimônio já existe na base (status: ${repetido.status})!\nDeseja salvar mesmo assim?`)) return;
             }
 
             const item = {
                 id: Date.now(),
-                serial,
+                serial: serial || '-',
                 patrimonio,
                 tipo: document.getElementById('tipo').value || "Notebook",
                 movimento: document.getElementById('movimento').value,
@@ -706,13 +709,13 @@
             salvarNoLocalStorage();
             renderizarTabela();
             mostrarAviso(manter
-                ? `Notebook ${item.serial} gravado! Pode lançar o próximo de ${item.colaborador === '-' ? 'mesmo movimento' : item.colaborador}.`
-                : `Notebook ${item.serial} gravado com sucesso!`);
+                ? `Notebook ${item.patrimonio} gravado! Pode lançar o próximo de ${item.colaborador === '-' ? 'mesmo movimento' : item.colaborador}.`
+                : `Notebook ${item.patrimonio} gravado com sucesso!`);
 
             const limpar = manter ? ['serial', 'patrimonio', 'observacao'] : ['serial', 'patrimonio', 'colaborador', 'observacao'];
             limpar.forEach(id => document.getElementById(id).value = '');
             verificarDuplicidadeAoDigitar();
-            document.getElementById('serial').focus();
+            document.getElementById('patrimonio').focus();
         }
 
         function salvarManual() {
@@ -734,7 +737,7 @@
             if (!item) return;
 
             document.getElementById('editItemId').value = item.id;
-            document.getElementById('editSerial').value = item.serial;
+            document.getElementById('editSerial').value = vazio(item.serial) ? '' : item.serial;
             document.getElementById('editPatrimonio').value = item.patrimonio;
             preencherSelectTipo(document.getElementById('editTipo'), item.tipo);
             document.getElementById('editMovimento').value = normalizarMov(item.movimento);
@@ -755,9 +758,10 @@
             const index = notebooks.findIndex(n => n.id === id);
             if (index < 0) return;
 
+            const serialEdit = document.getElementById('editSerial').value.trim().toUpperCase();
             const atualizado = {
                 ...notebooks[index],
-                serial: document.getElementById('editSerial').value.trim().toUpperCase(),
+                serial: serialEdit || '-',
                 patrimonio: document.getElementById('editPatrimonio').value.trim().toUpperCase(),
                 tipo: document.getElementById('editTipo').value || "Notebook",
                 movimento: document.getElementById('editMovimento').value,
@@ -835,9 +839,11 @@
                     const dupSerial = !vazio(n.serial) && notebooks.filter(i => i.serial === n.serial).length > 1;
                     const dupPat = !vazio(n.patrimonio) && notebooks.filter(i => i.patrimonio === n.patrimonio).length > 1;
 
-                    const serialFormatado = dupSerial
-                        ? `<span class="alerta-duplicado" title="⚠️ SERIAL DUPLICADO">⚠️ ${esc(n.serial)}</span>`
-                        : `<span class="txt-cor">${esc(n.serial)}</span>`;
+                    const serialFormatado = vazio(n.serial)
+                        ? `<span class="text-slate-300">-</span>`
+                        : dupSerial
+                            ? `<span class="alerta-duplicado" title="⚠️ SERIAL DUPLICADO">⚠️ ${esc(n.serial)}</span>`
+                            : `<span class="txt-cor">${esc(n.serial)}</span>`;
 
                     const patFormatado = dupPat
                         ? `<span class="alerta-duplicado" title="⚠️ PATRIMÔNIO DUPLICADO">⚠️ #${esc(n.patrimonio)}</span>`
@@ -860,8 +866,8 @@
                     const tr = document.createElement('tr');
                     tr.className = "hover:bg-slate-50 dark:hover:bg-slate-700/40 transition";
                     tr.innerHTML = `
-                        <td class="py-2.5 px-3 font-mono whitespace-nowrap">${serialFormatado}</td>
                         <td class="py-2.5 px-3 whitespace-nowrap">${patFormatado}<span class="block text-[9px] text-slate-400 mt-1">${esc(n.tipo || 'Notebook')}</span></td>
+                        <td class="py-2.5 px-3 font-mono whitespace-nowrap">${serialFormatado}</td>
                         <td class="py-2.5 px-3 whitespace-nowrap">${movTxt}</td>
                         <td class="py-2.5 px-3 text-center whitespace-nowrap text-[11px] font-medium text-slate-600 dark:text-slate-300">${esc(n.status)}</td>
                         <td class="py-2.5 px-3 text-[11px]">${obs}</td>
@@ -919,13 +925,15 @@
                       iEnt = col(['DATA_ENTREGA', 'DATA_SAIDA']),
                       iObs = col(['OBSERVACAO']);
 
-                if (iSerial < 0) return alert("Cabeçalho não reconhecido: falta a coluna SERIAL.");
+                if (iPat < 0) return alert("Cabeçalho não reconhecido: falta a coluna PATRIMONIO.");
 
                 const novos = [];
                 for (let i = 1; i < linhas.length; i++) {
                     const p = parseLinhaCSV(linhas[i], delim);
                     const g = (idx, def = '') => (idx >= 0 && p[idx] !== undefined && p[idx] !== '') ? p[idx] : def;
-                    if (!g(iSerial)) continue;
+                    const patrimonio = g(iPat).toUpperCase();
+                    const serial = g(iSerial).toUpperCase();
+                    if (!patrimonio && !serial) continue;
 
                     const colab = g(iColab, '-').toUpperCase();
                     let mov = g(iMov), data = g(iData);
@@ -938,8 +946,8 @@
 
                     novos.push({
                         id: Date.now() + i,
-                        serial: g(iSerial).toUpperCase(),
-                        patrimonio: g(iPat, '-').toUpperCase(),
+                        serial: serial || '-',
+                        patrimonio: patrimonio || '-',
                         tipo: g(iTipo, 'Notebook'),
                         status: g(iStatus, 'Em estoque'),
                         colaborador: colab,
@@ -967,9 +975,9 @@
         function exportarCSV() {
             if (notebooks.length === 0) return alert("Lista vazia!");
             const q = (v) => `"${String(v ?? '').replace(/"/g, '""').replace(/\r?\n/g, ' ')}"`;
-            let csv = "\uFEFFSERIAL;PATRIMONIO;TIPO;STATUS;COLABORADOR;MOVIMENTO;DATA;OBSERVACAO\n";
+            let csv = "\uFEFFPATRIMONIO;SERIAL;TIPO;STATUS;COLABORADOR;MOVIMENTO;DATA;OBSERVACAO\n";
             notebooks.forEach(n => {
-                csv += [n.serial, n.patrimonio, n.tipo, n.status, n.colaborador, n.movimento, n.data, n.observacao].map(q).join(';') + "\n";
+                csv += [n.patrimonio, n.serial, n.tipo, n.status, n.colaborador, n.movimento, n.data, n.observacao].map(q).join(';') + "\n";
             });
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const a = document.createElement('a');
@@ -989,8 +997,8 @@
             }
             return {
                 id: n.id || Date.now() + Math.random(),
-                serial: n.serial || '',
-                patrimonio: n.patrimonio || '',
+                serial: n.serial || '-',
+                patrimonio: n.patrimonio || '-',
                 tipo: n.tipo || 'Notebook',
                 status: n.status || 'Em estoque',
                 colaborador: colab,
