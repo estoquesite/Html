@@ -187,9 +187,10 @@
                         </div>
                         <div>
                             <label class="block text-[10px] font-bold text-slate-500 uppercase mb-1">Movimento *</label>
-                            <select id="movimento" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
+                            <select id="movimento" onchange="ajustarStatusPorMovimento('movimento','status')" class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
                                 <option value="Recebimento">Recebimento (notebook entrou)</option>
                                 <option value="Entrega">Entrega (notebook saiu)</option>
+                                <option value="Devolução">Devolução (colaborador devolveu)</option>
                             </select>
                         </div>
                         <div>
@@ -197,7 +198,7 @@
                             <input type="date" id="dataMov" required class="w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
                         </div>
                     </div>
-                    <p class="text-[10px] text-slate-400 mt-2">Entrega para um colaborador com status "Em estoque" muda sozinho para "Em uso". Para lançar outro notebook do mesmo colaborador, use o botão "+ Adicionar outro".</p>
+                    <p class="text-[10px] text-slate-400 mt-2">Entrega para um colaborador com status "Em estoque" muda sozinho para "Em uso". Devolução volta o status para "Em estoque" e mantém o nome do colaborador no histórico. Para lançar outro notebook do mesmo colaborador, use o botão "+ Adicionar outro".</p>
                 </div>
 
                 <div>
@@ -322,7 +323,11 @@
                 <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Colaborador (quem recebeu / retirou)</label>
                     <input type="text" id="editColaborador" class="uppercase-input w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"></div>
                 <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Movimento</label>
-                    <select id="editMovimento" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none"><option value="Recebimento">Recebimento</option><option value="Entrega">Entrega</option></select></div>
+                    <select id="editMovimento" onchange="ajustarStatusPorMovimento('editMovimento','editStatus')" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white font-bold outline-none">
+                        <option value="Recebimento">Recebimento</option>
+                        <option value="Entrega">Entrega</option>
+                        <option value="Devolução">Devolução</option>
+                    </select></div>
                 <div><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Data</label>
                     <input type="date" id="editData" class="w-full p-2 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl dark:text-white outline-none"></div>
                 <div class="sm:col-span-2 md:col-span-3"><label class="block text-[10px] font-bold text-slate-400 uppercase mb-1">Status</label>
@@ -353,6 +358,19 @@
         const dataHoje = () => new Date().toISOString().split('T')[0];
         const ehDefeito = (st) => /danific|quebrad|manuten|defeit/i.test(st || '');
         const ehEstoque = (st) => /estoque/i.test(st || '');
+        const normalizarMov = (m) => /entreg/i.test(m || '') ? 'Entrega' : (/devolu/i.test(m || '') ? 'Devolução' : 'Recebimento');
+
+        function statusAutomatico(mov, colab, status) {
+            if (mov === 'Entrega' && !vazio(colab) && ehEstoque(status)) return 'Em uso';
+            if (mov === 'Devolução') return 'Em estoque';
+            return status;
+        }
+
+        function ajustarStatusPorMovimento(idMov, idStatus) {
+            if (document.getElementById(idMov).value === 'Devolução') {
+                document.getElementById(idStatus).value = 'Em estoque';
+            }
+        }
 
         window.addEventListener('DOMContentLoaded', () => {
             document.getElementById('dataMov').value = dataHoje();
@@ -682,7 +700,7 @@
                 colaborador: document.getElementById('colaborador').value.trim().toUpperCase() || "-"
             };
 
-            if (entregue(item) && ehEstoque(item.status)) item.status = 'Em uso';
+            item.status = statusAutomatico(item.movimento, item.colaborador, item.status);
 
             notebooks.unshift(item);
             salvarNoLocalStorage();
@@ -719,7 +737,7 @@
             document.getElementById('editSerial').value = item.serial;
             document.getElementById('editPatrimonio').value = item.patrimonio;
             preencherSelectTipo(document.getElementById('editTipo'), item.tipo);
-            document.getElementById('editMovimento').value = item.movimento || 'Recebimento';
+            document.getElementById('editMovimento').value = normalizarMov(item.movimento);
             document.getElementById('editData').value = item.data || '';
             preencherSelectGenerico(document.getElementById('editStatus'), item.status);
             document.getElementById('editColaborador').value = vazio(item.colaborador) ? '' : item.colaborador;
@@ -748,7 +766,7 @@
                 colaborador: document.getElementById('editColaborador').value.trim().toUpperCase() || "-",
                 observacao: document.getElementById('editObservacao').value.trim()
             };
-            if (entregue(atualizado) && ehEstoque(atualizado.status)) atualizado.status = 'Em uso';
+            atualizado.status = statusAutomatico(atualizado.movimento, atualizado.colaborador, atualizado.status);
 
             notebooks[index] = atualizado;
             salvarNoLocalStorage();
@@ -825,9 +843,14 @@
                         ? `<span class="alerta-duplicado" title="⚠️ PATRIMÔNIO DUPLICADO">⚠️ #${esc(n.patrimonio)}</span>`
                         : `<span class="txt-cor">#${esc(n.patrimonio)}</span>`;
 
-                    const ehEntrega = n.movimento === 'Entrega';
+                    const rotulosMov = {
+                        'Entrega': ['📤 Entrega', 'text-blue-700 dark:text-blue-300'],
+                        'Devolução': ['↩️ Devolução', 'text-amber-700 dark:text-amber-300'],
+                        'Recebimento': ['📥 Recebimento', 'text-emerald-700 dark:text-emerald-300']
+                    };
+                    const [rotuloMov, corMov] = rotulosMov[normalizarMov(n.movimento)];
                     const movTxt = `
-                        <span class="text-[11px] font-medium ${ehEntrega ? 'text-blue-700 dark:text-blue-300' : 'text-emerald-700 dark:text-emerald-300'}">${ehEntrega ? '📤 Entrega' : '📥 Recebimento'}</span>
+                        <span class="text-[11px] font-medium ${corMov}">${rotuloMov}</span>
                         <span class="block text-[11px] text-slate-600 dark:text-slate-300">${formatarData(n.data)}</span>`;
 
                     const obs = n.observacao
@@ -911,7 +934,7 @@
                         if (colab !== '-' && ent !== '-') { mov = 'Entrega'; data = ent; }
                         else { mov = mov || 'Recebimento'; data = g(iRec, dataHoje()); }
                     }
-                    mov = /entreg/i.test(mov) ? 'Entrega' : 'Recebimento';
+                    mov = normalizarMov(mov);
 
                     novos.push({
                         id: Date.now() + i,
@@ -971,7 +994,7 @@
                 tipo: n.tipo || 'Notebook',
                 status: n.status || 'Em estoque',
                 colaborador: colab,
-                movimento: mov,
+                movimento: normalizarMov(mov),
                 data: data,
                 observacao: n.observacao || ''
             };
