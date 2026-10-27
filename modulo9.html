@@ -107,25 +107,8 @@
 
         <div id="alertaSistema" class="hidden p-3 rounded-xl text-xs font-bold text-center transition-all"></div>
 
-        <!-- CONTADORES -->
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-            <div class="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl p-3 text-center">
-                <div id="contTotal" class="text-2xl font-black text-slate-800 dark:text-white">0</div>
-                <div class="text-[10px] font-bold uppercase text-slate-400">Total</div>
-            </div>
-            <div class="bg-amber-50 dark:bg-amber-950/40 border border-amber-300 rounded-2xl p-3 text-center">
-                <div id="contEstoque" class="text-2xl font-black text-amber-700 dark:text-amber-400">0</div>
-                <div class="text-[10px] font-bold uppercase text-amber-700 dark:text-amber-400">No Estoque</div>
-            </div>
-            <div class="bg-blue-50 dark:bg-blue-950/40 border border-blue-300 rounded-2xl p-3 text-center">
-                <div id="contEntregues" class="text-2xl font-black text-blue-700 dark:text-blue-400">0</div>
-                <div class="text-[10px] font-bold uppercase text-blue-700 dark:text-blue-400">Entregues</div>
-            </div>
-            <div class="bg-rose-50 dark:bg-rose-950/40 border border-rose-300 rounded-2xl p-3 text-center">
-                <div id="contDefeito" class="text-2xl font-black text-rose-700 dark:text-rose-400">0</div>
-                <div class="text-[10px] font-bold uppercase text-rose-700 dark:text-rose-400">Com Defeito / Manutenção</div>
-            </div>
-        </div>
+        <!-- CONTADORES (por motivo) -->
+        <div id="contadores" class="grid grid-cols-2 md:grid-cols-5 gap-3"></div>
 
         <!-- SCANNER -->
         <div class="bloco-destacado bg-white dark:bg-slate-800 p-4 rounded-2xl space-y-3">
@@ -203,7 +186,7 @@
                             <input type="date" id="dataMov" required class="campo-amarelo w-full p-2.5 bg-slate-50 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-xl font-bold dark:text-white outline-none">
                         </div>
                     </div>
-                    <p class="text-[10px] text-slate-400 mt-2">Recebimento: o colaborador entregou o notebook. Entrega: o notebook saiu para um colaborador. Devolução para TI: o colaborador devolveu ao TI, e o status sugerido volta para "Em estoque". Você pode trocar o status a qualquer momento. Para lançar outro notebook do mesmo colaborador, use "+ Adicionar outro".</p>
+                    <p class="text-[10px] text-slate-400 mt-2">Recebimento: o colaborador entregou o notebook. Entrega: o notebook saiu para um colaborador. Devolução para TI: o colaborador devolveu ao TI. Ao trocar o movimento, o status é sugerido, mas você pode alterar antes de salvar. Para lançar outro notebook do mesmo colaborador, use "+ Adicionar outro".</p>
                 </div>
 
                 <div>
@@ -414,12 +397,12 @@
         const TIPOS_PADRAO = ["Notebook", "Desktop", "Tablet", "Celular"];
         const MOV_PADRAO = ["Recebimento", "Entrega", "Devolução para TI"];
         const MOTIVOS_PADRAO = [
-            { nome: "Novo equipamento", cor: "#22c55e" },
-            { nome: "Troca por defeito", cor: "#ef4444" },
-            { nome: "Manutenção", cor: "#f59e0b" },
-            { nome: "Substituição", cor: "#3b82f6" },
-            { nome: "Desligamento", cor: "#64748b" }
+            { nome: "Entregue", cor: "#3b82f6" },
+            { nome: "Devolução", cor: "#f59e0b" },
+            { nome: "Conserto", cor: "#ef4444" },
+            { nome: "Recebidos", cor: "#22c55e" }
         ];
+        const MOTIVOS_ANTIGOS = ["Novo equipamento", "Troca por defeito", "Manutenção", "Substituição", "Desligamento"];
         const PALETA = ["#ef4444", "#f97316", "#eab308", "#22c55e", "#14b8a6", "#3b82f6", "#a855f7", "#ec4899", "#64748b"];
 
         let listaStatus = [];
@@ -436,7 +419,6 @@
         const v = (id) => document.getElementById(id).value;
         const entregue = (n) => !vazio(n.colaborador) && n.movimento === 'Entrega';
         const dataHoje = () => new Date().toISOString().split('T')[0];
-        const ehDefeito = (st) => /danific|quebrad|manuten|defeit/i.test(st || '');
         const ehEstoque = (st) => /estoque/i.test(st || '');
 
         const normalizarMov = (m) => {
@@ -459,15 +441,8 @@
             return m ? m.cor : '#94a3b8';
         };
 
-        // Sugestão automática só é aplicada ao GRAVAR um registro novo.
-        // Depois de gravado, o status fica livre para ser alterado na edição.
-        function statusSugerido(mov, colab, status) {
-            if (mov === 'Entrega' && !vazio(colab) && ehEstoque(status)) return 'Em uso';
-            if (mov === 'Devolução para TI') return 'Em estoque';
-            return status;
-        }
-
-        // Ao trocar o movimento no formulário, sugere o status (sem travar o campo).
+        // Sugestão de status: só é usada quando o movimento muda no formulário.
+        // Não sobrescreve o status ao salvar.
         function ajustarStatusPorMovimento(idMov, idStatus) {
             const mov = v(idMov);
             const st = document.getElementById(idStatus);
@@ -483,9 +458,9 @@
             atualizarTodosSelects();
             carregarDoLocalStorage();
 
-            // Serial continua sem piscar; os demais campos piscam
+            // Serial, chamado, link e observação ficam sem piscar
             document.querySelectorAll('#notebookForm input:not([type=hidden]), #notebookForm select, #notebookForm textarea').forEach(el => {
-                if (el.id !== 'serial' && el.id !== 'linkChamado' && el.id !== 'chamado' && el.id !== 'observacao') {
+                if (!['serial', 'linkChamado', 'chamado', 'observacao'].includes(el.id)) {
                     el.classList.add('campo-amarelo');
                 }
             });
@@ -540,6 +515,8 @@
             filtro.appendChild(new Option('Todos os status', ''));
             listaStatus.forEach(st => filtro.appendChild(new Option(st, st)));
             filtro.value = atualF;
+
+            atualizarContadores();
         }
 
         // ================= PERSISTÊNCIA DE LISTAS =================
@@ -548,10 +525,19 @@
                 const m = JSON.parse(localStorage.getItem('modulo9_mov_custom') || '[]');
                 listaMov = [...MOV_PADRAO, ...m.filter(x => !MOV_PADRAO.includes(x))];
             } catch (e) { listaMov = [...MOV_PADRAO]; }
-            try {
-                const mo = JSON.parse(localStorage.getItem('modulo9_motivos') || 'null');
-                listaMotivos = Array.isArray(mo) && mo.length ? mo : [...MOTIVOS_PADRAO];
-            } catch (e) { listaMotivos = [...MOTIVOS_PADRAO]; }
+
+            let salvos = [];
+            try { salvos = JSON.parse(localStorage.getItem('modulo9_motivos') || '[]'); } catch (e) { salvos = []; }
+
+            if (!localStorage.getItem('modulo9_motivos_v3')) {
+                // Migração: mantém só os motivos criados pelo usuário e põe os novos padrão
+                const customs = salvos.filter(m => m && m.nome && !MOTIVOS_ANTIGOS.includes(m.nome));
+                listaMotivos = [...MOTIVOS_PADRAO, ...customs];
+                localStorage.setItem('modulo9_motivos_v3', '1');
+                salvarExtras();
+            } else {
+                listaMotivos = Array.isArray(salvos) && salvos.length ? salvos : [...MOTIVOS_PADRAO];
+            }
         }
 
         function salvarExtras() {
@@ -611,6 +597,24 @@
                 mostrarAviso(`Motivo "${val}" cadastrado!`);
             }
             fecharModalNova();
+        }
+
+        // ================= CONTADORES (por motivo) =================
+        function atualizarContadores() {
+            const box = document.getElementById('contadores');
+            if (!box) return;
+            const cards = [{ rotulo: 'Total', qtd: notebooks.length, cor: null }];
+            listaMotivos.forEach(m => cards.push({
+                rotulo: m.nome,
+                qtd: notebooks.filter(n => n.motivo === m.nome).length,
+                cor: m.cor
+            }));
+            box.innerHTML = cards.map(c => `
+                <div class="bg-white dark:bg-slate-800 border-2 rounded-2xl p-3 text-center ${c.cor ? '' : 'border-slate-200 dark:border-slate-700'}"
+                     style="${c.cor ? `border-color:${c.cor}` : ''}">
+                    <div class="text-2xl font-black ${c.cor ? '' : 'text-slate-800 dark:text-white'}" style="${c.cor ? `color:${c.cor}` : ''}">${c.qtd}</div>
+                    <div class="text-[10px] font-bold uppercase text-slate-500 dark:text-slate-400 truncate" title="${esc(c.rotulo)}">${esc(c.rotulo)}</div>
+                </div>`).join('');
         }
 
         // ================= STATUS =================
@@ -850,22 +854,17 @@
                 if (!confirm(`⚠️ ALERTA DE DUPLICIDADE: o Serial ou Patrimônio já existe na base (status: ${repetido.status})!\nDeseja salvar mesmo assim?`)) return;
             }
 
-            const colab = v('colaborador').trim().toUpperCase() || "-";
-            const mov = normalizarMov(v('movimento'));
-            let status = v('status');
-            // Sugestão automática só na gravação inicial
-            status = statusSugerido(mov, colab, status);
-
+            // Grava exatamente o que está selecionado no formulário
             const item = {
                 id: Date.now(),
                 serial: serial || '-',
                 patrimonio,
                 tipo: v('tipo') || "Notebook",
-                movimento: mov,
+                movimento: normalizarMov(v('movimento')),
                 data: v('dataMov'),
                 observacao: v('observacao').trim(),
-                status,
-                colaborador: colab,
+                status: v('status'),
+                colaborador: v('colaborador').trim().toUpperCase() || "-",
                 motivo: v('motivo'),
                 chamado: v('chamado').trim().toUpperCase(),
                 linkChamado: normLink(v('linkChamado'))
@@ -929,7 +928,6 @@
             const index = notebooks.findIndex(n => n.id === id);
             if (index < 0) return;
 
-            // Na edição o status é exatamente o que o usuário escolheu
             const atualizado = {
                 ...notebooks[index],
                 serial: v('editSerial').trim().toUpperCase() || '-',
@@ -953,13 +951,6 @@
         }
 
         // ================= TABELA =================
-        function atualizarContadores() {
-            document.getElementById('contTotal').innerText = notebooks.length;
-            document.getElementById('contEstoque').innerText = notebooks.filter(n => ehEstoque(n.status)).length;
-            document.getElementById('contEntregues').innerText = notebooks.filter(n => entregue(n)).length;
-            document.getElementById('contDefeito').innerText = notebooks.filter(n => ehDefeito(n.status)).length;
-        }
-
         function formatarData(d) {
             if (vazio(d)) return '-';
             const p = d.split('-');
