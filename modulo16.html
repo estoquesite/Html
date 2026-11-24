@@ -181,6 +181,7 @@
   <button id="anterior" type="button">◀ Semana anterior</button>
   <input id="seletor" type="week">
   <button id="proxima" type="button">Próxima semana ▶</button>
+  <button id="salvar" type="button">💾 Salvar</button>
   <button id="imprimir" type="button">🖨 Imprimir</button>
 </div>
 
@@ -298,10 +299,39 @@
     const grade = document.getElementById("grade");
     grade.innerHTML = cabecalho + "<tbody></tbody>";
     const corpo = grade.querySelector("tbody");
-    for (let min = HORA_INICIO; min < HORA_FIM; min += SLOT_MIN) {
-      corpo.appendChild(criarLinha(formatarHora(min)));
-    }
+    const horarios = carregarLinhas() || horariosPadrao();
+    horarios.forEach(function (h) { corpo.appendChild(criarLinha(h)); });
     atualizarSeletor();
+  }
+
+  function horariosPadrao() {
+    const lista = [];
+    for (let min = HORA_INICIO; min <= HORA_FIM; min += SLOT_MIN) lista.push(formatarHora(min));
+    return lista;
+  }
+
+  function chaveSalvamento() {
+    return "agenda_sala_g2_" + anoISO(segundaAtual) + "-W" + pad(numeroISO(segundaAtual));
+  }
+
+  function carregarLinhas() {
+    try {
+      const s = localStorage.getItem(chaveSalvamento());
+      return s ? JSON.parse(s) : null;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function salvarLinhas() {
+    const horarios = Array.from(document.querySelectorAll("#grade tbody .hora-texto"))
+      .map(function (el) { return el.textContent.trim(); });
+    try {
+      localStorage.setItem(chaveSalvamento(), JSON.stringify(horarios));
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 
   function atualizarSeletor() {
@@ -333,6 +363,13 @@
     const partes = valor.split("-W");
     segundaAtual = segundaDeISO(parseInt(partes[0], 10), parseInt(partes[1], 10));
     desenhar();
+  });
+
+  document.getElementById("salvar").addEventListener("click", function () {
+    const botao = this;
+    const ok = salvarLinhas();
+    botao.textContent = ok ? "✔ Salvo" : "Erro ao salvar";
+    setTimeout(function () { botao.textContent = "💾 Salvar"; }, 1500);
   });
 
   document.getElementById("imprimir").addEventListener("click", function () {
