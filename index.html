@@ -53,7 +53,7 @@
 
   <footer class="mt-8 text-center text-xs text-slate-400 font-medium space-y-1">
     <p>Sistema Operacional Integrado • Portal Vale Corporativo</p>
-    <p class="text-[10px]">Atalhos: tecla ` abre o Módulo 00; teclas 1 a 9 abrem os módulos 1 a 9; 0 abre o 10; – (hífen) abre o 11; F ou 4 abre o Quadro FMDS (Módulo 14).</p>
+    <p class="text-[10px]">Atalhos: tecla ` abre o Módulo 00; teclas 1 a 9 abrem os módulos 1 a 9; 0 abre o 10; – (hífen) abre o 11; F ou 4 abre o Quadro FMDS (Módulo 14); G abre a Agenda da Sala G2 (Módulo 16).</p>
   </footer>
 </div>
 
@@ -71,7 +71,8 @@ const MODULOS = [
   [9, '💻', 'Controle de Notebooks', 'Entrega e recebimento com leitor de código de barras, patrimônio, termos, status e alerta de duplicidade.', '#d97706', '#fef3c7', '9'],
   [10, '👥', 'Troca dos Participantes FMDS', 'Matriz de rotação de participantes (SSMA, Pessoas, Produtividade, Qualidade) com folhas de 24 linhas e salvamento automático.', '#475569', '#f1f5f9', '0'],
   [11, '📑', 'Controle de OV (Ordens de Venda)', 'Rastreio de Ordens de Venda (ZVSU / sucatas e resíduos), saldos, emissor, pesagens e remessas.', '#0284c7', '#e0f2fe', '-'],
-  [14, '📊', 'Quadro FMDS', 'Gestão visual integrada dos 5 pilares: Safety, Quality, Delivery, Cost e Morale com indicadores e planos de ação.', '#7c3aed', '#f3e8ff', 'f']
+  [14, '📊', 'Quadro FMDS', 'Gestão visual integrada dos 5 pilares: Safety, Quality, Delivery, Cost e Morale com indicadores e planos de ação.', '#7c3aed', '#f3e8ff', 'f'],
+  [16, '📅', 'Agenda da Sala de Reunião G2', 'Agenda semanal da sala G2 com horário das 07:30 às 16:30, feriados bloqueados e impressão A4 paisagem.', '#be123c', '#ffe4e6', 'g']
 ];
 
 const ROTAS = Object.fromEntries(MODULOS.map(m => [String(m[6]).toLowerCase(), `modulo${m[0]}.html`]));
@@ -82,6 +83,7 @@ const nomeTecla = t => {
   if (t === '-') return 'Tecla –';
   if (t === '`') return 'Tecla `';
   if (t === 'f') return 'Tecla F';
+  if (t === 'g') return 'Tecla G';
   return `Tecla ${t}`;
 };
 const $ = id => document.getElementById(id);
@@ -109,7 +111,8 @@ function desenhar(filtro = '') {
 
 function relogio() {
   const d = new Date();
-  $('relogio').textContent = d.toLocaleTimeString('pt-BR');$('data').textContent = d.toLocaleDateString('pt-BR');
+  $('relogio').textContent = d.toLocaleTimeString('pt-BR');
+  $('data').textContent = d.toLocaleDateString('pt-BR');
 }
 
 function tema(escuro) {
@@ -134,7 +137,8 @@ window.addEventListener('DOMContentLoaded', () => {
   setInterval(relogio, 1000);
   desenhar();
   $('bTema').onclick = () => tema(!document.documentElement.classList.contains('dark'));
-  $('busca').oninput = e => desenhar(e.target.value);$('busca').onkeydown = e => {
+  $('busca').oninput = e => desenhar(e.target.value);
+  $('busca').onkeydown = e => {
     if (e.key === 'Enter') {
       const a = document.querySelector('#grade a');
       if (a) location.href = a.href;
