@@ -53,7 +53,7 @@
 
   <footer class="mt-8 text-center text-xs text-slate-400 font-medium space-y-1">
     <p>Sistema Operacional Integrado • Portal Vale Corporativo</p>
-    <p class="text-[10px]">Atalhos: tecla ` abre o Módulo 00; teclas 1 a 9 abrem os módulos 1 a 9; 0 abre o 10; – (hífen) abre o 11; F ou 4 abre o Quadro FMDS (Módulo 14); G abre a Agenda da Sala G2 (Módulo 16).</p>
+    <p class="text-[10px]">Atalhos: tecla ` abre o Módulo 00; teclas 1 a 9 abrem os módulos 1 a 9; 0 abre o 10; – (hífen) abre o 11; F ou 4 abre o Quadro FMDS (Módulo 14); G abre a Agenda da Sala G2 (Módulo 16); P abre o Passaporte (Módulo 17).</p>
   </footer>
 </div>
 
@@ -72,7 +72,8 @@ const MODULOS = [
   [10, '👥', 'Troca dos Participantes FMDS', 'Matriz de rotação de participantes (SSMA, Pessoas, Produtividade, Qualidade) com folhas de 24 linhas e salvamento automático.', '#475569', '#f1f5f9', '0'],
   [11, '📑', 'Controle de OV (Ordens de Venda)', 'Rastreio de Ordens de Venda (ZVSU / sucatas e resíduos), saldos, emissor, pesagens e remessas.', '#0284c7', '#e0f2fe', '-'],
   [14, '📊', 'Quadro FMDS', 'Gestão visual integrada dos 5 pilares: Safety, Quality, Delivery, Cost e Morale com indicadores e planos de ação.', '#7c3aed', '#f3e8ff', 'f'],
-  [16, '📅', 'Agenda da Sala de Reunião G2', 'Agenda semanal da sala G2 com horário das 07:30 às 16:30, feriados bloqueados e impressão A4 paisagem.', '#be123c', '#ffe4e6', 'g']
+  [16, '📅', 'Agenda da Sala de Reunião G2', 'Agenda semanal da sala G2 com horário das 07:30 às 16:30, feriados bloqueados e impressão A4 paisagem.', '#be123c', '#ffe4e6', 'g'],
+  [17, '🪪', 'Passaporte de Treinamentos', 'Gerador do passaporte em tamanho de crachá: busca por matrícula ou nome e impressão direta.', '#4338ca', '#e0e7ff', 'p']
 ];
 
 const ROTAS = Object.fromEntries(MODULOS.map(m => [String(m[6]).toLowerCase(), `modulo${m[0]}.html`]));
@@ -84,6 +85,7 @@ const nomeTecla = t => {
   if (t === '`') return 'Tecla `';
   if (t === 'f') return 'Tecla F';
   if (t === 'g') return 'Tecla G';
+  if (t === 'p') return 'Tecla P';
   return `Tecla ${t}`;
 };
 const $ = id => document.getElementById(id);
