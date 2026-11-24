@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Agenda da Sala de Reunião G2</title>
+<style>
+  :root {
+    --ink: #1d1d1f;
+    --muted: #6b6b70;
+    --line: #9a9aa2;
+    --head: #f0f0f3;
+    --feriado: #e4e4e8;
+    --destaque: #fff4d6;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ink: #f2f2f4;
+      --muted: #a5a5ad;
+      --line: #5a5a62;
+      --head: #2a2a30;
+      --feriado: #34343b;
+      --destaque: #3d3420;
+    }
+  }
+  :root[data-theme="dark"] {
+    --ink: #f2f2f4;
+    --muted: #a5a5ad;
+    --line: #5a5a62;
+    --head: #2a2a30;
+    --feriado: #34343b;
+    --destaque: #3d3420;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    padding: 12px;
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    color: var(--ink);
+    background: transparent;
+  }
+  .controles {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-bottom: 14px;
+  }
+  .controles button {
+    font: inherit;
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    background: var(--head);
+    color: var(--ink);
+    border-radius: 6px;
+    cursor: pointer;
+  }
+  .controles input {
+    font: inherit;
+    padding: 5px 8px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: transparent;
+    color: var(--ink);
+  }
+  header {
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-size: 1.25rem;
+    margin: 0 0 4px;
+  }
+  .semana-titulo {
+    font-size: 1.05rem;
+    font-weight: 600;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    table-layout: fixed;
+    font-size: 0.85rem;
+  }
+  th, td {
+    border: 1px solid var(--line);
+    padding: 0;
+    height: 26px;
+  }
+  thead th {
+    background: var(--head);
+    font-weight: 600;
+    padding: 6px 2px;
+    height: auto;
+    line-height: 1.25;
+  }
+  thead th.hora {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--muted);
+    width: 14%;
+  }
+  thead th .data {
+    display: block;
+    font-weight: 400;
+    color: var(--muted);
+    font-size: 0.75rem;
+  }
+  thead th.feriado-cab {
+    background: var(--feriado);
+  }
+  thead th.feriado-cab .nome-feriado {
+    display: block;
+    font-size: 0.7rem;
+    color: var(--muted);
+    font-weight: 600;
+  }
+  td.hora {
+    width: 14%;
+    background: var(--head);
+    padding: 0 4px;
+  }
+  .hora-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    height: 100%;
+  }
+  .hora-texto {
+    font-size: 0.75rem;
+    color: var(--muted);
+    min-width: 40px;
+    text-align: center;
+    outline: none;
+  }
+  .hora-texto:focus {
+    color: var(--ink);
+    text-decoration: underline;
+  }
+  .ctrl {
+    display: inline-flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .ctrl button {
+    width: 18px;
+    height: 12px;
+    padding: 0;
+    font-size: 0.65rem;
+    line-height: 1;
+    border: 1px solid var(--line);
+    background: var(--head);
+    color: var(--ink);
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  td.slot { width: 17.2%; }
+  tr.meia-hora td { border-top: 1px dashed var(--line); }
+  td.slot.bloqueado {
+    background: repeating-linear-gradient(
+      45deg,
+      var(--feriado),
+      var(--feriado) 6px,
+      transparent 6px,
+      transparent 12px
+    );
+  }
+  @media print {
+    .controles, .no-print { display: none !important; }
+    body { padding: 0; }
+    @page { size: A4 landscape; margin: 8mm; }
+    td, th { height: 30px; }
+    thead th { height: auto; }
+  }
+</style>
+</head>
+<body>
+
+<div class="controles no-print">
+  <button id="anterior" type="button">◀ Semana anterior</button>
+  <input id="seletor" type="week">
+  <button id="proxima" type="button">Próxima semana ▶</button>
+  <button id="imprimir" type="button">🖨 Imprimir</button>
+</div>
+
+<header>
+  <h1>Agenda da Sala de Reunião G2</h1>
+  <div class="semana-titulo" id="semana-titulo"></div>
+</header>
+
+<main>
+  <table id="grade"></table>
+</main>
+
+<script>
+  const HORA_INICIO = 7 * 60 + 30;
+  const HORA_FIM = 16 * 60 + 30;
+  const SLOT_MIN = 30;
+  const DIAS = ["Segunda", "Terça", "Quarta", "Quinta", "Sexta"];
+
+  // Feriados nacionais de 2026 (chave: AAAA-MM-DD). Acrescente feriados locais ou da empresa aqui.
+  const FERIADOS = {
+    "2026-01-01": "Confraternização Universal",
+    "2026-04-03": "Sexta-feira Santa",
+    "2026-04-21": "Tiradentes",
+    "2026-05-01": "Dia do Trabalho",
+    "2026-06-04": "Corpus Christi",
+    "2026-09-07": "Independência",
+    "2026-10-12": "Nossa Sra. Aparecida",
+    "2026-11-02": "Finados",
+    "2026-11-15": "Proclamação da República",
+    "2026-11-20": "Consciência Negra",
+    "2026-12-25": "Natal"
+  };
+
+  let segundaAtual;
+  let colunasFeriado = [false, false, false, false, false];
+
+  function pad(n) { return String(n).padStart(2, "0"); }
+
+  function chaveData(d) {
+    return d.getFullYear() + "-" + pad(d.getMonth() + 1) + "-" + pad(d.getDate());
+  }
+
+  function segundaDaSemana(data) {
+    const d = new Date(data);
+    d.setHours(0, 0, 0, 0);
+    d.setDate(d.getDate() - ((d.getDay() + 6) % 7));
+    return d;
+  }
+
+  function numeroISO(segunda) {
+    const quinta = new Date(segunda);
+    quinta.setDate(quinta.getDate() + 3);
+    const d = new Date(Date.UTC(quinta.getFullYear(), quinta.getMonth(), quinta.getDate()));
+    const inicioAno = new Date(Date.UTC(d.getUTCFullYear(), 0, 1));
+    return Math.ceil(((d - inicioAno) / 86400000 + 1) / 7);
+  }
+
+  function anoISO(segunda) {
+    const quinta = new Date(segunda);
+    quinta.setDate(quinta.getDate() + 3);
+    return quinta.getFullYear();
+  }
+
+  function segundaDeISO(ano, semana) {
+    const quatro = new Date(ano, 0, 4);
+    const d = new Date(segundaDaSemana(quatro));
+    d.setDate(d.getDate() + (semana - 1) * 7);
+    return d;
+  }
+
+  function formatarHora(min) {
+    return pad(Math.floor(min / 60)) + ":" + pad(min % 60);
+  }
+
+  function criarLinha(horaTexto) {
+    const tr = document.createElement("tr");
+    if (horaTexto && horaTexto.endsWith(":30")) tr.className = "meia-hora";
+    let html = "<td class='hora'><div class='hora-wrap'>" +
+      "<span class='ctrl no-print'>" +
+        "<button class='mais' type='button' title='Adicionar linha abaixo'>+</button>" +
+        "<button class='menos' type='button' title='Excluir esta linha'>−</button>" +
+      "</span>" +
+      "<span class='hora-texto' contenteditable='true'>" + horaTexto + "</span>" +
+      "</div></td>";
+    colunasFeriado.forEach(function (feriado) {
+      html += "<td class='slot" + (feriado ? " bloqueado" : "") + "'></td>";
+    });
+    tr.innerHTML = html;
+    return tr;
+  }
+
+  function desenhar() {
+    const sexta = new Date(segundaAtual);
+    sexta.setDate(sexta.getDate() + 4);
+
+    document.getElementById("semana-titulo").textContent = "Semana " + numeroISO(segundaAtual);
+
+    const dias = [];
+    for (let i = 0; i < 5; i++) {
+      const data = new Date(segundaAtual);
+      data.setDate(data.getDate() + i);
+      dias.push({ nome: DIAS[i], data: data, feriado: FERIADOS[chaveData(data)] || null });
+    }
+    colunasFeriado = dias.map(function (d) { return !!d.feriado; });
+
+    let cabecalho = "<thead><tr><th class='hora'>Horário<br>07:30 às 16:30</th>";
+    dias.forEach(function (d) {
+      cabecalho += "<th class='dia" + (d.feriado ? " feriado-cab" : "") + "'>" + d.nome +
+        "<span class='data'>" + pad(d.data.getDate()) + "/" + pad(d.data.getMonth() + 1) + "</span>" +
+        (d.feriado ? "<span class='nome-feriado'>" + d.feriado + "</span>" : "") +
+        "</th>";
+    });
+    cabecalho += "</tr></thead>";
+
+    const grade = document.getElementById("grade");
+    grade.innerHTML = cabecalho + "<tbody></tbody>";
+    const corpo = grade.querySelector("tbody");
+    for (let min = HORA_INICIO; min < HORA_FIM; min += SLOT_MIN) {
+      corpo.appendChild(criarLinha(formatarHora(min)));
+    }
+    atualizarSeletor();
+  }
+
+  function atualizarSeletor() {
+    const ano = anoISO(segundaAtual);
+    const semana = numeroISO(segundaAtual);
+    document.getElementById("seletor").value = ano + "-W" + pad(semana);
+  }
+
+  function irParaSemana(data) {
+    segundaAtual = segundaDaSemana(data);
+    desenhar();
+  }
+
+  document.getElementById("anterior").addEventListener("click", function () {
+    const d = new Date(segundaAtual);
+    d.setDate(d.getDate() - 7);
+    irParaSemana(d);
+  });
+
+  document.getElementById("proxima").addEventListener("click", function () {
+    const d = new Date(segundaAtual);
+    d.setDate(d.getDate() + 7);
+    irParaSemana(d);
+  });
+
+  document.getElementById("seletor").addEventListener("change", function (e) {
+    const valor = e.target.value;
+    if (!valor) return;
+    const partes = valor.split("-W");
+    segundaAtual = segundaDeISO(parseInt(partes[0], 10), parseInt(partes[1], 10));
+    desenhar();
+  });
+
+  document.getElementById("imprimir").addEventListener("click", function () {
+    window.print();
+  });
+
+  document.getElementById("grade").addEventListener("click", function (e) {
+    const btn = e.target.closest("button");
+    if (!btn) return;
+    const tr = btn.closest("tr");
+    if (btn.classList.contains("mais")) {
+      tr.after(criarLinha("00:00"));
+    } else if (btn.classList.contains("menos")) {
+      tr.remove();
+    }
+  });
+
+  irParaSemana(new Date());
+</script>
+
+</body>
+</html>
