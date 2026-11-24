@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Passaporte de Treinamentos - Crachá</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<style>
+  :root { box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  *, *::before, *::after { box-sizing: border-box; }
+  body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: #f2f4f7; color: #222; }
+
+  .app { max-width: 720px; margin: 0 auto; padding: 16px; }
+  h1 { font-size: 20px; margin: 4px 0 14px; }
+  .painel { background: #fff; border-radius: 12px; padding: 16px; box-shadow: 0 1px 4px rgba(0,0,0,.08); }
+  label { display: block; font-weight: bold; font-size: 14px; margin: 4px 0 6px; }
+  input[type=file] { width: 100%; font-size: 15px; }
+  .status { font-size: 14px; color: #555; margin-top: 10px; min-height: 18px; }
+  .ajustes { margin-top: 14px; padding-top: 12px; border-top: 1px solid #e3e6ea; }
+  .ajustes[hidden] { display: none; }
+  .ajustes label output { font-weight: normal; color: #1d4f91; }
+  .ajustes input[type=range] { width: 100%; margin: 0 0 12px; }
+  .linha { display: flex; gap: 8px; margin-top: 14px; }
+  button.sec { font-size: 16px; padding: 12px 18px; border: 0; border-radius: 8px; background: #1d4f91; color: #fff; cursor: pointer; min-height: 46px; }
+  button:disabled { background: #aab; cursor: not-allowed; }
+
+  #resultado { margin-top: 18px; }
+
+  /* Uma pessoa por bloco. Na tela, frente e verso (se houver) lado a lado. */
+  .pessoa { margin-bottom: 24px; }
+  .nome-tela { font-size: 15px; margin: 0 0 8px; color: #333; }
+  .crachas { display: flex; flex-direction: row; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+
+  /* Crachá vertical: 54 x 86 mm, fundo branco, borda borgonha */
+  .crachas .card { width: 54mm; height: 86mm; padding: 5mm 3.5mm 3mm; background: #fff; color: #222; font-family: Arial, sans-serif; font-size: 6pt; overflow: hidden; border: 0.6mm solid #800020; border-radius: 2.5mm; }
+  .crachas .title { font-size: 1.45em; font-weight: 700; text-transform: uppercase; text-align: center; margin: 0 0 1mm; }
+  .crachas .divider { border-top: 0.2mm solid #ccc; margin: 1.2mm 0; }
+  .crachas .info-line { display: block; margin: 0.5mm 0; font-weight: bold; }
+  .crachas .rotulo { display: flex; justify-content: space-between; font-weight: bold; margin: 0.8mm 0; }
+  .crachas .rac-block { margin: 0.8mm 0 1.2mm; }
+  .crachas .rac-header { font-weight: bold; margin: 0.6mm 0 0.4mm; color: #1d4f91; }
+  .crachas .training-item { display: flex; justify-content: space-between; gap: 1.5mm; padding: 0.5mm 0.8mm; margin-bottom: 0.5mm; border-radius: 0.8mm; background-color: #eee; font-size: .9em; font-weight: bold; }
+  .crachas .training-item span:last-child { white-space: nowrap; }
+  .aviso { font-size: 13px; color: #a00; margin: 4px 0 0; }
+
+  @page { size: A4 portrait; margin: 0; }
+  @media print {
+    html, body { background: #fff; }
+    body * { visibility: hidden; }
+    .pessoa, .pessoa * { visibility: visible; }
+    .app > *:not(#resultado) { display: none !important; }
+    #resultado { margin: 0; padding: 0; display: block; }
+    .pessoa { position: relative; width: 210mm; height: 297mm; margin: 0; break-after: page; page-break-after: always; }
+    .pessoa:last-child { break-after: auto; page-break-after: auto; }
+    .crachas { position: absolute; left: 2mm; top: 2mm; display: flex; flex-direction: row; gap: 6mm; align-items: flex-start; }
+    .nome-tela, .aviso { display: none !important; }
+    .crachas .card { break-inside: avoid; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <h1>Passaporte de Treinamentos</h1>
+
+  <div class="painel">
+    <label for="arquivo">Anexe a planilha baixada (.xlsx ou .csv)</label>
+    <input type="file" id="arquivo" accept=".xlsx,.csv">
+    <div class="status" id="statusArquivo"></div>
+
+    <div class="ajustes" id="ajustes" hidden>
+      <label for="rngCab">Tamanho do cabeçalho (nome, matrícula, função…): <output id="valCab">6.5</output> pt</label>
+      <input type="range" id="rngCab" min="3.5" max="9" step="0.25" value="6.5">
+      <label for="rngTrei">Tamanho dos treinamentos: <output id="valTrei">5.8</output> pt</label>
+      <input type="range" id="rngTrei" min="3.5" max="9" step="0.25" value="5.8">
+    </div>
+
+    <div class="linha">
+      <button class="sec" id="imprimir" type="button" hidden>Imprimir tudo</button>
+    </div>
+  </div>
+
+  <div id="resultado"></div>
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const inputArquivo = $('arquivo');
+  const btnImp = $('imprimir');
+  const statusArquivo = $('statusArquivo');
+  const resultado = $('resultado');
+  const ajustes = $('ajustes');
+  const rngCab = $('rngCab');
+  const rngTrei = $('rngTrei');
+
+  let passaportes = [];
+  let tamCab = 6.5;
+  let tamTrei = 5.8;
+
+  // Converte o HTML da planilha em um passaporte pronto para montar o crachá
+  function textoDe(doc, rotulo) {
+    const el = [...doc.querySelectorAll('.info-line')].find(e => e.textContent.includes(rotulo));
+    return el ? el.textContent.replace(rotulo, '').trim() : '';
+  }
+
+  function extrair(bruto) {
+    const doc = new DOMParser().parseFromString(bruto, 'text/html');
+    doc.querySelectorAll('.info-line').forEach(el => {
+      if (el.textContent.includes('VENCIMENTO DA CNH')) {
+        const valor = el.textContent.split(':').slice(1).join(':').trim();
+        if (!valor) el.remove();
+      }
+    });
+    const card = doc.querySelector('.card');
+    return {
+      origem: card,
+      nome: textoDe(doc, 'NOME:'),
+      matricula: textoDe(doc, 'MATRÍCULA:')
+    };
+  }
+
+  function novoLado(verso) {
+    const el = document.createElement('div');
+    el.className = 'card';
+    el.dataset.lado = verso ? 'verso' : 'frente';
+    return el;
+  }
+
+  // Monta o crachá com os tamanhos escolhidos.
+  // usarVerso = false: tudo precisa caber só na frente.
+  // usarVerso = true: o que não couber na frente vai para o verso.
+  function montarLados(p, cr, usarVerso) {
+    cr.innerHTML = '';
+    const frente = novoLado(false);
+    cr.appendChild(frente);
+
+    let verso = null;
+    if (usarVerso) {
+      verso = novoLado(true);
+      cr.appendChild(verso);
+    }
+
+    const origem = p.origem;
+    const cabecalho = [...origem.children].filter(el => !el.classList.contains('rac-block'));
+    const blocos = [...origem.children].filter(el => el.classList.contains('rac-block'));
+
+    const cab = document.createElement('div');
+    cab.className = 'cab';
+    cab.style.fontSize = tamCab + 'pt';
+    cabecalho.forEach(el => cab.appendChild(el.cloneNode(true)));
+    frente.appendChild(cab);
+
+    let noVerso = false;
+    let nVerso = 0;
+    blocos.forEach(b => {
+      const wrap = document.createElement('div');
+      wrap.className = 'treino-wrap';
+      wrap.style.fontSize = tamTrei + 'pt';
+      wrap.appendChild(b.cloneNode(true));
+
+      if (!noVerso) {
+        frente.appendChild(wrap);
+        if (frente.scrollHeight > frente.clientHeight + 1) {
+          frente.removeChild(wrap);
+          noVerso = true;
+        }
+      }
+      if (noVerso && verso) {
+        verso.appendChild(wrap);
+        nVerso++;
+      }
+    });
+
+    // Sem nada no verso, ele não aparece
+    if (verso && nVerso === 0) {
+      verso.remove();
+      verso = null;
+    }
+
+    const frenteOk = frente.scrollHeight <= frente.clientHeight + 1;
+    const versoOk = verso ? verso.scrollHeight <= verso.clientHeight + 1 : false;
+    const cabe = frenteOk && (!noVerso || versoOk);
+    return { cabe };
+  }
+
+  // Cria o bloco de uma pessoa: só frente se couber; senão, usa o verso
+  function renderPessoa(p) {
+    const sec = document.createElement('section');
+    sec.className = 'pessoa';
+    const titulo = document.createElement('h3');
+    titulo.className = 'nome-tela';
+    titulo.textContent = `${p.matricula} - ${p.nome}`;
+    const cr = document.createElement('div');
+    cr.className = 'crachas';
+    sec.append(titulo, cr);
+    resultado.appendChild(sec);
+
+    let res = montarLados(p, cr, false);
+    if (!res.cabe) {
+      res = montarLados(p, cr, true);
+    }
+
+    if (!res.cabe) {
+      const aviso = document.createElement('p');
+      aviso.className = 'aviso';
+      aviso.textContent = 'Não coube nem com o verso neste tamanho. Diminua a fonte.';
+      sec.appendChild(aviso);
+    }
+  }
+
+  function renderTudo() {
+    resultado.innerHTML = '';
+    passaportes.forEach(renderPessoa);
+  }
+
+  rngCab.addEventListener('input', () => {
+    tamCab = parseFloat(rngCab.value);
+    $('valCab').textContent = tamCab;
+    renderTudo();
+  });
+
+  rngTrei.addEventListener('input', () => {
+    tamTrei = parseFloat(rngTrei.value);
+    $('valTrei').textContent = tamTrei;
+    renderTudo();
+  });
+
+  inputArquivo.addEventListener('change', async e => {
+    const arq = e.target.files[0];
+    resultado.innerHTML = '';
+    btnImp.hidden = true;
+    ajustes.hidden = true;
+    passaportes = [];
+    if (!arq) return;
+
+    statusArquivo.textContent = 'Lendo planilha...';
+    try {
+      const wb = XLSX.read(await arq.arrayBuffer(), { type: 'array' });
+      for (const nomeAba of wb.SheetNames) {
+        const linhas = XLSX.utils.sheet_to_json(wb.Sheets[nomeAba], { header: 1, defval: '' });
+        for (const linha of linhas) {
+          for (const celula of linha) {
+            if (typeof celula === 'string' && celula.toUpperCase().includes('PASSAPORTE DE TREINAMENTOS')) {
+              passaportes.push(extrair(celula));
+            }
+          }
+        }
+      }
+      passaportes.sort((a, b) => a.nome.localeCompare(b.nome, 'pt-BR'));
+
+      if (passaportes.length === 0) {
+        statusArquivo.textContent = 'Nenhum passaporte encontrado nesta planilha.';
+        return;
+      }
+      renderTudo();
+      statusArquivo.textContent = `${passaportes.length} passaporte(s) gerado(s) abaixo.`;
+      ajustes.hidden = false;
+      btnImp.hidden = false;
+    } catch (err) {
+      statusArquivo.textContent = 'Não consegui ler esse arquivo. Confira se é uma planilha .xlsx ou .csv.';
+    }
+  });
+
+  btnImp.addEventListener('click', () => window.print());
+</script>
+</body>
+</html>
